@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import javax.validation.Valid;
 import java.util.List;
 
@@ -27,5 +26,12 @@ public class CountryController {
     public ResponseEntity<ApiResponse> addCountry (@RequestBody @Valid Country country) {
         countryService.addCountry(country);
         return new ResponseEntity<>(new ApiResponse(true, "Country has been created."), HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse> deleteCountry (@PathVariable @Valid Long id) {
+        String country_name = countryService.getCountryNameByID(id);
+        countryService.deleteCountry(id);
+        return new ResponseEntity<>(new ApiResponse(true, country_name + " has been deleted."), HttpStatus.CREATED);
     }
 }

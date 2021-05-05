@@ -1,4 +1,8 @@
 package com.backend.xplaza.repository;
 
-public class LocationRepository {
+import com.backend.xplaza.model.Location;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface LocationRepository extends JpaRepository<Location, Long> {
+
 }

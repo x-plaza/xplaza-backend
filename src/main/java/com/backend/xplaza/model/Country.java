@@ -1,7 +1,10 @@
 package com.backend.xplaza.model;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 
@@ -9,6 +12,8 @@ import javax.persistence.*;
 @Entity
 @AllArgsConstructor
 @Table(name="countries")
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+@TypeDef(name = "json", typeClass = JsonStringType.class)
 public class Country {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,33 +23,17 @@ public class Country {
     @Column(name="country_name")
     private String name;
 
-    @Column(name="country_code")
+    @Column(name="iso")
     private String code;
 
-    public Country() {}
+    private String nicename;
+    private String iso3;
+    private String numcode;
+    private int phonecode;
 
-    /*public Country(long id, String name, String code) {
-        super();
-        this.id = id;
-        this.name = name;
-        this.code = code;
-    }
-    public long getId() {
-        return id;
-    }
-    public void setId(long id) {
-        this.id = id;
-    }
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-    public String getCode() {
-        return code;
-    }
-    public void setCode(String code) {
-        this.code = code;
-    }*/
+    /*
+    @OneToMany(mappedBy = "country")
+    private Set<Location> locationSet = new HashSet<Location>();
+    */
+    public Country() {}
 }

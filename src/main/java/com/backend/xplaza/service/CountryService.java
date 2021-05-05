@@ -10,10 +10,19 @@ import java.util.List;
 
 @Service
 public class CountryService {
-    @Autowired private CountryRepository countryRepo;
+    @Autowired
+    private CountryRepository countryRepo;
 
     public void addCountry(Country country) {
         countryRepo.save(country);
+    }
+
+    public String getCountryNameByID(Long id) {
+        return countryRepo.getName(id);
+    }
+
+    public void deleteCountry(Long id) {
+        countryRepo.deleteById(id);
     }
 
     public List<Country> listCountries() {
