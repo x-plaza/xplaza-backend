@@ -1,4 +1,10 @@
 package com.backend.xplaza.repository;
 
-public class ShopRepository {
+import com.backend.xplaza.model.Shop;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+public interface ShopRepository extends JpaRepository<Shop, Long>  {
+    @Query(value = "select shop_name from shops where shop_id = ?1", nativeQuery = true)
+    String getName(Long id);
 }

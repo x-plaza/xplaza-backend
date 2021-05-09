@@ -7,13 +7,16 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-
 @Service
 public class CountryService {
     @Autowired
     private CountryRepository countryRepo;
 
     public void addCountry(Country country) {
+        countryRepo.save(country);
+    }
+
+    public void updateCountry(Country country) {
         countryRepo.save(country);
     }
 

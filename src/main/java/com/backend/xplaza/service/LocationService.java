@@ -17,6 +17,10 @@ public class LocationService {
         locationRepo.save(location);
     }
 
+    public void updateLocation(Location location) {
+        locationRepo.save(location);
+    }
+
     public List<Location> listLocations() {
         return locationRepo.findAll(Sort.by(Sort.Direction.ASC, "name"));
     }

@@ -52,6 +52,12 @@ public class CountryController {
         return new ResponseEntity<>(new ApiResponse(true, "Country has been created."), HttpStatus.CREATED);
     }
 
+    @PutMapping("/update")
+    public ResponseEntity<ApiResponse> updateCountry (@RequestBody @Valid Country country) {
+        countryService.updateCountry(country);
+        return new ResponseEntity<>(new ApiResponse(true, "Country has been updated."), HttpStatus.OK);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse> deleteCountry (@PathVariable @Valid Long id) {
         String country_name = countryService.getCountryNameByID(id);

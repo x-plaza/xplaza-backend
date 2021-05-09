@@ -14,7 +14,6 @@ import javax.validation.Valid;
 import java.util.Date;
 import java.util.List;
 
-
 @RestController
 @RequestMapping("/api/location")
 public class LocationController {
@@ -48,13 +47,19 @@ public class LocationController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ApiResponse> addCountry (@RequestBody @Valid Location location) {
+    public ResponseEntity<ApiResponse> addLocation (@RequestBody @Valid Location location) {
         locationService.addLocation(location);
         return new ResponseEntity<>(new ApiResponse(true, "Location has been created."), HttpStatus.CREATED);
     }
 
+    @PutMapping("/update")
+    public ResponseEntity<ApiResponse> updateLocation (@RequestBody @Valid Location location) {
+        locationService.updateLocation(location);
+        return new ResponseEntity<>(new ApiResponse(true, "Location has been updated."), HttpStatus.OK);
+    }
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse> deleteCountry (@PathVariable @Valid Long id) {
+    public ResponseEntity<ApiResponse> deleteLocation (@PathVariable @Valid Long id) {
         String location_name = locationService.getLocationNameByID(id);
         locationService.deleteLocation(id);
         return new ResponseEntity<>(new ApiResponse(true, location_name + " has been deleted."), HttpStatus.OK);

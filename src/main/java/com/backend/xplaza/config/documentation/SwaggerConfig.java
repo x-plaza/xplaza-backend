@@ -20,13 +20,13 @@ public class SwaggerConfig {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(getApiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.webtutsplus.ecommerce"))
+                .apis(RequestHandlerSelectors.basePackage("com.backend.xplaza"))
                 .paths(PathSelectors.any())
                 .build();
     }
 
     private ApiInfo getApiInfo() {
-        Contact contact = new Contact("Umar Draz", "-", "umar.umar82@gmail.com");
+        Contact contact = new Contact("Mahiuddin Al Kamal", "-", "mahiuddinalkamal@gmail.com");
         return new ApiInfoBuilder()
                 .title("User Profile API")
                 .description("Documentation User profile api")
