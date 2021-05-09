@@ -20,4 +20,12 @@ public class LocationService {
     public List<Location> listLocations() {
         return locationRepo.findAll(Sort.by(Sort.Direction.ASC, "name"));
     }
+
+    public String getLocationNameByID(Long id) {
+        return locationRepo.getName(id);
+    }
+
+    public void deleteLocation(Long id) {
+        locationRepo.deleteById(id);
+    }
 }
