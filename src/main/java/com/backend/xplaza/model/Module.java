@@ -17,13 +17,13 @@ import javax.persistence.*;
 public class Module {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="role_id")
+    @Column(name="module_id")
     private long id;
 
-    @Column(name="role_name")
+    @Column(name="module_name")
     private String name;
 
-    @Column(name="role_description")
+    @Column(name="module_description")
     private String description;
 
     public Module() {}

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,7 +33,7 @@ public class CategoryController {
         response.setHeader("Set-Cookie", "type=ninja");
     }
 
-    @GetMapping(value = { "", "/" })
+    @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getCategories() throws JsonProcessingException {
         start = new Date();
         List<Category> dtos = categoryService.listCategories();

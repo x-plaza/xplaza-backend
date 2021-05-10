@@ -1,4 +1,71 @@
 package com.backend.xplaza.controller;
 
+import com.backend.xplaza.common.ApiResponse;
+import com.backend.xplaza.model.Role;
+import com.backend.xplaza.service.RoleService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.util.Date;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/role")
 public class RoleController {
+    @Autowired
+    private RoleService roleService;
+    private Date start, end;
+    long responseTime;
+
+    @ModelAttribute
+    public void setResponseHeader(HttpServletResponse response) {
+        response.setHeader("Cache-Control", "no-store"); // HTTP 1.1.
+        response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
+        response.setHeader("Expires", "0"); // Proxies.
+        response.setHeader("Content-Type", "application/json");
+        response.setHeader("Set-Cookie", "type=ninja");
+    }
+
+    @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getRoles() throws JsonProcessingException {
+        start = new Date();
+        List<Role> dtos = roleService.listRoles();
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        ObjectMapper mapper = new ObjectMapper();
+        String response= "{\n" +
+                "  \"responseTime\": "+ responseTime + ",\n" +
+                "  \"responseType\": \"Role List\",\n" +
+                "  \"status\": 200,\n" +
+                "  \"response\": \"Success\",\n" +
+                "  \"msg\": \"\",\n" +
+                "  \"data\":"+mapper.writeValueAsString(dtos)+"\n}";
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/add")
+    public ResponseEntity<ApiResponse> addRole (@RequestBody @Valid Role role) {
+        roleService.addRole(role);
+        return new ResponseEntity<>(new ApiResponse(true, "Role has been created."), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<ApiResponse> updateRole (@RequestBody @Valid Role role) {
+        roleService.updateRole(role);
+        return new ResponseEntity<>(new ApiResponse(true, "Role has been updated."), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse> deleteRole (@PathVariable @Valid Long id) {
+        String role_name = roleService.getRoleNameByID(id);
+        roleService.deleteRole(id);
+        return new ResponseEntity<>(new ApiResponse(true, role_name + " has been deleted."), HttpStatus.OK);
+    }
 }

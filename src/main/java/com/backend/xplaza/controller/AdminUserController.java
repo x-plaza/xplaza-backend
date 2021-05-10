@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,8 +33,8 @@ public class AdminUserController {
         response.setHeader("Set-Cookie", "type=ninja");
     }
 
-    @GetMapping(value = { "", "/" })
-    public ResponseEntity<String> getBrands() throws JsonProcessingException {
+    @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getAdminUsers() throws JsonProcessingException {
         start = new Date();
         List<AdminUser> dtos = adminUserService.listAdminUsers();
         end = new Date();
@@ -55,19 +56,19 @@ public class AdminUserController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ApiResponse> addBrand (@RequestBody @Valid AdminUser adminUser) {
+    public ResponseEntity<ApiResponse> addAdminUser (@RequestBody @Valid AdminUser adminUser) {
         adminUserService.addAdminUser(adminUser);
         return new ResponseEntity<>(new ApiResponse(true, "Admin User has been created."), HttpStatus.CREATED);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ApiResponse> updateBrand (@RequestBody @Valid AdminUser adminUser) {
+    public ResponseEntity<ApiResponse> updateAdminUser (@RequestBody @Valid AdminUser adminUser) {
         adminUserService.updateAdminUser(adminUser);
         return new ResponseEntity<>(new ApiResponse(true, "Admin User has been updated."), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse> deleteBrand (@PathVariable @Valid Long id) {
+    public ResponseEntity<ApiResponse> deleteAdminUser (@PathVariable @Valid Long id) {
         String admin_user_name = adminUserService.getAdminUserNameByID(id);
         adminUserService.deleteAdminUser(id);
         return new ResponseEntity<>(new ApiResponse(true, admin_user_name + " has been deleted."), HttpStatus.OK);
