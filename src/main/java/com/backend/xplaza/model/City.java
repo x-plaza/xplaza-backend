@@ -11,27 +11,20 @@ import javax.persistence.*;
 @Data
 @Entity
 @AllArgsConstructor
-@Table(name="locations")
+@Table(name="cities")
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @TypeDef(name = "json", typeClass = JsonStringType.class)
-public class Location {
+public class City {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="location_id")
+    @Column(name="city_id")
     private long id;
 
-    @Column(name="location_name")
+    @Column(name="city_name")
     private String name;
 
-    @Column(name="fk_city_id")
-    private long city_id;
+    @Column(name="fk_country_id")
+    private int country_id;
 
-    /*
-    @ManyToOne
-    @JoinColumn (name="fk_country_id")
-    @JsonBackReference
-    private Country country;
-    */
-
-    public Location() {}
+    public City(){}
 }
