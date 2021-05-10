@@ -3,9 +3,12 @@ package com.backend.xplaza.controller;
 import com.backend.xplaza.common.ApiResponse;
 import com.backend.xplaza.model.Brand;
 import com.backend.xplaza.service.BrandService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,21 +32,23 @@ public class BrandController {
         response.setHeader("Expires", "0"); // Proxies.
         response.setHeader("Content-Type", "application/json");
         response.setHeader("Set-Cookie", "type=ninja");
-        response.setHeader("msg", "");
     }
 
-    @GetMapping(value = { "", "/" })
-    public ResponseEntity<List<Brand>> getBrands() {
+    @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getBrands() throws JsonProcessingException, JSONException {
         start = new Date();
         List<Brand> dtos = brandService.listBrands();
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        HttpHeaders responseHeader = new HttpHeaders();
-        responseHeader.set("responseTime", String.valueOf(responseTime));
-        responseHeader.set("responseType", "Brand List");
-        responseHeader.set("status", String.valueOf(HttpStatus.OK.value()));
-        responseHeader.set("response", "Success");
-        return new ResponseEntity<List<Brand>>(dtos, responseHeader, HttpStatus.OK);
+        ObjectMapper mapper = new ObjectMapper();
+        String response= "{\n" +
+                "  \"responseTime\": "+ responseTime + ",\n" +
+                "  \"responseType\": \"Brand List\",\n" +
+                "  \"status\": 200,\n" +
+                "  \"response\": \"Success\",\n" +
+                "  \"msg\": \"\",\n" +
+                "  \"data\":"+mapper.writeValueAsString(dtos)+"\n}";
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/add")

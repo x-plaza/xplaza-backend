@@ -3,8 +3,9 @@ package com.backend.xplaza.controller;
 import com.backend.xplaza.common.ApiResponse;
 import com.backend.xplaza.model.Shop;
 import com.backend.xplaza.service.ShopService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,17 +35,20 @@ public class ShopController {
     }
 
     @GetMapping(value = { "", "/" })
-    public ResponseEntity<List<Shop>> getShops() {
+    public ResponseEntity<String> getShops() throws JsonProcessingException {
         start = new Date();
         List<Shop> dtos = shopService.listShops();
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        HttpHeaders responseHeader = new HttpHeaders();
-        responseHeader.set("responseTime", String.valueOf(responseTime));
-        responseHeader.set("responseType", "Country List");
-        responseHeader.set("status", String.valueOf(HttpStatus.OK.value()));
-        responseHeader.set("response", "Success");
-        return new ResponseEntity<List<Shop>>(dtos, responseHeader, HttpStatus.OK);
+        ObjectMapper mapper = new ObjectMapper();
+        String response= "{\n" +
+                "  \"responseTime\": "+ responseTime + ",\n" +
+                "  \"responseType\": \"Shop List\",\n" +
+                "  \"status\": 200,\n" +
+                "  \"response\": \"Success\",\n" +
+                "  \"msg\": \"\",\n" +
+                "  \"data\":"+mapper.writeValueAsString(dtos)+"\n}";
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/add")
