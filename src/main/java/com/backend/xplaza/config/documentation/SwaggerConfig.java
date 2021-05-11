@@ -28,7 +28,7 @@ public class SwaggerConfig {
     }
 
     private ApiInfo getApiInfo() {
-        Contact contact = new Contact("Mahiuddin Al Kamal", "-", "mahiuddinalkamal@gmail.com");
+        Contact contact = new Contact("Mahiuddin Al Kamal", "http://mahiuddinalkamal.github.io", "mahiuddinalkamal@gmail.com");
         return new ApiInfoBuilder()
                 .title("X-Plaza API Documentation")
                 .description("Documentation for all X-plaza backend API's")
