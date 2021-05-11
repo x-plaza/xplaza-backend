@@ -7,6 +7,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ModuleService {
@@ -31,5 +32,9 @@ public class ModuleService {
 
     public void deleteModule(Long id) {
         moduleRepo.deleteById(id);
+    }
+
+    public Module listModule(long id) {
+        return moduleRepo.findItemById(id);
     }
 }

@@ -32,4 +32,8 @@ public class ProductVarTypeService {
     public void deleteProductVarType(Long id) {
         prodVarTypeRepo.deleteById(id);
     }
+
+    public ProductVarType listProductVarType(long id) {
+        return prodVarTypeRepo.findItemById(id);
+    }
 }

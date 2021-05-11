@@ -7,4 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query(value = "select product_name from products where product_id = ?1", nativeQuery = true)
     String getName(Long id);
+
+    @Query(value = "select * from products where product_id = ?1", nativeQuery = true)
+    Product findItemById(long id);
 }

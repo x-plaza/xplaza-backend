@@ -7,6 +7,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CurrencyService {
@@ -31,5 +32,9 @@ public class CurrencyService {
 
     public void deleteCurrency(Long id) {
         currencyRepo.deleteById(id);
+    }
+
+    public Currency listCurrency(long id) {
+        return currencyRepo.findItemById(id);
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductService {
@@ -31,5 +32,9 @@ public class ProductService {
 
     public void deleteProduct(Long id) {
         productRepo.deleteById(id);
+    }
+
+    public Product listProduct(long id) {
+        return productRepo.findItemById(id);
     }
 }

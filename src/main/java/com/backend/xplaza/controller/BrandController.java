@@ -51,6 +51,23 @@ public class BrandController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getBrand(@PathVariable @Valid Long id) throws JsonProcessingException {
+        start = new Date();
+        Brand dtos = brandService.listBrand(id);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        ObjectMapper mapper = new ObjectMapper();
+        String response= "{\n" +
+                "  \"responseTime\": "+ responseTime + ",\n" +
+                "  \"responseType\": \"Brand List\",\n" +
+                "  \"status\": 200,\n" +
+                "  \"response\": \"Success\",\n" +
+                "  \"msg\": \"\",\n" +
+                "  \"data\":"+mapper.writeValueAsString(dtos)+"\n}";
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     @PostMapping("/add")
     public ResponseEntity<ApiResponse> addBrand (@RequestBody @Valid Brand brand) {
         brandService.addBrand(brand);

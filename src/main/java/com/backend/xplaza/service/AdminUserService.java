@@ -31,4 +31,8 @@ public class AdminUserService {
     public List<AdminUser> listAdminUsers() {
         return adminUserRepo.findAll();
     }
+
+    public AdminUser listAdminUser(Long id) {
+        return adminUserRepo.findItemById(id);
+    }
 }

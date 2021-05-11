@@ -50,6 +50,23 @@ public class ProductController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getProduct(@PathVariable @Valid Long id) throws JsonProcessingException {
+        start = new Date();
+        Product dtos = productService.listProduct(id);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        ObjectMapper mapper = new ObjectMapper();
+        String response= "{\n" +
+                "  \"responseTime\": "+ responseTime + ",\n" +
+                "  \"responseType\": \"Product List\",\n" +
+                "  \"status\": 200,\n" +
+                "  \"response\": \"Success\",\n" +
+                "  \"msg\": \"\",\n" +
+                "  \"data\":"+mapper.writeValueAsString(dtos)+"\n}";
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     @PostMapping("/add")
     public ResponseEntity<ApiResponse> addProduct (@RequestBody @Valid Product product) {
         productService.addProduct(product);
