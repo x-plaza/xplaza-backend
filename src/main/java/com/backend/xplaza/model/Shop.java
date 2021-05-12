@@ -32,5 +32,10 @@ public class Shop {
     @Column(name="fk_location_id")
     private long location_id;
 
+    /*@ManyToOne
+    @JoinColumn(name="fk_location_id")
+    @JsonIgnore
+    private Location location;*/
+
     public Shop() {}
 }

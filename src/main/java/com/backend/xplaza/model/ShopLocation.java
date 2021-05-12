@@ -11,24 +11,29 @@ import javax.persistence.*;
 @Data
 @Entity
 @AllArgsConstructor
-@Table(name="locations")
+@Table(name="shops")
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @TypeDef(name = "json", typeClass = JsonStringType.class)
-public class Location {
+public class ShopLocation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="location_id")
+    @Column(name="shop_id")
     private long id;
 
-    @Column(name="location_name")
+    @Column(name="shop_name")
     private String name;
 
-    @Column(name="fk_city_id")
-    private long city_id;
+    @Column(name="shop_description")
+    private String description;
 
-    /*@JsonManagedReference
-    @OneToMany(mappedBy = "location")
-    private List<Shop> shops;*/
+    @Column(name="shop_address")
+    private String address;
 
-    public Location() {}
+    @Column(name="fk_location_id")
+    private long location_id;
+
+    @Column(name="location_name")
+    private String location_name;
+
+    public ShopLocation() {}
 }

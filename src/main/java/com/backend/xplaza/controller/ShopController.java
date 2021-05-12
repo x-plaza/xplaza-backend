@@ -2,6 +2,7 @@ package com.backend.xplaza.controller;
 
 import com.backend.xplaza.common.ApiResponse;
 import com.backend.xplaza.model.Shop;
+import com.backend.xplaza.model.ShopLocation;
 import com.backend.xplaza.service.ShopService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,7 +39,7 @@ public class ShopController {
     @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getShops() throws JsonProcessingException {
         start = new Date();
-        List<Shop> dtos = shopService.listShops();
+        List<ShopLocation> dtos = shopService.listShops();
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         ObjectMapper mapper = new ObjectMapper();
@@ -55,7 +56,7 @@ public class ShopController {
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getShop(@PathVariable @Valid Long id) throws JsonProcessingException {
         start = new Date();
-        Shop dtos = shopService.listShop(id);
+        ShopLocation dtos = shopService.listShop(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         ObjectMapper mapper = new ObjectMapper();
