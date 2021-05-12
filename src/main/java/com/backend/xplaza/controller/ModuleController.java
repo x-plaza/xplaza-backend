@@ -70,20 +70,32 @@ public class ModuleController {
 
     @PostMapping("/add")
     public ResponseEntity<ApiResponse> addModule (@RequestBody @Valid Module module) {
+        start = new Date();
         moduleService.addModule(module);
-        return new ResponseEntity<>(new ApiResponse(true, "Module has been created."), HttpStatus.CREATED);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Module", HttpStatus.CREATED.value(),"Success", "Module has been created.","[]"), HttpStatus.CREATED);
+        //return new ResponseEntity<>(new ApiResponse(true, "Module has been created."), HttpStatus.CREATED);
     }
 
     @PutMapping("/update")
     public ResponseEntity<ApiResponse> updateModule (@RequestBody @Valid Module module) {
+        start = new Date();
         moduleService.updateModule(module);
-        return new ResponseEntity<>(new ApiResponse(true, "Module has been updated."), HttpStatus.OK);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Module", HttpStatus.OK.value(),"Success", "Module has been updated.","[]"), HttpStatus.OK);
+        //return new ResponseEntity<>(new ApiResponse(true, "Module has been updated."), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse> deleteModule (@PathVariable @Valid Long id) {
         String module_name = moduleService.getModuleNameByID(id);
+        start = new Date();
         moduleService.deleteModule(id);
-        return new ResponseEntity<>(new ApiResponse(true, module_name + " has been deleted."), HttpStatus.OK);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Module", HttpStatus.OK.value(),"Success", module_name + " has been deleted.","[]"), HttpStatus.OK);
+        //return new ResponseEntity<>(new ApiResponse(true, module_name + " has been deleted."), HttpStatus.OK);
     }
 }

@@ -71,20 +71,32 @@ public class ShopController {
 
     @PostMapping("/add")
     public ResponseEntity<ApiResponse> addShop (@RequestBody @Valid Shop shop) {
+        start = new Date();
         shopService.addShop(shop);
-        return new ResponseEntity<>(new ApiResponse(true, "Shop has been created."), HttpStatus.CREATED);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Shop", HttpStatus.CREATED.value(),"Success", "Shop has been created.","[]"), HttpStatus.CREATED);
+        //return new ResponseEntity<>(new ApiResponse(true, "Shop has been created."), HttpStatus.CREATED);
     }
 
     @PutMapping("/update")
     public ResponseEntity<ApiResponse> updateShop (@RequestBody @Valid Shop shop) {
+        start = new Date();
         shopService.updateShop(shop);
-        return new ResponseEntity<>(new ApiResponse(true, "Shop has been updated."), HttpStatus.OK);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Shop", HttpStatus.OK.value(),"Success", "Shop has been updated.","[]"), HttpStatus.OK);
+        //return new ResponseEntity<>(new ApiResponse(true, "Shop has been updated."), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse> deleteShop (@PathVariable @Valid Long id) {
         String shop_name = shopService.getShopNameByID(id);
+        start = new Date();
         shopService.deleteShop(id);
-        return new ResponseEntity<>(new ApiResponse(true, shop_name + " has been deleted."), HttpStatus.OK);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Shop", HttpStatus.OK.value(),"Success", shop_name + " has been deleted.","[]"), HttpStatus.OK);
+        //return new ResponseEntity<>(new ApiResponse(true, shop_name + " has been deleted."), HttpStatus.OK);
     }
 }

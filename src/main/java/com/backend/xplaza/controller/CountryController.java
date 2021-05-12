@@ -69,20 +69,32 @@ public class CountryController {
 
     @PostMapping("/add")
     public ResponseEntity<ApiResponse> addCountry (@RequestBody @Valid Country country) {
+        start = new Date();
         countryService.addCountry(country);
-        return new ResponseEntity<>(new ApiResponse(true, "Country has been created."), HttpStatus.CREATED);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Country", HttpStatus.CREATED.value(),"Success", "Country has been created.","[]"), HttpStatus.CREATED);
+        //return new ResponseEntity<>(new ApiResponse(true, "Country has been created."), HttpStatus.CREATED);
     }
 
     @PutMapping("/update")
     public ResponseEntity<ApiResponse> updateCountry (@RequestBody @Valid Country country) {
+        start = new Date();
         countryService.updateCountry(country);
-        return new ResponseEntity<>(new ApiResponse(true, "Country has been updated."), HttpStatus.OK);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Country", HttpStatus.OK.value(),"Success", "Country has been updated.","[]"), HttpStatus.OK);
+        //return new ResponseEntity<>(new ApiResponse(true, "Country has been updated."), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse> deleteCountry (@PathVariable @Valid Long id) {
         String country_name = countryService.getCountryNameByID(id);
+        start = new Date();
         countryService.deleteCountry(id);
-        return new ResponseEntity<>(new ApiResponse(true, country_name + " has been deleted."), HttpStatus.OK);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Country", HttpStatus.OK.value(),"Success", country_name + " has been deleted.","[]"), HttpStatus.OK);
+        //return new ResponseEntity<>(new ApiResponse(true, country_name + " has been deleted."), HttpStatus.OK);
     }
 }

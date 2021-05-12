@@ -69,20 +69,32 @@ public class CityController {
 
     @PostMapping("/add")
     public ResponseEntity<ApiResponse> addCity (@RequestBody @Valid City city) {
+        start = new Date();
         cityService.addCity(city);
-        return new ResponseEntity<>(new ApiResponse(true, "City has been created."), HttpStatus.CREATED);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add City", HttpStatus.CREATED.value(),"Success", "City has been created.","[]"), HttpStatus.CREATED);
+        //return new ResponseEntity<>(new ApiResponse(true, "City has been created."), HttpStatus.CREATED);
     }
 
     @PutMapping("/update")
     public ResponseEntity<ApiResponse> updateCity (@RequestBody @Valid City city) {
+        start = new Date();
         cityService.updateCity(city);
-        return new ResponseEntity<>(new ApiResponse(true, "City has been updated."), HttpStatus.OK);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Update City", HttpStatus.OK.value(),"Success", "City has been updated.","[]"), HttpStatus.OK);
+        //return new ResponseEntity<>(new ApiResponse(true, "City has been updated."), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse> deleteCity (@PathVariable @Valid Long id) {
         String city_name = cityService.getCityNameByID(id);
+        start = new Date();
         cityService.deleteCity(id);
-        return new ResponseEntity<>(new ApiResponse(true, city_name + " has been deleted."), HttpStatus.OK);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete City", HttpStatus.OK.value(),"Success", city_name + " has been deleted.","[]"), HttpStatus.OK);
+        //return new ResponseEntity<>(new ApiResponse(true, city_name + " has been deleted."), HttpStatus.OK);
     }
 }

@@ -70,20 +70,32 @@ public class ProductVarTypeController {
 
     @PostMapping("/add")
     public ResponseEntity<ApiResponse> addProductVarType (@RequestBody @Valid ProductVarType productVarType) {
+        start = new Date();
         prodVarTypeService.addProductVarType(productVarType);
-        return new ResponseEntity<>(new ApiResponse(true, "Product Variation Type has been created."), HttpStatus.CREATED);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Product Variation Type", HttpStatus.CREATED.value(),"Success", "Product Variation Type has been created.","[]"), HttpStatus.CREATED);
+        //return new ResponseEntity<>(new ApiResponse(true, "Product Variation Type has been created."), HttpStatus.CREATED);
     }
 
     @PutMapping("/update")
     public ResponseEntity<ApiResponse> updateProductVarType (@RequestBody @Valid ProductVarType productVarType) {
+        start = new Date();
         prodVarTypeService.updateProductVarType(productVarType);
-        return new ResponseEntity<>(new ApiResponse(true, "Product Variation Type has been updated."), HttpStatus.OK);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Product Variation Type", HttpStatus.OK.value(),"Success", "Product Variation Type has been updated.","[]"), HttpStatus.OK);
+        //return new ResponseEntity<>(new ApiResponse(true, "Product Variation Type has been updated."), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse> deleteProductVarType (@PathVariable @Valid Long id) {
         String prod_var_type_name = prodVarTypeService.getProductVarTypeNameByID(id);
+        start = new Date();
         prodVarTypeService.deleteProductVarType(id);
-        return new ResponseEntity<>(new ApiResponse(true, prod_var_type_name + " has been deleted."), HttpStatus.OK);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Product Variation Type", HttpStatus.OK.value(),"Success", prod_var_type_name + " has been deleted.","[]"), HttpStatus.OK);
+        //return new ResponseEntity<>(new ApiResponse(true, prod_var_type_name + " has been deleted."), HttpStatus.OK);
     }
 }

@@ -70,20 +70,32 @@ public class BrandController {
 
     @PostMapping("/add")
     public ResponseEntity<ApiResponse> addBrand (@RequestBody @Valid Brand brand) {
+        start = new Date();
         brandService.addBrand(brand);
-        return new ResponseEntity<>(new ApiResponse(true, "Brand has been created."), HttpStatus.CREATED);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Brand", HttpStatus.CREATED.value(),"Success", "Brand has been created.","[]"), HttpStatus.CREATED);
+        //return new ResponseEntity<>(new ApiResponse(true, "Brand has been created."), HttpStatus.CREATED);
     }
 
     @PutMapping("/update")
     public ResponseEntity<ApiResponse> updateBrand (@RequestBody @Valid Brand brand) {
+        start = new Date();
         brandService.updateBrand(brand);
-        return new ResponseEntity<>(new ApiResponse(true, "Brand has been updated."), HttpStatus.OK);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Brand", HttpStatus.OK.value(),"Success", "Brand has been updated.","[]"), HttpStatus.OK);
+        //return new ResponseEntity<>(new ApiResponse(true, "Brand has been updated."), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse> deleteBrand (@PathVariable @Valid Long id) {
         String brand_name = brandService.getBrandNameByID(id);
+        start = new Date();
         brandService.deleteBrand(id);
-        return new ResponseEntity<>(new ApiResponse(true, brand_name + " has been deleted."), HttpStatus.OK);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Brand", HttpStatus.OK.value(),"Success", brand_name + " has been deleted.","[]"), HttpStatus.OK);
+        //return new ResponseEntity<>(new ApiResponse(true, brand_name + " has been deleted."), HttpStatus.OK);
     }
 }

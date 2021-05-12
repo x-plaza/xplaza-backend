@@ -70,20 +70,32 @@ public class CurrencyController {
 
     @PostMapping("/add")
     public ResponseEntity<ApiResponse> addCurrency (@RequestBody @Valid Currency brand) {
+        start = new Date();
         currencyService.addCurrency(brand);
-        return new ResponseEntity<>(new ApiResponse(true, "Currency has been created."), HttpStatus.CREATED);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Currency", HttpStatus.CREATED.value(),"Success", "Currency has been created.","[]"), HttpStatus.CREATED);
+        //return new ResponseEntity<>(new ApiResponse(true, "Currency has been created."), HttpStatus.CREATED);
     }
 
     @PutMapping("/update")
     public ResponseEntity<ApiResponse> updateCurrency (@RequestBody @Valid Currency brand) {
+        start = new Date();
         currencyService.updateCurrency(brand);
-        return new ResponseEntity<>(new ApiResponse(true, "Currency has been updated."), HttpStatus.OK);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Currency", HttpStatus.OK.value(),"Success", "Currency has been updated.","[]"), HttpStatus.OK);
+        //return new ResponseEntity<>(new ApiResponse(true, "Currency has been updated."), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse> deleteCurrency (@PathVariable @Valid Long id) {
         String currency_name = currencyService.getCurrencyNameByID(id);
+        start = new Date();
         currencyService.deleteCurrency(id);
-        return new ResponseEntity<>(new ApiResponse(true, currency_name + " has been deleted."), HttpStatus.OK);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Currency", HttpStatus.OK.value(),"Success", currency_name + " has been deleted.","[]"), HttpStatus.OK);
+        //return new ResponseEntity<>(new ApiResponse(true, currency_name + " has been deleted."), HttpStatus.OK);
     }
 }

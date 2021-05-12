@@ -69,20 +69,32 @@ public class LocationController {
 
     @PostMapping("/add")
     public ResponseEntity<ApiResponse> addLocation (@RequestBody @Valid Location location) {
+        start = new Date();
         locationService.addLocation(location);
-        return new ResponseEntity<>(new ApiResponse(true, "Location has been created."), HttpStatus.CREATED);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Location", HttpStatus.CREATED.value(),"Success", "Location has been created.","[]"), HttpStatus.CREATED);
+        //return new ResponseEntity<>(new ApiResponse(true, "Location has been created."), HttpStatus.CREATED);
     }
 
     @PutMapping("/update")
     public ResponseEntity<ApiResponse> updateLocation (@RequestBody @Valid Location location) {
+        start = new Date();
         locationService.updateLocation(location);
-        return new ResponseEntity<>(new ApiResponse(true, "Location has been updated."), HttpStatus.OK);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Location", HttpStatus.OK.value(),"Success", "Location has been updated.","[]"), HttpStatus.OK);
+        //return new ResponseEntity<>(new ApiResponse(true, "Location has been updated."), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse> deleteLocation (@PathVariable @Valid Long id) {
         String location_name = locationService.getLocationNameByID(id);
+        start = new Date();
         locationService.deleteLocation(id);
-        return new ResponseEntity<>(new ApiResponse(true, location_name + " has been deleted."), HttpStatus.OK);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Location", HttpStatus.OK.value(),"Success", location_name + " has been deleted.","[]"), HttpStatus.OK);
+        //return new ResponseEntity<>(new ApiResponse(true, location_name + " has been deleted."), HttpStatus.OK);
     }
 }

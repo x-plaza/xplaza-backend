@@ -3,20 +3,20 @@ package com.backend.xplaza.common;
 import java.time.LocalDateTime;
 
 public class ApiResponse {
-    private final boolean success;
-    private final String message;
+    public long responseTime;
+    public String responseType;
+    public int status;
+    public String response;
+    public String message;
+    public String data;
 
-    public ApiResponse(boolean success, String message) {
-        this.success = success;
+    public ApiResponse(long responseTime, String responseType, int status, String response, String message, String data) {
+        this.responseTime = responseTime;
+        this.responseType = responseType;
+        this.status = status;
+        this.response = response;
         this.message = message;
-    }
-
-    public boolean isSuccess() {
-        return success;
-    }
-
-    public String getMessage() {
-        return message;
+        this.data = data;
     }
 
     public String getTimestamp() {
