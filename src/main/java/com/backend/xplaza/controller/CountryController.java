@@ -73,7 +73,7 @@ public class CountryController {
         countryService.addCountry(country);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Country", HttpStatus.CREATED.value(),"Success", "Country has been created.","[]"), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Country", HttpStatus.CREATED.value(),"Success", "Country has been created.",null), HttpStatus.CREATED);
         //return new ResponseEntity<>(new ApiResponse(true, "Country has been created."), HttpStatus.CREATED);
     }
 
@@ -83,7 +83,7 @@ public class CountryController {
         countryService.updateCountry(country);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Country", HttpStatus.OK.value(),"Success", "Country has been updated.","[]"), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Country", HttpStatus.OK.value(),"Success", "Country has been updated.",null), HttpStatus.OK);
         //return new ResponseEntity<>(new ApiResponse(true, "Country has been updated."), HttpStatus.OK);
     }
 
@@ -94,7 +94,7 @@ public class CountryController {
         countryService.deleteCountry(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Country", HttpStatus.OK.value(),"Success", country_name + " has been deleted.","[]"), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Country", HttpStatus.OK.value(),"Success", country_name + " has been deleted.",null), HttpStatus.OK);
         //return new ResponseEntity<>(new ApiResponse(true, country_name + " has been deleted."), HttpStatus.OK);
     }
 }

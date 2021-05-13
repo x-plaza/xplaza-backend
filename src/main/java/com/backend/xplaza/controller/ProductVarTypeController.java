@@ -74,7 +74,7 @@ public class ProductVarTypeController {
         prodVarTypeService.addProductVarType(productVarType);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Product Variation Type", HttpStatus.CREATED.value(),"Success", "Product Variation Type has been created.","[]"), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Product Variation Type", HttpStatus.CREATED.value(),"Success", "Product Variation Type has been created.",null), HttpStatus.CREATED);
         //return new ResponseEntity<>(new ApiResponse(true, "Product Variation Type has been created."), HttpStatus.CREATED);
     }
 
@@ -84,7 +84,7 @@ public class ProductVarTypeController {
         prodVarTypeService.updateProductVarType(productVarType);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Product Variation Type", HttpStatus.OK.value(),"Success", "Product Variation Type has been updated.","[]"), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Product Variation Type", HttpStatus.OK.value(),"Success", "Product Variation Type has been updated.",null), HttpStatus.OK);
         //return new ResponseEntity<>(new ApiResponse(true, "Product Variation Type has been updated."), HttpStatus.OK);
     }
 
@@ -95,7 +95,7 @@ public class ProductVarTypeController {
         prodVarTypeService.deleteProductVarType(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Product Variation Type", HttpStatus.OK.value(),"Success", prod_var_type_name + " has been deleted.","[]"), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Product Variation Type", HttpStatus.OK.value(),"Success", prod_var_type_name + " has been deleted.",null), HttpStatus.OK);
         //return new ResponseEntity<>(new ApiResponse(true, prod_var_type_name + " has been deleted."), HttpStatus.OK);
     }
 }

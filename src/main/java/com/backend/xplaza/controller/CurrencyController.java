@@ -74,7 +74,7 @@ public class CurrencyController {
         currencyService.addCurrency(brand);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Currency", HttpStatus.CREATED.value(),"Success", "Currency has been created.","[]"), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Currency", HttpStatus.CREATED.value(),"Success", "Currency has been created.",null), HttpStatus.CREATED);
         //return new ResponseEntity<>(new ApiResponse(true, "Currency has been created."), HttpStatus.CREATED);
     }
 
@@ -84,7 +84,7 @@ public class CurrencyController {
         currencyService.updateCurrency(brand);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Currency", HttpStatus.OK.value(),"Success", "Currency has been updated.","[]"), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Currency", HttpStatus.OK.value(),"Success", "Currency has been updated.",null), HttpStatus.OK);
         //return new ResponseEntity<>(new ApiResponse(true, "Currency has been updated."), HttpStatus.OK);
     }
 
@@ -95,7 +95,7 @@ public class CurrencyController {
         currencyService.deleteCurrency(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Currency", HttpStatus.OK.value(),"Success", currency_name + " has been deleted.","[]"), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Currency", HttpStatus.OK.value(),"Success", currency_name + " has been deleted.",null), HttpStatus.OK);
         //return new ResponseEntity<>(new ApiResponse(true, currency_name + " has been deleted."), HttpStatus.OK);
     }
 }

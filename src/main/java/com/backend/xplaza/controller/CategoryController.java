@@ -73,7 +73,7 @@ public class CategoryController {
         categoryService.addCategory(category);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Category", HttpStatus.CREATED.value(),"Success", "Category has been created.","[]"), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Category", HttpStatus.CREATED.value(),"Success", "Category has been created.",null), HttpStatus.CREATED);
         //return new ResponseEntity<>(new ApiResponse(true, "Category has been created."), HttpStatus.CREATED);
     }
 
@@ -83,7 +83,7 @@ public class CategoryController {
         categoryService.updateCategory(category);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Category", HttpStatus.OK.value(),"Success", "Category has been updated.","[]"), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Category", HttpStatus.OK.value(),"Success", "Category has been updated.",null), HttpStatus.OK);
         //return new ResponseEntity<>(new ApiResponse(true, "Category has been updated."), HttpStatus.OK);
     }
 
@@ -94,7 +94,7 @@ public class CategoryController {
         categoryService.deleteCategory(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Category", HttpStatus.OK.value(),"Success", category_name + " has been deleted.","[]"), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Category", HttpStatus.OK.value(),"Success", category_name + " has been deleted.",null), HttpStatus.OK);
         //return new ResponseEntity<>(new ApiResponse(true, category_name + " has been deleted."), HttpStatus.OK);
     }
 }

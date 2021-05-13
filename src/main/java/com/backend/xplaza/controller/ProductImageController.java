@@ -73,7 +73,7 @@ public class ProductImageController {
         productImgService.addProductImage(productImg);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Product Image", HttpStatus.CREATED.value(),"Success", "Product Image has been created.","[]"), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Product Image", HttpStatus.CREATED.value(),"Success", "Product Image has been created.",null), HttpStatus.CREATED);
         //return new ResponseEntity<>(new ApiResponse(true, "Product has been created."), HttpStatus.CREATED);
     }
 
@@ -83,7 +83,7 @@ public class ProductImageController {
         productImgService.updateProductImage(productImg);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Product Image", HttpStatus.OK.value(),"Success", "Product Image has been updated.","[]"), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Product Image", HttpStatus.OK.value(),"Success", "Product Image has been updated.",null), HttpStatus.OK);
         //return new ResponseEntity<>(new ApiResponse(true, "Product has been updated."), HttpStatus.OK);
     }
 
@@ -94,7 +94,7 @@ public class ProductImageController {
         productImgService.deleteProductImage(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Product Image", HttpStatus.OK.value(),"Success", product_image_name + " has been deleted.","[]"), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Product Image", HttpStatus.OK.value(),"Success", product_image_name + " has been deleted.",null), HttpStatus.OK);
         //return new ResponseEntity<>(new ApiResponse(true, product_name + " has been deleted."), HttpStatus.OK);
     }
 }

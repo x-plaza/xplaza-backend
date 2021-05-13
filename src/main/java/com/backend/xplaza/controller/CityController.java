@@ -73,7 +73,7 @@ public class CityController {
         cityService.addCity(city);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Add City", HttpStatus.CREATED.value(),"Success", "City has been created.","[]"), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add City", HttpStatus.CREATED.value(),"Success", "City has been created.",null), HttpStatus.CREATED);
         //return new ResponseEntity<>(new ApiResponse(true, "City has been created."), HttpStatus.CREATED);
     }
 
@@ -83,7 +83,7 @@ public class CityController {
         cityService.updateCity(city);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Update City", HttpStatus.OK.value(),"Success", "City has been updated.","[]"), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Update City", HttpStatus.OK.value(),"Success", "City has been updated.",null), HttpStatus.OK);
         //return new ResponseEntity<>(new ApiResponse(true, "City has been updated."), HttpStatus.OK);
     }
 
@@ -94,7 +94,7 @@ public class CityController {
         cityService.deleteCity(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete City", HttpStatus.OK.value(),"Success", city_name + " has been deleted.","[]"), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete City", HttpStatus.OK.value(),"Success", city_name + " has been deleted.",null), HttpStatus.OK);
         //return new ResponseEntity<>(new ApiResponse(true, city_name + " has been deleted."), HttpStatus.OK);
     }
 }

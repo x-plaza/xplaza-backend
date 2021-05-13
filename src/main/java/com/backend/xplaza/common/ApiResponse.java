@@ -1,7 +1,10 @@
 package com.backend.xplaza.common;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+
 import java.time.LocalDateTime;
 
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class ApiResponse {
     public long responseTime;
     public String responseType;

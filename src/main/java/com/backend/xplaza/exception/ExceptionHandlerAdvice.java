@@ -17,33 +17,33 @@ public class ExceptionHandlerAdvice {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ApiResponse> conflict(DataIntegrityViolationException ex){
         String message = getMostSpecificMessage(ex);
-        return new ResponseEntity<ApiResponse>(new ApiResponse(0, "", HttpStatus.CONFLICT.value(),"Failed", message,"[]"), HttpStatus.CONFLICT);
+        return new ResponseEntity<ApiResponse>(new ApiResponse(0, "", HttpStatus.CONFLICT.value(),"Failed", message,null), HttpStatus.CONFLICT);
     }
 
 	@ExceptionHandler(AccessDeniedException.class)
 	public ResponseEntity<ApiResponse> accessDenied(AccessDeniedException ex){
 		String message = ex.getMessage();
-		return new ResponseEntity<ApiResponse>(new ApiResponse(0, "", HttpStatus.FORBIDDEN.value(),"Failed", message,"[]"), HttpStatus.FORBIDDEN);
+		return new ResponseEntity<ApiResponse>(new ApiResponse(0, "", HttpStatus.FORBIDDEN.value(),"Failed", message,null), HttpStatus.FORBIDDEN);
 	}
 
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<ApiResponse> validationException(ValidationException ex){
         String message = ex.getMessage();
-        return new ResponseEntity<ApiResponse>(new ApiResponse(0, "", HttpStatus.UNPROCESSABLE_ENTITY.value(),"Failed", message,"[]"), HttpStatus.UNPROCESSABLE_ENTITY);
+        return new ResponseEntity<ApiResponse>(new ApiResponse(0, "", HttpStatus.UNPROCESSABLE_ENTITY.value(),"Failed", message,null), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ApiResponse> methodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex){
         ex.printStackTrace();
         String message = ex.getMessage();
-        return new ResponseEntity<ApiResponse>(new ApiResponse(0, "", HttpStatus.INTERNAL_SERVER_ERROR.value(),"Failed", message,"[]"), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<ApiResponse>(new ApiResponse(0, "", HttpStatus.INTERNAL_SERVER_ERROR.value(),"Failed", message,null), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse> unhandledExceptions(Exception ex){
         String message = NestedExceptionUtils.getMostSpecificCause(ex).getMessage();
         ex.printStackTrace();
-        return new ResponseEntity<ApiResponse>(new ApiResponse(0, "", HttpStatus.INTERNAL_SERVER_ERROR.value(),"Failed", message,"[]"), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<ApiResponse>(new ApiResponse(0, "", HttpStatus.INTERNAL_SERVER_ERROR.value(),"Failed", message,null), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private String getMostSpecificMessage(DataIntegrityViolationException ex) {

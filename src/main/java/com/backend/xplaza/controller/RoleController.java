@@ -73,7 +73,7 @@ public class RoleController {
         roleService.addRole(role);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Role", HttpStatus.CREATED.value(),"Success", "Role has been created.","[]"), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Role", HttpStatus.CREATED.value(),"Success", "Role has been created.",null), HttpStatus.CREATED);
         //return new ResponseEntity<>(new ApiResponse(true, "Role has been created."), HttpStatus.CREATED);
     }
 
@@ -83,7 +83,7 @@ public class RoleController {
         roleService.updateRole(role);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Role", HttpStatus.OK.value(),"Success", "Role has been updated.","[]"), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Role", HttpStatus.OK.value(),"Success", "Role has been updated.",null), HttpStatus.OK);
         //return new ResponseEntity<>(new ApiResponse(true, "Role has been updated."), HttpStatus.OK);
     }
 
@@ -94,7 +94,7 @@ public class RoleController {
         roleService.deleteRole(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Role", HttpStatus.OK.value(),"Success", role_name + " has been deleted.","[]"), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Role", HttpStatus.OK.value(),"Success", role_name + " has been deleted.",null), HttpStatus.OK);
         //return new ResponseEntity<>(new ApiResponse(true, role_name + " has been deleted."), HttpStatus.OK);
     }
 }
