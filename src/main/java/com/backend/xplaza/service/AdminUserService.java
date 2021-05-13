@@ -1,6 +1,8 @@
 package com.backend.xplaza.service;
 
 import com.backend.xplaza.model.AdminUser;
+import com.backend.xplaza.model.AdminUserList;
+import com.backend.xplaza.repository.AdminUserListRepository;
 import com.backend.xplaza.repository.AdminUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,6 +13,9 @@ import java.util.List;
 public class AdminUserService {
     @Autowired
     private AdminUserRepository adminUserRepo;
+
+    @Autowired
+    private AdminUserListRepository adminUserListRepo;
 
     public void addAdminUser(AdminUser adminUser) {
         adminUserRepo.save(adminUser);
@@ -28,11 +33,11 @@ public class AdminUserService {
         adminUserRepo.deleteById(id);
     }
 
-    public List<AdminUser> listAdminUsers() {
-        return adminUserRepo.findAll();
+    public List<AdminUserList> listAdminUsers() {
+        return adminUserListRepo.findAllItem();
     }
 
-    public AdminUser listAdminUser(Long id) {
-        return adminUserRepo.findItemById(id);
+    public AdminUserList listAdminUser(Long id) {
+        return adminUserListRepo.findItemById(id);
     }
 }

@@ -14,7 +14,7 @@ import javax.persistence.*;
 @Table(name="shops")
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @TypeDef(name = "json", typeClass = JsonStringType.class)
-public class ShopLocation {
+public class ShopList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="shop_id")
@@ -35,5 +35,5 @@ public class ShopLocation {
     @Column(name="location_name")
     private String location_name;
 
-    public ShopLocation() {}
+    public ShopList() {}
 }

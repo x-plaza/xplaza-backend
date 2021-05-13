@@ -1,9 +1,8 @@
 package com.backend.xplaza.controller;
 
 import com.backend.xplaza.common.ApiResponse;
-import com.backend.xplaza.model.Shop;
-import com.backend.xplaza.model.ShopList;
-import com.backend.xplaza.service.ShopService;
+import com.backend.xplaza.model.ProductImage;
+import com.backend.xplaza.service.ProductImageService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +16,11 @@ import javax.validation.Valid;
 import java.util.Date;
 import java.util.List;
 
-
 @RestController
-@RequestMapping("/api/shop")
-public class ShopController {
+@RequestMapping("/api/productimage")
+public class ProductImageController {
     @Autowired
-    private ShopService shopService;
+    private ProductImageService productImgService;
     private Date start, end;
     long responseTime;
 
@@ -33,19 +31,18 @@ public class ShopController {
         response.setHeader("Expires", "0"); // Proxies.
         response.setHeader("Content-Type", "application/json");
         response.setHeader("Set-Cookie", "type=ninja");
-        response.setHeader("msg", "");
     }
 
     @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getShops() throws JsonProcessingException {
+    public ResponseEntity<String> getProductImages() throws JsonProcessingException {
         start = new Date();
-        List<ShopList> dtos = shopService.listShops();
+        List<ProductImage> dtos = productImgService.listProductImages();
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         ObjectMapper mapper = new ObjectMapper();
         String response= "{\n" +
                 "  \"responseTime\": "+ responseTime + ",\n" +
-                "  \"responseType\": \"Shop List\",\n" +
+                "  \"responseType\": \"Product Image List\",\n" +
                 "  \"status\": 200,\n" +
                 "  \"response\": \"Success\",\n" +
                 "  \"msg\": \"\",\n" +
@@ -54,15 +51,15 @@ public class ShopController {
     }
 
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getShop(@PathVariable @Valid Long id) throws JsonProcessingException {
+    public ResponseEntity<String> getProductImage(@PathVariable @Valid Long id) throws JsonProcessingException {
         start = new Date();
-        ShopList dtos = shopService.listShop(id);
+        ProductImage dtos = productImgService.listProductImage(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         ObjectMapper mapper = new ObjectMapper();
         String response= "{\n" +
                 "  \"responseTime\": "+ responseTime + ",\n" +
-                "  \"responseType\": \"Shop List\",\n" +
+                "  \"responseType\": \"Product Image List\",\n" +
                 "  \"status\": 200,\n" +
                 "  \"response\": \"Success\",\n" +
                 "  \"msg\": \"\",\n" +
@@ -71,33 +68,33 @@ public class ShopController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ApiResponse> addShop (@RequestBody @Valid Shop shop) {
+    public ResponseEntity<ApiResponse> addProductImage (@RequestBody @Valid ProductImage productImg) {
         start = new Date();
-        shopService.addShop(shop);
+        productImgService.addProductImage(productImg);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Shop", HttpStatus.CREATED.value(),"Success", "Shop has been created.","[]"), HttpStatus.CREATED);
-        //return new ResponseEntity<>(new ApiResponse(true, "Shop has been created."), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Product Image", HttpStatus.CREATED.value(),"Success", "Product Image has been created.","[]"), HttpStatus.CREATED);
+        //return new ResponseEntity<>(new ApiResponse(true, "Product has been created."), HttpStatus.CREATED);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ApiResponse> updateShop (@RequestBody @Valid Shop shop) {
+    public ResponseEntity<ApiResponse> updateProductImage (@RequestBody @Valid ProductImage productImg) {
         start = new Date();
-        shopService.updateShop(shop);
+        productImgService.updateProductImage(productImg);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Shop", HttpStatus.OK.value(),"Success", "Shop has been updated.","[]"), HttpStatus.OK);
-        //return new ResponseEntity<>(new ApiResponse(true, "Shop has been updated."), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Product Image", HttpStatus.OK.value(),"Success", "Product Image has been updated.","[]"), HttpStatus.OK);
+        //return new ResponseEntity<>(new ApiResponse(true, "Product has been updated."), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse> deleteShop (@PathVariable @Valid Long id) {
-        String shop_name = shopService.getShopNameByID(id);
+    public ResponseEntity<ApiResponse> deleteProductImage (@PathVariable @Valid Long id) {
+        String product_image_name = productImgService.getProductImageNameByID(id);
         start = new Date();
-        shopService.deleteShop(id);
+        productImgService.deleteProductImage(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Shop", HttpStatus.OK.value(),"Success", shop_name + " has been deleted.","[]"), HttpStatus.OK);
-        //return new ResponseEntity<>(new ApiResponse(true, shop_name + " has been deleted."), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Product Image", HttpStatus.OK.value(),"Success", product_image_name + " has been deleted.","[]"), HttpStatus.OK);
+        //return new ResponseEntity<>(new ApiResponse(true, product_name + " has been deleted."), HttpStatus.OK);
     }
 }

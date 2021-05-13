@@ -10,4 +10,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Query(value = "select * from products where product_id = ?1", nativeQuery = true)
     Product findItemById(long id);
+
+    @Query(value = "SELECT product_id \n" +
+            "FROM products \n" +
+            "ORDER BY product_id DESC \n" +
+            "LIMIT 1", nativeQuery = true)
+    Long getMaxID();
 }

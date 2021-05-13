@@ -2,6 +2,7 @@ package com.backend.xplaza.controller;
 
 import com.backend.xplaza.common.ApiResponse;
 import com.backend.xplaza.model.Product;
+import com.backend.xplaza.model.ProductList;
 import com.backend.xplaza.service.ProductService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,7 +37,7 @@ public class ProductController {
     @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getProducts() throws JsonProcessingException {
         start = new Date();
-        List<Product> dtos = productService.listProducts();
+        List<ProductList> dtos = productService.listProducts();
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         ObjectMapper mapper = new ObjectMapper();
@@ -53,7 +54,7 @@ public class ProductController {
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getProduct(@PathVariable @Valid Long id) throws JsonProcessingException {
         start = new Date();
-        Product dtos = productService.listProduct(id);
+        ProductList dtos = productService.listProduct(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         ObjectMapper mapper = new ObjectMapper();
@@ -69,11 +70,12 @@ public class ProductController {
 
     @PostMapping("/add")
     public ResponseEntity<ApiResponse> addProduct (@RequestBody @Valid Product product) {
+        Long product_id = productService.getMaxID();
         start = new Date();
         productService.addProduct(product);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Product", HttpStatus.CREATED.value(),"Success", "Product has been created.","[]"), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Product", HttpStatus.CREATED.value(),"Success", "Product has been created.","product_id: "+product_id+1), HttpStatus.CREATED);
         //return new ResponseEntity<>(new ApiResponse(true, "Product has been created."), HttpStatus.CREATED);
     }
 

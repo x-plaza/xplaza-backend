@@ -14,7 +14,7 @@ import javax.persistence.*;
 @Table(name="products")
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @TypeDef(name = "json", typeClass = JsonStringType.class)
-public class Product {
+public class ProductList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="product_id")
@@ -29,11 +29,20 @@ public class Product {
     @Column(name="fk_brand_id")
     private long brand_id;
 
+    @Column(name="brand_name")
+    private String brand_name;
+
     @Column(name="fk_category_id")
     private long category_id;
 
+    @Column(name="category_name")
+    private String category_name;
+
     @Column(name="fk_product_var_type_id")
     private long product_var_type_id;
+
+    @Column(name="product_var_type_name")
+    private String product_var_type_name;
 
     private long product_var_type_option;
 
@@ -46,9 +55,14 @@ public class Product {
     @Column(name="fk_currency_id")
     private long currency_id;
 
+    @Column(name="currency_name")
+    private String currency_name;
+
     @Column(name="fk_shop_id")
     private long shop_id;
 
-    public Product() {}
-}
+    @Column(name="shop_name")
+    private String shop_name;
 
+    public ProductList() {}
+}

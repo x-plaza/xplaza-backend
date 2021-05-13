@@ -2,6 +2,7 @@ package com.backend.xplaza.controller;
 
 import com.backend.xplaza.common.ApiResponse;
 import com.backend.xplaza.model.AdminUser;
+import com.backend.xplaza.model.AdminUserList;
 import com.backend.xplaza.service.AdminUserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,7 +37,7 @@ public class AdminUserController {
     @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getAdminUsers() throws JsonProcessingException {
         start = new Date();
-        List<AdminUser> dtos = adminUserService.listAdminUsers();
+        List<AdminUserList> dtos = adminUserService.listAdminUsers();
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         /*HttpHeaders responseHeader = new HttpHeaders();
@@ -58,7 +59,7 @@ public class AdminUserController {
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getAdminUser(@PathVariable @Valid Long id) throws JsonProcessingException {
         start = new Date();
-        AdminUser dtos = adminUserService.listAdminUser(id);
+        AdminUserList dtos = adminUserService.listAdminUser(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         ObjectMapper mapper = new ObjectMapper();
