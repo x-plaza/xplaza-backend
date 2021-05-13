@@ -41,7 +41,7 @@ public class ProductList {
     @Column(name="fk_product_var_type_id")
     private long product_var_type_id;
 
-    @Column(name="product_var_type_name")
+    @Column(name="var_type_name")
     private String product_var_type_name;
 
     private long product_var_type_option;
