@@ -27,7 +27,7 @@ public class ProductImage {
     private String path;
 
     @Column(name="fk_product_id")
-    private String product_id;
+    private Long product_id;
 
     public ProductImage() {}
 }
