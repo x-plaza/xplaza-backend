@@ -33,7 +33,7 @@ public class ProductImageService {
         productImgRepo.deleteById(id);
     }
 
-    public ProductImage listProductImage(long id) {
-        return productImgRepo.findItemById(id);
+    public List<ProductImage> listProductImage(long id) {
+        return productImgRepo.findImageByProductId(id);
     }
 }

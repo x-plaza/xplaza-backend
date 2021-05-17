@@ -53,7 +53,7 @@ public class ProductImageController {
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getProductImage(@PathVariable @Valid Long id) throws JsonProcessingException {
         start = new Date();
-        ProductImage dtos = productImgService.listProductImage(id);
+        List<ProductImage> dtos = productImgService.listProductImage(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         ObjectMapper mapper = new ObjectMapper();
