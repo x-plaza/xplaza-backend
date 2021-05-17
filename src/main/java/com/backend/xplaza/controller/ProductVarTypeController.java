@@ -68,7 +68,7 @@ public class ProductVarTypeController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("/add")
+    @PostMapping(value= "/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> addProductVarType (@RequestBody @Valid ProductVarType productVarType) {
         start = new Date();
         prodVarTypeService.addProductVarType(productVarType);
@@ -78,7 +78,7 @@ public class ProductVarTypeController {
         //return new ResponseEntity<>(new ApiResponse(true, "Product Variation Type has been created."), HttpStatus.CREATED);
     }
 
-    @PutMapping("/update")
+    @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> updateProductVarType (@RequestBody @Valid ProductVarType productVarType) {
         start = new Date();
         prodVarTypeService.updateProductVarType(productVarType);
@@ -88,7 +88,7 @@ public class ProductVarTypeController {
         //return new ResponseEntity<>(new ApiResponse(true, "Product Variation Type has been updated."), HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> deleteProductVarType (@PathVariable @Valid Long id) {
         String prod_var_type_name = prodVarTypeService.getProductVarTypeNameByID(id);
         start = new Date();

@@ -67,7 +67,7 @@ public class RoleController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("/add")
+    @PostMapping(value= "/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> addRole (@RequestBody @Valid Role role) {
         start = new Date();
         roleService.addRole(role);
@@ -77,7 +77,7 @@ public class RoleController {
         //return new ResponseEntity<>(new ApiResponse(true, "Role has been created."), HttpStatus.CREATED);
     }
 
-    @PutMapping("/update")
+    @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> updateRole (@RequestBody @Valid Role role) {
         start = new Date();
         roleService.updateRole(role);
@@ -87,7 +87,7 @@ public class RoleController {
         //return new ResponseEntity<>(new ApiResponse(true, "Role has been updated."), HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> deleteRole (@PathVariable @Valid Long id) {
         String role_name = roleService.getRoleNameByID(id);
         start = new Date();

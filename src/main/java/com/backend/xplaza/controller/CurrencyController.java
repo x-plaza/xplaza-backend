@@ -68,7 +68,7 @@ public class CurrencyController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("/add")
+    @PostMapping(value= "/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> addCurrency (@RequestBody @Valid Currency brand) {
         start = new Date();
         currencyService.addCurrency(brand);
@@ -78,7 +78,7 @@ public class CurrencyController {
         //return new ResponseEntity<>(new ApiResponse(true, "Currency has been created."), HttpStatus.CREATED);
     }
 
-    @PutMapping("/update")
+    @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> updateCurrency (@RequestBody @Valid Currency brand) {
         start = new Date();
         currencyService.updateCurrency(brand);
@@ -88,7 +88,7 @@ public class CurrencyController {
         //return new ResponseEntity<>(new ApiResponse(true, "Currency has been updated."), HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> deleteCurrency (@PathVariable @Valid Long id) {
         String currency_name = currencyService.getCurrencyNameByID(id);
         start = new Date();

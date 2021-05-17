@@ -68,7 +68,7 @@ public class BrandController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("/add")
+    @PostMapping(value= "/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> addBrand (@RequestBody @Valid Brand brand) {
         start = new Date();
         brandService.addBrand(brand);
@@ -78,7 +78,7 @@ public class BrandController {
         //return new ResponseEntity<>(new ApiResponse(true, "Brand has been created."), HttpStatus.CREATED);
     }
 
-    @PutMapping("/update")
+    @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> updateBrand (@RequestBody @Valid Brand brand) {
         start = new Date();
         brandService.updateBrand(brand);
@@ -88,7 +88,7 @@ public class BrandController {
         //return new ResponseEntity<>(new ApiResponse(true, "Brand has been updated."), HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> deleteBrand (@PathVariable @Valid Long id) {
         String brand_name = brandService.getBrandNameByID(id);
         start = new Date();

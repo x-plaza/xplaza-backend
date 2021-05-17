@@ -67,7 +67,7 @@ public class ProductImageController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("/add")
+    @PostMapping(value= "/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> addProductImage (@RequestBody @Valid ProductImage productImg) {
         start = new Date();
         productImgService.addProductImage(productImg);
@@ -77,7 +77,7 @@ public class ProductImageController {
         //return new ResponseEntity<>(new ApiResponse(true, "Product has been created."), HttpStatus.CREATED);
     }
 
-    @PutMapping("/update")
+    @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> updateProductImage (@RequestBody @Valid ProductImage productImg) {
         start = new Date();
         productImgService.updateProductImage(productImg);
@@ -87,7 +87,7 @@ public class ProductImageController {
         //return new ResponseEntity<>(new ApiResponse(true, "Product has been updated."), HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> deleteProductImage (@PathVariable @Valid Long id) {
         String product_image_name = productImgService.getProductImageNameByID(id);
         start = new Date();

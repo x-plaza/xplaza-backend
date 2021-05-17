@@ -68,7 +68,7 @@ public class ModuleController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("/add")
+    @PostMapping(value= "/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> addModule (@RequestBody @Valid Module module) {
         start = new Date();
         moduleService.addModule(module);
@@ -78,7 +78,7 @@ public class ModuleController {
         //return new ResponseEntity<>(new ApiResponse(true, "Module has been created."), HttpStatus.CREATED);
     }
 
-    @PutMapping("/update")
+    @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> updateModule (@RequestBody @Valid Module module) {
         start = new Date();
         moduleService.updateModule(module);
@@ -88,7 +88,7 @@ public class ModuleController {
         //return new ResponseEntity<>(new ApiResponse(true, "Module has been updated."), HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> deleteModule (@PathVariable @Valid Long id) {
         String module_name = moduleService.getModuleNameByID(id);
         start = new Date();

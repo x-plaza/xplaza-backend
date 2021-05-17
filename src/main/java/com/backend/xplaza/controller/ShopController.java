@@ -70,7 +70,7 @@ public class ShopController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("/add")
+    @PostMapping(value= "/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> addShop (@RequestBody @Valid Shop shop) {
         start = new Date();
         shopService.addShop(shop);
@@ -80,7 +80,7 @@ public class ShopController {
         //return new ResponseEntity<>(new ApiResponse(true, "Shop has been created."), HttpStatus.CREATED);
     }
 
-    @PutMapping("/update")
+    @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> updateShop (@RequestBody @Valid Shop shop) {
         start = new Date();
         shopService.updateShop(shop);
@@ -90,7 +90,7 @@ public class ShopController {
         //return new ResponseEntity<>(new ApiResponse(true, "Shop has been updated."), HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> deleteShop (@PathVariable @Valid Long id) {
         String shop_name = shopService.getShopNameByID(id);
         start = new Date();

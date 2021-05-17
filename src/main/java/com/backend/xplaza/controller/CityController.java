@@ -67,7 +67,7 @@ public class CityController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("/add")
+    @PostMapping(value= "/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> addCity (@RequestBody @Valid City city) {
         start = new Date();
         cityService.addCity(city);
@@ -77,7 +77,7 @@ public class CityController {
         //return new ResponseEntity<>(new ApiResponse(true, "City has been created."), HttpStatus.CREATED);
     }
 
-    @PutMapping("/update")
+    @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> updateCity (@RequestBody @Valid City city) {
         start = new Date();
         cityService.updateCity(city);
@@ -87,7 +87,7 @@ public class CityController {
         //return new ResponseEntity<>(new ApiResponse(true, "City has been updated."), HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> deleteCity (@PathVariable @Valid Long id) {
         String city_name = cityService.getCityNameByID(id);
         start = new Date();

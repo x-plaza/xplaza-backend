@@ -67,7 +67,7 @@ public class CategoryController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("/add")
+    @PostMapping(value= "/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> addCategory (@RequestBody @Valid Category category) {
         start = new Date();
         categoryService.addCategory(category);
@@ -77,7 +77,7 @@ public class CategoryController {
         //return new ResponseEntity<>(new ApiResponse(true, "Category has been created."), HttpStatus.CREATED);
     }
 
-    @PutMapping("/update")
+    @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> updateCategory (@RequestBody @Valid Category category) {
         start = new Date();
         categoryService.updateCategory(category);
@@ -87,7 +87,7 @@ public class CategoryController {
         //return new ResponseEntity<>(new ApiResponse(true, "Category has been updated."), HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> deleteCategory (@PathVariable @Valid Long id) {
         String category_name = categoryService.getCategoryNameByID(id);
         start = new Date();

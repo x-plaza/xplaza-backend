@@ -67,7 +67,7 @@ public class CountryController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("/add")
+    @PostMapping(value= "/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> addCountry (@RequestBody @Valid Country country) {
         start = new Date();
         countryService.addCountry(country);
@@ -77,7 +77,7 @@ public class CountryController {
         //return new ResponseEntity<>(new ApiResponse(true, "Country has been created."), HttpStatus.CREATED);
     }
 
-    @PutMapping("/update")
+    @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> updateCountry (@RequestBody @Valid Country country) {
         start = new Date();
         countryService.updateCountry(country);
@@ -87,7 +87,7 @@ public class CountryController {
         //return new ResponseEntity<>(new ApiResponse(true, "Country has been updated."), HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> deleteCountry (@PathVariable @Valid Long id) {
         String country_name = countryService.getCountryNameByID(id);
         start = new Date();

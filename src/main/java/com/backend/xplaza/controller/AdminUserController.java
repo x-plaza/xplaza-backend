@@ -73,7 +73,7 @@ public class AdminUserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("/add")
+    @PostMapping(value= "/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> addAdminUser (@RequestBody @Valid AdminUser adminUser) {
         start = new Date();
         adminUserService.addAdminUser(adminUser);
@@ -83,7 +83,7 @@ public class AdminUserController {
         //return new ResponseEntity<>(new ApiResponse(true, "Admin User has been created."), HttpStatus.CREATED);
     }
 
-    @PutMapping("/update")
+    @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> updateAdminUser (@RequestBody @Valid AdminUser adminUser) {
         start = new Date();
         adminUserService.updateAdminUser(adminUser);
@@ -93,7 +93,7 @@ public class AdminUserController {
         //return new ResponseEntity<>(new ApiResponse(true, "Admin User has been updated."), HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> deleteAdminUser (@PathVariable @Valid Long id) {
         String admin_user_name = adminUserService.getAdminUserNameByID(id);
         start = new Date();

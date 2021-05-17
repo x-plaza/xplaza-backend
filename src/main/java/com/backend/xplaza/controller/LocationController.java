@@ -67,7 +67,7 @@ public class LocationController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("/add")
+    @PostMapping(value= "/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> addLocation (@RequestBody @Valid Location location) {
         start = new Date();
         locationService.addLocation(location);
@@ -77,7 +77,7 @@ public class LocationController {
         //return new ResponseEntity<>(new ApiResponse(true, "Location has been created."), HttpStatus.CREATED);
     }
 
-    @PutMapping("/update")
+    @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> updateLocation (@RequestBody @Valid Location location) {
         start = new Date();
         locationService.updateLocation(location);
@@ -87,7 +87,7 @@ public class LocationController {
         //return new ResponseEntity<>(new ApiResponse(true, "Location has been updated."), HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> deleteLocation (@PathVariable @Valid Long id) {
         String location_name = locationService.getLocationNameByID(id);
         start = new Date();
