@@ -98,6 +98,7 @@ public class ProductController {
     public ResponseEntity<ApiResponse> deleteProduct (@PathVariable @Valid Long id) {
         String product_name = productService.getProductNameByID(id);
         start = new Date();
+        productService.deleteImagesByProductId(id);
         productService.deleteProduct(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();

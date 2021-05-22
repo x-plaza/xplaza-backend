@@ -1,18 +1,21 @@
 package com.backend.xplaza.service;
 
 import com.backend.xplaza.model.Location;
+import com.backend.xplaza.model.LocationList;
+import com.backend.xplaza.repository.LocationListRepository;
 import com.backend.xplaza.repository.LocationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class LocationService {
     @Autowired
     private LocationRepository locationRepo;
+
+    @Autowired
+    private LocationListRepository locationListRepo;
 
     public void addLocation(Location location) {
         locationRepo.save(location);
@@ -22,8 +25,12 @@ public class LocationService {
         locationRepo.save(location);
     }
 
-    public List<Location> listLocations() {
-        return locationRepo.findAll(Sort.by(Sort.Direction.ASC, "name"));
+    public List<LocationList> listLocations() {
+        return locationListRepo.findAllItem();
+    }
+
+    public LocationList listLocation(long id) {
+        return locationListRepo.findItemById(id);
     }
 
     public String getLocationNameByID(Long id) {
@@ -32,9 +39,5 @@ public class LocationService {
 
     public void deleteLocation(Long id) {
         locationRepo.deleteById(id);
-    }
-
-    public Location listLocation(long id) {
-        return locationRepo.findItemById(id);
     }
 }

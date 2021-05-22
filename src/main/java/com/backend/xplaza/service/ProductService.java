@@ -33,6 +33,10 @@ public class ProductService {
         return productRepo.getMaxID();
     }
 
+    public void deleteImagesByProductId(Long id) {
+        productRepo.deleteImagesByProductId(id);
+    }
+
     public void deleteProduct(Long id) {
         productRepo.deleteById(id);
     }

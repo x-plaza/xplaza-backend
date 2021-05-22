@@ -2,7 +2,9 @@ package com.backend.xplaza.repository;
 
 import com.backend.xplaza.model.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query(value = "select product_name from products where product_id = ?1", nativeQuery = true)
@@ -16,4 +18,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "ORDER BY product_id DESC \n" +
             "LIMIT 1", nativeQuery = true)
     Long getMaxID();
+
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM product_images WHERE fk_product_id = ?1", nativeQuery = true)
+    void deleteImagesByProductId(Long id);
 }
