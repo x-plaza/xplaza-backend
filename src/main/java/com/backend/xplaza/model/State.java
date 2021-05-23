@@ -11,20 +11,20 @@ import javax.persistence.*;
 @Data
 @Entity
 @AllArgsConstructor
-@Table(name="cities")
+@Table(name="states")
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @TypeDef(name = "json", typeClass = JsonStringType.class)
-public class City {
+public class State {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="city_id")
+    @Column(name="state_id")
     private long id;
 
-    @Column(name="city_name")
+    @Column(name="state_name")
     private String name;
 
-    @Column(name="fk_state_id")
-    private int state_id;
+    @Column(name="fk_country_id")
+    private int country_id;
 
-    public City(){}
+    public State(){}
 }

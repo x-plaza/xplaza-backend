@@ -64,5 +64,8 @@ public class ProductList {
     @Column(name="shop_name")
     private String shop_name;
 
+    @Column(name="quantity")
+    private Long quantity;
+
     public ProductList() {}
 }

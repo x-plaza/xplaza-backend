@@ -49,6 +49,9 @@ public class Product {
     @Column(name="fk_shop_id")
     private long shop_id;
 
+    @Column(name="quantity")
+    private Long quantity;
+
     public Product() {}
 }
 
