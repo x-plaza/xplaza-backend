@@ -38,8 +38,10 @@ public class LoginController {
         Login dtos = loginService.getAdminUserDetails(username);
         if (dtos != null) {
             boolean isValidUser = loginService.isVaidUser(username, password);
-            if(isValidUser) dtos.setAuthentication(true);
-            else {
+            if(isValidUser) {
+                dtos.setAuthentication(true);
+                //List<Permission> permissions = loginService.getPermissionsByUserID(dtos.getId());
+            } else {
                 dtos.setAuthData(null);
             }
         } else {

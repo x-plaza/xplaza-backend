@@ -8,9 +8,11 @@ import lombok.Data;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @Entity
+@Table(name="login")
 @AllArgsConstructor
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @TypeDef(name = "json", typeClass = JsonStringType.class)
@@ -38,9 +40,12 @@ public class Login {
         this.authData = authData;
     }
 
+    @OneToMany(mappedBy = "login")
+    private List<Permission> permissions;
+
     /*@Embedded
     private Permissions permissions;
-    public void setPermissions(Permissions permissions) { this.permissions = permissions; }
-    */
+    public void setPermissions(Permissions permissions) { this.permissions = permissions; }*/
+
     public Login() {}
 }

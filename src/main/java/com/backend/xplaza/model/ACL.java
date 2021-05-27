@@ -13,10 +13,7 @@ import javax.persistence.Embeddable;
 @AllArgsConstructor
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @TypeDef(name = "json", typeClass = JsonStringType.class)
-@TypeDef(name = "json", typeClass = JsonStringType.class)
 public class ACL {
-
     private boolean full, view, add, update, delete;
-
     public ACL() {}
 }
