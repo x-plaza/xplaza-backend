@@ -1,8 +1,6 @@
 package com.backend.xplaza.controller;
 
-import com.backend.xplaza.model.AuthData;
 import com.backend.xplaza.model.Login;
-import com.backend.xplaza.model.Permissions;
 import com.backend.xplaza.service.LoginService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +20,6 @@ public class LoginController {
     @Autowired
     private LoginService loginService;
 
-    AuthData authData = new AuthData();
-    Permissions permissions = new Permissions();
-
     private Date start, end;
     long responseTime;
 
@@ -41,11 +36,17 @@ public class LoginController {
     public ResponseEntity<String> loginAdminUser (@RequestParam("username") @Valid String username, @RequestParam("password") @Valid String password) throws IOException {
         start = new Date();
         Login dtos = loginService.getAdminUserDetails(username);
-        authData = dtos.getAuthData();
-        boolean isValidUser = loginService.isVaidUser(username, password);
-        authData.setAuthentication(isValidUser);
-        dtos.setAuthData(authData);
-        //dtos.setPermissions(permissions);
+        if (dtos != null) {
+            boolean isValidUser = loginService.isVaidUser(username, password);
+            if(isValidUser) dtos.setAuthentication(true);
+            else {
+                dtos.setAuthData(null);
+            }
+        } else {
+            dtos = new Login();
+            dtos.setAuthentication(false);
+            dtos.setAuthData(null);
+        }
         end = new Date();
         responseTime = end.getTime() - start.getTime();
 

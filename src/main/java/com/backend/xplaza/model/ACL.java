@@ -15,6 +15,8 @@ import javax.persistence.Embeddable;
 @TypeDef(name = "json", typeClass = JsonStringType.class)
 @TypeDef(name = "json", typeClass = JsonStringType.class)
 public class ACL {
+
     private boolean full, view, add, update, delete;
+
     public ACL() {}
 }

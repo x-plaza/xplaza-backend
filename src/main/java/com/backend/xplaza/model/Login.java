@@ -21,6 +21,12 @@ public class Login {
     @ApiModelProperty(hidden= true)
     private long id;
 
+    private boolean authentication;
+
+    public void setAuthentication(boolean auth) {
+        this.authentication = auth;
+    }
+
     @Embedded
     private AuthData authData;
 
@@ -34,10 +40,7 @@ public class Login {
 
     /*@Embedded
     private Permissions permissions;
-
-    public void setPermissions(Permissions permissions) {
-        this.permissions = permissions;
-    }*/
-
+    public void setPermissions(Permissions permissions) { this.permissions = permissions; }
+    */
     public Login() {}
 }

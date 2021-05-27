@@ -15,15 +15,14 @@ import javax.persistence.Embeddable;
 @TypeDef(name = "json", typeClass = JsonStringType.class)
 public class AuthData {
     private String user_name;
-    private long role_id;
-    private String role_name;
-    private long shop_id;
-    private String shop_name;
-    private boolean authentication;
 
-    public void setAuthentication(boolean auth) {
-        this.authentication = auth;
-    }
+    private long role_id;
+
+    private String role_name;
+
+    private long shop_id;
+
+    private String shop_name;
 
     public AuthData() {}
 }
