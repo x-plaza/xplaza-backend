@@ -2,6 +2,7 @@ package com.backend.xplaza.model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.hibernate.annotations.TypeDef;
@@ -18,6 +19,7 @@ public class AdminUserList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="admin_user_id")
+    @ApiModelProperty(hidden= true)
     private long id;
 
     @Column(name="user_name")
@@ -26,6 +28,7 @@ public class AdminUserList {
     @Column(name="password")
     private String password;
 
+    @ApiModelProperty(hidden= true)
     @Column(name="salt")
     private String salt;
 

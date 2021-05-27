@@ -2,6 +2,7 @@ package com.backend.xplaza.model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.hibernate.annotations.TypeDef;
@@ -18,6 +19,7 @@ public class ProductVarType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="product_var_type_id")
+    @ApiModelProperty(hidden= true)
     private long id;
 
     @Column(name="var_type_name")
