@@ -21,9 +21,7 @@ public class ProductVarTypeService {
         prodVarTypeRepo.save(productVarType);
     }
 
-    public List<ProductVarType> listProductVarTypes() {
-        return prodVarTypeRepo.findAll(Sort.by(Sort.Direction.ASC, "name"));
-    }
+    public List<ProductVarType> listProductVarTypes() { return prodVarTypeRepo.findAll(Sort.by(Sort.Direction.ASC, "name")); }
 
     public String getProductVarTypeNameByID(Long id) {
         return prodVarTypeRepo.getName(id);
@@ -34,6 +32,6 @@ public class ProductVarTypeService {
     }
 
     public ProductVarType listProductVarType(long id) {
-        return prodVarTypeRepo.findItemById(id);
+        return prodVarTypeRepo.findProdVarTypeById(id);
     }
 }

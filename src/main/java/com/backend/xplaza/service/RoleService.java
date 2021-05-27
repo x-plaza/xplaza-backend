@@ -34,6 +34,6 @@ public class RoleService {
     }
 
     public Role listRole(long id) {
-        return roleRepo.findItemById(id);
+        return roleRepo.findRoleById(id);
     }
 }

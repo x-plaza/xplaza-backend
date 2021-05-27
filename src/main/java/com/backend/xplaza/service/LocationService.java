@@ -29,9 +29,7 @@ public class LocationService {
         return locationListRepo.findAllItem();
     }
 
-    public LocationList listLocation(long id) {
-        return locationListRepo.findItemById(id);
-    }
+    public LocationList listLocation(long id) { return locationListRepo.findLocationListById(id); }
 
     public String getLocationNameByID(Long id) {
         return locationRepo.getName(id);

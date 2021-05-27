@@ -26,8 +26,24 @@ public class AdminUser {
     @Column(name="password")
     private String password;
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     @Column(name="salt")
     private String salt;
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
+    }
 
     @Column(name="fk_role_id")
     private long role_id;

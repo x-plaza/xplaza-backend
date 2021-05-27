@@ -9,5 +9,5 @@ public interface ProductVarTypeRepository extends JpaRepository<ProductVarType, 
     String getName(Long id);
 
     @Query(value = "select * from product_variation_types where product_var_type_id = ?1", nativeQuery = true)
-    ProductVarType findItemById(long id);
+    ProductVarType findProdVarTypeById(long id);
 }

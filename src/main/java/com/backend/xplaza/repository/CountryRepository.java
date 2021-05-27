@@ -10,5 +10,5 @@ public interface CountryRepository extends JpaRepository<Country, Long> {
     String getName(Long id);
 
     @Query(value = "select * from countries where country_id = ?1", nativeQuery = true)
-    Country findItemById(long id);
+    Country findCountryById(long id);
 }

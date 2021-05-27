@@ -4,6 +4,7 @@ import com.backend.xplaza.common.ApiResponse;
 import com.backend.xplaza.model.AdminUser;
 import com.backend.xplaza.model.AdminUserList;
 import com.backend.xplaza.service.AdminUserService;
+import com.backend.xplaza.service.SecurityService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,14 +15,20 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/api/adminuser")
 public class AdminUserController {
     @Autowired
     private AdminUserService adminUserService;
+    @Autowired
+    private SecurityService securityService;
+
     private Date start, end;
     long responseTime;
 
@@ -52,7 +59,7 @@ public class AdminUserController {
                 "  \"status\": 200,\n" +
                 "  \"response\": \"Success\",\n" +
                 "  \"msg\": \"\",\n" +
-                "  \"data\":"+mapper.writeValueAsString(dtos)+"\n}";
+                "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -69,12 +76,24 @@ public class AdminUserController {
                 "  \"status\": 200,\n" +
                 "  \"response\": \"Success\",\n" +
                 "  \"msg\": \"\",\n" +
-                "  \"data\":"+mapper.writeValueAsString(dtos)+"\n}";
+                "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping(value= "/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> addAdminUser (@RequestBody @Valid AdminUser adminUser) {
+        byte[] byteSalt = null;
+        try{
+            byteSalt = securityService.getSalt();
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger("Salt error").log(Level.SEVERE, null, ex);
+        }
+        byte[] biteDigestPsw = securityService.getSaltedHashSHA512(adminUser.getPassword(),byteSalt);
+        String strDigestPsw = securityService.toHex(biteDigestPsw);
+        String strSalt = securityService.toHex(byteSalt);
+        adminUser.setPassword(strDigestPsw);
+        adminUser.setSalt(strSalt);
+
         start = new Date();
         adminUserService.addAdminUser(adminUser);
         end = new Date();

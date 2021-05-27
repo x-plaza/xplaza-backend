@@ -46,7 +46,7 @@ public class RoleController {
                 "  \"status\": 200,\n" +
                 "  \"response\": \"Success\",\n" +
                 "  \"msg\": \"\",\n" +
-                "  \"data\":"+mapper.writeValueAsString(dtos)+"\n}";
+                "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -63,7 +63,7 @@ public class RoleController {
                 "  \"status\": 200,\n" +
                 "  \"response\": \"Success\",\n" +
                 "  \"msg\": \"\",\n" +
-                "  \"data\":"+mapper.writeValueAsString(dtos)+"\n}";
+                "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

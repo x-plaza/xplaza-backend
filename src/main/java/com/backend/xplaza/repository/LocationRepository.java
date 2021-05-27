@@ -9,5 +9,5 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
     String getName(Long id);
 
     @Query(value = "select * from locations where location_id = ?1", nativeQuery = true)
-    Location findItemById(long id);
+    Location findLocationById(long id);
 }

@@ -9,5 +9,5 @@ public interface StateRepository extends JpaRepository<State, Long> {
     String getName(Long id);
 
     @Query(value = "select * from states where state_id = ?1", nativeQuery = true)
-    State findItemById(Long id);
+    State findStateById(Long id);
 }

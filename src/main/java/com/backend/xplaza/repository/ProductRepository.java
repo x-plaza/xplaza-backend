@@ -11,7 +11,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     String getName(Long id);
 
     @Query(value = "select * from products where product_id = ?1", nativeQuery = true)
-    Product findItemById(long id);
+    Product findProductById(long id);
 
     @Query(value = "SELECT product_id \n" +
             "FROM products \n" +

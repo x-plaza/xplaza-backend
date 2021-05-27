@@ -24,10 +24,7 @@ public class ShopService {
         shopRepo.save(shop);
     }
 
-    public List<ShopList> listShops() {
-        //return shopRepo.findAll(Sort.by(Sort.Direction.ASC, "name"));
-        return shopLocRepo.findAllItem();
-    }
+    public List<ShopList> listShops() { return shopLocRepo.findAllShopList(); }
 
     public String getShopNameByID(Long id) {
         return shopRepo.getName(id);
@@ -38,6 +35,6 @@ public class ShopService {
     }
 
     public ShopList listShop(long id) {
-        return shopLocRepo.findItemById(id);
+        return shopLocRepo.findShopListById(id);
     }
 }

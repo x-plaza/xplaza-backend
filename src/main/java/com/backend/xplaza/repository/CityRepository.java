@@ -9,5 +9,5 @@ public interface CityRepository extends JpaRepository<City, Long> {
     String getName(Long id);
 
     @Query(value = "select * from cities where city_id = ?1", nativeQuery = true)
-    City findItemById(Long id);
+    City findCityById(Long id);
 }

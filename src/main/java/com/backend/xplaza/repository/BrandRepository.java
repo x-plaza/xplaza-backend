@@ -9,5 +9,5 @@ public interface BrandRepository extends JpaRepository<Brand, Long> {
     String getName(Long id);
 
     @Query(value = "select * from brands where brand_id = ?1", nativeQuery = true)
-    Brand findItemById(long id);
+    Brand findBrandById(long id);
 }

@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class BrandService {
@@ -34,6 +33,6 @@ public class BrandService {
     }
 
     public Brand listBrand(long id) {
-        return brandRepo.findItemById(id);
+        return brandRepo.findBrandById(id);
     }
 }

@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CountryService {
@@ -34,6 +33,6 @@ public class CountryService {
     }
 
     public Country listCountry(long id) {
-        return countryRepo.findItemById(id);
+        return countryRepo.findCountryById(id);
     }
 }

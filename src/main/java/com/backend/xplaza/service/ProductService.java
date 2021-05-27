@@ -25,27 +25,21 @@ public class ProductService {
         productRepo.save(product);
     }
 
-    public String getProductNameByID(Long id) {
-        return productRepo.getName(id);
-    }
+    public String getProductNameByID(Long id) { return productRepo.getName(id); }
 
     public Long getMaxID() {
         return productRepo.getMaxID();
     }
 
-    public void deleteImagesByProductId(Long id) {
-        productRepo.deleteImagesByProductId(id);
-    }
+    public void deleteImagesByProductId(Long id) { productRepo.deleteImagesByProductId(id); }
 
-    public void deleteProduct(Long id) {
-        productRepo.deleteById(id);
-    }
+    public void deleteProduct(Long id) { productRepo.deleteById(id); }
 
     public List<ProductList> listProducts() {
-        return productListRepo.findAllItem();
+        return productListRepo.findAllProductList();
     }
 
     public ProductList listProduct(long id) {
-        return productListRepo.findItemById(id);
+        return productListRepo.findProductListById(id);
     }
 }

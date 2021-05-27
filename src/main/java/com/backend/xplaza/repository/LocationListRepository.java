@@ -11,5 +11,5 @@ public interface LocationListRepository extends JpaRepository<LocationList, Long
     List<LocationList> findAllItem();
 
     @Query(value = "select l.*, c.city_name from locations l left join cities c on l.fk_city_id = c.city_id where l.location_id = ?1", nativeQuery = true)
-    LocationList findItemById(Long id);
+    LocationList findLocationListById(Long id);
 }

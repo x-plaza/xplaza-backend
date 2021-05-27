@@ -9,5 +9,5 @@ public interface ModuleRepository extends JpaRepository<Module, Long> {
     String getName(Long id);
 
     @Query(value = "select * from modules where module_id = ?1", nativeQuery = true)
-    Module findItemById(long id);
+    Module findModuleById(long id);
 }

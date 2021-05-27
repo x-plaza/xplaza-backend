@@ -9,5 +9,5 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     String getName(Long id);
 
     @Query(value = "select * from categories where category_id = ?1", nativeQuery = true)
-    Category findItemById(long id);
+    Category findCategoryById(long id);
 }

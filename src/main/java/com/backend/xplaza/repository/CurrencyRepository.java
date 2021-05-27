@@ -9,5 +9,5 @@ public interface CurrencyRepository extends JpaRepository<Currency, Long> {
     String getName(Long id);
 
     @Query(value = "select * from currencies where currency_id = ?1", nativeQuery = true)
-    Currency findItemById(long id);
+    Currency findCurrencyById(long id);
 }

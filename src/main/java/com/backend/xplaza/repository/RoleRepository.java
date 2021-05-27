@@ -9,5 +9,5 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
     String getName(Long id);
 
     @Query(value = "select * from roles where role_id = ?1", nativeQuery = true)
-    Role findItemById(Long id);
+    Role findRoleById(Long id);
 }

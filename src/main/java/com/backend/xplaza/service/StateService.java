@@ -33,6 +33,6 @@ public class StateService {
     }
 
     public State listState(Long id) {
-        return stateRepo.findItemById(id);
+        return stateRepo.findStateById(id);
     }
 }

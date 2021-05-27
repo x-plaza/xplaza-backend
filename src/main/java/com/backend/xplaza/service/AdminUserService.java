@@ -13,7 +13,6 @@ import java.util.List;
 public class AdminUserService {
     @Autowired
     private AdminUserRepository adminUserRepo;
-
     @Autowired
     private AdminUserListRepository adminUserListRepo;
 
@@ -34,10 +33,14 @@ public class AdminUserService {
     }
 
     public List<AdminUserList> listAdminUsers() {
-        return adminUserListRepo.findAllItem();
+        return adminUserListRepo.findAllUsers();
     }
 
     public AdminUserList listAdminUser(Long id) {
-        return adminUserListRepo.findItemById(id);
+        return adminUserListRepo.findUserById(id);
+    }
+
+    public AdminUser listAdminUser(String username) {
+        return adminUserRepo.findUserByUsername(username);
     }
 }
