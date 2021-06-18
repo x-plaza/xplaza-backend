@@ -21,7 +21,7 @@ public class LoginController {
     private LoginService loginService;
 
     private Date start, end;
-    long responseTime;
+    private long responseTime;
 
     @ModelAttribute
     public void setResponseHeader(HttpServletResponse response) {
@@ -40,7 +40,6 @@ public class LoginController {
             boolean isValidUser = loginService.isVaidUser(username, password);
             if(isValidUser) {
                 dtos.setAuthentication(true);
-                //List<Permission> permissions = loginService.getPermissionsByUserID(dtos.getId());
             } else {
                 dtos.setAuthData(null);
             }

@@ -23,7 +23,7 @@ public class LocationController {
     @Autowired
     private LocationService locationService;
     private Date start, end;
-    long responseTime;
+    private long responseTime;
 
     @ModelAttribute
     public void setResponseHeader(HttpServletResponse response) {
@@ -75,7 +75,6 @@ public class LocationController {
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         return new ResponseEntity<>(new ApiResponse(responseTime, "Add Location", HttpStatus.CREATED.value(),"Success", "Location has been created.",null), HttpStatus.CREATED);
-        //return new ResponseEntity<>(new ApiResponse(true, "Location has been created."), HttpStatus.CREATED);
     }
 
     @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -85,7 +84,6 @@ public class LocationController {
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         return new ResponseEntity<>(new ApiResponse(responseTime, "Update Location", HttpStatus.OK.value(),"Success", "Location has been updated.",null), HttpStatus.OK);
-        //return new ResponseEntity<>(new ApiResponse(true, "Location has been updated."), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -96,6 +94,5 @@ public class LocationController {
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Location", HttpStatus.OK.value(),"Success", location_name + " has been deleted.",null), HttpStatus.OK);
-        //return new ResponseEntity<>(new ApiResponse(true, location_name + " has been deleted."), HttpStatus.OK);
     }
 }

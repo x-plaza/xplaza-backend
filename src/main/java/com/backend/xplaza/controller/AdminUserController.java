@@ -30,7 +30,7 @@ public class AdminUserController {
     private SecurityService securityService;
 
     private Date start, end;
-    long responseTime;
+    private long responseTime;
 
     @ModelAttribute
     public void setResponseHeader(HttpServletResponse response) {

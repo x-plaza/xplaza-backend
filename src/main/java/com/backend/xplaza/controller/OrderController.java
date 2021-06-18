@@ -1,10 +1,13 @@
 package com.backend.xplaza.controller;
 
 import com.backend.xplaza.common.ApiResponse;
-import com.backend.xplaza.model.ProductVarType;
-import com.backend.xplaza.service.ProductVarTypeService;
+import com.backend.xplaza.model.Order;
+import com.backend.xplaza.model.OrderDetails;
+import com.backend.xplaza.model.OrderList;
+import com.backend.xplaza.service.OrderService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,10 +20,10 @@ import java.util.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/prodvartype")
-public class ProductVarTypeController {
+@RequestMapping("/api/order")
+public class OrderController {
     @Autowired
-    private ProductVarTypeService prodVarTypeService;
+    private OrderService orderService;
     private Date start, end;
     private long responseTime;
 
@@ -31,19 +34,18 @@ public class ProductVarTypeController {
         response.setHeader("Expires", "0"); // Proxies.
         response.setHeader("Content-Type", "application/json");
         response.setHeader("Set-Cookie", "type=ninja");
-        response.setHeader("msg", "");
     }
 
     @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getProductVarTypes() throws JsonProcessingException {
+    public ResponseEntity<String> getOrders() throws JsonProcessingException, JSONException {
         start = new Date();
-        List<ProductVarType> dtos = prodVarTypeService.listProductVarTypes();
+        List<OrderList> dtos = orderService.listOrders();
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         ObjectMapper mapper = new ObjectMapper();
         String response= "{\n" +
                 "  \"responseTime\": "+ responseTime + ",\n" +
-                "  \"responseType\": \"Product Variation Type List\",\n" +
+                "  \"responseType\": \"Order List\",\n" +
                 "  \"status\": 200,\n" +
                 "  \"response\": \"Success\",\n" +
                 "  \"msg\": \"\",\n" +
@@ -52,15 +54,15 @@ public class ProductVarTypeController {
     }
 
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getProductVarType(@PathVariable @Valid Long id) throws JsonProcessingException {
+    public ResponseEntity<String> getOrder(@PathVariable @Valid Long id) throws JsonProcessingException {
         start = new Date();
-        ProductVarType dtos = prodVarTypeService.listProductVarType(id);
+        OrderDetails dtos = orderService.listOrderDetails(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         ObjectMapper mapper = new ObjectMapper();
         String response= "{\n" +
                 "  \"responseTime\": "+ responseTime + ",\n" +
-                "  \"responseType\": \"Product Variation Type List\",\n" +
+                "  \"responseType\": \"Order Details\",\n" +
                 "  \"status\": 200,\n" +
                 "  \"response\": \"Success\",\n" +
                 "  \"msg\": \"\",\n" +
@@ -69,30 +71,29 @@ public class ProductVarTypeController {
     }
 
     @PostMapping(value= "/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> addProductVarType (@RequestBody @Valid ProductVarType productVarType) {
+    public ResponseEntity<ApiResponse> addOrder (@RequestBody @Valid Order order) {
         start = new Date();
-        prodVarTypeService.addProductVarType(productVarType);
+        orderService.addOrder(order);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Product Variation Type", HttpStatus.CREATED.value(),"Success", "Product Variation Type has been created.",null), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Order", HttpStatus.CREATED.value(),"Success", "Order has been created.",null), HttpStatus.CREATED);
     }
 
     @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> updateProductVarType (@RequestBody @Valid ProductVarType productVarType) {
+    public ResponseEntity<ApiResponse> updateOrder (@RequestBody @Valid Order order) {
         start = new Date();
-        prodVarTypeService.updateProductVarType(productVarType);
+        orderService.updateOrder(order);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Product Variation Type", HttpStatus.OK.value(),"Success", "Product Variation Type has been updated.",null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Order", HttpStatus.OK.value(),"Success", "Order has been updated.",null), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> deleteProductVarType (@PathVariable @Valid Long id) {
-        String prod_var_type_name = prodVarTypeService.getProductVarTypeNameByID(id);
+    public ResponseEntity<ApiResponse> deleteOrder (@PathVariable @Valid Long id) {
         start = new Date();
-        prodVarTypeService.deleteProductVarType(id);
+        orderService.deleteOrder(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Product Variation Type", HttpStatus.OK.value(),"Success", prod_var_type_name + " has been deleted.",null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Order", HttpStatus.OK.value(),"Success", "Order no: " + id + " has been deleted.",null), HttpStatus.OK);
     }
 }

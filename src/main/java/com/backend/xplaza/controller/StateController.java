@@ -22,7 +22,7 @@ public class StateController {
     @Autowired
     private StateService stateService;
     private Date start, end;
-    long responseTime;
+    private long responseTime;
 
     @ModelAttribute
     public void setResponseHeader(HttpServletResponse response) {
@@ -74,7 +74,6 @@ public class StateController {
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         return new ResponseEntity<>(new ApiResponse(responseTime, "Add State", HttpStatus.CREATED.value(),"Success", "State has been created.",null), HttpStatus.CREATED);
-        //return new ResponseEntity<>(new ApiResponse(true, "City has been created."), HttpStatus.CREATED);
     }
 
     @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -84,7 +83,6 @@ public class StateController {
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         return new ResponseEntity<>(new ApiResponse(responseTime, "Update State", HttpStatus.OK.value(),"Success", "State has been updated.",null), HttpStatus.OK);
-        //return new ResponseEntity<>(new ApiResponse(true, "City has been updated."), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -95,6 +93,5 @@ public class StateController {
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         return new ResponseEntity<>(new ApiResponse(responseTime, "Delete State", HttpStatus.OK.value(),"Success", state_name + " has been deleted.",null), HttpStatus.OK);
-        //return new ResponseEntity<>(new ApiResponse(true, city_name + " has been deleted."), HttpStatus.OK);
     }
 }

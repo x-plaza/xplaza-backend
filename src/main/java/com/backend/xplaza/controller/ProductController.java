@@ -24,7 +24,7 @@ public class ProductController {
     @Autowired
     private ProductService productService;
     private Date start, end;
-    long responseTime;
+    private long responseTime;
 
     @ModelAttribute
     public void setResponseHeader(HttpServletResponse response) {
@@ -80,7 +80,6 @@ public class ProductController {
         responseTime = end.getTime() - start.getTime();
         return new ResponseEntity<>(new ApiResponse(responseTime, "Add Product", HttpStatus.CREATED.value(),"Success", "Product has been created.",
                 data), HttpStatus.CREATED);
-        //return new ResponseEntity<>(new ApiResponse(true, "Product has been created."), HttpStatus.CREATED);
     }
 
     @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -91,7 +90,6 @@ public class ProductController {
         responseTime = end.getTime() - start.getTime();
         return new ResponseEntity<>(new ApiResponse(responseTime, "Update Product", HttpStatus.OK.value(),"Success", "Product has been updated.",
                 null), HttpStatus.OK);
-        //return new ResponseEntity<>(new ApiResponse(true, "Product has been updated."), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -104,6 +102,5 @@ public class ProductController {
         responseTime = end.getTime() - start.getTime();
         return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Product", HttpStatus.OK.value(),"Success", product_name + " has been deleted.",
                 null), HttpStatus.OK);
-        //return new ResponseEntity<>(new ApiResponse(true, product_name + " has been deleted."), HttpStatus.OK);
     }
 }

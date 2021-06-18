@@ -1,10 +1,11 @@
 package com.backend.xplaza.controller;
 
 import com.backend.xplaza.common.ApiResponse;
-import com.backend.xplaza.model.ProductVarType;
-import com.backend.xplaza.service.ProductVarTypeService;
+import com.backend.xplaza.model.OrderItem;
+import com.backend.xplaza.service.OrderItemService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,10 +18,10 @@ import java.util.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/prodvartype")
-public class ProductVarTypeController {
+@RequestMapping("/api/order-items")
+public class OrderItemController {
     @Autowired
-    private ProductVarTypeService prodVarTypeService;
+    private OrderItemService orderItemService;
     private Date start, end;
     private long responseTime;
 
@@ -31,19 +32,18 @@ public class ProductVarTypeController {
         response.setHeader("Expires", "0"); // Proxies.
         response.setHeader("Content-Type", "application/json");
         response.setHeader("Set-Cookie", "type=ninja");
-        response.setHeader("msg", "");
     }
 
     @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getProductVarTypes() throws JsonProcessingException {
+    public ResponseEntity<String> getOrderItems() throws JsonProcessingException, JSONException {
         start = new Date();
-        List<ProductVarType> dtos = prodVarTypeService.listProductVarTypes();
+        List<OrderItem> dtos = orderItemService.listOrderItems();
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         ObjectMapper mapper = new ObjectMapper();
         String response= "{\n" +
                 "  \"responseTime\": "+ responseTime + ",\n" +
-                "  \"responseType\": \"Product Variation Type List\",\n" +
+                "  \"responseType\": \"Module List\",\n" +
                 "  \"status\": 200,\n" +
                 "  \"response\": \"Success\",\n" +
                 "  \"msg\": \"\",\n" +
@@ -52,15 +52,15 @@ public class ProductVarTypeController {
     }
 
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getProductVarType(@PathVariable @Valid Long id) throws JsonProcessingException {
+    public ResponseEntity<String> getOrderItem(@PathVariable @Valid Long id) throws JsonProcessingException {
         start = new Date();
-        ProductVarType dtos = prodVarTypeService.listProductVarType(id);
+        OrderItem dtos = orderItemService.listOrderItem(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         ObjectMapper mapper = new ObjectMapper();
         String response= "{\n" +
                 "  \"responseTime\": "+ responseTime + ",\n" +
-                "  \"responseType\": \"Product Variation Type List\",\n" +
+                "  \"responseType\": \"Order Item List\",\n" +
                 "  \"status\": 200,\n" +
                 "  \"response\": \"Success\",\n" +
                 "  \"msg\": \"\",\n" +
@@ -69,30 +69,30 @@ public class ProductVarTypeController {
     }
 
     @PostMapping(value= "/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> addProductVarType (@RequestBody @Valid ProductVarType productVarType) {
+    public ResponseEntity<ApiResponse> addOrderItem (@RequestBody @Valid OrderItem orderItem) {
         start = new Date();
-        prodVarTypeService.addProductVarType(productVarType);
+        orderItemService.addOrderItem(orderItem);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Product Variation Type", HttpStatus.CREATED.value(),"Success", "Product Variation Type has been created.",null), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Order Items", HttpStatus.CREATED.value(),"Success", "Order Item has been created.",null), HttpStatus.CREATED);
     }
 
     @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> updateProductVarType (@RequestBody @Valid ProductVarType productVarType) {
+    public ResponseEntity<ApiResponse> updateOrderItem (@RequestBody @Valid OrderItem orderItem) {
         start = new Date();
-        prodVarTypeService.updateProductVarType(productVarType);
+        orderItemService.updateOrderItem(orderItem);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Product Variation Type", HttpStatus.OK.value(),"Success", "Product Variation Type has been updated.",null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Order Items", HttpStatus.OK.value(),"Success", "Order Item has been updated.",null), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> deleteProductVarType (@PathVariable @Valid Long id) {
-        String prod_var_type_name = prodVarTypeService.getProductVarTypeNameByID(id);
+    public ResponseEntity<ApiResponse> deleteOrderItem (@PathVariable @Valid Long id) {
+        String order_item_name = orderItemService.getOrderItemNameByID(id);
         start = new Date();
-        prodVarTypeService.deleteProductVarType(id);
+        orderItemService.deleteOrderItem(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Product Variation Type", HttpStatus.OK.value(),"Success", prod_var_type_name + " has been deleted.",null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Order Items", HttpStatus.OK.value(),"Success", order_item_name + " has been deleted.",null), HttpStatus.OK);
     }
 }

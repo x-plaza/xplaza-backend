@@ -22,7 +22,7 @@ public class RoleController {
     @Autowired
     private RoleService roleService;
     private Date start, end;
-    long responseTime;
+    private long responseTime;
 
     @ModelAttribute
     public void setResponseHeader(HttpServletResponse response) {
@@ -74,7 +74,6 @@ public class RoleController {
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         return new ResponseEntity<>(new ApiResponse(responseTime, "Add Role", HttpStatus.CREATED.value(),"Success", "Role has been created.",null), HttpStatus.CREATED);
-        //return new ResponseEntity<>(new ApiResponse(true, "Role has been created."), HttpStatus.CREATED);
     }
 
     @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -84,7 +83,6 @@ public class RoleController {
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         return new ResponseEntity<>(new ApiResponse(responseTime, "Update Role", HttpStatus.OK.value(),"Success", "Role has been updated.",null), HttpStatus.OK);
-        //return new ResponseEntity<>(new ApiResponse(true, "Role has been updated."), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -95,6 +93,5 @@ public class RoleController {
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Role", HttpStatus.OK.value(),"Success", role_name + " has been deleted.",null), HttpStatus.OK);
-        //return new ResponseEntity<>(new ApiResponse(true, role_name + " has been deleted."), HttpStatus.OK);
     }
 }

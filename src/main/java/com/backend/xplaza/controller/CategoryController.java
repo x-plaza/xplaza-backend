@@ -22,7 +22,7 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService;
     private Date start, end;
-    long responseTime;
+    private long responseTime;
 
     @ModelAttribute
     public void setResponseHeader(HttpServletResponse response) {
@@ -74,7 +74,6 @@ public class CategoryController {
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         return new ResponseEntity<>(new ApiResponse(responseTime, "Add Category", HttpStatus.CREATED.value(),"Success", "Category has been created.",null), HttpStatus.CREATED);
-        //return new ResponseEntity<>(new ApiResponse(true, "Category has been created."), HttpStatus.CREATED);
     }
 
     @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -84,7 +83,6 @@ public class CategoryController {
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         return new ResponseEntity<>(new ApiResponse(responseTime, "Update Category", HttpStatus.OK.value(),"Success", "Category has been updated.",null), HttpStatus.OK);
-        //return new ResponseEntity<>(new ApiResponse(true, "Category has been updated."), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -95,6 +93,5 @@ public class CategoryController {
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Category", HttpStatus.OK.value(),"Success", category_name + " has been deleted.",null), HttpStatus.OK);
-        //return new ResponseEntity<>(new ApiResponse(true, category_name + " has been deleted."), HttpStatus.OK);
     }
 }

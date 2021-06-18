@@ -1,0 +1,38 @@
+package com.backend.xplaza.service;
+
+import com.backend.xplaza.model.Order;
+import com.backend.xplaza.model.OrderDetails;
+import com.backend.xplaza.model.OrderList;
+import com.backend.xplaza.repository.OrderDetailsRepository;
+import com.backend.xplaza.repository.OrderListRepository;
+import com.backend.xplaza.repository.OrderRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class OrderService {
+    @Autowired
+    private OrderRepository orderRepo;
+    @Autowired
+    private OrderListRepository orderListRepo;
+    @Autowired
+    private OrderDetailsRepository orderDetailsRepo;
+
+    public void addOrder(Order order) {
+        orderRepo.save(order);
+    }
+
+    public void updateOrder(Order order) {
+        orderRepo.save(order);
+    }
+
+    public List<OrderList> listOrders() { return orderListRepo.findAllOrders(); }
+
+    public OrderDetails listOrderDetails(long id) { return orderDetailsRepo.findOrderDetailsById(id); }
+
+    public void deleteOrder(Long id) {
+        orderRepo.deleteById(id);
+    }
+}
