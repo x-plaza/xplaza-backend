@@ -43,7 +43,7 @@ public class OrderItemController {
         ObjectMapper mapper = new ObjectMapper();
         String response= "{\n" +
                 "  \"responseTime\": "+ responseTime + ",\n" +
-                "  \"responseType\": \"Module List\",\n" +
+                "  \"responseType\": \"Order Item List\",\n" +
                 "  \"status\": 200,\n" +
                 "  \"response\": \"Success\",\n" +
                 "  \"msg\": \"\",\n" +
