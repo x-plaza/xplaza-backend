@@ -73,7 +73,7 @@ public class OrderDetails {
     @Column(name="status_name")
     private String status_name;
 
-    @Column(name="fk_delivery_id")
+    @Column(name="delivery_id")
     private long delivery_id;
 
     @Column(name="person_name")
