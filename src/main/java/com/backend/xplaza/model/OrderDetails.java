@@ -9,6 +9,7 @@ import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Entity
@@ -91,8 +92,10 @@ public class OrderDetails {
     @Column(name="coupon_amount")
     private long coupon_amount;
 
-    @Embedded
-    private OrderItemList orderItemList;
+    //@Embedded
+    //private OrderItemList orderItemList;
+    @OneToMany(mappedBy = "orderDetails")
+    private List<OrderItemList> orderItemLists;
 
     public OrderDetails(){}
 }

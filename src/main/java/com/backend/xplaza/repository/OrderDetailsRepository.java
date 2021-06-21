@@ -11,7 +11,7 @@ public interface OrderDetailsRepository extends JpaRepository<OrderDetails, Long
             "o.fk_payment_type_id, pt.payment_type_name, d.delivery_id, d.person_name, d.contact_no, " +
             "o.fk_coupon_id, cou.coupon_code, cou.coupon_amount, " +
             "oi.order_item_name, oi.order_item_category, oi.order_item_quantity, oi.order_item_quantity_type, oi.order_item_unit_price, " +
-            "oi.order_item_total_price, oi.order_item_image " +
+            "oi.order_item_total_price, oi.order_item_image, oi.order_item_id " +
             "from orders o " +
             "left join order_items oi on o.order_id = oi.fk_order_id " +
             "left join delivery_costs dc on dc.delivery_cost_id = o.fk_delivery_cost_id " +
