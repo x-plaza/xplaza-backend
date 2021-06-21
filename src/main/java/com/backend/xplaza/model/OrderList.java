@@ -56,7 +56,7 @@ public class OrderList {
     private long status_id;
 
     @Column(name="status_name")
-    private long status_name;
+    private String status_name;
 
     public OrderList(){}
 }
