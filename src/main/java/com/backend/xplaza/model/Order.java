@@ -56,8 +56,8 @@ public class Order {
     @Column(name="fk_status_id")
     private long status_id;
 
-    @Column(name="fk_delivery_id")
-    private long delivery_id;
+    //@Column(name="fk_delivery_id")
+    //private long delivery_id;
 
     @Column(name="fk_coupon_id")
     private long coupon_id;
