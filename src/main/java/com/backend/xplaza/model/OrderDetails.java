@@ -65,28 +65,28 @@ public class OrderDetails {
     private long payment_type_id;
 
     @Column(name="payment_type_name")
-    private long payment_type_name;
+    private String payment_type_name;
 
     @Column(name="fk_status_id")
     private long status_id;
 
     @Column(name="status_name")
-    private long status_name;
+    private String status_name;
 
     @Column(name="fk_delivery_id")
     private long delivery_id;
 
     @Column(name="person_name")
-    private long delivery_person;
+    private String delivery_person;
 
     @Column(name="contact_no")
-    private long contact_no;
+    private String contact_no;
 
     @Column(name="fk_coupon_id")
     private long coupon_id;
 
     @Column(name="coupon_code")
-    private long coupon_code;
+    private String coupon_code;
 
     @Column(name="coupon_amount")
     private long coupon_amount;
