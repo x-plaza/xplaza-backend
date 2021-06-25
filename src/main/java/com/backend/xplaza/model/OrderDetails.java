@@ -8,6 +8,7 @@ import lombok.Data;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -92,8 +93,9 @@ public class OrderDetails {
     @Column(name="coupon_amount")
     private long coupon_amount;
 
-    //@Embedded
-    //private OrderItemList orderItemList;
+    @Column(name="date_to_deliver")
+    private LocalDate date_to_deliver;
+
     @OneToMany(mappedBy = "orderDetails")
     private List<OrderItemList> orderItemLists;
 

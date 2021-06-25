@@ -8,6 +8,7 @@ import lombok.Data;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -61,6 +62,9 @@ public class Order {
 
     @Column(name="fk_coupon_id")
     private long coupon_id;
+
+    @Column(name="date_to_deliver")
+    private LocalDate date_to_deliver;
 
     public Order(){}
 }
