@@ -9,6 +9,7 @@ import com.backend.xplaza.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -34,5 +35,13 @@ public class OrderService {
 
     public void deleteOrder(Long id) {
         orderRepo.deleteById(id);
+    }
+
+    public List<OrderList> listOrdersByFilter(String status, Date order_date) {
+        return orderListRepo.findAllOrdersByFilter(status,order_date);
+    }
+
+    public List<OrderList> listOrdersByStatus(String status) {
+        return orderListRepo.findAllOrdersByStatus(status);
     }
 }

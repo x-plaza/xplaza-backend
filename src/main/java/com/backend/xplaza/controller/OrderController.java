@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -37,9 +39,17 @@ public class OrderController {
     }
 
     @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getOrders() throws JsonProcessingException, JSONException {
+    public ResponseEntity<String> getOrders(@RequestParam(value ="status",required = false) @Valid String status, @RequestParam(value ="order_date",required = false) @Valid String order_date) throws JsonProcessingException, JSONException, ParseException {
         start = new Date();
-        List<OrderList> dtos = orderService.listOrders();
+        List<OrderList> dtos;
+        SimpleDateFormat formatter=new SimpleDateFormat("dd-MM-yyyy");
+        if (status == null && order_date == null) dtos = orderService.listOrders();
+        else if (status!=null && order_date == null) dtos = orderService.listOrdersByStatus(status);
+        else {
+            if (status == null) status = "Pending";
+            Date date = formatter.parse(order_date);
+            dtos = orderService.listOrdersByFilter(status,date);
+        }
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         ObjectMapper mapper = new ObjectMapper();
