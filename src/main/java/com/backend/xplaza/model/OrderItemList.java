@@ -20,7 +20,7 @@ public class OrderItemList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="order_item_id")
-    @ApiModelProperty(hidden= true)
+    @ApiModelProperty(hidden=true)
     private long id;
 
     @Column(name="order_item_name")

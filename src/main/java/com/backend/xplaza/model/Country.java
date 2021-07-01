@@ -36,9 +36,5 @@ public class Country {
 
     private int phonecode;
 
-    /*
-    @OneToMany(mappedBy = "country")
-    private Set<Location> locationSet = new HashSet<Location>();
-    */
     public Country() {}
 }

@@ -7,16 +7,14 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface AdminUserListRepository extends JpaRepository<AdminUserList, Long> {
-    @Query(value = "select a.*, r.role_name, s.shop_id, s.shop_name from admin_users a " +
+    @Query(value = "select a.*, r.role_name " +
+            "from admin_users a " +
             "left join roles r on a.fk_role_id = r.role_id " +
-            "left join admin_user_shop_link ausl on ausl.admin_user_id = a.admin_user_id " +
-            "left join shops s on ausl.shop_id = s.shop_id " +
-            "where admin_user_id = ?1", nativeQuery = true)
+            "where a.admin_user_id = ?1", nativeQuery = true)
     AdminUserList findUserById(Long id);
 
-    @Query(value = "select a.*, r.role_name, s.shop_id, s.shop_name from admin_users a " +
-            "left join roles r on a.fk_role_id = r.role_id " +
-            "left join admin_user_shop_link ausl on ausl.admin_user_id = a.admin_user_id " +
-            "left join shops s on ausl.shop_id = s.shop_id " , nativeQuery = true)
+    @Query(value = "select a.*, r.role_name " +
+            "from admin_users a " +
+            "left join roles r on a.fk_role_id = r.role_id" , nativeQuery = true)
     List<AdminUserList> findAllUsers();
 }

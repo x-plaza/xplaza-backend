@@ -8,6 +8,7 @@ import lombok.Data;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @Entity
@@ -23,7 +24,7 @@ public class AdminUserList {
     private long id;
 
     @Column(name="user_name")
-    private String name;
+    private String user_name;
 
     @Column(name="password")
     private String password;
@@ -38,11 +39,8 @@ public class AdminUserList {
     @Column(name="role_name")
     private String role_name;
 
-    @Column(name="shop_id")
-    private long shop_id;
-
-    @Column(name="shop_name")
-    private String shop_name;
+    @OneToMany(mappedBy = "adminUserList")
+    private List<AdminUserShopList> shopList;
 
     public AdminUserList() {}
 }

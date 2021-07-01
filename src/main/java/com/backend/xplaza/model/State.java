@@ -19,7 +19,7 @@ public class State {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="state_id")
-    @ApiModelProperty(hidden= true)
+    @ApiModelProperty(hidden=true)
     private long id;
 
     @Column(name="state_name")

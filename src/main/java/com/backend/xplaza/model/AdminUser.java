@@ -23,7 +23,7 @@ public class AdminUser {
     private long id;
 
     @Column(name="user_name")
-    private String name;
+    private String user_name;
 
     @Column(name="password")
     private String password;

@@ -19,7 +19,7 @@ public class ShopList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="shop_id")
-    @ApiModelProperty(hidden= true)
+    @ApiModelProperty(hidden=true)
     private long id;
 
     @Column(name="shop_name")

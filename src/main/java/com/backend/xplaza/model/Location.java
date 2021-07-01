@@ -28,9 +28,5 @@ public class Location {
     @Column(name="fk_city_id")
     private long city_id;
 
-    /*@JsonManagedReference
-    @OneToMany(mappedBy = "location")
-    private List<Shop> shops;*/
-
     public Location() {}
 }

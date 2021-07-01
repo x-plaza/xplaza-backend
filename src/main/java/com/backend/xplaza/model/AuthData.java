@@ -5,6 +5,7 @@ import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.hibernate.annotations.TypeDef;
+
 import javax.persistence.Embeddable;
 
 @Data
@@ -18,10 +19,6 @@ public class AuthData {
     private long role_id;
 
     private String role_name;
-
-    private long shop_id;
-
-    private String shop_name;
 
     public AuthData() {}
 }

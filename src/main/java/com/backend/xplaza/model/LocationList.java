@@ -19,7 +19,7 @@ public class LocationList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="location_id")
-    @ApiModelProperty(hidden= true)
+    @ApiModelProperty(hidden=true)
     private long id;
 
     @Column(name="location_name")
@@ -30,10 +30,6 @@ public class LocationList {
 
     @Column(name="city_name")
     private String city_name;
-
-    /*@JsonManagedReference
-    @OneToMany(mappedBy = "location")
-    private List<Shop> shops;*/
 
     public LocationList() {}
 }

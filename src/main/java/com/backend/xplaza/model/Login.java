@@ -20,11 +20,10 @@ public class Login {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="admin_user_id")
-    @ApiModelProperty(hidden= true)
+    @ApiModelProperty(hidden=true)
     private long id;
 
     private boolean authentication;
-
     public void setAuthentication(boolean auth) {
         this.authentication = auth;
     }
@@ -32,20 +31,11 @@ public class Login {
     @Embedded
     private AuthData authData;
 
-    public AuthData getAuthData() {
-        return authData;
-    }
-
-    public void setAuthData(AuthData authData) {
-        this.authData = authData;
-    }
+    @OneToMany(mappedBy = "login")
+    private List<LoginUserShopList> shopList;
 
     @OneToMany(mappedBy = "login")
     private List<Permission> permissions;
-
-    /*@Embedded
-    private Permissions permissions;
-    public void setPermissions(Permissions permissions) { this.permissions = permissions; }*/
 
     public Login() {}
 }
