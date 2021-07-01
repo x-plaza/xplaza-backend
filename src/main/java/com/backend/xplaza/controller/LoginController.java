@@ -42,11 +42,15 @@ public class LoginController {
                 dtos.setAuthentication(true);
             } else {
                 dtos.setAuthData(null);
+                dtos.setShopList(null);
+                dtos.setPermissions(null);
             }
         } else {
             dtos = new Login();
             dtos.setAuthentication(false);
             dtos.setAuthData(null);
+            dtos.setShopList(null);
+            dtos.setPermissions(null);
         }
         end = new Date();
         responseTime = end.getTime() - start.getTime();

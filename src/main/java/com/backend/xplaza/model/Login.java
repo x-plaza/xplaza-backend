@@ -24,6 +24,7 @@ public class Login {
     private long id;
 
     private boolean authentication;
+
     public void setAuthentication(boolean auth) {
         this.authentication = auth;
     }
@@ -31,11 +32,23 @@ public class Login {
     @Embedded
     private AuthData authData;
 
+    public void setAuthData(AuthData authData) {
+        this.authData = authData;
+    }
+
     @OneToMany(mappedBy = "login")
     private List<LoginUserShopList> shopList;
 
+    public void setShopList(List<LoginUserShopList> shopList) {
+        this.shopList = shopList;
+    }
+
     @OneToMany(mappedBy = "login")
     private List<Permission> permissions;
+
+    public void setPermissions(List<Permission> permissions) {
+        this.permissions = permissions;
+    }
 
     public Login() {}
 }
