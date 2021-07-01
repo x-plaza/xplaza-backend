@@ -25,8 +25,8 @@ public class Shop {
     @Column(name="shop_name")
     private String name;
 
-    @Column(name="shop_description")
-    private String description;
+    @Column(name="shop_owner")
+    private String owner;
 
     @Column(name="shop_address")
     private String address;
