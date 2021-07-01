@@ -51,8 +51,5 @@ public class AdminUser {
     @Column(name="fk_role_id")
     private long role_id;
 
-    @Column(name="fk_shop_id")
-    private long shop_id;
-
     public AdminUser() {}
 }

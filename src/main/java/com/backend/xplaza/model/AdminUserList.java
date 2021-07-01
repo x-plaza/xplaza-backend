@@ -38,7 +38,7 @@ public class AdminUserList {
     @Column(name="role_name")
     private String role_name;
 
-    @Column(name="fk_shop_id")
+    @Column(name="shop_id")
     private long shop_id;
 
     @Column(name="shop_name")
