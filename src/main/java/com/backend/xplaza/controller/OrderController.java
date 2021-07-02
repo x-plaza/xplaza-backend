@@ -39,7 +39,9 @@ public class OrderController {
     }
 
     @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getOrders(@RequestParam(value ="status",required = false) @Valid String status, @RequestParam(value ="order_date",required = false) @Valid String order_date) throws JsonProcessingException, JSONException, ParseException {
+    public ResponseEntity<String> getOrders(@RequestParam(value ="status",required = false) @Valid String status,
+                                            @RequestParam(value ="order_date",required = false) @Valid String order_date)
+                                            throws JsonProcessingException, JSONException, ParseException {
         start = new Date();
         List<OrderList> dtos;
         SimpleDateFormat formatter=new SimpleDateFormat("dd-MM-yyyy");
@@ -96,6 +98,15 @@ public class OrderController {
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         return new ResponseEntity<>(new ApiResponse(responseTime, "Update Order", HttpStatus.OK.value(),"Success", "Order has been updated.",null), HttpStatus.OK);
+    }
+
+    @PutMapping(value= "/status-update", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiResponse> updateOrderStatus (@RequestParam("invoice_number") @Valid long invoice_number, @RequestParam("status") @Valid long status) {
+        start = new Date();
+        orderService.updateOrderStatus(invoice_number,status);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Order Status", HttpStatus.OK.value(),"Success", "Order Status has been updated.",null), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

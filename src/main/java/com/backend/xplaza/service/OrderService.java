@@ -44,4 +44,8 @@ public class OrderService {
     public List<OrderList> listOrdersByStatus(String status) {
         return orderListRepo.findAllOrdersByStatus(status);
     }
+
+    public void updateOrderStatus(long invoice_number, long status) {
+        orderRepo.updateOrderStatus(invoice_number,status);
+    }
 }
