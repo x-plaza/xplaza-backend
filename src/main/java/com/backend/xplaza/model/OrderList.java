@@ -21,7 +21,7 @@ public class OrderList {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="order_id")
     @ApiModelProperty(hidden=true)
-    private long id;
+    private long invoice_number;
 
     @Column(name="total_price")
     private double total_price;

@@ -46,7 +46,7 @@ public class ProductList {
     @Column(name="var_type_name")
     private String product_var_type_name;
 
-    private long product_var_type_option;
+    private float product_var_type_value;
 
     @Column(name="product_buying_price")
     private float buying_price;

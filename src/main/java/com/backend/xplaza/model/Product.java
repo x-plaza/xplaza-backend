@@ -2,7 +2,6 @@ package com.backend.xplaza.model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.hibernate.annotations.TypeDef;
@@ -19,7 +18,7 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="product_id")
-    @ApiModelProperty(hidden=true)
+    //@ApiModelProperty(hidden=true)
     private long id;
 
     @Column(name="product_name")
@@ -37,7 +36,7 @@ public class Product {
     @Column(name="fk_product_var_type_id")
     private long product_var_type_id;
 
-    private long product_var_type_option;
+    private float product_var_type_value;
 
     @Column(name="product_buying_price")
     private float buying_price;

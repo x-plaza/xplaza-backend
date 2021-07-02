@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import org.hibernate.annotations.TypeDef;
+
 import javax.persistence.*;
 
 @Entity
@@ -17,7 +17,7 @@ import javax.persistence.*;
 public class Permission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ApiModelProperty(hidden=true)
+    //@ApiModelProperty(hidden=true)
     @JsonIgnore
     private long id;
 

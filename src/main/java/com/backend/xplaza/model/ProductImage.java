@@ -2,7 +2,6 @@ package com.backend.xplaza.model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.hibernate.annotations.TypeDef;
@@ -19,7 +18,7 @@ public class ProductImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="product_image_id")
-    @ApiModelProperty(hidden=true)
+    //@ApiModelProperty(hidden=true)
     private long id;
 
     @Column(name="product_image_name")
