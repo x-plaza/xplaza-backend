@@ -1,0 +1,98 @@
+package com.backend.xplaza.controller;
+
+import com.backend.xplaza.common.ApiResponse;
+import com.backend.xplaza.model.Coupon;
+import com.backend.xplaza.model.CouponList;
+import com.backend.xplaza.service.CouponService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.util.Date;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/coupon")
+public class CouponController {
+    @Autowired
+    private CouponService couponService;
+    private Date start, end;
+    private long responseTime;
+
+    @ModelAttribute
+    public void setResponseHeader(HttpServletResponse response) {
+        response.setHeader("Cache-Control", "no-store"); // HTTP 1.1.
+        response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
+        response.setHeader("Expires", "0"); // Proxies.
+        response.setHeader("Content-Type", "application/json");
+        response.setHeader("Set-Cookie", "type=ninja");
+    }
+
+    @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getCoupons() throws JsonProcessingException {
+        start = new Date();
+        List<CouponList> dtos = couponService.listCoupons();
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        ObjectMapper mapper = new ObjectMapper();
+        String response= "{\n" +
+                "  \"responseTime\": "+ responseTime + ",\n" +
+                "  \"responseType\": \"Coupon List\",\n" +
+                "  \"status\": 200,\n" +
+                "  \"response\": \"Success\",\n" +
+                "  \"msg\": \"\",\n" +
+                "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getCoupon(@PathVariable @Valid Long id) throws JsonProcessingException {
+        start = new Date();
+        CouponList dtos = couponService.listCoupon(id);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        ObjectMapper mapper = new ObjectMapper();
+        String response= "{\n" +
+                "  \"responseTime\": "+ responseTime + ",\n" +
+                "  \"responseType\": \"Coupon List\",\n" +
+                "  \"status\": 200,\n" +
+                "  \"response\": \"Success\",\n" +
+                "  \"msg\": \"\",\n" +
+                "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping(value= "/add", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiResponse> addCoupon (@RequestBody @Valid Coupon coupon) {
+        start = new Date();
+        couponService.addCoupon(coupon);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Coupon", HttpStatus.CREATED.value(),"Success", "Coupon has been created.",null), HttpStatus.CREATED);
+    }
+
+    @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiResponse> updateCoupon (@RequestBody @Valid Coupon coupon) {
+        start = new Date();
+        couponService.updateCoupon(coupon);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Coupon", HttpStatus.OK.value(),"Success", "Coupon has been updated.",null), HttpStatus.OK);
+    }
+
+    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiResponse> deleteCoupon (@PathVariable @Valid Long id) {
+        String coupon_name = couponService.getCouponNameByID(id);
+        start = new Date();
+        couponService.deleteCoupon(id);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Coupon", HttpStatus.OK.value(),"Success", coupon_name + " has been deleted.",null), HttpStatus.OK);
+    }
+}
