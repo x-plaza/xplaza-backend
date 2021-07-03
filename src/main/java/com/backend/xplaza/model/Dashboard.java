@@ -19,12 +19,9 @@ import java.util.List;
 public class Dashboard {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id")
+    @Column(name="shop_id")
     @ApiModelProperty(hidden= true)
     private long id;
-
-    @Column(name="shop_id")
-    private long shop_id;
 
     @Embedded
     private Revenue revenue;
