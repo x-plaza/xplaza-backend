@@ -1,0 +1,37 @@
+package com.backend.xplaza.model;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.vladmihalcea.hibernate.type.json.JsonStringType;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import org.hibernate.annotations.TypeDef;
+
+import javax.persistence.*;
+
+@Data
+@Entity
+@AllArgsConstructor
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+@TypeDef(name = "json", typeClass = JsonStringType.class)
+public class TopCustomer {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="customer_id")
+    @ApiModelProperty(hidden= true)
+    private long id;
+
+    @Column(name="customer_name")
+    private String name;
+
+    @Column(name="total_order_amount")
+    private double total_order_amount;
+
+    @ManyToOne
+    @JsonBackReference
+    @JoinColumn(name="id",insertable = false,updatable = false)
+    private Dashboard dashboard;
+
+    public TopCustomer(){}
+}
