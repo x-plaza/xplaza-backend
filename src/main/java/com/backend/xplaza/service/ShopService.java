@@ -7,6 +7,7 @@ import com.backend.xplaza.repository.ShopRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Service
@@ -14,7 +15,7 @@ public class ShopService {
     @Autowired
     private ShopRepository shopRepo;
     @Autowired
-    private ShopListRepository shopLocRepo;
+    private ShopListRepository shopListRepo;
 
     public void addShop(Shop shop) {
         shopRepo.save(shop);
@@ -24,7 +25,7 @@ public class ShopService {
         shopRepo.save(shop);
     }
 
-    public List<ShopList> listShops() { return shopLocRepo.findAllShopList(); }
+    public List<ShopList> listShops() { return shopListRepo.findAllShopList(); }
 
     public String getShopNameByID(Long id) {
         return shopRepo.getName(id);
@@ -35,6 +36,10 @@ public class ShopService {
     }
 
     public ShopList listShop(long id) {
-        return shopLocRepo.findShopListById(id);
+        return shopListRepo.findShopListById(id);
+    }
+
+    public List<ShopList> listShopsByUserID(@Valid long user_id) {
+        return shopListRepo.findAllShopListByUserID(user_id);
     }
 }

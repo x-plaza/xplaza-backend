@@ -4,6 +4,7 @@ import com.backend.xplaza.common.ApiResponse;
 import com.backend.xplaza.model.AdminUser;
 import com.backend.xplaza.model.AdminUserList;
 import com.backend.xplaza.service.AdminUserService;
+import com.backend.xplaza.service.RoleService;
 import com.backend.xplaza.service.SecurityService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,7 +18,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,6 +28,8 @@ public class AdminUserController {
     private AdminUserService adminUserService;
     @Autowired
     private SecurityService securityService;
+    @Autowired
+    private RoleService roleService;
 
     private Date start, end;
     private long responseTime;
@@ -42,9 +44,12 @@ public class AdminUserController {
     }
 
     @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getAdminUsers() throws JsonProcessingException {
+    public ResponseEntity<String> getAdminUsers(@RequestParam(value ="user_id",required = true) @Valid Long user_id) throws JsonProcessingException {
         start = new Date();
-        List<AdminUserList> dtos = adminUserService.listAdminUsers();
+        Object dtos;
+        String role_name = roleService.getRoleNameByID(user_id);
+        if(role_name == "Master Admin") dtos = adminUserService.listAdminUsers();
+        else dtos = adminUserService.listAdminUser(user_id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         /*HttpHeaders responseHeader = new HttpHeaders();
@@ -99,7 +104,6 @@ public class AdminUserController {
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         return new ResponseEntity<>(new ApiResponse(responseTime, "Add Admin User", HttpStatus.CREATED.value(),"Success", "Admin User has been created.",null), HttpStatus.CREATED);
-        //return new ResponseEntity<>(new ApiResponse(true, "Admin User has been created."), HttpStatus.CREATED);
     }
 
     @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -109,7 +113,6 @@ public class AdminUserController {
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         return new ResponseEntity<>(new ApiResponse(responseTime, "Update Admin User", HttpStatus.OK.value(),"Success", "Admin User has been updated.",null), HttpStatus.OK);
-        //return new ResponseEntity<>(new ApiResponse(true, "Admin User has been updated."), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -120,6 +123,5 @@ public class AdminUserController {
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Admin User", HttpStatus.OK.value(),"Success", admin_user_name + " has been deleted.",null), HttpStatus.OK);
-        //return new ResponseEntity<>(new ApiResponse(true, admin_user_name + " has been deleted."), HttpStatus.OK);
     }
 }

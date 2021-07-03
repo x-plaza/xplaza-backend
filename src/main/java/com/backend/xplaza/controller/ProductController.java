@@ -4,6 +4,7 @@ import com.backend.xplaza.common.ApiResponse;
 import com.backend.xplaza.model.Product;
 import com.backend.xplaza.model.ProductList;
 import com.backend.xplaza.service.ProductService;
+import com.backend.xplaza.service.RoleService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONException;
@@ -23,6 +24,9 @@ import java.util.List;
 public class ProductController {
     @Autowired
     private ProductService productService;
+    @Autowired
+    private RoleService roleService;
+
     private Date start, end;
     private long responseTime;
 
@@ -36,9 +40,12 @@ public class ProductController {
     }
 
     @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getProducts() throws JsonProcessingException {
+    public ResponseEntity<String> getProducts(@RequestParam(value ="user_id",required = true) @Valid long user_id) throws JsonProcessingException {
         start = new Date();
         List<ProductList> dtos = productService.listProducts();
+        String role_name = roleService.getRoleNameByID(user_id);
+        if(role_name == "Master Admin") dtos = productService.listProducts();
+        else dtos = productService.listProductsByUserID(user_id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         ObjectMapper mapper = new ObjectMapper();

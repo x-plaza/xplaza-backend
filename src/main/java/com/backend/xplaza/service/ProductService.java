@@ -42,4 +42,8 @@ public class ProductService {
     public ProductList listProduct(long id) {
         return productListRepo.findProductListById(id);
     }
+
+    public List<ProductList> listProductsByUserID(long user_id) {
+        return productListRepo.findAllProductListByUserID(user_id);
+    }
 }

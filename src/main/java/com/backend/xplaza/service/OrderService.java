@@ -48,4 +48,16 @@ public class OrderService {
     public void updateOrderStatus(long invoice_number, long status) {
         orderRepo.updateOrderStatus(invoice_number,status);
     }
+
+    public List<OrderList> listOrdersByUserID(long user_id) {
+        return orderListRepo.findAllOrdersUserID(user_id);
+    }
+
+    public List<OrderList> listOrdersByStatusAndUserID(String status, long user_id) {
+        return orderListRepo.findAllOrdersByStatusAndUserID(status,user_id);
+    }
+
+    public List<OrderList> listOrdersByFilterAndUserID(String status, Date order_date, long user_id) {
+        return orderListRepo.findAllOrdersByFilterAndUserID(status,order_date,user_id);
+    }
 }

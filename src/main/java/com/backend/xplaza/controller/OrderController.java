@@ -5,6 +5,7 @@ import com.backend.xplaza.model.Order;
 import com.backend.xplaza.model.OrderDetails;
 import com.backend.xplaza.model.OrderList;
 import com.backend.xplaza.service.OrderService;
+import com.backend.xplaza.service.RoleService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONException;
@@ -26,6 +27,9 @@ import java.util.List;
 public class OrderController {
     @Autowired
     private OrderService orderService;
+    @Autowired
+    private RoleService roleService;
+
     private Date start, end;
     private long responseTime;
 
@@ -39,18 +43,31 @@ public class OrderController {
     }
 
     @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getOrders(@RequestParam(value ="status",required = false) @Valid String status,
+    public ResponseEntity<String> getOrders(@RequestParam(value ="user_id",required = true) @Valid long user_id,
+                                            @RequestParam(value ="status",required = false) @Valid String status,
                                             @RequestParam(value ="order_date",required = false) @Valid String order_date)
                                             throws JsonProcessingException, JSONException, ParseException {
         start = new Date();
         List<OrderList> dtos;
         SimpleDateFormat formatter=new SimpleDateFormat("dd-MM-yyyy");
-        if (status == null && order_date == null) dtos = orderService.listOrders();
-        else if (status!=null && order_date == null) dtos = orderService.listOrdersByStatus(status);
-        else {
-            if (status == null) status = "Pending";
-            Date date = formatter.parse(order_date);
-            dtos = orderService.listOrdersByFilter(status,date);
+        String role_name = roleService.getRoleNameByID(user_id);
+        if(role_name == "Master Admin"){
+            if (status == null && order_date == null) dtos = orderService.listOrders();
+            else if (status!=null && order_date == null) dtos = orderService.listOrdersByStatus(status);
+            else {
+                if (status == null) status = "Pending";
+                Date date = formatter.parse(order_date);
+                dtos = orderService.listOrdersByFilter(status,date);
+            }
+        }
+        else{
+            if (status == null && order_date == null) dtos = orderService.listOrdersByUserID(user_id);
+            else if (status!=null && order_date == null) dtos = orderService.listOrdersByStatusAndUserID(status,user_id);
+            else {
+                if (status == null) status = "Pending";
+                Date date = formatter.parse(order_date);
+                dtos = orderService.listOrdersByFilterAndUserID(status,date,user_id);
+            }
         }
         end = new Date();
         responseTime = end.getTime() - start.getTime();

@@ -25,4 +25,15 @@ public interface ProductListRepository extends JpaRepository<ProductList, Long> 
             "left join product_variation_types var on p.fk_product_var_type_id = var.product_var_type_id " +
             "left join currencies cur on p.fk_currency_id = cur.currency_id", nativeQuery = true)
     List<ProductList> findAllProductList();
+
+    @Query(value = "select p.*, b.brand_name, s.shop_name, c.category_name, var.var_type_name, cur.currency_name " +
+            "from products p " +
+            "left join brands b on p.fk_brand_id = b.brand_id " +
+            "left join shops s on p.fk_shop_id = s.shop_id " +
+            "left join categories c on p.fk_category_id = c.category_id " +
+            "left join product_variation_types var on p.fk_product_var_type_id = var.product_var_type_id " +
+            "left join currencies cur on p.fk_currency_id = cur.currency_id " +
+            "left join admin_user_shop_link ausl on ausl.shop_id = s.shop_id " +
+            "where ausl.admin_user_id = ?1", nativeQuery = true)
+    List<ProductList> findAllProductListByUserID(long user_id);
 }
