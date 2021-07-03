@@ -21,7 +21,7 @@ public class Dashboard {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="shop_id")
     @ApiModelProperty(hidden= true)
-    private long id;
+    private long shop_id;
 
     @Embedded
     private Revenue revenue;
