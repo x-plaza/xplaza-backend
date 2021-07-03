@@ -12,6 +12,7 @@ import java.util.List;
 
 @Data
 @Entity
+@Table(name="revenue")
 @AllArgsConstructor
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @TypeDef(name = "json", typeClass = JsonStringType.class)
@@ -21,6 +22,9 @@ public class Dashboard {
     @Column(name="id")
     @ApiModelProperty(hidden= true)
     private long id;
+
+    @Column(name="shop_id")
+    private long shop_id;
 
     @Embedded
     private Revenue revenue;

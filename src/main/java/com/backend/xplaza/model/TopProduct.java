@@ -12,15 +12,18 @@ import javax.persistence.*;
 
 @Data
 @Entity
+@Table(name="top_product")
 @AllArgsConstructor
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @TypeDef(name = "json", typeClass = JsonStringType.class)
 public class TopProduct {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="product_id")
     @ApiModelProperty(hidden= true)
     private long id;
+
+    @Column(name="product_id")
+    private long product_id;
 
     @Column(name="product_name")
     private String name;
@@ -30,7 +33,7 @@ public class TopProduct {
 
     @ManyToOne
     @JsonBackReference
-    @JoinColumn(name="id",insertable = false,updatable = false)
+    @JoinColumn(name="shop_id",insertable = false,updatable = false)
     private Dashboard dashboard;
 
     public TopProduct(){}

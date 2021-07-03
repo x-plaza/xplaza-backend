@@ -1,4 +1,10 @@
 package com.backend.xplaza.repository;
 
-public interface DashboardRepository {
+import com.backend.xplaza.model.Dashboard;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+public interface DashboardRepository extends JpaRepository<Dashboard, Long> {
+    @Query(value = "select r.* from revenue r where r.shop_id = ?1", nativeQuery = true)
+    Dashboard findAllDetailsByShopId(long shop_id);
 }
