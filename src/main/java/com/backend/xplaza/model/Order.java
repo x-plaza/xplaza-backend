@@ -7,8 +7,7 @@ import lombok.Data;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 @Entity
@@ -36,7 +35,7 @@ public class Order {
     private String delivery_address;
 
     @Column(name="received_time")
-    private LocalDateTime received_time;
+    private Date received_time;
 
     @Column(name="fk_customer_id")
     private long customer_id;
@@ -63,7 +62,7 @@ public class Order {
     private long coupon_id;
 
     @Column(name="date_to_deliver")
-    private LocalDate date_to_deliver;
+    private Date date_to_deliver;
 
     public Order(){}
 }

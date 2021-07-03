@@ -8,7 +8,8 @@ import lombok.Data;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Data
 @Entity
@@ -35,6 +36,9 @@ public class OrderList {
     @Column(name="delivery_address")
     private String delivery_address;
 
+    @Column(name="fk_customer_id")
+    private String customer_id;
+
     @Column(name="customer_name")
     private String customer_name;
 
@@ -44,7 +48,12 @@ public class OrderList {
     private String allotted_time;
 
     @Column(name="received_time")
-    private LocalDateTime received_time;
+    private Date received_time;
+
+    public String getReceived_time() {
+        if(received_time != null) return new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(received_time);
+        return null;
+    }
 
     @Column(name="fk_shop_id")
     private long shop_id;
@@ -57,6 +66,14 @@ public class OrderList {
 
     @Column(name="status_name")
     private String status_name;
+
+    @Column(name="date_to_deliver")
+    private Date date_to_deliver;
+
+    public String getDate_to_deliver() {
+        if(date_to_deliver != null) return new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(date_to_deliver);
+        return null;
+    }
 
     public OrderList(){}
 }

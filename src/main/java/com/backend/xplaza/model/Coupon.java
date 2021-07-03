@@ -7,7 +7,7 @@ import lombok.Data;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 @Entity
@@ -19,14 +19,10 @@ public class Coupon {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="coupon_id")
-    //@ApiModelProperty(hidden=true)
     private long id;
 
     @Column(name="coupon_code")
     private String coupon_code;
-
-    @Column(name="is_active")
-    private boolean is_active;
 
     @Column(name="coupon_amount")
     private float amount;
@@ -41,10 +37,13 @@ public class Coupon {
     private long discount_type_id;
 
     @Column(name="coupon_start_date")
-    private LocalDateTime start_date;
+    private Date start_date;
 
     @Column(name="coupon_end_date")
-    private LocalDateTime end_date;
+    private Date end_date;
+
+    @Column(name="is_active")
+    private boolean is_active;
 
     public Coupon() {}
 }

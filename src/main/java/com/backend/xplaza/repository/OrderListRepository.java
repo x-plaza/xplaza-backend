@@ -8,7 +8,8 @@ import java.util.Date;
 import java.util.List;
 
 public interface OrderListRepository extends JpaRepository<OrderList, Long> {
-    @Query(value = "select o.order_id, o.total_price, o.discount_amount, o.grand_total_price, o.delivery_address, concat(c.first_name,' ',c.last_name) as customer_name, " +
+    @Query(value = "select o.order_id, o.total_price, o.discount_amount, o.grand_total_price, o.delivery_address, o.fk_customer_id, " +
+            "o.date_to_deliver, concat(c.first_name,' ',c.last_name) as customer_name, " +
             "c.mobile_no, o.received_time, o.fk_shop_id, s.shop_name, o.fk_status_id, st.status_name, " +
             "concat(d.delivery_schedule_start, '-' , d.delivery_schedule_end) as allotted_time " +
             "from orders o " +
@@ -19,7 +20,8 @@ public interface OrderListRepository extends JpaRepository<OrderList, Long> {
     List<OrderList> findAllOrders();
 
 
-    @Query(value = "select o.order_id, o.total_price, o.discount_amount, o.grand_total_price, o.delivery_address, concat(c.first_name,' ',c.last_name) as customer_name, " +
+    @Query(value = "select o.order_id, o.total_price, o.discount_amount, o.grand_total_price, o.delivery_address, o.fk_customer_id, " +
+            "o.date_to_deliver, concat(c.first_name,' ',c.last_name) as customer_name, " +
             "c.mobile_no, o.received_time, o.fk_shop_id, s.shop_name, o.fk_status_id, st.status_name, " +
             "concat(d.delivery_schedule_start, '-' , d.delivery_schedule_end) as allotted_time " +
             "from orders o " +
@@ -31,7 +33,8 @@ public interface OrderListRepository extends JpaRepository<OrderList, Long> {
     List<OrderList> findAllOrdersByStatus(String status);
 
 
-    @Query(value = "select o.order_id, o.total_price, o.discount_amount, o.grand_total_price, o.delivery_address, concat(c.first_name,' ',c.last_name) as customer_name, " +
+    @Query(value = "select o.order_id, o.total_price, o.discount_amount, o.grand_total_price, o.delivery_address, o.fk_customer_id, " +
+            "o.date_to_deliver, concat(c.first_name,' ',c.last_name) as customer_name, " +
             "c.mobile_no, o.received_time, o.fk_shop_id, s.shop_name, o.fk_status_id, st.status_name, " +
             "concat(d.delivery_schedule_start, '-' , d.delivery_schedule_end) as allotted_time " +
             "from orders o " +
