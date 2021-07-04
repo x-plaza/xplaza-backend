@@ -50,7 +50,7 @@ public class AdminUserController {
         ObjectMapper mapper = new ObjectMapper();
         String data = null;
         String role_name = roleService.getRoleNameByUserID(user_id);
-        if(role_name == "Master Admin") {
+        if(role_name.equals("Master Admin")) {
             List<AdminUserList> dtosList = adminUserService.listAdminUsers();
             data = mapper.writeValueAsString(dtosList);
         } else {

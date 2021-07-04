@@ -45,7 +45,7 @@ public class ShopController {
         start = new Date();
         List<ShopList> dtos;
         String role_name = roleService.getRoleNameByUserID(user_id);
-        if(role_name == "Master Admin") dtos = shopService.listShops();
+        if(role_name.equals("Master Admin")) dtos = shopService.listShops();
         else dtos = shopService.listShopsByUserID(user_id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();

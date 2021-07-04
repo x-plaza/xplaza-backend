@@ -51,7 +51,7 @@ public class OrderController {
         List<OrderList> dtos;
         SimpleDateFormat formatter=new SimpleDateFormat("dd-MM-yyyy");
         String role_name = roleService.getRoleNameByUserID(user_id);
-        if(role_name == "Master Admin"){
+        if(role_name.equals("Master Admin")) {
             if (status == null && order_date == null) dtos = orderService.listOrders();
             else if (status!=null && order_date == null) dtos = orderService.listOrdersByStatus(status);
             else {

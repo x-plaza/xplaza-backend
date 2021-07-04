@@ -44,7 +44,7 @@ public class ProductController {
         start = new Date();
         List<ProductList> dtos;
         String role_name = roleService.getRoleNameByUserID(user_id);
-        if(role_name == "Master Admin") dtos = productService.listProducts();
+        if(role_name.equals("Master Admin")) dtos = productService.listProducts();
         else dtos = productService.listProductsByUserID(user_id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
