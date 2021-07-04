@@ -19,7 +19,6 @@ public class AdminUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="admin_user_id")
-    //@ApiModelProperty(hidden=true)
     private long id;
 
     @Column(name="user_name")

@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,25 +47,26 @@ public class AdminUserController {
     @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getAdminUsers(@RequestParam(value ="user_id",required = true) @Valid Long user_id) throws JsonProcessingException {
         start = new Date();
-        Object dtos;
+        ObjectMapper mapper = new ObjectMapper();
+        String data = null;
         String role_name = roleService.getRoleNameByID(user_id);
-        if(role_name == "Master Admin") dtos = adminUserService.listAdminUsers();
-        else dtos = adminUserService.listAdminUser(user_id);
+        if(role_name == "Master Admin") {
+            List<AdminUserList> dtosList = adminUserService.listAdminUsers();
+            data = mapper.writeValueAsString(dtosList);
+        } else {
+            AdminUserList dtos = adminUserService.listAdminUser(user_id);
+            data = mapper.writeValueAsString(dtos);
+        }
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        /*HttpHeaders responseHeader = new HttpHeaders();
-        responseHeader.set("responseTime", String.valueOf(responseTime));
-        responseHeader.set("responseType", "Admin User List");
-        responseHeader.set("status", String.valueOf(HttpStatus.OK.value()));
-        responseHeader.set("response", "Success");*/
-        ObjectMapper mapper = new ObjectMapper();
+
         String response= "{\n" +
                 "  \"responseTime\": "+ responseTime + ",\n" +
                 "  \"responseType\": \"Admin User List\",\n" +
                 "  \"status\": 200,\n" +
                 "  \"response\": \"Success\",\n" +
                 "  \"msg\": \"\",\n" +
-                "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
+                "  \"data\":" +  data + "\n}";
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
