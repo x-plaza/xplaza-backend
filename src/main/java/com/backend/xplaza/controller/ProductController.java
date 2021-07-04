@@ -42,8 +42,8 @@ public class ProductController {
     @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getProducts(@RequestParam(value ="user_id",required = true) @Valid long user_id) throws JsonProcessingException {
         start = new Date();
-        List<ProductList> dtos = productService.listProducts();
-        String role_name = roleService.getRoleNameByID(user_id);
+        List<ProductList> dtos;
+        String role_name = roleService.getRoleNameByUserID(user_id);
         if(role_name == "Master Admin") dtos = productService.listProducts();
         else dtos = productService.listProductsByUserID(user_id);
         end = new Date();
@@ -60,7 +60,7 @@ public class ProductController {
     }
 
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getProduct(@PathVariable @Valid Long id) throws JsonProcessingException {
+    public ResponseEntity<String> getProduct(@PathVariable @Valid long id) throws JsonProcessingException {
         start = new Date();
         ProductList dtos = productService.listProduct(id);
         end = new Date();
@@ -100,7 +100,7 @@ public class ProductController {
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> deleteProduct (@PathVariable @Valid Long id) {
+    public ResponseEntity<ApiResponse> deleteProduct (@PathVariable @Valid long id) {
         String product_name = productService.getProductNameByID(id);
         start = new Date();
         productService.deleteImagesByProductId(id);

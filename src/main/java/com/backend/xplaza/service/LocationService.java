@@ -31,11 +31,11 @@ public class LocationService {
 
     public LocationList listLocation(long id) { return locationListRepo.findLocationListById(id); }
 
-    public String getLocationNameByID(Long id) {
+    public String getLocationNameByID(long id) {
         return locationRepo.getName(id);
     }
 
-    public void deleteLocation(Long id) {
+    public void deleteLocation(long id) {
         locationRepo.deleteById(id);
     }
 }

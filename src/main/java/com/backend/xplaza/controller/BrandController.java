@@ -52,7 +52,7 @@ public class BrandController {
     }
 
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getBrand(@PathVariable @Valid Long id) throws JsonProcessingException {
+    public ResponseEntity<String> getBrand(@PathVariable @Valid long id) throws JsonProcessingException {
         start = new Date();
         Brand dtos = brandService.listBrand(id);
         end = new Date();
@@ -87,7 +87,7 @@ public class BrandController {
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> deleteBrand (@PathVariable @Valid Long id) {
+    public ResponseEntity<ApiResponse> deleteBrand (@PathVariable @Valid long id) {
         String brand_name = brandService.getBrandNameByID(id);
         start = new Date();
         brandService.deleteBrand(id);

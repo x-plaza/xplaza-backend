@@ -45,11 +45,11 @@ public class AdminUserController {
     }
 
     @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getAdminUsers(@RequestParam(value ="user_id",required = true) @Valid Long user_id) throws JsonProcessingException {
+    public ResponseEntity<String> getAdminUsers(@RequestParam(value ="user_id",required = true) @Valid long user_id) throws JsonProcessingException {
         start = new Date();
         ObjectMapper mapper = new ObjectMapper();
         String data = null;
-        String role_name = roleService.getRoleNameByID(user_id);
+        String role_name = roleService.getRoleNameByUserID(user_id);
         if(role_name == "Master Admin") {
             List<AdminUserList> dtosList = adminUserService.listAdminUsers();
             data = mapper.writeValueAsString(dtosList);
@@ -71,7 +71,7 @@ public class AdminUserController {
     }
 
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getAdminUser(@PathVariable @Valid Long id) throws JsonProcessingException {
+    public ResponseEntity<String> getAdminUser(@PathVariable @Valid long id) throws JsonProcessingException {
         start = new Date();
         AdminUserList dtos = adminUserService.listAdminUser(id);
         end = new Date();

@@ -20,11 +20,11 @@ public class CategoryService {
         categoryRepo.save(category);
     }
 
-    public String getCategoryNameByID(Long id) {
+    public String getCategoryNameByID(long id) {
         return categoryRepo.getName(id);
     }
 
-    public void deleteCategory(Long id) {
+    public void deleteCategory(long id) {
         categoryRepo.deleteById(id);
     }
 

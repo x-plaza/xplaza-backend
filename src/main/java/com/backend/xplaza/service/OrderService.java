@@ -33,7 +33,7 @@ public class OrderService {
 
     public OrderDetails listOrderDetails(long id) { return orderDetailsRepo.findOrderDetailsById(id); }
 
-    public void deleteOrder(Long id) {
+    public void deleteOrder(long id) {
         orderRepo.deleteById(id);
     }
 

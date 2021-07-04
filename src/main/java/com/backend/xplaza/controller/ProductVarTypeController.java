@@ -52,7 +52,7 @@ public class ProductVarTypeController {
     }
 
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getProductVarType(@PathVariable @Valid Long id) throws JsonProcessingException {
+    public ResponseEntity<String> getProductVarType(@PathVariable @Valid long id) throws JsonProcessingException {
         start = new Date();
         ProductVarType dtos = prodVarTypeService.listProductVarType(id);
         end = new Date();
@@ -87,7 +87,7 @@ public class ProductVarTypeController {
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> deleteProductVarType (@PathVariable @Valid Long id) {
+    public ResponseEntity<ApiResponse> deleteProductVarType (@PathVariable @Valid long id) {
         String prod_var_type_name = prodVarTypeService.getProductVarTypeNameByID(id);
         start = new Date();
         prodVarTypeService.deleteProductVarType(id);

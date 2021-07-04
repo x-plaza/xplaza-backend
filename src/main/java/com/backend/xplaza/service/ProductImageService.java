@@ -21,11 +21,11 @@ public class ProductImageService {
 
     public List<ProductImage> listProductImages() { return productImgRepo.findAll(Sort.by(Sort.Direction.ASC, "name")); }
 
-    public String getProductImageNameByID(Long id) {
+    public String getProductImageNameByID(long id) {
         return productImgRepo.getName(id);
     }
 
-    public void deleteProductImage(Long id) {
+    public void deleteProductImage(long id) {
         productImgRepo.deleteById(id);
     }
 

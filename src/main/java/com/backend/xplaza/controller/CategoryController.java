@@ -51,7 +51,7 @@ public class CategoryController {
     }
 
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getCategory(@PathVariable @Valid Long id) throws JsonProcessingException {
+    public ResponseEntity<String> getCategory(@PathVariable @Valid long id) throws JsonProcessingException {
         start = new Date();
         Category dtos = categoryService.listCategory(id);
         end = new Date();
@@ -86,7 +86,7 @@ public class CategoryController {
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> deleteCategory (@PathVariable @Valid Long id) {
+    public ResponseEntity<ApiResponse> deleteCategory (@PathVariable @Valid long id) {
         String category_name = categoryService.getCategoryNameByID(id);
         start = new Date();
         categoryService.deleteCategory(id);

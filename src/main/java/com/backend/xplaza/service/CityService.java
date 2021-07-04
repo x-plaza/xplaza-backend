@@ -20,11 +20,11 @@ public class CityService {
         cityRepo.save(city);
     }
 
-    public String getCityNameByID(Long id) {
+    public String getCityNameByID(long id) {
         return cityRepo.getName(id);
     }
 
-    public void deleteCity(Long id) {
+    public void deleteCity(long id) {
         cityRepo.deleteById(id);
     }
 
@@ -32,7 +32,7 @@ public class CityService {
         return cityRepo.findAll();
     }
 
-    public City listCity(Long id) {
+    public City listCity(long id) {
         return cityRepo.findCityById(id);
     }
 }

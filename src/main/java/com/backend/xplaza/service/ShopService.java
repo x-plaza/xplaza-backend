@@ -27,11 +27,11 @@ public class ShopService {
 
     public List<ShopList> listShops() { return shopListRepo.findAllShopList(); }
 
-    public String getShopNameByID(Long id) {
+    public String getShopNameByID(long id) {
         return shopRepo.getName(id);
     }
 
-    public void deleteShop(Long id) {
+    public void deleteShop(long id) {
         shopRepo.deleteById(id);
     }
 

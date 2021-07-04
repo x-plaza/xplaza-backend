@@ -14,7 +14,7 @@ public interface ShopListRepository extends JpaRepository<ShopList, Long> {
 
     @Query(value = "select s.shop_id, s.shop_name, s.shop_owner, s.shop_address, s.fk_location_id, location_name from shops s " +
             "left join locations l on s.fk_location_id = l.location_id where s.shop_id = ?1", nativeQuery = true)
-    ShopList findShopListById(Long id);
+    ShopList findShopListById(long id);
 
     @Query(value = "select s.shop_id, s.shop_name, s.shop_owner, s.shop_address, s.fk_location_id, location_name from shops s " +
             "left join locations l on s.fk_location_id = l.location_id " +

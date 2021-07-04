@@ -52,7 +52,7 @@ public class CurrencyController {
     }
 
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getCurrency(@PathVariable @Valid Long id) throws JsonProcessingException {
+    public ResponseEntity<String> getCurrency(@PathVariable @Valid long id) throws JsonProcessingException {
         start = new Date();
         Currency dtos = currencyService.listCurrency(id);
         end = new Date();
@@ -87,7 +87,7 @@ public class CurrencyController {
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> deleteCurrency (@PathVariable @Valid Long id) {
+    public ResponseEntity<ApiResponse> deleteCurrency (@PathVariable @Valid long id) {
         String currency_name = currencyService.getCurrencyNameByID(id);
         start = new Date();
         currencyService.deleteCurrency(id);

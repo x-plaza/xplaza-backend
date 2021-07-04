@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface AdminUserRepository extends JpaRepository<AdminUser, Long> {
     @Query(value = "select user_name from admin_users where admin_user_id = ?1", nativeQuery = true)
-    String getName(Long id);
+    String getName(long id);
 
     @Query(value = "select * from admin_users where user_name = ?1", nativeQuery = true)
     AdminUser findUserByUsername(String username);

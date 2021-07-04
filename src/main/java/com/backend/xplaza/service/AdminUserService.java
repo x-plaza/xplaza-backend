@@ -24,11 +24,11 @@ public class AdminUserService {
         adminUserRepo.save(adminUser);
     }
 
-    public String getAdminUserNameByID(Long id) {
+    public String getAdminUserNameByID(long id) {
         return adminUserRepo.getName(id);
     }
 
-    public void deleteAdminUser(Long id) {
+    public void deleteAdminUser(long id) {
         adminUserRepo.deleteById(id);
     }
 
@@ -36,7 +36,7 @@ public class AdminUserService {
         return adminUserListRepo.findAllUsers();
     }
 
-    public AdminUserList listAdminUser(Long id) {
+    public AdminUserList listAdminUser(long id) {
         return adminUserListRepo.findUserById(id);
     }
 

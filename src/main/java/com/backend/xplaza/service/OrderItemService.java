@@ -24,11 +24,11 @@ public class OrderItemService {
 
     public OrderItem listOrderItem(long id) { return orderItemRepo.findOrderItemById(id); }
 
-    public String getOrderItemNameByID(Long id) {
+    public String getOrderItemNameByID(long id) {
         return orderItemRepo.getName(id);
     }
 
-    public void deleteOrderItem(Long id) {
+    public void deleteOrderItem(long id) {
         orderItemRepo.deleteById(id);
     }
 }

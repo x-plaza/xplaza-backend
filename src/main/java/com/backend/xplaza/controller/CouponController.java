@@ -52,7 +52,7 @@ public class CouponController {
     }
 
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getCoupon(@PathVariable @Valid Long id) throws JsonProcessingException {
+    public ResponseEntity<String> getCoupon(@PathVariable @Valid long id) throws JsonProcessingException {
         start = new Date();
         CouponList dtos = couponService.listCoupon(id);
         end = new Date();
@@ -87,7 +87,7 @@ public class CouponController {
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> deleteCoupon (@PathVariable @Valid Long id) {
+    public ResponseEntity<ApiResponse> deleteCoupon (@PathVariable @Valid long id) {
         String coupon_name = couponService.getCouponNameByID(id);
         start = new Date();
         couponService.deleteCoupon(id);

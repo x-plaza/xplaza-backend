@@ -52,7 +52,7 @@ public class OrderItemController {
     }
 
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getOrderItem(@PathVariable @Valid Long id) throws JsonProcessingException {
+    public ResponseEntity<String> getOrderItem(@PathVariable @Valid long id) throws JsonProcessingException {
         start = new Date();
         OrderItem dtos = orderItemService.listOrderItem(id);
         end = new Date();
@@ -87,7 +87,7 @@ public class OrderItemController {
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> deleteOrderItem (@PathVariable @Valid Long id) {
+    public ResponseEntity<ApiResponse> deleteOrderItem (@PathVariable @Valid long id) {
         String order_item_name = orderItemService.getOrderItemNameByID(id);
         start = new Date();
         orderItemService.deleteOrderItem(id);

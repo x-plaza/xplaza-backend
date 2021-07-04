@@ -52,7 +52,7 @@ public class LocationController {
     }
 
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getLocation(@PathVariable @Valid Long id) throws JsonProcessingException {
+    public ResponseEntity<String> getLocation(@PathVariable @Valid long id) throws JsonProcessingException {
         start = new Date();
         LocationList dtos = locationService.listLocation(id);
         end = new Date();
@@ -87,7 +87,7 @@ public class LocationController {
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> deleteLocation (@PathVariable @Valid Long id) {
+    public ResponseEntity<ApiResponse> deleteLocation (@PathVariable @Valid long id) {
         String location_name = locationService.getLocationNameByID(id);
         start = new Date();
         locationService.deleteLocation(id);

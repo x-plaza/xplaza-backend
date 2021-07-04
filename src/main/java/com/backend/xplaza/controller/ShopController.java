@@ -44,7 +44,7 @@ public class ShopController {
     public ResponseEntity<String> getShops(@RequestParam(value ="user_id",required = true) @Valid long user_id) throws JsonProcessingException {
         start = new Date();
         List<ShopList> dtos;
-        String role_name = roleService.getRoleNameByID(user_id);
+        String role_name = roleService.getRoleNameByUserID(user_id);
         if(role_name == "Master Admin") dtos = shopService.listShops();
         else dtos = shopService.listShopsByUserID(user_id);
         end = new Date();
@@ -61,7 +61,7 @@ public class ShopController {
     }
 
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getShop(@PathVariable @Valid Long id) throws JsonProcessingException {
+    public ResponseEntity<String> getShop(@PathVariable @Valid long id) throws JsonProcessingException {
         start = new Date();
         ShopList dtos = shopService.listShop(id);
         end = new Date();
@@ -96,7 +96,7 @@ public class ShopController {
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> deleteShop (@PathVariable @Valid Long id) {
+    public ResponseEntity<ApiResponse> deleteShop (@PathVariable @Valid long id) {
         String shop_name = shopService.getShopNameByID(id);
         start = new Date();
         shopService.deleteShop(id);

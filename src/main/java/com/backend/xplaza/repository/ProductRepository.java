@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query(value = "select product_name from products where product_id = ?1", nativeQuery = true)
-    String getName(Long id);
+    String getName(long id);
 
     @Query(value = "select * from products where product_id = ?1", nativeQuery = true)
     Product findProductById(long id);
@@ -17,10 +17,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "FROM products \n" +
             "ORDER BY product_id DESC \n" +
             "LIMIT 1", nativeQuery = true)
-    Long getMaxID();
+    long getMaxID();
 
     @Modifying
     @Transactional
     @Query(value = "DELETE FROM product_images WHERE fk_product_id = ?1", nativeQuery = true)
-    void deleteImagesByProductId(Long id);
+    void deleteImagesByProductId(long id);
 }

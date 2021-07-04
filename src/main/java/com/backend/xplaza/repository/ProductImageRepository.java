@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ProductImageRepository extends JpaRepository<ProductImage, Long> {
     @Query(value = "select product_image_name from product_images where product_image_id = ?1", nativeQuery = true)
-    String getName(Long id);
+    String getName(long id);
 
     @Query(value = "select * from product_images where fk_product_id = ?1", nativeQuery = true)
     List<ProductImage> findImageByProductId(long id);

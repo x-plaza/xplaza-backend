@@ -51,7 +51,7 @@ public class StateController {
     }
 
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getState (@PathVariable @Valid Long id) throws JsonProcessingException {
+    public ResponseEntity<String> getState (@PathVariable @Valid long id) throws JsonProcessingException {
         start = new Date();
         State dtos = stateService.listState(id);
         end = new Date();
@@ -86,7 +86,7 @@ public class StateController {
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> deleteState (@PathVariable @Valid Long id) {
+    public ResponseEntity<ApiResponse> deleteState (@PathVariable @Valid long id) {
         String state_name = stateService.getStateNameByID(id);
         start = new Date();
         stateService.deleteState(id);

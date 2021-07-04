@@ -50,7 +50,7 @@ public class OrderController {
         start = new Date();
         List<OrderList> dtos;
         SimpleDateFormat formatter=new SimpleDateFormat("dd-MM-yyyy");
-        String role_name = roleService.getRoleNameByID(user_id);
+        String role_name = roleService.getRoleNameByUserID(user_id);
         if(role_name == "Master Admin"){
             if (status == null && order_date == null) dtos = orderService.listOrders();
             else if (status!=null && order_date == null) dtos = orderService.listOrdersByStatus(status);
@@ -83,7 +83,7 @@ public class OrderController {
     }
 
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getOrder(@PathVariable @Valid Long id) throws JsonProcessingException {
+    public ResponseEntity<String> getOrder(@PathVariable @Valid long id) throws JsonProcessingException {
         start = new Date();
         OrderDetails dtos = orderService.listOrderDetails(id);
         end = new Date();
@@ -127,7 +127,7 @@ public class OrderController {
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> deleteOrder (@PathVariable @Valid Long id) {
+    public ResponseEntity<ApiResponse> deleteOrder (@PathVariable @Valid long id) {
         start = new Date();
         orderService.deleteOrder(id);
         end = new Date();

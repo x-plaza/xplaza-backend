@@ -51,7 +51,7 @@ public class RoleController {
     }
 
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getRole(@PathVariable @Valid Long id) throws JsonProcessingException {
+    public ResponseEntity<String> getRole(@PathVariable @Valid long id) throws JsonProcessingException {
         start = new Date();
         Role dtos = roleService.listRole(id);
         end = new Date();
@@ -86,7 +86,7 @@ public class RoleController {
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> deleteRole (@PathVariable @Valid Long id) {
+    public ResponseEntity<ApiResponse> deleteRole (@PathVariable @Valid long id) {
         String role_name = roleService.getRoleNameByID(id);
         start = new Date();
         roleService.deleteRole(id);
