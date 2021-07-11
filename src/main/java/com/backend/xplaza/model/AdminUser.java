@@ -8,6 +8,7 @@ import lombok.Data;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @Entity
@@ -20,6 +21,10 @@ public class AdminUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="admin_user_id")
     private long id;
+
+    public long getId() {
+        return id;
+    }
 
     @Column(name="user_name")
     private String user_name;
@@ -49,6 +54,13 @@ public class AdminUser {
 
     @Column(name="fk_role_id")
     private long role_id;
+
+    @OneToMany(mappedBy = "adminUser")
+    private List<AdminUserShopLink> adminUserShopLinks;
+
+    public List<AdminUserShopLink> getAdminUserShopLinks() {
+        return adminUserShopLinks;
+    }
 
     public AdminUser() {}
 }

@@ -1,6 +1,7 @@
 package com.backend.xplaza.model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,27 +12,26 @@ import javax.persistence.*;
 @Data
 @Entity
 @AllArgsConstructor
-@Table(name="shops")
+@Table(name="admin_user_shop_link")
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @TypeDef(name = "json", typeClass = JsonStringType.class)
-public class Shop {
+public class AdminUserShopLink {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="shop_id")
-    //@ApiModelProperty(hidden=true)
+    @Column(name="admin_user_id")
     private long id;
 
-    @Column(name="shop_name")
-    private String name;
+    @Column(name="shop_id")
+    private long shop_id;
 
-    @Column(name="shop_owner")
-    private String owner;
+    public long getShop_id() {
+        return shop_id;
+    }
 
-    @Column(name="shop_address")
-    private String address;
+    @ManyToOne
+    @JsonBackReference
+    @JoinColumn(name="admin_user_id",insertable = false,updatable = false)
+    private AdminUser adminUser;
 
-    @Column(name="fk_location_id")
-    private long location_id;
+    public AdminUserShopLink() {}
 
-    public Shop() {}
 }
