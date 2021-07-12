@@ -26,6 +26,9 @@ public class AdminUser {
         return id;
     }
 
+    @Column(name="full_name")
+    private String full_name;
+
     @Column(name="user_name")
     private String user_name;
 

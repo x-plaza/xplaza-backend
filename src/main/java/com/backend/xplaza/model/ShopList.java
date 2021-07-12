@@ -31,6 +31,9 @@ public class ShopList {
     @Column(name="shop_address")
     private String address;
 
+    @Column(name="shop_description")
+    private String description;
+
     @Column(name="fk_location_id")
     private long location_id;
 

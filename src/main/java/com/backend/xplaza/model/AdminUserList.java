@@ -23,6 +23,9 @@ public class AdminUserList {
     @ApiModelProperty(hidden= true)
     private long id;
 
+    @Column(name="full_name")
+    private String full_name;
+
     @Column(name="user_name")
     private String user_name;
 

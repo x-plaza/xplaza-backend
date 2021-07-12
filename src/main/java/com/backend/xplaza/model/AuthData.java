@@ -16,6 +16,8 @@ import javax.persistence.Embeddable;
 public class AuthData {
     private String user_name;
 
+    private String full_name;
+
     private long role_id;
 
     private String role_name;
