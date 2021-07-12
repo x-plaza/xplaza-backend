@@ -3,6 +3,7 @@ package com.backend.xplaza.model;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.hibernate.annotations.TypeDef;
@@ -17,6 +18,7 @@ import javax.persistence.*;
 @TypeDef(name = "json", typeClass = JsonStringType.class)
 public class AdminUserShopLink {
     @Id
+    @ApiModelProperty(hidden=true)
     @Column(name="admin_user_id")
     private long id;
 
