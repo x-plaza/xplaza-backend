@@ -29,6 +29,10 @@ public class AdminUser {
     @Column(name="full_name")
     private String full_name;
 
+    public String getFull_name() {
+        return full_name;
+    }
+
     @Column(name="user_name")
     private String user_name;
 
@@ -57,6 +61,10 @@ public class AdminUser {
 
     @Column(name="fk_role_id")
     private long role_id;
+
+    public long getRole_id() {
+        return role_id;
+    }
 
     @OneToMany(mappedBy = "adminUser")
     private List<AdminUserShopLink> adminUserShopLinks;

@@ -112,6 +112,18 @@ public class AdminUserController {
     @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> updateAdminUser (@RequestBody @Valid AdminUser adminUser) {
         start = new Date();
+        byte[] byteSalt = null;
+        try{
+            byteSalt = securityService.getSalt();
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger("Salt error").log(Level.SEVERE, null, ex);
+        }
+        byte[] biteDigestPsw = securityService.getSaltedHashSHA512(adminUser.getPassword(),byteSalt);
+        String strDigestPsw = securityService.toHex(biteDigestPsw);
+        String strSalt = securityService.toHex(byteSalt);
+        adminUser.setPassword(strDigestPsw);
+        adminUser.setSalt(strSalt);
+
         for (AdminUserShopLink ausl : adminUser.getAdminUserShopLinks()) {
             ausl.setId(adminUser.getId());
         }
