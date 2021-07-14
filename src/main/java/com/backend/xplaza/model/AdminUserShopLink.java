@@ -14,6 +14,7 @@ import javax.persistence.*;
 @Entity
 @AllArgsConstructor
 @Table(name="admin_user_shop_link")
+@IdClass(AdminUserShopLinkId.class)
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @TypeDef(name = "json", typeClass = JsonStringType.class)
 public class AdminUserShopLink {
@@ -22,6 +23,11 @@ public class AdminUserShopLink {
     @Column(name="admin_user_id")
     private long id;
 
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    @Id
     @Column(name="shop_id")
     private long shop_id;
 
@@ -35,5 +41,4 @@ public class AdminUserShopLink {
     private AdminUser adminUser;
 
     public AdminUserShopLink() {}
-
 }

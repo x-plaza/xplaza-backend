@@ -31,8 +31,8 @@ public class AdminUserService {
 
     @Transactional
     public void updateAdminUser(AdminUser adminUser) {
-        adminUserShopLinkRepo.deleteByAdminUserID(adminUser.getId());
         adminUserRepo.save(adminUser);
+        adminUserShopLinkRepo.deleteByAdminUserID(adminUser.getId());
         for (AdminUserShopLink ausl : adminUser.getAdminUserShopLinks()) {
             adminUserShopLinkRepo.insert(adminUser.getId(),ausl.getShop_id());
         }

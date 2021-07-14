@@ -3,6 +3,7 @@ package com.backend.xplaza.controller;
 import com.backend.xplaza.common.ApiResponse;
 import com.backend.xplaza.model.AdminUser;
 import com.backend.xplaza.model.AdminUserList;
+import com.backend.xplaza.model.AdminUserShopLink;
 import com.backend.xplaza.service.AdminUserService;
 import com.backend.xplaza.service.RoleService;
 import com.backend.xplaza.service.SecurityService;
@@ -111,6 +112,9 @@ public class AdminUserController {
     @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> updateAdminUser (@RequestBody @Valid AdminUser adminUser) {
         start = new Date();
+        for (AdminUserShopLink ausl : adminUser.getAdminUserShopLinks()) {
+            ausl.setId(adminUser.getId());
+        }
         adminUserService.updateAdminUser(adminUser);
         end = new Date();
         responseTime = end.getTime() - start.getTime();

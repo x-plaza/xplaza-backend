@@ -65,5 +65,9 @@ public class AdminUser {
         return adminUserShopLinks;
     }
 
+    public void setAdminUserShopLinks(List<AdminUserShopLink> adminUserShopLinks) {
+        this.adminUserShopLinks = adminUserShopLinks;
+    }
+
     public AdminUser() {}
 }
