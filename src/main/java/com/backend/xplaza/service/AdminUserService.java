@@ -31,7 +31,7 @@ public class AdminUserService {
 
     @Transactional
     public void updateAdminUser(AdminUser adminUser) {
-        adminUserRepo.update(adminUser.getPassword(),adminUser.getSalt(),adminUser.getRole_id(),adminUser.getFull_name(),adminUser.getId());
+        adminUserRepo.update(adminUser.getRole_id(),adminUser.getFull_name(),adminUser.getId());
         adminUserShopLinkRepo.deleteByAdminUserID(adminUser.getId());
         for (AdminUserShopLink ausl : adminUser.getAdminUserShopLinks()) {
             adminUserShopLinkRepo.insert(adminUser.getId(),ausl.getShop_id());
@@ -58,5 +58,9 @@ public class AdminUserService {
 
     public AdminUser listAdminUser(String username) {
         return adminUserRepo.findUserByUsername(username);
+    }
+
+    public void changeAdminUserPassword(String new_password, String salt, String user_name) {
+        adminUserRepo.changePassword(new_password,salt,user_name);
     }
 }

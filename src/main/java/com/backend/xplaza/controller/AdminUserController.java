@@ -5,6 +5,7 @@ import com.backend.xplaza.model.AdminUser;
 import com.backend.xplaza.model.AdminUserList;
 import com.backend.xplaza.model.AdminUserShopLink;
 import com.backend.xplaza.service.AdminUserService;
+import com.backend.xplaza.service.LoginService;
 import com.backend.xplaza.service.RoleService;
 import com.backend.xplaza.service.SecurityService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.List;
@@ -32,6 +34,8 @@ public class AdminUserController {
     private SecurityService securityService;
     @Autowired
     private RoleService roleService;
+    @Autowired
+    private LoginService loginService;
 
     private Date start, end;
     private long responseTime;
@@ -109,21 +113,33 @@ public class AdminUserController {
         return new ResponseEntity<>(new ApiResponse(responseTime, "Add Admin User", HttpStatus.CREATED.value(),"Success", "Admin User has been created.",null), HttpStatus.CREATED);
     }
 
-    @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> updateAdminUser (@RequestBody @Valid AdminUser adminUser) {
+    @PostMapping(value= "/change-password", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiResponse> changeAdminUserPassword (@RequestParam("username") @Valid String username,
+                                                          @RequestParam("oldPassword") @Valid String oldPassword,
+                                                          @RequestParam("newPassword") @Valid String newPassword) throws IOException {
         start = new Date();
+        boolean isValidUser = loginService.isVaidUser(username, oldPassword);
+        if(!isValidUser) {
+            return new ResponseEntity<>(new ApiResponse(responseTime, "Change Admin User Password", HttpStatus.FORBIDDEN.value(),"Failure", "Old Password does not match.",null), HttpStatus.FORBIDDEN);
+        }
         byte[] byteSalt = null;
-        try{
+        try {
             byteSalt = securityService.getSalt();
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger("Salt error").log(Level.SEVERE, null, ex);
         }
-        byte[] biteDigestPsw = securityService.getSaltedHashSHA512(adminUser.getPassword(),byteSalt);
+        byte[] biteDigestPsw = securityService.getSaltedHashSHA512(newPassword, byteSalt);
         String strDigestPsw = securityService.toHex(biteDigestPsw);
         String strSalt = securityService.toHex(byteSalt);
-        adminUser.setPassword(strDigestPsw);
-        adminUser.setSalt(strSalt);
+        adminUserService.changeAdminUserPassword(strDigestPsw,strSalt,username);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Change Admin User Password", HttpStatus.OK.value(),"Success", "Password has been updated successfully.",null), HttpStatus.OK);
+    }
 
+    @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiResponse> updateAdminUser (@RequestBody @Valid AdminUser adminUser) {
+        start = new Date();
         for (AdminUserShopLink ausl : adminUser.getAdminUserShopLinks()) {
             ausl.setId(adminUser.getId());
         }
