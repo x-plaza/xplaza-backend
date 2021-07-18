@@ -61,5 +61,11 @@ public class Order {
     @Column(name="date_to_deliver")
     private Date date_to_deliver;
 
+    @Column(name="additional_info")
+    private String additional_info;
+
+    @Column(name="remarks")
+    private String remarks;
+
     public Order(){}
 }

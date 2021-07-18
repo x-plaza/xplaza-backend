@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 public interface OrderDetailsRepository extends JpaRepository<OrderDetails, Long> {
     @Query(value = "select o.order_id, o.total_price, o.discount_amount, o.grand_total_price, o.delivery_address, o.fk_customer_id, o.fk_shop_id, o.fk_delivery_schedule_id, " +
             "o.fk_delivery_cost_id, o.fk_payment_type_id, o.fk_status_id, COALESCE(o.fk_coupon_id, 0) as fk_coupon_id, o.received_time, o.date_to_deliver, o.fk_currency_id, " +
+            "COALESCE(o.additional_info,'N/A') as additional_info, COALESCE(o.remarks,'N/A') as remarks, " +
             "concat(c.first_name,' ',c.last_name) as customer_name, c.mobile_no, " +
             "s.shop_name, " +
             "st.status_name, " +

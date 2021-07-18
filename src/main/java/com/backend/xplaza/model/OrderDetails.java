@@ -118,6 +118,12 @@ public class OrderDetails {
     @Column(name="currency_sign")
     private String currency_sign;
 
+    @Column(name="additional_info")
+    private String additional_info;
+
+    @Column(name="remarks")
+    private String remarks;
+
     @OneToMany(mappedBy = "orderDetails")
     private List<OrderItemList> orderItemLists;
 

@@ -119,9 +119,10 @@ public class OrderController {
     }
 
     @PutMapping(value= "/status-update", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> updateOrderStatus (@RequestParam("invoice_number") @Valid long invoice_number, @RequestParam("status") @Valid long status) {
+    public ResponseEntity<ApiResponse> updateOrderStatus (@RequestParam("invoice_number") @Valid Long invoice_number, @RequestParam("status") @Valid Long status,
+                                                          @RequestParam(value="remarks",required = false) @Valid String remarks) {
         start = new Date();
-        orderService.updateOrderStatus(invoice_number,status);
+        orderService.updateOrderStatus(invoice_number,remarks,status);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         return new ResponseEntity<>(new ApiResponse(responseTime, "Update Order Status", HttpStatus.OK.value(),"Success", "Order Status has been updated.",null), HttpStatus.OK);
