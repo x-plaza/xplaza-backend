@@ -10,6 +10,7 @@ import org.hibernate.annotations.TypeDef;
 import javax.persistence.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Entity
@@ -17,7 +18,7 @@ import java.util.Date;
 @Table(name="coupons")
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @TypeDef(name = "json", typeClass = JsonStringType.class)
-public class CouponList {
+public class CouponDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="coupon_id")
@@ -70,5 +71,8 @@ public class CouponList {
     @Column(name="min_shopping_amount")
     private Double min_shopping_amount;
 
-    public CouponList() {}
+    @OneToMany(mappedBy = "couponDetails")
+    private List<CouponShopList> shopList;
+
+    public CouponDetails() {}
 }

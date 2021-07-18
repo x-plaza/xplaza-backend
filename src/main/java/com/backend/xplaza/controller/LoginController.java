@@ -37,7 +37,7 @@ public class LoginController {
         start = new Date();
         Login dtos = loginService.getAdminUserDetails(username);
         if (dtos != null) {
-            boolean isValidUser = loginService.isVaidUser(username, password);
+            Boolean isValidUser = loginService.isVaidUser(username, password);
             if(isValidUser) {
                 dtos.setAuthentication(true);
             } else {

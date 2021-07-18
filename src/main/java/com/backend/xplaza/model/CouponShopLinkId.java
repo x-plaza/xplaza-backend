@@ -5,14 +5,17 @@ import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.hibernate.annotations.TypeDef;
-import javax.persistence.Embeddable;
+
+import java.io.Serializable;
 
 @Data
-@Embeddable
 @AllArgsConstructor
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @TypeDef(name = "json", typeClass = JsonStringType.class)
-public class ACL {
-    private Boolean full, view, add, update, delete;
-    public ACL() {}
+public class CouponShopLinkId implements Serializable {
+    private Long shop_id;
+
+    private Long coupon_id;
+
+    public CouponShopLinkId() {}
 }

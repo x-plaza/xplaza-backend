@@ -18,7 +18,7 @@ public class LoginService {
     @Autowired
     private LoginRepository loginRepo;
 
-    public boolean isVaidUser (String username, String password) throws IOException {
+    public Boolean isVaidUser (String username, String password) throws IOException {
         AdminUser adminUser = adminUserService.listAdminUser(username);
         String strOrgSalt = adminUser.getSalt();
         byte[] byteSalt = securityService.fromHex(strOrgSalt);

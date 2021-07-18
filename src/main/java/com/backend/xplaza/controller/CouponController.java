@@ -1,9 +1,9 @@
 package com.backend.xplaza.controller;
 
 import com.backend.xplaza.common.ApiResponse;
-import com.backend.xplaza.model.Coupon;
-import com.backend.xplaza.model.CouponList;
+import com.backend.xplaza.model.*;
 import com.backend.xplaza.service.CouponService;
+import com.backend.xplaza.service.RoleService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +22,8 @@ import java.util.List;
 public class CouponController {
     @Autowired
     private CouponService couponService;
+    @Autowired
+    private RoleService roleService;
     private Date start, end;
     private Long responseTime;
 
@@ -35,9 +37,13 @@ public class CouponController {
     }
 
     @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getCoupons() throws JsonProcessingException {
+    public ResponseEntity<String> getCoupons(@RequestParam(value ="user_id",required = true) @Valid Long user_id) throws JsonProcessingException {
         start = new Date();
-        List<CouponList> dtos = couponService.listCoupons();
+        List<CouponList> dtos = null;
+        String role_name = roleService.getRoleNameByUserID(user_id);
+        if(role_name == null) dtos = null;
+        else if(role_name.equals("Master Admin")) { dtos = couponService.listCoupons(); }
+        else{ dtos = couponService.listCouponsByUserID(user_id); }
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         ObjectMapper mapper = new ObjectMapper();
@@ -52,9 +58,9 @@ public class CouponController {
     }
 
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getCoupon(@PathVariable @Valid Long id) throws JsonProcessingException {
+    public ResponseEntity<String> getCouponDetails (@PathVariable @Valid Long id) throws JsonProcessingException {
         start = new Date();
-        CouponList dtos = couponService.listCoupon(id);
+        CouponDetails dtos = couponService.getCouponDetails(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         ObjectMapper mapper = new ObjectMapper();
@@ -80,6 +86,9 @@ public class CouponController {
     @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> updateCoupon (@RequestBody @Valid Coupon coupon) {
         start = new Date();
+        for (CouponShopLink csl : coupon.getCouponShopLinks()) {
+            csl.setCoupon_id(coupon.getId());
+        }
         couponService.updateCoupon(coupon);
         end = new Date();
         responseTime = end.getTime() - start.getTime();

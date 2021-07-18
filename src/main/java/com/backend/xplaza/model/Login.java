@@ -23,9 +23,9 @@ public class Login {
     @ApiModelProperty(hidden=true)
     private Long id;
 
-    private boolean authentication;
+    private Boolean authentication;
 
-    public void setAuthentication(boolean auth) {
+    public void setAuthentication(Boolean auth) {
         this.authentication = auth;
     }
 
