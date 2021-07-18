@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface ShopRepository extends JpaRepository<Shop, Long>  {
     @Query(value = "select shop_name from shops where shop_id = ?1", nativeQuery = true)
-    String getName(long id);
+    String getName(Long id);
 }

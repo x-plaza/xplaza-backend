@@ -10,5 +10,5 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Modifying
     @Transactional
     @Query(value = "update orders set fk_status_id = ?2 where order_id = ?1", nativeQuery = true)
-    void updateOrderStatus(long invoice_number, long status);
+    void updateOrderStatus(Long invoice_number, Long status);
 }

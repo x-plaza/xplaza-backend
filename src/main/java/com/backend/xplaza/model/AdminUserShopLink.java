@@ -21,17 +21,17 @@ public class AdminUserShopLink {
     @Id
     @ApiModelProperty(hidden=true)
     @Column(name="admin_user_id")
-    private long id;
+    private Long id;
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
     @Id
     @Column(name="shop_id")
-    private long shop_id;
+    private Long shop_id;
 
-    public long getShop_id() {
+    public Long getShop_id() {
         return shop_id;
     }
 

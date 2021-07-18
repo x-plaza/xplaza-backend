@@ -21,7 +21,7 @@ public class Login {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="admin_user_id")
     @ApiModelProperty(hidden=true)
-    private long id;
+    private Long id;
 
     private boolean authentication;
 

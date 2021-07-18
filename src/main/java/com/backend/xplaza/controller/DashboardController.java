@@ -1,7 +1,6 @@
 package com.backend.xplaza.controller;
 
 import com.backend.xplaza.model.Dashboard;
-import com.backend.xplaza.model.Login;
 import com.backend.xplaza.service.DashboardService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,7 @@ public class DashboardController {
     @Autowired
     private DashboardService dashboardService;
     private Date start, end;
-    private long responseTime;
+    private Long responseTime;
 
     @ModelAttribute
     public void setResponseHeader(HttpServletResponse response) {
@@ -33,7 +32,7 @@ public class DashboardController {
     }
 
     @PostMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> dashboardDetails (@RequestParam(value ="shop_id",required = true) @Valid long shop_id) throws IOException {
+    public ResponseEntity<String> dashboardDetails (@RequestParam(value ="shop_id",required = true) @Valid Long shop_id) throws IOException {
         start = new Date();
         Dashboard dtos = dashboardService.getDashboardDetails(shop_id);
         end = new Date();

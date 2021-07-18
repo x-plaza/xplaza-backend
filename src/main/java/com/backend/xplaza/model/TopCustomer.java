@@ -21,16 +21,16 @@ public class TopCustomer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id")
     @ApiModelProperty(hidden= true)
-    private long id;
+    private Long id;
 
     @Column(name="customer_id")
-    private long customer_id;
+    private Long customer_id;
 
     @Column(name="customer_name")
     private String name;
 
     @Column(name="total_order_amount")
-    private double total_order_amount;
+    private Double total_order_amount;
 
     @ManyToOne
     @JsonBackReference

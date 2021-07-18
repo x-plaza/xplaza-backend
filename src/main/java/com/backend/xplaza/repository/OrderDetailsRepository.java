@@ -29,5 +29,5 @@ public interface OrderDetailsRepository extends JpaRepository<OrderDetails, Long
             "left join delivery_schedules ds on o.fk_delivery_schedule_id = ds.delivery_schedule_id " +
             "left join status_catalogues st on o.fk_status_id = st.status_id " +
             "where o.order_id = ?1", nativeQuery = true)
-    OrderDetails findOrderDetailsById(long id);
+    OrderDetails findOrderDetailsById(Long id);
 }

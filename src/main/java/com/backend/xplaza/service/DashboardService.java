@@ -10,7 +10,7 @@ public class DashboardService {
     @Autowired
     private DashboardRepository dashboardRepo ;
 
-    public Dashboard getDashboardDetails(long shop_id) {
+    public Dashboard getDashboardDetails(Long shop_id) {
         return dashboardRepo.findAllDetailsByShopId(shop_id);
     }
 }

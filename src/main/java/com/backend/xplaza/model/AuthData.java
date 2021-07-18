@@ -18,7 +18,7 @@ public class AuthData {
 
     private String full_name;
 
-    private long role_id;
+    private Long role_id;
 
     private String role_name;
 

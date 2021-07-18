@@ -25,15 +25,15 @@ public class CurrencyService {
         return currencyRepo.findAll(Sort.by(Sort.Direction.ASC, "name"));
     }
 
-    public String getCurrencyNameByID(long id) {
+    public String getCurrencyNameByID(Long id) {
         return currencyRepo.getName(id);
     }
 
-    public void deleteCurrency(long id) {
+    public void deleteCurrency(Long id) {
         currencyRepo.deleteById(id);
     }
 
-    public Currency listCurrency(long id) {
+    public Currency listCurrency(Long id) {
         return currencyRepo.findCurrencyById(id);
     }
 }

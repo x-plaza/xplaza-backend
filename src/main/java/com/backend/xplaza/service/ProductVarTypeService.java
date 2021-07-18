@@ -23,15 +23,15 @@ public class ProductVarTypeService {
 
     public List<ProductVarType> listProductVarTypes() { return prodVarTypeRepo.findAll(Sort.by(Sort.Direction.ASC, "name")); }
 
-    public String getProductVarTypeNameByID(long id) {
+    public String getProductVarTypeNameByID(Long id) {
         return prodVarTypeRepo.getName(id);
     }
 
-    public void deleteProductVarType(long id) {
+    public void deleteProductVarType(Long id) {
         prodVarTypeRepo.deleteById(id);
     }
 
-    public ProductVarType listProductVarType(long id) {
+    public ProductVarType listProductVarType(Long id) {
         return prodVarTypeRepo.findProdVarTypeById(id);
     }
 }

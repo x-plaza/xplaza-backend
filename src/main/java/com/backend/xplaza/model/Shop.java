@@ -19,7 +19,7 @@ public class Shop {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="shop_id")
     //@ApiModelProperty(hidden=true)
-    private long id;
+    private Long id;
 
     @Column(name="shop_name")
     private String name;
@@ -34,7 +34,7 @@ public class Shop {
     private String description;
 
     @Column(name="fk_location_id")
-    private long location_id;
+    private Long location_id;
 
     public Shop() {}
 }

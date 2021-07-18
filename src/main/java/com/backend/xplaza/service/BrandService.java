@@ -20,11 +20,11 @@ public class BrandService {
         brandRepo.save(brand);
     }
 
-    public String getBrandNameByID(long id) {
+    public String getBrandNameByID(Long id) {
         return brandRepo.getName(id);
     }
 
-    public void deleteBrand(long id) {
+    public void deleteBrand(Long id) {
         brandRepo.deleteById(id);
     }
 
@@ -32,7 +32,7 @@ public class BrandService {
         return brandRepo.findAll();
     }
 
-    public Brand listBrand(long id) {
+    public Brand listBrand(Long id) {
         return brandRepo.findBrandById(id);
     }
 }

@@ -19,7 +19,7 @@ public class ProductImage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="product_image_id")
     //@ApiModelProperty(hidden=true)
-    private long id;
+    private Long id;
 
     @Column(name="product_image_name")
     private String name;

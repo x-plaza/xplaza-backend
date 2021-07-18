@@ -20,7 +20,7 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="role_id")
     @ApiModelProperty(hidden=true)
-    private long id;
+    private Long id;
 
     @Column(name="role_name")
     private String name;
@@ -29,7 +29,7 @@ public class Role {
     private String description;
 
     @Column(name="fk_module_id")
-    private long module_id;
+    private Long module_id;
 
     public Role() {}
 }

@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface AdminUserRepository extends JpaRepository<AdminUser, Long> {
     @Query(value = "select user_name from admin_users where admin_user_id = ?1", nativeQuery = true)
-    String getName(long id);
+    String getName(Long id);
 
     @Query(value = "select * from admin_users where user_name = ?1", nativeQuery = true)
     AdminUser findUserByUsername(String username);
@@ -16,7 +16,7 @@ public interface AdminUserRepository extends JpaRepository<AdminUser, Long> {
     @Modifying
     @Transactional
     @Query(value = "update admin_users set fk_role_id=?1, full_name=?2 where admin_user_id=?3", nativeQuery = true)
-    void update(long role_id, String full_name, long admin_user_id);
+    void update(Long role_id, String full_name, Long admin_user_id);
 
     @Modifying
     @Transactional

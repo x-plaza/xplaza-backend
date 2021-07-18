@@ -19,7 +19,7 @@ public class Permission {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     //@ApiModelProperty(hidden=true)
     @JsonIgnore
-    private long id;
+    private Long id;
 
     private String menu_name;
 

@@ -28,7 +28,7 @@ public class ProductController {
     private RoleService roleService;
 
     private Date start, end;
-    private long responseTime;
+    private Long responseTime;
 
     @ModelAttribute
     public void setResponseHeader(HttpServletResponse response) {
@@ -40,7 +40,7 @@ public class ProductController {
     }
 
     @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getProducts(@RequestParam(value ="user_id",required = true) @Valid long user_id) throws JsonProcessingException {
+    public ResponseEntity<String> getProducts(@RequestParam(value ="user_id",required = true) @Valid Long user_id) throws JsonProcessingException {
         start = new Date();
         List<ProductList> dtos;
         String role_name = roleService.getRoleNameByUserID(user_id);
@@ -61,7 +61,7 @@ public class ProductController {
     }
 
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getProduct(@PathVariable @Valid long id) throws JsonProcessingException {
+    public ResponseEntity<String> getProduct(@PathVariable @Valid Long id) throws JsonProcessingException {
         start = new Date();
         ProductList dtos = productService.listProduct(id);
         end = new Date();
@@ -101,7 +101,7 @@ public class ProductController {
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> deleteProduct (@PathVariable @Valid long id) {
+    public ResponseEntity<ApiResponse> deleteProduct (@PathVariable @Valid Long id) {
         String product_name = productService.getProductNameByID(id);
         start = new Date();
         productService.deleteImagesByProductId(id);

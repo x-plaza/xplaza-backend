@@ -22,13 +22,13 @@ public class OrderItemService {
 
     public List<OrderItem> listOrderItems() { return orderItemRepo.findAll(); }
 
-    public OrderItem listOrderItem(long id) { return orderItemRepo.findOrderItemById(id); }
+    public OrderItem listOrderItem(Long id) { return orderItemRepo.findOrderItemById(id); }
 
-    public String getOrderItemNameByID(long id) {
+    public String getOrderItemNameByID(Long id) {
         return orderItemRepo.getName(id);
     }
 
-    public void deleteOrderItem(long id) {
+    public void deleteOrderItem(Long id) {
         orderItemRepo.deleteById(id);
     }
 }

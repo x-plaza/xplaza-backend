@@ -31,9 +31,9 @@ public class OrderService {
 
     public List<OrderList> listOrders() { return orderListRepo.findAllOrders(); }
 
-    public OrderDetails listOrderDetails(long id) { return orderDetailsRepo.findOrderDetailsById(id); }
+    public OrderDetails listOrderDetails(Long id) { return orderDetailsRepo.findOrderDetailsById(id); }
 
-    public void deleteOrder(long id) {
+    public void deleteOrder(Long id) {
         orderRepo.deleteById(id);
     }
 
@@ -45,19 +45,19 @@ public class OrderService {
         return orderListRepo.findAllOrdersByStatus(status);
     }
 
-    public void updateOrderStatus(long invoice_number, long status) {
+    public void updateOrderStatus(Long invoice_number, Long status) {
         orderRepo.updateOrderStatus(invoice_number,status);
     }
 
-    public List<OrderList> listOrdersByUserID(long user_id) {
+    public List<OrderList> listOrdersByUserID(Long user_id) {
         return orderListRepo.findAllOrdersUserID(user_id);
     }
 
-    public List<OrderList> listOrdersByStatusAndUserID(String status, long user_id) {
+    public List<OrderList> listOrdersByStatusAndUserID(String status, Long user_id) {
         return orderListRepo.findAllOrdersByStatusAndUserID(status,user_id);
     }
 
-    public List<OrderList> listOrdersByFilterAndUserID(String status, Date order_date, long user_id) {
+    public List<OrderList> listOrdersByFilterAndUserID(String status, Date order_date, Long user_id) {
         return orderListRepo.findAllOrdersByFilterAndUserID(status,order_date,user_id);
     }
 }

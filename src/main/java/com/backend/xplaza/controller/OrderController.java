@@ -31,7 +31,7 @@ public class OrderController {
     private RoleService roleService;
 
     private Date start, end;
-    private long responseTime;
+    private Long responseTime;
 
     @ModelAttribute
     public void setResponseHeader(HttpServletResponse response) {
@@ -43,7 +43,7 @@ public class OrderController {
     }
 
     @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getOrders(@RequestParam(value ="user_id",required = true) @Valid long user_id,
+    public ResponseEntity<String> getOrders(@RequestParam(value ="user_id",required = true) @Valid Long user_id,
                                             @RequestParam(value ="status",required = false) @Valid String status,
                                             @RequestParam(value ="order_date",required = false) @Valid String order_date)
                                             throws JsonProcessingException, JSONException, ParseException {
@@ -84,7 +84,7 @@ public class OrderController {
     }
 
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getOrderDetails(@PathVariable @Valid long id) throws JsonProcessingException {
+    public ResponseEntity<String> getOrderDetails(@PathVariable @Valid Long id) throws JsonProcessingException {
         start = new Date();
         OrderDetails dtos = orderService.listOrderDetails(id);
         end = new Date();
@@ -128,7 +128,7 @@ public class OrderController {
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> deleteOrder (@PathVariable @Valid long id) {
+    public ResponseEntity<ApiResponse> deleteOrder (@PathVariable @Valid Long id) {
         start = new Date();
         orderService.deleteOrder(id);
         end = new Date();

@@ -19,7 +19,7 @@ public class Currency {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="currency_id")
     //@ApiModelProperty(hidden=true)
-    private long id;
+    private Long id;
 
     @Column(name="currency_name")
     private String name;

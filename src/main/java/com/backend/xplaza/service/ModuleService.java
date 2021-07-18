@@ -25,15 +25,15 @@ public class ModuleService {
         return moduleRepo.findAll(Sort.by(Sort.Direction.ASC, "name"));
     }
 
-    public String getModuleNameByID(long id) {
+    public String getModuleNameByID(Long id) {
         return moduleRepo.getName(id);
     }
 
-    public void deleteModule(long id) {
+    public void deleteModule(Long id) {
         moduleRepo.deleteById(id);
     }
 
-    public Module listModule(long id) {
+    public Module listModule(Long id) {
         return moduleRepo.findModuleById(id);
     }
 }

@@ -19,7 +19,7 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="category_id")
     //@ApiModelProperty(hidden=true)
-    private long id;
+    private Long id;
 
     @Column(name="category_name")
     private String name;
@@ -28,7 +28,7 @@ public class Category {
     private String description;
 
     @Column(name="parent_category")
-    private long parent_category_id;
+    private Long parent_category_id;
 
     public Category() {}
 }

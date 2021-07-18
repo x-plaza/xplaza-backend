@@ -18,5 +18,5 @@ public interface CouponListRepository extends JpaRepository<CouponList, Long> {
             "left join currencies c on cou.fk_currency_id = c.currency_id " +
             "left join discount_types dt on dt.discount_type_id = cou.fk_discount_type_id " +
             "where cou.coupon_id = ?1", nativeQuery = true)
-    CouponList findCouponById(long id);
+    CouponList findCouponById(Long id);
 }

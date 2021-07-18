@@ -23,16 +23,16 @@ public class OrderDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="order_id")
     @ApiModelProperty(hidden=true)
-    private long invoice_number;
+    private Long invoice_number;
 
     @Column(name="total_price")
-    private double total_price;
+    private Double total_price;
 
     @Column(name="discount_amount")
-    private double discount_amount;
+    private Double discount_amount;
 
     @Column(name="grand_total_price")
-    private double grand_total_price;
+    private Double grand_total_price;
 
     @Column(name="delivery_address")
     private String delivery_address;
@@ -47,13 +47,13 @@ public class OrderDetails {
     private String mobile_no;
 
     @Column(name="fk_shop_id")
-    private long shop_id;
+    private Long shop_id;
 
     @Column(name="shop_name")
     private String shop_name;
 
     @Column(name="fk_delivery_schedule_id")
-    private long delivery_schedule_id;
+    private Long delivery_schedule_id;
 
     private String allotted_time;
 
@@ -66,25 +66,25 @@ public class OrderDetails {
     }
 
     @Column(name="fk_delivery_cost_id")
-    private long delivery_cost_id;
+    private Long delivery_cost_id;
 
     @Column(name="delivery_cost")
-    private long delivery_cost;
+    private Long delivery_cost;
 
     @Column(name="fk_payment_type_id")
-    private long payment_type_id;
+    private Long payment_type_id;
 
     @Column(name="payment_type_name")
     private String payment_type_name;
 
     @Column(name="fk_status_id")
-    private long status_id;
+    private Long status_id;
 
     @Column(name="status_name")
     private String status_name;
 
     @Column(name="delivery_id")
-    private long delivery_id;
+    private Long delivery_id;
 
     @Column(name="person_name")
     private String delivery_person;
@@ -93,13 +93,13 @@ public class OrderDetails {
     private String contact_no;
 
     @Column(name="fk_coupon_id")
-    private long coupon_id;
+    private Long coupon_id;
 
     @Column(name="coupon_code")
     private String coupon_code;
 
     @Column(name="coupon_amount")
-    private long coupon_amount;
+    private Long coupon_amount;
 
     @Column(name="date_to_deliver")
     private Date date_to_deliver;
@@ -110,7 +110,7 @@ public class OrderDetails {
     }
 
     @Column(name="fk_currency_id")
-    private long currency_id;
+    private Long currency_id;
 
     @Column(name="currency_name")
     private String currency_name;

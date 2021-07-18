@@ -13,9 +13,9 @@ import java.io.Serializable;
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @TypeDef(name = "json", typeClass = JsonStringType.class)
 public class AdminUserShopLinkId implements Serializable {
-    private long id;
+    private Long id;
 
-    private long shop_id;
+    private Long shop_id;
 
     public AdminUserShopLinkId() {}
 }

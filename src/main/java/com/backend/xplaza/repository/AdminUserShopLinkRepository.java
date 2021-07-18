@@ -10,10 +10,10 @@ public interface AdminUserShopLinkRepository extends JpaRepository<AdminUserShop
     @Modifying
     @Transactional
     @Query(value = "insert into admin_user_shop_link values(?1, ?2)", nativeQuery = true)
-    void insert(long admin_user_id, long shop_id);
+    void insert(Long admin_user_id, Long shop_id);
 
     @Modifying
     @Transactional
     @Query(value = "delete from admin_user_shop_link where admin_user_id = ?1", nativeQuery = true)
-    void deleteByAdminUserID(long id);
+    void deleteByAdminUserID(Long id);
 }

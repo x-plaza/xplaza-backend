@@ -29,13 +29,13 @@ public class LocationService {
         return locationListRepo.findAllItem();
     }
 
-    public LocationList listLocation(long id) { return locationListRepo.findLocationListById(id); }
+    public LocationList listLocation(Long id) { return locationListRepo.findLocationListById(id); }
 
-    public String getLocationNameByID(long id) {
+    public String getLocationNameByID(Long id) {
         return locationRepo.getName(id);
     }
 
-    public void deleteLocation(long id) {
+    public void deleteLocation(Long id) {
         locationRepo.deleteById(id);
     }
 }

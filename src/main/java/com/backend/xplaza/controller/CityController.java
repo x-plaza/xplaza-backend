@@ -22,7 +22,7 @@ public class CityController {
     @Autowired
     private CityService cityService;
     private Date start, end;
-    private long responseTime;
+    private Long responseTime;
 
     @ModelAttribute
     public void setResponseHeader(HttpServletResponse response) {
@@ -51,7 +51,7 @@ public class CityController {
     }
 
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getCity(@PathVariable @Valid long id) throws JsonProcessingException {
+    public ResponseEntity<String> getCity(@PathVariable @Valid Long id) throws JsonProcessingException {
         start = new Date();
         City dtos = cityService.listCity(id);
         end = new Date();
@@ -86,7 +86,7 @@ public class CityController {
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> deleteCity (@PathVariable @Valid long id) {
+    public ResponseEntity<ApiResponse> deleteCity (@PathVariable @Valid Long id) {
         String city_name = cityService.getCityNameByID(id);
         start = new Date();
         cityService.deleteCity(id);

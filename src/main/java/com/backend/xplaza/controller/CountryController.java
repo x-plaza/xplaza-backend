@@ -22,7 +22,7 @@ public class CountryController {
     @Autowired
     private CountryService countryService;
     private Date start, end;
-    private long responseTime;
+    private Long responseTime;
 
     @ModelAttribute
     public void setResponseHeader(HttpServletResponse response) {
@@ -51,7 +51,7 @@ public class CountryController {
     }
 
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getCountry(@PathVariable @Valid long id) throws JsonProcessingException {
+    public ResponseEntity<String> getCountry(@PathVariable @Valid Long id) throws JsonProcessingException {
         start = new Date();
         Country dtos = countryService.listCountry(id);
         end = new Date();
@@ -86,7 +86,7 @@ public class CountryController {
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> deleteCountry (@PathVariable @Valid long id) {
+    public ResponseEntity<ApiResponse> deleteCountry (@PathVariable @Valid Long id) {
         String country_name = countryService.getCountryNameByID(id);
         start = new Date();
         countryService.deleteCountry(id);

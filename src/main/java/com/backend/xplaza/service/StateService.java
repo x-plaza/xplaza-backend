@@ -20,11 +20,11 @@ public class StateService {
         stateRepo.save(city);
     }
 
-    public String getStateNameByID(long id) {
+    public String getStateNameByID(Long id) {
         return stateRepo.getName(id);
     }
 
-    public void deleteState(long id) {
+    public void deleteState(Long id) {
         stateRepo.deleteById(id);
     }
 
@@ -32,7 +32,7 @@ public class StateService {
         return stateRepo.findAll();
     }
 
-    public State listState(long id) {
+    public State listState(Long id) {
         return stateRepo.findStateById(id);
     }
 }

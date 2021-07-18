@@ -11,7 +11,7 @@ public interface AdminUserListRepository extends JpaRepository<AdminUserList, Lo
             "from admin_users a " +
             "left join roles r on a.fk_role_id = r.role_id " +
             "where a.admin_user_id = ?1", nativeQuery = true)
-    AdminUserList findUserById(long id);
+    AdminUserList findUserById(Long id);
 
     @Query(value = "select a.*, r.role_name " +
             "from admin_users a " +

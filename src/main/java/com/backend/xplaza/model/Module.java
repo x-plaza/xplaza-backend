@@ -19,7 +19,7 @@ public class Module {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="module_id")
     //@ApiModelProperty(hidden=true)
-    private long id;
+    private Long id;
 
     @Column(name="module_name")
     private String name;

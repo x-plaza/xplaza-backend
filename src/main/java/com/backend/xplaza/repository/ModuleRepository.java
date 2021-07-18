@@ -6,8 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface ModuleRepository extends JpaRepository<Module, Long> {
     @Query(value = "select module_name from modules where module_id = ?1", nativeQuery = true)
-    String getName(long id);
+    String getName(Long id);
 
     @Query(value = "select * from modules where module_id = ?1", nativeQuery = true)
-    Module findModuleById(long id);
+    Module findModuleById(Long id);
 }

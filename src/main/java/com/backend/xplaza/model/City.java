@@ -19,13 +19,13 @@ public class City {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="city_id")
     //@ApiModelProperty(hidden=true)
-    private long id;
+    private Long id;
 
     @Column(name="city_name")
     private String name;
 
     @Column(name="fk_state_id")
-    private int state_id;
+    private Long state_id;
 
     public City(){}
 }

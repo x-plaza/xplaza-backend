@@ -20,16 +20,16 @@ public class TopProduct {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ApiModelProperty(hidden= true)
-    private long id;
+    private Long id;
 
     @Column(name="product_id")
-    private long product_id;
+    private Long product_id;
 
     @Column(name="product_name")
     private String name;
 
     @Column(name="monthly_sold_unit")
-    private double monthly_sold_unit;
+    private Double monthly_sold_unit;
 
     @ManyToOne
     @JsonBackReference

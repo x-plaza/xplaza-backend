@@ -20,7 +20,7 @@ public class DiscountType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="discount_type_id")
     @ApiModelProperty(hidden= true)
-    private long id;
+    private Long id;
 
     @Column(name="discount_type_name")
     private String name;

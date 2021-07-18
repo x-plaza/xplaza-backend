@@ -24,11 +24,11 @@ public class CouponService {
         couponRepo.save(coupon);
     }
 
-    public String getCouponNameByID(long id) {
+    public String getCouponNameByID(Long id) {
         return couponRepo.getName(id);
     }
 
-    public void deleteCoupon(long id) {
+    public void deleteCoupon(Long id) {
         couponRepo.deleteById(id);
     }
 
@@ -36,7 +36,7 @@ public class CouponService {
         return couponListRepo.findAllCoupons();
     }
 
-    public CouponList listCoupon(long id) {
+    public CouponList listCoupon(Long id) {
         return couponListRepo.findCouponById(id);
     }
 }

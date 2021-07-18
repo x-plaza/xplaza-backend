@@ -19,13 +19,13 @@ public class OrderItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="order_item_id")
     //@ApiModelProperty(hidden=true)
-    private long id;
+    private Long id;
 
     @Column(name="fk_order_id")
-    private long order_id;
+    private Long order_id;
 
     @Column(name="fk_product_id")
-    private long product_id;
+    private Long product_id;
 
     @Column(name="order_item_name")
     private String item_name;
@@ -34,22 +34,22 @@ public class OrderItem {
     private String item_category;
 
     @Column(name="order_item_quantity")
-    private long quantity;
+    private Long quantity;
 
     @Column(name="order_item_quantity_type")
     private String quantity_type;
 
     @Column(name="order_item_unit_price")
-    private double unit_price;
+    private Double unit_price;
 
     @Column(name="order_item_total_price")
-    private double item_total_price;
+    private Double item_total_price;
 
     @Column(name="order_item_image")
     private String item_image;
 
     @Column(name="fk_currency_id")
-    private long currency_id;
+    private Long currency_id;
 
     public OrderItem(){}
 }

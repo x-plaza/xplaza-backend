@@ -22,16 +22,16 @@ public class OrderList {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="order_id")
     @ApiModelProperty(hidden=true)
-    private long invoice_number;
+    private Long invoice_number;
 
     @Column(name="total_price")
-    private double total_price;
+    private Double total_price;
 
     @Column(name="discount_amount")
-    private double discount_amount;
+    private Double discount_amount;
 
     @Column(name="grand_total_price")
-    private double grand_total_price;
+    private Double grand_total_price;
 
     @Column(name="delivery_address")
     private String delivery_address;
@@ -56,13 +56,13 @@ public class OrderList {
     }
 
     @Column(name="fk_shop_id")
-    private long shop_id;
+    private Long shop_id;
 
     @Column(name="shop_name")
     private String shop_name;
 
     @Column(name="fk_status_id")
-    private long status_id;
+    private Long status_id;
 
     @Column(name="status_name")
     private String status_name;
@@ -76,7 +76,7 @@ public class OrderList {
     }
 
     @Column(name="fk_currency_id")
-    private long currency_id;
+    private Long currency_id;
 
     @Column(name="currency_name")
     private String currency_name;

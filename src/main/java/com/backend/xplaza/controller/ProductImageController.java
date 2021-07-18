@@ -22,7 +22,7 @@ public class ProductImageController {
     @Autowired
     private ProductImageService productImgService;
     private Date start, end;
-    private long responseTime;
+    private Long responseTime;
 
     @ModelAttribute
     public void setResponseHeader(HttpServletResponse response) {
@@ -51,7 +51,7 @@ public class ProductImageController {
     }
 
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getProductImage(@PathVariable @Valid long id) throws JsonProcessingException {
+    public ResponseEntity<String> getProductImage(@PathVariable @Valid Long id) throws JsonProcessingException {
         start = new Date();
         List<ProductImage> dtos = productImgService.listProductImage(id);
         end = new Date();
@@ -86,7 +86,7 @@ public class ProductImageController {
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> deleteProductImage (@PathVariable @Valid long id) {
+    public ResponseEntity<ApiResponse> deleteProductImage (@PathVariable @Valid Long id) {
         String product_image_name = productImgService.getProductImageNameByID(id);
         start = new Date();
         productImgService.deleteProductImage(id);

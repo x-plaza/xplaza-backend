@@ -6,8 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface CurrencyRepository extends JpaRepository<Currency, Long> {
     @Query(value = "select currency_name from currencies where currency_id = ?1", nativeQuery = true)
-    String getName(long id);
+    String getName(Long id);
 
     @Query(value = "select * from currencies where currency_id = ?1", nativeQuery = true)
-    Currency findCurrencyById(long id);
+    Currency findCurrencyById(Long id);
 }

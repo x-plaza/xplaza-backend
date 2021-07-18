@@ -25,19 +25,19 @@ public class RoleService {
         return roleRepo.findAll(Sort.by(Sort.Direction.ASC, "name"));
     }
 
-    public String getRoleNameByID(long id) {
+    public String getRoleNameByID(Long id) {
         return roleRepo.getName(id);
     }
 
-    public void deleteRole(long id) {
+    public void deleteRole(Long id) {
         roleRepo.deleteById(id);
     }
 
-    public Role listRole(long id) {
+    public Role listRole(Long id) {
         return roleRepo.findRoleById(id);
     }
 
-    public String getRoleNameByUserID(long id) {
+    public String getRoleNameByUserID(Long id) {
         return roleRepo.getRoleNameByUserID(id);
     }
 }

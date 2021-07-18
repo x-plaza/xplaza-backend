@@ -22,7 +22,7 @@ public class CouponList {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="coupon_id")
     @ApiModelProperty(hidden=true)
-    private long id;
+    private Long id;
 
     @Column(name="coupon_code")
     private String coupon_code;
@@ -31,19 +31,19 @@ public class CouponList {
     private boolean is_active;
 
     @Column(name="coupon_amount")
-    private float amount;
+    private Double amount;
 
     @Column(name="max_coupon_amount")
-    private float max_amount;
+    private Double max_amount;
 
     @Column(name="fk_currency_id")
-    private long currency_id;
+    private Long currency_id;
 
     @Column(name="currency_name")
     private String currency_name;
 
     @Column(name="fk_discount_type_id")
-    private long discount_type_id;
+    private Long discount_type_id;
 
     @Column(name="discount_type_name")
     private String discount_type_name;

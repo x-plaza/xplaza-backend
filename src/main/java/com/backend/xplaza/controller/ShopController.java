@@ -28,7 +28,7 @@ public class ShopController {
     private RoleService roleService;
 
     private Date start, end;
-    private long responseTime;
+    private Long responseTime;
 
     @ModelAttribute
     public void setResponseHeader(HttpServletResponse response) {
@@ -41,7 +41,7 @@ public class ShopController {
     }
 
     @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getShops(@RequestParam(value ="user_id",required = true) @Valid long user_id) throws JsonProcessingException {
+    public ResponseEntity<String> getShops(@RequestParam(value ="user_id",required = true) @Valid Long user_id) throws JsonProcessingException {
         start = new Date();
         List<ShopList> dtos;
         String role_name = roleService.getRoleNameByUserID(user_id);
@@ -62,7 +62,7 @@ public class ShopController {
     }
 
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getShop(@PathVariable @Valid long id) throws JsonProcessingException {
+    public ResponseEntity<String> getShop(@PathVariable @Valid Long id) throws JsonProcessingException {
         start = new Date();
         ShopList dtos = shopService.listShop(id);
         end = new Date();
@@ -97,7 +97,7 @@ public class ShopController {
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> deleteShop (@PathVariable @Valid long id) {
+    public ResponseEntity<ApiResponse> deleteShop (@PathVariable @Valid Long id) {
         String shop_name = shopService.getShopNameByID(id);
         start = new Date();
         shopService.deleteShop(id);

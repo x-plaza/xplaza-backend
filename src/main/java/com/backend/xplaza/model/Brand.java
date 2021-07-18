@@ -19,7 +19,7 @@ public class Brand {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="brand_id")
     //@ApiModelProperty(hidden=true)
-    private long id;
+    private Long id;
 
     @Column(name="brand_name")
     private String name;

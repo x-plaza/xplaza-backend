@@ -2,12 +2,12 @@ package com.backend.xplaza.model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
 
 @Data
 @Embeddable
@@ -17,13 +17,13 @@ import javax.persistence.*;
 public class Revenue {
 
     @Column(name="total_income")
-    private double total_income;
+    private Double total_income;
 
     @Column(name="total_expense")
-    private double total_expense;
+    private Double total_expense;
 
     @Column(name="total_revenue")
-    private double total_revenue;
+    private Double total_revenue;
 
     public Revenue(){}
 }

@@ -21,7 +21,7 @@ public class AdminUserList {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="admin_user_id")
     @ApiModelProperty(hidden= true)
-    private long id;
+    private Long id;
 
     @Column(name="full_name")
     private String full_name;
@@ -37,7 +37,7 @@ public class AdminUserList {
     private String salt;
 
     @Column(name="fk_role_id")
-    private long role_id;
+    private Long role_id;
 
     @Column(name="role_name")
     private String role_name;

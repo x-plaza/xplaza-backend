@@ -20,9 +20,9 @@ public class LoginUserShopList {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ApiModelProperty(hidden=true)
     @JsonIgnore
-    private long id;
+    private Long id;
 
-    private long shop_id;
+    private Long shop_id;
 
     private String shop_name;
 

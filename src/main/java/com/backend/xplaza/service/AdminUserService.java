@@ -38,12 +38,12 @@ public class AdminUserService {
         }
     }
 
-    public String getAdminUserNameByID(long id) {
+    public String getAdminUserNameByID(Long id) {
         return adminUserRepo.getName(id);
     }
 
     @Transactional
-    public void deleteAdminUser(long id) {
+    public void deleteAdminUser(Long id) {
         adminUserShopLinkRepo.deleteByAdminUserID(id);
         adminUserRepo.deleteById(id);
     }
@@ -52,7 +52,7 @@ public class AdminUserService {
         return adminUserListRepo.findAllUsers();
     }
 
-    public AdminUserList listAdminUser(long id) {
+    public AdminUserList listAdminUser(Long id) {
         return adminUserListRepo.findUserById(id);
     }
 

@@ -21,7 +21,7 @@ public class LoginController {
     private LoginService loginService;
 
     private Date start, end;
-    private long responseTime;
+    private Long responseTime;
 
     @ModelAttribute
     public void setResponseHeader(HttpServletResponse response) {

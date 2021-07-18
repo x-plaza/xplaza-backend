@@ -19,7 +19,7 @@ public class Country {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="country_id")
     //@ApiModelProperty(hidden=true)
-    private long id;
+    private Long id;
 
     @Column(name="country_name")
     private String name;
@@ -33,7 +33,7 @@ public class Country {
 
     private String numcode;
 
-    private int phonecode;
+    private Long phonecode;
 
     public Country() {}
 }

@@ -20,16 +20,16 @@ public class ProductToStock {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ApiModelProperty(hidden= true)
-    private long id;
+    private Long id;
 
     @Column(name="product_id")
-    private long product_id;
+    private Long product_id;
 
     @Column(name="product_name")
     private String name;
 
     @Column(name="remaining_unit")
-    private long remaining_unit;
+    private Long remaining_unit;
 
     @ManyToOne
     @JsonBackReference

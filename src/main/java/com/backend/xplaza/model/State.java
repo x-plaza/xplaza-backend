@@ -20,13 +20,13 @@ public class State {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="state_id")
     @ApiModelProperty(hidden=true)
-    private long id;
+    private Long id;
 
     @Column(name="state_name")
     private String name;
 
     @Column(name="fk_country_id")
-    private int country_id;
+    private Long country_id;
 
     public State(){}
 }

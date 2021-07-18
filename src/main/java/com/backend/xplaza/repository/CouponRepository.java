@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface CouponRepository extends JpaRepository<Coupon, Long> {
     @Query(value = "select coupon_code from coupons where coupon_id = ?1", nativeQuery = true)
-    String getName(long id);
+    String getName(Long id);
 }

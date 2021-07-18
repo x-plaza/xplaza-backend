@@ -38,7 +38,7 @@ public class AdminUserController {
     private LoginService loginService;
 
     private Date start, end;
-    private long responseTime;
+    private Long responseTime;
 
     @ModelAttribute
     public void setResponseHeader(HttpServletResponse response) {
@@ -50,7 +50,7 @@ public class AdminUserController {
     }
 
     @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getAdminUsers(@RequestParam(value ="user_id",required = true) @Valid long user_id) throws JsonProcessingException {
+    public ResponseEntity<String> getAdminUsers(@RequestParam(value ="user_id",required = true) @Valid Long user_id) throws JsonProcessingException {
         start = new Date();
         ObjectMapper mapper = new ObjectMapper();
         String data = null;
@@ -77,7 +77,7 @@ public class AdminUserController {
     }
 
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getAdminUser(@PathVariable @Valid long id) throws JsonProcessingException {
+    public ResponseEntity<String> getAdminUser(@PathVariable @Valid Long id) throws JsonProcessingException {
         start = new Date();
         AdminUserList dtos = adminUserService.listAdminUser(id);
         end = new Date();

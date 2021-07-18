@@ -21,15 +21,15 @@ public class ProductImageService {
 
     public List<ProductImage> listProductImages() { return productImgRepo.findAll(Sort.by(Sort.Direction.ASC, "name")); }
 
-    public String getProductImageNameByID(long id) {
+    public String getProductImageNameByID(Long id) {
         return productImgRepo.getName(id);
     }
 
-    public void deleteProductImage(long id) {
+    public void deleteProductImage(Long id) {
         productImgRepo.deleteById(id);
     }
 
-    public List<ProductImage> listProductImage(long id) {
+    public List<ProductImage> listProductImage(Long id) {
         return productImgRepo.findImageByProductId(id);
     }
 }

@@ -20,9 +20,9 @@ public class AdminUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="admin_user_id")
-    private long id;
+    private Long id;
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -60,9 +60,9 @@ public class AdminUser {
     }
 
     @Column(name="fk_role_id")
-    private long role_id;
+    private Long role_id;
 
-    public long getRole_id() {
+    public Long getRole_id() {
         return role_id;
     }
 

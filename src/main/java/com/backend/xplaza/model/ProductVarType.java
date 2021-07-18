@@ -20,7 +20,7 @@ public class ProductVarType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="product_var_type_id")
     @ApiModelProperty(hidden=true)
-    private long id;
+    private Long id;
 
     @Column(name="var_type_name")
     private String name;

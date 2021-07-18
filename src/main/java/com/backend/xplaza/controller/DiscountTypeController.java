@@ -24,7 +24,7 @@ public class DiscountTypeController {
     @Autowired
     private DiscountTypeService discountTypeService;
     private Date start, end;
-    private long responseTime;
+    private Long responseTime;
 
     @ModelAttribute
     public void setResponseHeader(HttpServletResponse response) {

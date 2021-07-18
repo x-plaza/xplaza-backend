@@ -20,11 +20,11 @@ public class CountryService {
         countryRepo.save(country);
     }
 
-    public String getCountryNameByID(long id) {
+    public String getCountryNameByID(Long id) {
         return countryRepo.getName(id);
     }
 
-    public void deleteCountry(long id) {
+    public void deleteCountry(Long id) {
         countryRepo.deleteById(id);
     }
 
@@ -32,7 +32,7 @@ public class CountryService {
         return countryRepo.findAll();
     }
 
-    public Country listCountry(long id) {
+    public Country listCountry(Long id) {
         return countryRepo.findCountryById(id);
     }
 }

@@ -19,7 +19,7 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="product_id")
     //@ApiModelProperty(hidden=true)
-    private long id;
+    private Long id;
 
     @Column(name="product_name")
     private String name;
@@ -28,27 +28,27 @@ public class Product {
     private String description;
 
     @Column(name="fk_brand_id")
-    private long brand_id;
+    private Long brand_id;
 
     @Column(name="fk_category_id")
-    private long category_id;
+    private Long category_id;
 
     @Column(name="fk_product_var_type_id")
-    private long product_var_type_id;
+    private Long product_var_type_id;
 
-    private float product_var_type_value;
+    private Double product_var_type_value;
 
     @Column(name="product_buying_price")
-    private float buying_price;
+    private Double buying_price;
 
     @Column(name="product_selling_price")
-    private float selling_price;
+    private Double selling_price;
 
     @Column(name="fk_currency_id")
-    private long currency_id;
+    private Long currency_id;
 
     @Column(name="fk_shop_id")
-    private long shop_id;
+    private Long shop_id;
 
     @Column(name="quantity")
     private Long quantity;

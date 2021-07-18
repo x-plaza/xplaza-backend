@@ -23,7 +23,7 @@ public class ModuleController {
     @Autowired
     private ModuleService moduleService;
     private Date start, end;
-    private long responseTime;
+    private Long responseTime;
 
     @ModelAttribute
     public void setResponseHeader(HttpServletResponse response) {
@@ -52,7 +52,7 @@ public class ModuleController {
     }
 
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getModule(@PathVariable @Valid long id) throws JsonProcessingException {
+    public ResponseEntity<String> getModule(@PathVariable @Valid Long id) throws JsonProcessingException {
         start = new Date();
         Module dtos = moduleService.listModule(id);
         end = new Date();
@@ -87,7 +87,7 @@ public class ModuleController {
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> deleteModule (@PathVariable @Valid long id) {
+    public ResponseEntity<ApiResponse> deleteModule (@PathVariable @Valid Long id) {
         String module_name = moduleService.getModuleNameByID(id);
         start = new Date();
         moduleService.deleteModule(id);
