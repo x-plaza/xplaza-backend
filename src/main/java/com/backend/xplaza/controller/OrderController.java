@@ -51,7 +51,8 @@ public class OrderController {
         List<OrderList> dtos;
         SimpleDateFormat formatter=new SimpleDateFormat("dd-MM-yyyy");
         String role_name = roleService.getRoleNameByUserID(user_id);
-        if(role_name.equals("Master Admin")) {
+        if(role_name == null) dtos = null;
+        else if(role_name.equals("Master Admin")) {
             if (status == null && order_date == null) dtos = orderService.listOrders();
             else if (status!=null && order_date == null) dtos = orderService.listOrdersByStatus(status);
             else {
@@ -83,7 +84,7 @@ public class OrderController {
     }
 
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getOrder(@PathVariable @Valid long id) throws JsonProcessingException {
+    public ResponseEntity<String> getOrderDetails(@PathVariable @Valid long id) throws JsonProcessingException {
         start = new Date();
         OrderDetails dtos = orderService.listOrderDetails(id);
         end = new Date();

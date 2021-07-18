@@ -11,8 +11,10 @@ public interface OrderListRepository extends JpaRepository<OrderList, Long> {
     @Query(value = "select o.order_id, o.total_price, o.discount_amount, o.grand_total_price, o.delivery_address, o.fk_customer_id, " +
             "o.date_to_deliver, concat(c.first_name,' ',c.last_name) as customer_name, " +
             "c.mobile_no, o.received_time, o.fk_shop_id, s.shop_name, o.fk_status_id, st.status_name, " +
-            "concat(d.delivery_schedule_start, '-' , d.delivery_schedule_end) as allotted_time " +
+            "concat(d.delivery_schedule_start, '-' , d.delivery_schedule_end) as allotted_time, " +
+            "o.fk_currency_id, cur.currency_name, cur.currency_sign " +
             "from orders o " +
+            "left join currencies cur on cur.currency_id = o.fk_currency_id " +
             "left join shops s on o.fk_shop_id = s.shop_id " +
             "left join customers c on o.fk_customer_id = c.customer_id " +
             "left join delivery_schedules d on o.fk_delivery_schedule_id = d.delivery_schedule_id " +
@@ -23,8 +25,10 @@ public interface OrderListRepository extends JpaRepository<OrderList, Long> {
     @Query(value = "select o.order_id, o.total_price, o.discount_amount, o.grand_total_price, o.delivery_address, o.fk_customer_id, " +
             "o.date_to_deliver, concat(c.first_name,' ',c.last_name) as customer_name, " +
             "c.mobile_no, o.received_time, o.fk_shop_id, s.shop_name, o.fk_status_id, st.status_name, " +
-            "concat(d.delivery_schedule_start, '-' , d.delivery_schedule_end) as allotted_time " +
+            "concat(d.delivery_schedule_start, '-' , d.delivery_schedule_end) as allotted_time, " +
+            "o.fk_currency_id, cur.currency_name, cur.currency_sign " +
             "from orders o " +
+            "left join currencies cur on cur.currency_id = o.fk_currency_id " +
             "left join shops s on o.fk_shop_id = s.shop_id " +
             "left join customers c on o.fk_customer_id = c.customer_id " +
             "left join delivery_schedules d on o.fk_delivery_schedule_id = d.delivery_schedule_id " +
@@ -36,8 +40,10 @@ public interface OrderListRepository extends JpaRepository<OrderList, Long> {
     @Query(value = "select o.order_id, o.total_price, o.discount_amount, o.grand_total_price, o.delivery_address, o.fk_customer_id, " +
             "o.date_to_deliver, concat(c.first_name,' ',c.last_name) as customer_name, " +
             "c.mobile_no, o.received_time, o.fk_shop_id, s.shop_name, o.fk_status_id, st.status_name, " +
-            "concat(d.delivery_schedule_start, '-' , d.delivery_schedule_end) as allotted_time " +
+            "concat(d.delivery_schedule_start, '-' , d.delivery_schedule_end) as allotted_time, " +
+            "o.fk_currency_id, cur.currency_name, cur.currency_sign " +
             "from orders o " +
+            "left join currencies cur on cur.currency_id = o.fk_currency_id " +
             "left join shops s on o.fk_shop_id = s.shop_id " +
             "left join customers c on o.fk_customer_id = c.customer_id " +
             "left join delivery_schedules d on o.fk_delivery_schedule_id = d.delivery_schedule_id " +
@@ -49,8 +55,10 @@ public interface OrderListRepository extends JpaRepository<OrderList, Long> {
     @Query(value = "select o.order_id, o.total_price, o.discount_amount, o.grand_total_price, o.delivery_address, o.fk_customer_id, " +
             "o.date_to_deliver, concat(c.first_name,' ',c.last_name) as customer_name, " +
             "c.mobile_no, o.received_time, o.fk_shop_id, s.shop_name, o.fk_status_id, st.status_name, " +
-            "concat(d.delivery_schedule_start, '-' , d.delivery_schedule_end) as allotted_time " +
+            "concat(d.delivery_schedule_start, '-' , d.delivery_schedule_end) as allotted_time, " +
+            "o.fk_currency_id, cur.currency_name, cur.currency_sign " +
             "from orders o " +
+            "left join currencies cur on cur.currency_id = o.fk_currency_id " +
             "left join shops s on o.fk_shop_id = s.shop_id " +
             "left join customers c on o.fk_customer_id = c.customer_id " +
             "left join delivery_schedules d on o.fk_delivery_schedule_id = d.delivery_schedule_id " +
@@ -63,8 +71,10 @@ public interface OrderListRepository extends JpaRepository<OrderList, Long> {
     @Query(value = "select o.order_id, o.total_price, o.discount_amount, o.grand_total_price, o.delivery_address, o.fk_customer_id, " +
             "o.date_to_deliver, concat(c.first_name,' ',c.last_name) as customer_name, " +
             "c.mobile_no, o.received_time, o.fk_shop_id, s.shop_name, o.fk_status_id, st.status_name, " +
-            "concat(d.delivery_schedule_start, '-' , d.delivery_schedule_end) as allotted_time " +
+            "concat(d.delivery_schedule_start, '-' , d.delivery_schedule_end) as allotted_time, " +
+            "o.fk_currency_id, cur.currency_name, cur.currency_sign " +
             "from orders o " +
+            "left join currencies cur on cur.currency_id = o.fk_currency_id " +
             "left join shops s on o.fk_shop_id = s.shop_id " +
             "left join customers c on o.fk_customer_id = c.customer_id " +
             "left join delivery_schedules d on o.fk_delivery_schedule_id = d.delivery_schedule_id " +
@@ -77,8 +87,10 @@ public interface OrderListRepository extends JpaRepository<OrderList, Long> {
     @Query(value = "select o.order_id, o.total_price, o.discount_amount, o.grand_total_price, o.delivery_address, o.fk_customer_id, " +
             "o.date_to_deliver, concat(c.first_name,' ',c.last_name) as customer_name, " +
             "c.mobile_no, o.received_time, o.fk_shop_id, s.shop_name, o.fk_status_id, st.status_name, " +
-            "concat(d.delivery_schedule_start, '-' , d.delivery_schedule_end) as allotted_time " +
+            "concat(d.delivery_schedule_start, '-' , d.delivery_schedule_end) as allotted_time, " +
+            "o.fk_currency_id, cur.currency_name, cur.currency_sign " +
             "from orders o " +
+            "left join currencies cur on cur.currency_id = o.fk_currency_id " +
             "left join shops s on o.fk_shop_id = s.shop_id " +
             "left join customers c on o.fk_customer_id = c.customer_id " +
             "left join delivery_schedules d on o.fk_delivery_schedule_id = d.delivery_schedule_id " +

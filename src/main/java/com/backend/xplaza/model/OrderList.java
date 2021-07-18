@@ -75,5 +75,14 @@ public class OrderList {
         return null;
     }
 
+    @Column(name="fk_currency_id")
+    private long currency_id;
+
+    @Column(name="currency_name")
+    private String currency_name;
+
+    @Column(name="currency_sign")
+    private String currency_sign;
+
     public OrderList(){}
 }
