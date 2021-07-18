@@ -7,13 +7,13 @@ import org.springframework.data.jpa.repository.Query;
 public interface OrderDetailsRepository extends JpaRepository<OrderDetails, Long> {
     @Query(value = "select o.order_id, o.total_price, o.discount_amount, o.grand_total_price, o.delivery_address, o.fk_customer_id, o.fk_shop_id, o.fk_delivery_schedule_id, " +
             "o.fk_delivery_cost_id, o.fk_payment_type_id, o.fk_status_id, COALESCE(o.fk_coupon_id, 0) as fk_coupon_id, o.received_time, o.date_to_deliver, o.fk_currency_id, " +
-            "concat(c.first_name,' ',c.last_name) as customer_name, c.mobile_no," +
+            "concat(c.first_name,' ',c.last_name) as customer_name, c.mobile_no, " +
             "s.shop_name, " +
             "st.status_name, " +
             "concat(ds.delivery_schedule_start, '-' , ds.delivery_schedule_end) as allotted_time, dc.delivery_cost, " +
             "pt.payment_type_name, " +
             "d.delivery_id, d.person_name, d.contact_no, " +
-            "COALESCE(cou.coupon_code,'') as coupon_code, COALESCE(cou.coupon_amount, 0) as coupon_amount, " +
+            "COALESCE(cou.coupon_code,'N/A') as coupon_code, COALESCE(cou.coupon_amount, 0) as coupon_amount, " +
             "oi.order_item_name, oi.order_item_category, oi.order_item_quantity, oi.order_item_quantity_type, oi.order_item_unit_price, " +
             "oi.order_item_total_price, oi.order_item_image, oi.order_item_id, " +
             "cur.currency_name, cur.currency_sign " +

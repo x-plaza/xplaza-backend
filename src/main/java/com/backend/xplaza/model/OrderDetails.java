@@ -105,7 +105,7 @@ public class OrderDetails {
     private Date date_to_deliver;
 
     public String getDate_to_deliver() {
-        if(date_to_deliver != null) return new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(date_to_deliver);
+        if(date_to_deliver != null) return new SimpleDateFormat("dd MMM yyyy").format(date_to_deliver);
         return null;
     }
 
