@@ -40,14 +40,8 @@ public class AdminUserService {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(adminUser.getUser_name());
         mailMessage.setSubject("Complete Registration!");
-        //mailMessage.setFrom("robbin_mak@yahoo.com");
-        mailMessage.setText("To confirm your Xplaza-Admin account, please click here : "
-                +"https://xplaza-backend.herokuapp.com/api/adminuser/confirm-account?token="+confirmationToken.getConfirmation_token());
-        try{
-            emailSenderService.sendEmail(mailMessage);
-        }catch (Exception e){
-
-        }
+        mailMessage.setText("To confirm your X-plaza Admin account, please click here: " +"https://xplaza-backend.herokuapp.com/api/adminuser/confirm-account?token="+confirmationToken.getConfirmation_token());
+        emailSenderService.sendEmail(mailMessage);
     }
 
     @Transactional
@@ -61,6 +55,7 @@ public class AdminUserService {
 
     @Transactional
     public void deleteAdminUser(Long id) {
+        confirmationTokenRepo.deleteByUserID(id);
         adminUserShopLinkRepo.deleteByAdminUserID(id);
         adminUserRepo.deleteById(id);
     }
