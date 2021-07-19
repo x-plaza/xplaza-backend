@@ -3,10 +3,13 @@ package com.backend.xplaza.service;
 import com.backend.xplaza.model.AdminUser;
 import com.backend.xplaza.model.AdminUserList;
 import com.backend.xplaza.model.AdminUserShopLink;
+import com.backend.xplaza.model.ConfirmationToken;
 import com.backend.xplaza.repository.AdminUserListRepository;
 import com.backend.xplaza.repository.AdminUserRepository;
 import com.backend.xplaza.repository.AdminUserShopLinkRepository;
+import com.backend.xplaza.repository.ConfirmationTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,12 +23,30 @@ public class AdminUserService {
     private AdminUserListRepository adminUserListRepo;
     @Autowired
     private AdminUserShopLinkRepository adminUserShopLinkRepo;
+    @Autowired
+    private ConfirmationTokenRepository confirmationTokenRepo;
+    @Autowired
+    private EmailSenderService emailSenderService;
 
     @Transactional
     public void addAdminUser(AdminUser adminUser) {
         adminUserRepo.save(adminUser);
         for (AdminUserShopLink ausl : adminUser.getAdminUserShopLinks()) {
             adminUserShopLinkRepo.insert(adminUser.getId(),ausl.getShop_id());
+        }
+        // Send authentication token in user email
+        ConfirmationToken confirmationToken = new ConfirmationToken(adminUser);
+        confirmationTokenRepo.save(confirmationToken);
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(adminUser.getUser_name());
+        mailMessage.setSubject("Complete Registration!");
+        //mailMessage.setFrom("robbin_mak@yahoo.com");
+        mailMessage.setText("To confirm your Xplaza-Admin account, please click here : "
+                +"https://xplaza-backend.herokuapp.com/api/adminuser/confirm-account?token="+confirmationToken.getConfirmation_token());
+        try{
+            emailSenderService.sendEmail(mailMessage);
+        }catch (Exception e){
+
         }
     }
 
@@ -38,14 +59,14 @@ public class AdminUserService {
         }
     }
 
-    public String getAdminUserNameByID(Long id) {
-        return adminUserRepo.getName(id);
-    }
-
     @Transactional
     public void deleteAdminUser(Long id) {
         adminUserShopLinkRepo.deleteByAdminUserID(id);
         adminUserRepo.deleteById(id);
+    }
+
+    public String getAdminUserNameByID(Long id) {
+        return adminUserRepo.getName(id);
     }
 
     public List<AdminUserList> listAdminUsers() {
@@ -62,5 +83,9 @@ public class AdminUserService {
 
     public void changeAdminUserPassword(String new_password, String salt, String user_name) {
         adminUserRepo.changePassword(new_password,salt,user_name);
+    }
+
+    public void updateAdminUserConfirmationStatus(Long user_id, Boolean is_confirmed) {
+        adminUserRepo.updateConfirmStatus(user_id,is_confirmed);
     }
 }

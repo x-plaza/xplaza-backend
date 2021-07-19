@@ -36,6 +36,10 @@ public class AdminUser {
     @Column(name="user_name")
     private String user_name;
 
+    public String getUser_name() {
+        return user_name;
+    }
+
     @Column(name="password")
     private String password;
 
@@ -64,6 +68,17 @@ public class AdminUser {
 
     public Long getRole_id() {
         return role_id;
+    }
+
+    @Column(name="is_confirmed")
+    private Boolean is_confirmed;
+
+    public void setIs_confirmed(Boolean is_confirmed) {
+        this.is_confirmed = is_confirmed;
+    }
+
+    public Boolean getIs_confirmed() {
+        return is_confirmed;
     }
 
     @OneToMany(mappedBy = "adminUser")

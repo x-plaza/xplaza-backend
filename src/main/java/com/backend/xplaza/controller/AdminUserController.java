@@ -4,10 +4,8 @@ import com.backend.xplaza.common.ApiResponse;
 import com.backend.xplaza.model.AdminUser;
 import com.backend.xplaza.model.AdminUserList;
 import com.backend.xplaza.model.AdminUserShopLink;
-import com.backend.xplaza.service.AdminUserService;
-import com.backend.xplaza.service.LoginService;
-import com.backend.xplaza.service.RoleService;
-import com.backend.xplaza.service.SecurityService;
+import com.backend.xplaza.model.ConfirmationToken;
+import com.backend.xplaza.service.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +34,8 @@ public class AdminUserController {
     private RoleService roleService;
     @Autowired
     private LoginService loginService;
+    @Autowired
+    private ConfirmationTokenService confirmationTokenService;
 
     private Date start, end;
     private Long responseTime;
@@ -95,23 +95,52 @@ public class AdminUserController {
 
     @PostMapping(value= "/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> addAdminUser (@RequestBody @Valid AdminUser adminUser) {
-        byte[] byteSalt = null;
-        try{
-            byteSalt = securityService.getSalt();
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger("Salt error").log(Level.SEVERE, null, ex);
-        }
-        byte[] biteDigestPsw = securityService.getSaltedHashSHA512(adminUser.getPassword(),byteSalt);
-        String strDigestPsw = securityService.toHex(biteDigestPsw);
-        String strSalt = securityService.toHex(byteSalt);
-        adminUser.setPassword(strDigestPsw);
-        adminUser.setSalt(strSalt);
-
         start = new Date();
-        adminUserService.addAdminUser(adminUser);
+        AdminUser user = adminUserService.listAdminUser(adminUser.getUser_name());
+        if(user != null) {
+            end = new Date();
+            responseTime = end.getTime() - start.getTime();
+            return new ResponseEntity<>(new ApiResponse(responseTime, "Add Admin User", HttpStatus.FORBIDDEN.value(),
+                    "Failed", "User Already Exist. ", null), HttpStatus.FORBIDDEN);
+        } else {
+            // Encrypt Password with Salt
+            byte[] byteSalt = null;
+            try {
+                byteSalt = securityService.getSalt();
+            } catch (NoSuchAlgorithmException ex) {
+                Logger.getLogger("Salt error").log(Level.SEVERE, null, ex);
+            }
+            byte[] biteDigestPsw = securityService.getSaltedHashSHA512(adminUser.getPassword(), byteSalt);
+            String strDigestPsw = securityService.toHex(biteDigestPsw);
+            String strSalt = securityService.toHex(byteSalt);
+            adminUser.setPassword(strDigestPsw);
+            adminUser.setSalt(strSalt);
+            //--------------------------------------
+            adminUserService.addAdminUser(adminUser);
+            end = new Date();
+            responseTime = end.getTime() - start.getTime();
+        }
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Admin User", HttpStatus.CREATED.value(),"Success", "Admin User has been created. " +
+                "A confirmation link has been sent to the email. Please confirm it first to activate the account. ",null), HttpStatus.CREATED);
+    }
+
+    @RequestMapping(value="/confirm-account", method= {RequestMethod.GET, RequestMethod.POST})
+    public ResponseEntity<ApiResponse> confirmUserAccount(@RequestParam("token") String confirmation_token)
+    {
+        start = new Date();
+        ConfirmationToken token = confirmationTokenService.getConfirmationToken(confirmation_token);
+        if(token != null) {
+            AdminUser adminUser = adminUserService.listAdminUser(token.getAdminUser().getUser_name());
+            adminUser.setIs_confirmed(true);
+            adminUserService.updateAdminUserConfirmationStatus(adminUser.getId(),adminUser.getIs_confirmed());
+        } else {
+            end = new Date();
+            responseTime = end.getTime() - start.getTime();
+            return new ResponseEntity<>(new ApiResponse(responseTime, "Confirm Admin User", HttpStatus.FORBIDDEN.value(),"Error", "The link is either invalid or broken!",null), HttpStatus.FORBIDDEN);
+        }
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Admin User", HttpStatus.CREATED.value(),"Success", "Admin User has been created.",null), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Confirm Admin User", HttpStatus.OK.value(),"Success", "Admin User has been confirmed successfully. Please Login now.",null), HttpStatus.OK);
     }
 
     @PostMapping(value= "/change-password", produces = MediaType.APPLICATION_JSON_VALUE)
