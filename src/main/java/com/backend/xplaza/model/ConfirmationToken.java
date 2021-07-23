@@ -39,15 +39,17 @@ public class ConfirmationToken {
     @Temporal(TemporalType.TIMESTAMP)
     private Date created_date;
 
-    public ConfirmationToken(String email) {
+    public ConfirmationToken(String email, String type) {
         Random rnd = new Random();
-        int number = rnd.nextInt(999999);
-        confirmation_token = String.format("%06d", number); // this will convert any number sequence into 6 character.
+        int number = rnd.nextInt(99999999);
+        if(type == "OTP") confirmation_token = String.format("%08d", number);
+        else confirmation_token = String.format("%06d", number);
         this.email = email;
         created_date = new Date();
     }
 
-    /*@OneToOne(targetEntity = AdminUser.class, fetch = FetchType.EAGER)
+    /*
+    @OneToOne(targetEntity = AdminUser.class, fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "admin_user_id")
     private AdminUser adminUser;
 

@@ -26,9 +26,10 @@ public class ConfirmationTokenController {
     @PostMapping(value= "", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> sendConfirmationToken (@RequestParam("username") @Valid String username) {
         start = new Date();
-        confirmationTokenService.sendConfirmationToken(username);
+        confirmationTokenService.sendConfirmationToken(username.toLowerCase());
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Send Confirmation OTP", HttpStatus.CREATED.value(),"Success", "A confirmation token has been sent to the email.",null), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Send Confirmation Code", HttpStatus.CREATED.value(),
+                "Success", "A confirmation code has been sent to the email.",null), HttpStatus.CREATED);
     }
 }

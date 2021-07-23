@@ -40,6 +40,10 @@ public class AdminUser {
         return user_name;
     }
 
+    public void setUser_name(String user_name) {
+        this.user_name = user_name;
+    }
+
     @Column(name="password")
     private String password;
 

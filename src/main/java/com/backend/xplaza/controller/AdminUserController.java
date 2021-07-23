@@ -103,13 +103,13 @@ public class AdminUserController {
             return new ResponseEntity<>(new ApiResponse(responseTime, "Add Admin User", HttpStatus.FORBIDDEN.value(),
                     "Failed", "Confirmation code does not match!", null), HttpStatus.FORBIDDEN);
         }
-        if(!token.getEmail().equals(adminUser.getUser_name())) {
+        if(!token.getEmail().equals(adminUser.getUser_name().toLowerCase())) {
             end = new Date();
             responseTime = end.getTime() - start.getTime();
             return new ResponseEntity<>(new ApiResponse(responseTime, "Add Admin User", HttpStatus.FORBIDDEN.value(),
                     "Failed", "Confirmation code does not match!", null), HttpStatus.FORBIDDEN);
         }
-        AdminUser user = adminUserService.listAdminUser(adminUser.getUser_name());
+        AdminUser user = adminUserService.listAdminUser(adminUser.getUser_name().toLowerCase());
         if(user != null) {
             end = new Date();
             responseTime = end.getTime() - start.getTime();
@@ -128,7 +128,7 @@ public class AdminUserController {
         String strSalt = securityService.toHex(byteSalt);
         adminUser.setPassword(strDigestPsw);
         adminUser.setSalt(strSalt);
-        //adminUser.setIs_confirmed(true);
+        adminUser.setUser_name(adminUser.getUser_name().toLowerCase());
         adminUserService.addAdminUser(adminUser);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
@@ -160,7 +160,7 @@ public class AdminUserController {
                                                           @RequestParam("oldPassword") @Valid String oldPassword,
                                                           @RequestParam("newPassword") @Valid String newPassword) throws IOException {
         start = new Date();
-        boolean isValidUser = loginService.isVaidUser(username, oldPassword);
+        boolean isValidUser = loginService.isVaidUser(username.toLowerCase(), oldPassword);
         if(!isValidUser) {
             return new ResponseEntity<>(new ApiResponse(responseTime, "Change Admin User Password", HttpStatus.FORBIDDEN.value(),"Failure", "Old Password does not match.",null), HttpStatus.FORBIDDEN);
         }
@@ -173,7 +173,7 @@ public class AdminUserController {
         byte[] biteDigestPsw = securityService.getSaltedHashSHA512(newPassword, byteSalt);
         String strDigestPsw = securityService.toHex(biteDigestPsw);
         String strSalt = securityService.toHex(byteSalt);
-        adminUserService.changeAdminUserPassword(strDigestPsw,strSalt,username);
+        adminUserService.changeAdminUserPassword(strDigestPsw,strSalt,username.toLowerCase());
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         return new ResponseEntity<>(new ApiResponse(responseTime, "Change Admin User Password", HttpStatus.OK.value(),"Success", "Password has been updated successfully.",null), HttpStatus.OK);

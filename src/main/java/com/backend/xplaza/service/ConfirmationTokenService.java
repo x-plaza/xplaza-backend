@@ -19,12 +19,23 @@ public class ConfirmationTokenService {
 
     public void sendConfirmationToken(String email) {
         // Send authentication token in the user email
-        ConfirmationToken confirmationToken = new ConfirmationToken(email);
+        ConfirmationToken confirmationToken = new ConfirmationToken(email,"Code");
         confirmationTokenRepo.save(confirmationToken);
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(email);
         mailMessage.setSubject("Complete Registration!");
-        mailMessage.setText("To confirm your X-plaza Admin account, use the code below:\n" +confirmationToken.getConfirmation_token());
+        mailMessage.setText("To confirm your X-plaza Admin account, use the Code below:\n\n" +confirmationToken.getConfirmation_token());
+        emailSenderService.sendEmail(mailMessage);
+    }
+
+    public void sendOTP(String email) {
+        // Send OTP in the user email
+        ConfirmationToken confirmationToken = new ConfirmationToken(email,"OTP");
+        confirmationTokenRepo.save(confirmationToken);
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(email);
+        mailMessage.setSubject("One Time Password!");
+        mailMessage.setText("To reset your X-plaza Admin account password, use the OTP below:\n\n" +confirmationToken.getConfirmation_token());
         emailSenderService.sendEmail(mailMessage);
     }
 }
