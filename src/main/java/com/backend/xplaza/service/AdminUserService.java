@@ -8,6 +8,7 @@ import com.backend.xplaza.repository.AdminUserRepository;
 import com.backend.xplaza.repository.AdminUserShopLinkRepository;
 import com.backend.xplaza.repository.ConfirmationTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,8 +24,8 @@ public class AdminUserService {
     private AdminUserShopLinkRepository adminUserShopLinkRepo;
     @Autowired
     private ConfirmationTokenRepository confirmationTokenRepo;
-    //@Autowired
-    //private EmailSenderService emailSenderService;
+    @Autowired
+    private EmailSenderService emailSenderService;
 
     @Transactional
     public void addAdminUser(AdminUser adminUser) {
@@ -76,6 +77,16 @@ public class AdminUserService {
 
     public void changeAdminUserPassword(String new_password, String salt, String user_name) {
         adminUserRepo.changePassword(new_password,salt,user_name);
+    }
+
+    public void sendLoginDetails(String email, String temp_password) {
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(email);
+        mailMessage.setSubject("Login Details!");
+        mailMessage.setText("Congratulations! Your X-plaza Admin account has been created successfully.\n\n" +
+                "Use the login details below to login to the admin panel and please change the password immediately.\n\n" +
+                "Username : " + email + "\n" + "Password : " + temp_password);
+        emailSenderService.sendEmail(mailMessage);
     }
 
     /*public void updateAdminUserConfirmationStatus(Long user_id, Boolean is_confirmed) {

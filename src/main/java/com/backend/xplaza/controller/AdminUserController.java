@@ -117,6 +117,7 @@ public class AdminUserController {
                     "Failed", "User Already Exist!", null), HttpStatus.FORBIDDEN);
         }
         // Encrypt Password with Salt
+        String temp_password = adminUser.getPassword();
         byte[] byteSalt = null;
         try {
             byteSalt = securityService.getSalt();
@@ -130,6 +131,7 @@ public class AdminUserController {
         adminUser.setSalt(strSalt);
         adminUser.setUser_name(adminUser.getUser_name().toLowerCase());
         adminUserService.addAdminUser(adminUser);
+        adminUserService.sendLoginDetails(adminUser.getUser_name(),temp_password);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         return new ResponseEntity<>(new ApiResponse(responseTime, "Add Admin User", HttpStatus.CREATED.value(),"Success",

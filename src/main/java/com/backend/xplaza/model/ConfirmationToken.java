@@ -41,9 +41,14 @@ public class ConfirmationToken {
 
     public ConfirmationToken(String email, String type) {
         Random rnd = new Random();
-        int number = rnd.nextInt(99999999);
-        if(type == "OTP") confirmation_token = String.format("%08d", number);
-        else confirmation_token = String.format("%06d", number);
+        int number;
+        if(type == "OTP") {
+            number = rnd.nextInt(99999999);
+            confirmation_token = String.format("%08d", number);
+        } else {
+            number = rnd.nextInt(999999);
+            confirmation_token = String.format("%06d", number);
+        }
         this.email = email;
         created_date = new Date();
     }
