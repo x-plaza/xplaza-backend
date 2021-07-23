@@ -23,8 +23,8 @@ public interface AdminUserRepository extends JpaRepository<AdminUser, Long> {
     @Query(value = "update admin_users set password=?1, salt=?2 where user_name=?3", nativeQuery = true)
     void changePassword(String new_password, String salt, String user_name);
 
-    @Modifying
+    /*@Modifying
     @Transactional
     @Query(value = "update admin_users set is_confirmed=?2 where admin_user_id=?1", nativeQuery = true)
-    void updateConfirmStatus(Long user_id, Boolean is_confirmed);
+    void updateConfirmStatus(Long user_id, Boolean is_confirmed);*/
 }

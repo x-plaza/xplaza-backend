@@ -3,13 +3,11 @@ package com.backend.xplaza.service;
 import com.backend.xplaza.model.AdminUser;
 import com.backend.xplaza.model.AdminUserList;
 import com.backend.xplaza.model.AdminUserShopLink;
-import com.backend.xplaza.model.ConfirmationToken;
 import com.backend.xplaza.repository.AdminUserListRepository;
 import com.backend.xplaza.repository.AdminUserRepository;
 import com.backend.xplaza.repository.AdminUserShopLinkRepository;
 import com.backend.xplaza.repository.ConfirmationTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,8 +23,8 @@ public class AdminUserService {
     private AdminUserShopLinkRepository adminUserShopLinkRepo;
     @Autowired
     private ConfirmationTokenRepository confirmationTokenRepo;
-    @Autowired
-    private EmailSenderService emailSenderService;
+    //@Autowired
+    //private EmailSenderService emailSenderService;
 
     @Transactional
     public void addAdminUser(AdminUser adminUser) {
@@ -35,13 +33,13 @@ public class AdminUserService {
             adminUserShopLinkRepo.insert(adminUser.getId(),ausl.getShop_id());
         }
         // Send authentication token in user email
-        ConfirmationToken confirmationToken = new ConfirmationToken(adminUser);
+        /*ConfirmationToken confirmationToken = new ConfirmationToken(adminUser);
         confirmationTokenRepo.save(confirmationToken);
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(adminUser.getUser_name());
         mailMessage.setSubject("Complete Registration!");
         mailMessage.setText("To confirm your X-plaza Admin account, please click here: " +"https://xplaza-backend.herokuapp.com/api/adminuser/confirm-account?token="+confirmationToken.getConfirmation_token());
-        emailSenderService.sendEmail(mailMessage);
+        emailSenderService.sendEmail(mailMessage);*/
     }
 
     @Transactional
@@ -55,7 +53,7 @@ public class AdminUserService {
 
     @Transactional
     public void deleteAdminUser(Long id) {
-        confirmationTokenRepo.deleteByUserID(id);
+        //confirmationTokenRepo.deleteByUserID(id);
         adminUserShopLinkRepo.deleteByAdminUserID(id);
         adminUserRepo.deleteById(id);
     }
@@ -80,7 +78,7 @@ public class AdminUserService {
         adminUserRepo.changePassword(new_password,salt,user_name);
     }
 
-    public void updateAdminUserConfirmationStatus(Long user_id, Boolean is_confirmed) {
+    /*public void updateAdminUserConfirmationStatus(Long user_id, Boolean is_confirmed) {
         adminUserRepo.updateConfirmStatus(user_id,is_confirmed);
-    }
+    }*/
 }

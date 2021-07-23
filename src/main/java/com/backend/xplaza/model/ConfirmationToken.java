@@ -8,7 +8,7 @@ import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.UUID;
+import java.util.Random;
 
 @Data
 @Entity
@@ -29,10 +29,25 @@ public class ConfirmationToken {
         return confirmation_token;
     }
 
+    @Column(name="user_email")
+    private String email;
+
+    public String getEmail() {
+        return email;
+    }
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date created_date;
 
-    @OneToOne(targetEntity = AdminUser.class, fetch = FetchType.EAGER)
+    public ConfirmationToken(String email) {
+        Random rnd = new Random();
+        int number = rnd.nextInt(999999);
+        confirmation_token = String.format("%06d", number); // this will convert any number sequence into 6 character.
+        this.email = email;
+        created_date = new Date();
+    }
+
+    /*@OneToOne(targetEntity = AdminUser.class, fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "admin_user_id")
     private AdminUser adminUser;
 
@@ -44,7 +59,7 @@ public class ConfirmationToken {
         this.adminUser = adminUser;
         created_date = new Date();
         confirmation_token = UUID.randomUUID().toString();
-    }
+    }*/
 
     public ConfirmationToken() {}
 }

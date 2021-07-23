@@ -70,6 +70,7 @@ public class AdminUser {
         return role_id;
     }
 
+    /*@ApiModelProperty(hidden= true)
     @Column(name="is_confirmed")
     private Boolean is_confirmed;
 
@@ -79,6 +80,13 @@ public class AdminUser {
 
     public Boolean getIs_confirmed() {
         return is_confirmed;
+    }*/
+
+    @Column(name="confirmation_code")
+    private String confirmation_code;
+
+    public String getConfirmation_code() {
+        return confirmation_code;
     }
 
     @OneToMany(mappedBy = "adminUser")

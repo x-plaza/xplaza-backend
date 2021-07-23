@@ -96,35 +96,47 @@ public class AdminUserController {
     @PostMapping(value= "/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> addAdminUser (@RequestBody @Valid AdminUser adminUser) {
         start = new Date();
+        ConfirmationToken token = confirmationTokenService.getConfirmationToken(adminUser.getConfirmation_code());
+        if(token == null) {
+            end = new Date();
+            responseTime = end.getTime() - start.getTime();
+            return new ResponseEntity<>(new ApiResponse(responseTime, "Add Admin User", HttpStatus.FORBIDDEN.value(),
+                    "Failed", "Confirmation code does not match!", null), HttpStatus.FORBIDDEN);
+        }
+        if(!token.getEmail().equals(adminUser.getUser_name())) {
+            end = new Date();
+            responseTime = end.getTime() - start.getTime();
+            return new ResponseEntity<>(new ApiResponse(responseTime, "Add Admin User", HttpStatus.FORBIDDEN.value(),
+                    "Failed", "Confirmation code does not match!", null), HttpStatus.FORBIDDEN);
+        }
         AdminUser user = adminUserService.listAdminUser(adminUser.getUser_name());
         if(user != null) {
             end = new Date();
             responseTime = end.getTime() - start.getTime();
             return new ResponseEntity<>(new ApiResponse(responseTime, "Add Admin User", HttpStatus.FORBIDDEN.value(),
-                    "Failed", "User Already Exist. ", null), HttpStatus.FORBIDDEN);
-        } else {
-            // Encrypt Password with Salt
-            byte[] byteSalt = null;
-            try {
-                byteSalt = securityService.getSalt();
-            } catch (NoSuchAlgorithmException ex) {
-                Logger.getLogger("Salt error").log(Level.SEVERE, null, ex);
-            }
-            byte[] biteDigestPsw = securityService.getSaltedHashSHA512(adminUser.getPassword(), byteSalt);
-            String strDigestPsw = securityService.toHex(biteDigestPsw);
-            String strSalt = securityService.toHex(byteSalt);
-            adminUser.setPassword(strDigestPsw);
-            adminUser.setSalt(strSalt);
-            //--------------------------------------
-            adminUserService.addAdminUser(adminUser);
-            end = new Date();
-            responseTime = end.getTime() - start.getTime();
+                    "Failed", "User Already Exist!", null), HttpStatus.FORBIDDEN);
         }
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Admin User", HttpStatus.CREATED.value(),"Success", "Admin User has been created. " +
-                "A confirmation link has been sent to the email. Please confirm it first to activate the account. ",null), HttpStatus.CREATED);
+        // Encrypt Password with Salt
+        byte[] byteSalt = null;
+        try {
+            byteSalt = securityService.getSalt();
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger("Salt error").log(Level.SEVERE, null, ex);
+        }
+        byte[] biteDigestPsw = securityService.getSaltedHashSHA512(adminUser.getPassword(), byteSalt);
+        String strDigestPsw = securityService.toHex(biteDigestPsw);
+        String strSalt = securityService.toHex(byteSalt);
+        adminUser.setPassword(strDigestPsw);
+        adminUser.setSalt(strSalt);
+        //adminUser.setIs_confirmed(true);
+        adminUserService.addAdminUser(adminUser);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Admin User", HttpStatus.CREATED.value(),"Success",
+                "Admin User has been created successfully.",null), HttpStatus.CREATED);
     }
 
-    @RequestMapping(value="/confirm-account", method= {RequestMethod.GET, RequestMethod.POST})
+    /*@RequestMapping(value="/confirm-account", method= {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<ApiResponse> confirmUserAccount(@RequestParam("token") String confirmation_token)
     {
         start = new Date();
@@ -141,7 +153,7 @@ public class AdminUserController {
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         return new ResponseEntity<>(new ApiResponse(responseTime, "Confirm Admin User", HttpStatus.OK.value(),"Success", "Admin User has been confirmed successfully. Please Login now.",null), HttpStatus.OK);
-    }
+    }*/
 
     @PostMapping(value= "/change-password", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> changeAdminUserPassword (@RequestParam("username") @Valid String username,
