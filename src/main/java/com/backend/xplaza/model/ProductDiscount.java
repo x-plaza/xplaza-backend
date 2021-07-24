@@ -1,44 +1,42 @@
 package com.backend.xplaza.model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Data
 @Entity
 @AllArgsConstructor
-@Table(name="product_images")
+@Table(name="product_discounts")
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @TypeDef(name = "json", typeClass = JsonStringType.class)
-public class ProductImage {
+public class ProductDiscount {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="product_image_id")
+    @Column(name="product_discount_id")
     //@ApiModelProperty(hidden=true)
     private Long id;
-
-    @Column(name="product_image_name")
-    private String name;
-
-    @Column(name="product_image_path")
-    private String path;
 
     @Column(name="fk_product_id")
     private Long product_id;
 
-    public void setProduct_id(Long product_id) {
-        this.product_id = product_id;
-    }
+    @Column(name="fk_discount_type_id")
+    private Long discount_type_id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JsonBackReference
-    @JoinColumn(name = "fk_product_id", referencedColumnName = "product_id", insertable = false, updatable = false)
-    private Product product;
+    @Column(name="discount_amount")
+    private Double discount_amount;
 
-    public ProductImage() { }
+    @Column(name="fk_currency_id")
+    private Long currency_id;
+
+    @Column(name="discount_start_date")
+    private Date start_date;
+
+    @Column(name="discount_end_date")
+    private Date end_date;
 }

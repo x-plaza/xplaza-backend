@@ -7,6 +7,7 @@ import lombok.Data;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @Entity
@@ -20,6 +21,10 @@ public class Product {
     @Column(name="product_id")
     //@ApiModelProperty(hidden=true)
     private Long id;
+
+    public Long getId() {
+        return id;
+    }
 
     @Column(name="product_name")
     private String name;
@@ -52,6 +57,13 @@ public class Product {
 
     @Column(name="quantity")
     private Long quantity;
+
+    @OneToMany(mappedBy = "product")
+    private List<ProductImage> productImage;
+
+    public List<ProductImage> getProductImage() {
+        return productImage;
+    }
 
     public Product() {}
 }

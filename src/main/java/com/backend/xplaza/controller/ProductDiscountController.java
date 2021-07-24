@@ -1,9 +1,9 @@
 package com.backend.xplaza.controller;
 
 import com.backend.xplaza.common.ApiResponse;
-import com.backend.xplaza.model.Product;
-import com.backend.xplaza.model.ProductList;
-import com.backend.xplaza.service.ProductService;
+import com.backend.xplaza.model.ProductDiscount;
+import com.backend.xplaza.model.ProductDiscountList;
+import com.backend.xplaza.service.ProductDiscountService;
 import com.backend.xplaza.service.RoleService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,10 +20,10 @@ import java.util.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/product")
-public class ProductController {
+@RequestMapping("/api/product-discount")
+public class ProductDiscountController {
     @Autowired
-    private ProductService productService;
+    private ProductDiscountService productDiscountService;
     @Autowired
     private RoleService roleService;
 
@@ -40,19 +40,19 @@ public class ProductController {
     }
 
     @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getProducts(@RequestParam(value ="user_id",required = true) @Valid Long user_id) throws JsonProcessingException {
+    public ResponseEntity<String> getProductDiscounts (@RequestParam(value ="user_id",required = true) @Valid Long user_id) throws JsonProcessingException {
         start = new Date();
-        List<ProductList> dtos;
+        List<ProductDiscountList> dtos;
         String role_name = roleService.getRoleNameByUserID(user_id);
         if(role_name == null) dtos = null;
-        else if(role_name.equals("Master Admin")) dtos = productService.listProducts();
-        else dtos = productService.listProductsByUserID(user_id);
+        else if(role_name.equals("Master Admin")) dtos = productDiscountService.listProductDiscounts();
+        else dtos = productDiscountService.listProductDiscountsByUserID(user_id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         ObjectMapper mapper = new ObjectMapper();
         String response= "{\n" +
                 "  \"responseTime\": "+ responseTime + ",\n" +
-                "  \"responseType\": \"Product List\",\n" +
+                "  \"responseType\": \"Product Discount List\",\n" +
                 "  \"status\": 200,\n" +
                 "  \"response\": \"Success\",\n" +
                 "  \"msg\": \"\",\n" +
@@ -61,15 +61,15 @@ public class ProductController {
     }
 
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getProduct(@PathVariable @Valid Long id) throws JsonProcessingException {
+    public ResponseEntity<String> getProductDiscountByID (@PathVariable @Valid Long id) throws JsonProcessingException {
         start = new Date();
-        ProductList dtos = productService.listProduct(id);
+        ProductDiscountList dtos = productDiscountService.listProductDiscount(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         ObjectMapper mapper = new ObjectMapper();
         String response= "{\n" +
                 "  \"responseTime\": "+ responseTime + ",\n" +
-                "  \"responseType\": \"Product List\",\n" +
+                "  \"responseType\": \"Product Discount List\",\n" +
                 "  \"status\": 200,\n" +
                 "  \"response\": \"Success\",\n" +
                 "  \"msg\": \"\",\n" +
@@ -78,33 +78,33 @@ public class ProductController {
     }
 
     @PostMapping(value= "/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> addProduct (@RequestBody @Valid Product product) throws JSONException, JsonProcessingException {
+    public ResponseEntity<ApiResponse> addProductDiscount (@RequestBody @Valid ProductDiscount productDiscount) throws JSONException, JsonProcessingException {
         start = new Date();
-        productService.addProduct(product);
+        productDiscountService.addProductDiscount(productDiscount);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Product", HttpStatus.CREATED.value(),"Success", "Product has been created.",
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Product Discount", HttpStatus.CREATED.value(),"Success", "Discount on product has been created.",
                 null), HttpStatus.CREATED);
     }
 
     @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> updateProduct (@RequestBody @Valid Product product) {
+    public ResponseEntity<ApiResponse> updateProductDiscount (@RequestBody @Valid ProductDiscount productDiscount) {
         start = new Date();
-        productService.updateProduct(product);
+        productDiscountService.updateProductDiscount(productDiscount);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Product", HttpStatus.OK.value(),"Success", "Product has been updated.",
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Product Discount", HttpStatus.OK.value(),"Success", "Discount on product has been updated.",
                 null), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> deleteProduct (@PathVariable @Valid Long id) {
-        String product_name = productService.getProductNameByID(id);
+    public ResponseEntity<ApiResponse> deleteProductDiscount (@PathVariable @Valid Long id) {
+        String product_name = productDiscountService.getProductNameByID(id);
         start = new Date();
-        productService.deleteProduct(id);
+        productDiscountService.deleteProductDiscount(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Product", HttpStatus.OK.value(),"Success", product_name + " has been deleted.",
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Product Discount", HttpStatus.OK.value(),"Success", "Discount on " + product_name + " has been deleted.",
                 null), HttpStatus.OK);
     }
 }

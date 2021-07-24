@@ -8,6 +8,7 @@ import lombok.Data;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @Entity
@@ -68,6 +69,9 @@ public class ProductList {
 
     @Column(name="quantity")
     private Long quantity;
+
+    @OneToMany(mappedBy = "productList")
+    private List<ProductImageList> productImageList;
 
     public ProductList() {}
 }
