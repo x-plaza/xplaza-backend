@@ -45,8 +45,8 @@ public class OrderService {
         return orderListRepo.findAllOrdersByStatus(status);
     }
 
-    public void updateOrderStatus(Long invoice_number, String remarks, Long status) {
-        orderRepo.updateOrderStatus(invoice_number,remarks,status);
+    public void updateOrderStatus(Long order_id, String remarks, Long status) {
+        orderRepo.updateOrderStatus(order_id,remarks,status);
     }
 
     public List<OrderList> listOrdersByUserID(Long user_id) {

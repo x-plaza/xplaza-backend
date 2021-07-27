@@ -8,35 +8,25 @@ import lombok.Data;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
-import java.util.Date;
 
 @Data
 @Entity
+@Table(name="delivery_costs")
 @AllArgsConstructor
-@Table(name="product_discounts")
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @TypeDef(name = "json", typeClass = JsonStringType.class)
-public class ProductDiscountList {
+public class DeliveryCostList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="product_discount_id")
+    @Column(name="delivery_cost_id")
     @ApiModelProperty(hidden=true)
     private Long id;
 
-    @Column(name="fk_product_id")
-    private Long product_id;
+    @Column(name="delivery_slab_range")
+    private String delivery_slab_range;
 
-    @Column(name="product_name")
-    private String product_name;
-
-    @Column(name="fk_discount_type_id")
-    private Long discount_type_id;
-
-    @Column(name="discount_type_name")
-    private String discount_type_name;
-
-    @Column(name="discount_amount")
-    private Double discount_amount;
+    @Column(name="delivery_cost")
+    private Double cost;
 
     @Column(name="fk_currency_id")
     private Long currency_id;
@@ -47,11 +37,5 @@ public class ProductDiscountList {
     @Column(name="currency_sign")
     private String currency_sign;
 
-    @Column(name="discount_start_date")
-    private Date start_date;
-
-    @Column(name="discount_end_date")
-    private Date end_date;
-
-    public ProductDiscountList() {}
+    public DeliveryCostList() {}
 }

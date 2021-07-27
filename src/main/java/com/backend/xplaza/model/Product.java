@@ -49,6 +49,10 @@ public class Product {
     @Column(name="product_selling_price")
     private Double selling_price;
 
+    public Double getSelling_price() {
+        return selling_price;
+    }
+
     @Column(name="fk_currency_id")
     private Long currency_id;
 
@@ -57,6 +61,10 @@ public class Product {
 
     @Column(name="quantity")
     private Long quantity;
+
+    public void setQuantity(Long quantity) {
+        this.quantity = quantity;
+    }
 
     @OneToMany(mappedBy = "product")
     private List<ProductImage> productImage;

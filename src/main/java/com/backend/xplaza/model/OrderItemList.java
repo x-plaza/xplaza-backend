@@ -13,7 +13,7 @@ import javax.persistence.*;
 @Data
 @Entity
 @AllArgsConstructor
-@Table(name="order_items")
+@Table(name="order_details")
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @TypeDef(name = "json", typeClass = JsonStringType.class)
 public class OrderItemList {
@@ -46,7 +46,7 @@ public class OrderItemList {
 
     @ManyToOne
     @JsonBackReference
-    @JoinColumn(name="fk_order_id",insertable = false,updatable = false)
+    @JoinColumn(name="order_id",insertable = false,updatable = false)
     private OrderDetails orderDetails;
 
     public OrderItemList() {}

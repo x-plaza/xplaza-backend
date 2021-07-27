@@ -1,8 +1,9 @@
 package com.backend.xplaza.controller;
 
 import com.backend.xplaza.common.ApiResponse;
-import com.backend.xplaza.model.OrderItem;
-import com.backend.xplaza.service.OrderItemService;
+import com.backend.xplaza.model.DeliveryCost;
+import com.backend.xplaza.model.DeliveryCostList;
+import com.backend.xplaza.service.DeliveryCostService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONException;
@@ -18,10 +19,10 @@ import java.util.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/order-items")
-public class OrderItemController {
+@RequestMapping("/api/delivery-cost")
+public class DeliveryCostController {
     @Autowired
-    private OrderItemService orderItemService;
+    private DeliveryCostService deliveryCostService;
     private Date start, end;
     private Long responseTime;
 
@@ -35,15 +36,15 @@ public class OrderItemController {
     }
 
     @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getOrderItems() throws JsonProcessingException, JSONException {
+    public ResponseEntity<String> getDeliveryCosts() throws JsonProcessingException, JSONException {
         start = new Date();
-        List<OrderItem> dtos = orderItemService.listOrderItems();
+        List<DeliveryCostList> dtos = deliveryCostService.listDeliveryCosts();
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         ObjectMapper mapper = new ObjectMapper();
         String response= "{\n" +
                 "  \"responseTime\": "+ responseTime + ",\n" +
-                "  \"responseType\": \"Order Item List\",\n" +
+                "  \"responseType\": \"Delivery Cost List\",\n" +
                 "  \"status\": 200,\n" +
                 "  \"response\": \"Success\",\n" +
                 "  \"msg\": \"\",\n" +
@@ -52,15 +53,15 @@ public class OrderItemController {
     }
 
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getOrderItem(@PathVariable @Valid Long id) throws JsonProcessingException {
+    public ResponseEntity<String> getDeliveryCost(@PathVariable @Valid Long id) throws JsonProcessingException {
         start = new Date();
-        OrderItem dtos = orderItemService.listOrderItem(id);
+        DeliveryCostList dtos = deliveryCostService.listDeliveryCost(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         ObjectMapper mapper = new ObjectMapper();
         String response= "{\n" +
                 "  \"responseTime\": "+ responseTime + ",\n" +
-                "  \"responseType\": \"Order Item List\",\n" +
+                "  \"responseType\": \"Delivery Cost List\",\n" +
                 "  \"status\": 200,\n" +
                 "  \"response\": \"Success\",\n" +
                 "  \"msg\": \"\",\n" +
@@ -69,40 +70,31 @@ public class OrderItemController {
     }
 
     @PostMapping(value= "/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> addOrderItem (@RequestBody @Valid OrderItem orderItem) {
+    public ResponseEntity<ApiResponse> addDeliveryCost (@RequestBody @Valid DeliveryCost deliveryCost) {
         start = new Date();
-        orderItemService.addOrderItem(orderItem);
+        deliveryCostService.addDeliveryCost(deliveryCost);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Order Items", HttpStatus.CREATED.value(),"Success", "Order Item has been created.",null), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Delivery Cost", HttpStatus.CREATED.value(),"Success", "Delivery Cost has been created.",null), HttpStatus.CREATED);
     }
 
-    /*@PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> updateOrderItem (@RequestBody @Valid OrderItem orderItem) {
-        start = new Date();
-        orderItemService.updateOrderItem(orderItem);
-        end = new Date();
-        responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Order Items", HttpStatus.OK.value(),"Success", "Order Item has been updated.",null), HttpStatus.OK);
-    }*/
-
     @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> updateOrderItem (@RequestParam("order_item_id") @Valid Long order_item_id,
-                                                        @RequestParam("quantity") @Valid Long quantity) {
+    public ResponseEntity<ApiResponse> updateDeliveryCostd (@RequestBody @Valid DeliveryCost deliveryCost) {
         start = new Date();
-        orderItemService.updateOrderItem(order_item_id, quantity);
+        deliveryCostService.updateDeliveryCost(deliveryCost);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Order Items", HttpStatus.OK.value(),"Success", "Order Item has been updated.",null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Delivery Cost", HttpStatus.OK.value(),"Success", "Delivery Cost has been updated.",null), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> deleteOrderItem (@PathVariable @Valid Long id) {
-        String order_item_name = orderItemService.getOrderItemNameByID(id);
+    public ResponseEntity<ApiResponse> deleteDeliveryCost (@PathVariable @Valid Long id) {
+        String delivery_slab = deliveryCostService.getDeliverySlabRangeNameByID(id);
         start = new Date();
-        orderItemService.deleteOrderItem(id);
+        deliveryCostService.deleteDeliveryCost(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Order Items", HttpStatus.OK.value(),"Success", order_item_name + " has been deleted.",null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Delivery Cost", HttpStatus.OK.value(),"Success", "Delivery cost of "+
+                delivery_slab + " order range has been deleted.",null), HttpStatus.OK);
     }
 }

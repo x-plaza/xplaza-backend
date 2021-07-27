@@ -25,11 +25,27 @@ public class Order {
     @Column(name="total_price")
     private Double total_price;
 
+    public Double getTotal_price() {
+        return total_price;
+    }
+
+    public void setTotal_price(Double total_price) {
+        this.total_price = total_price;
+    }
+
     @Column(name="discount_amount")
     private Double discount_amount;
 
+    public Double getDiscount_amount() {
+        return discount_amount;
+    }
+
     @Column(name="grand_total_price")
     private Double grand_total_price;
+
+    public void setGrand_total_price(Double grand_total_price) {
+        this.grand_total_price = grand_total_price;
+    }
 
     @Column(name="delivery_address")
     private String delivery_address;

@@ -15,7 +15,7 @@ import java.util.List;
 @Data
 @Entity
 @AllArgsConstructor
-@Table(name="orders")
+@Table(name="order_details")
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @TypeDef(name = "json", typeClass = JsonStringType.class)
 public class OrderDetails {
