@@ -55,7 +55,7 @@ public class CouponList {
     private Date start_date;
 
     public String getStart_date() {
-        if(start_date != null) return new SimpleDateFormat("dd MMM yyyy HH:mm:ss").format(start_date);
+        if(start_date != null) return new SimpleDateFormat("dd MMM yyyy").format(start_date);
         return null;
     }
 
@@ -63,7 +63,7 @@ public class CouponList {
     private Date end_date;
 
     public String getEnd_date() {
-        if(end_date != null) return new SimpleDateFormat("dd MMM yyyy HH:mm:ss").format(end_date);
+        if(end_date != null) return new SimpleDateFormat("dd MMM yyyy").format(end_date);
         return null;
     }
 
