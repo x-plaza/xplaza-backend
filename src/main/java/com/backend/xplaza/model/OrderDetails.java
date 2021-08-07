@@ -37,7 +37,7 @@ public class OrderDetails {
     @Column(name="delivery_address")
     private String delivery_address;
 
-    @Column(name="fk_customer_id")
+    @Column(name="customer_id")
     private String customer_id;
 
     @Column(name="customer_name")
@@ -46,14 +46,11 @@ public class OrderDetails {
     @Column(name="mobile_no")
     private String mobile_no;
 
-    @Column(name="fk_shop_id")
+    @Column(name="shop_id")
     private Long shop_id;
 
     @Column(name="shop_name")
     private String shop_name;
-
-    @Column(name="fk_delivery_schedule_id")
-    private Long delivery_schedule_id;
 
     private String allotted_time;
 
@@ -64,9 +61,6 @@ public class OrderDetails {
         if(received_time != null) return new SimpleDateFormat("dd MMM yyyy").format(received_time);
         return null;
     }
-
-    @Column(name="fk_delivery_cost_id")
-    private Long delivery_cost_id;
 
     @Column(name="delivery_cost")
     private Long delivery_cost;
@@ -92,7 +86,7 @@ public class OrderDetails {
     @Column(name="contact_no")
     private String contact_no;
 
-    @Column(name="fk_coupon_id")
+    @Column(name="coupon_id")
     private Long coupon_id;
 
     @Column(name="coupon_code")

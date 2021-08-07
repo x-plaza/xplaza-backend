@@ -36,7 +36,7 @@ public class OrderList {
     @Column(name="delivery_address")
     private String delivery_address;
 
-    @Column(name="fk_customer_id")
+    @Column(name="customer_id")
     private String customer_id;
 
     @Column(name="customer_name")
@@ -55,7 +55,7 @@ public class OrderList {
         return null;
     }
 
-    @Column(name="fk_shop_id")
+    @Column(name="shop_id")
     private Long shop_id;
 
     @Column(name="shop_name")

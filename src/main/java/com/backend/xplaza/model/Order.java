@@ -7,6 +7,7 @@ import lombok.Data;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import java.sql.Time;
 import java.util.Date;
 
 @Data
@@ -50,19 +51,13 @@ public class Order {
     @Column(name="delivery_address")
     private String delivery_address;
 
-    @Column(name="received_time")
-    private Date received_time;
-
-    @Column(name="fk_customer_id")
+    @Column(name="customer_id")
     private Long customer_id;
 
-    @Column(name="fk_shop_id")
+    @Column(name="shop_id")
     private Long shop_id;
 
-    @Column(name="fk_delivery_schedule_id")
-    private Long delivery_schedule_id;
-
-    @Column(name="fk_delivery_cost_id")
+    @Column(name="delivery_cost_id")
     private Long delivery_cost_id;
 
     @Column(name="fk_payment_type_id")
@@ -71,17 +66,47 @@ public class Order {
     @Column(name="fk_status_id")
     private Long status_id;
 
-    @Column(name="fk_coupon_id")
+    @Column(name="coupon_id")
     private Long coupon_id;
+
+    @Column(name="received_time")
+    private Date received_time;
 
     @Column(name="date_to_deliver")
     private Date date_to_deliver;
+
+    @Column(name="fk_currency_id")
+    private Long currency_id;
 
     @Column(name="additional_info")
     private String additional_info;
 
     @Column(name="remarks")
     private String remarks;
+
+    @Column(name="customer_name")
+    private String customer_name;
+
+    @Column(name="shop_name")
+    private String shop_name;
+
+    @Column(name="delivery_schedule_start")
+    private Time delivery_schedule_start;
+
+    @Column(name="delivery_schedule_end")
+    private Time delivery_schedule_end;
+
+    @Column(name="delivery_cost")
+    private Long delivery_cost;
+
+    @Column(name="coupon_code")
+    private String coupon_code;
+
+    @Column(name="coupon_amount")
+    private Long coupon_amount;
+
+    @Column(name="mobile_no")
+    private String mobile_no;
 
     public Order(){}
 }
