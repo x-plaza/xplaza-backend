@@ -11,4 +11,7 @@ public interface ProductDiscountRepository extends JpaRepository<ProductDiscount
             "left join product_variation_types pvt on p.fk_product_variation_type_id = pvt.product_variation_type " +
             "where pd.fk_product_id = ?1", nativeQuery = true)
     String getName(Long id);
+
+    @Query(value = "select COALESCE(discount_amount,0) as discount_amount from product_discounts where fk_product_id = ?1", nativeQuery = true)
+    Double findProductDiscountByProductId(Long product_id);
 }

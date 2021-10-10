@@ -28,6 +28,10 @@ public class DeliveryCostList {
     @Column(name="delivery_cost")
     private Double cost;
 
+    public Double getCost() {
+        return cost;
+    }
+
     @Column(name="fk_currency_id")
     private Long currency_id;
 

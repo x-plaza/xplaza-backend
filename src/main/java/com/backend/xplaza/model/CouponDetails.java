@@ -31,11 +31,23 @@ public class CouponDetails {
     @Column(name="is_active")
     private Boolean is_active;
 
+    public Boolean getIs_active() {
+        return is_active;
+    }
+
     @Column(name="coupon_amount")
     private Double amount;
 
+    public Double getAmount() {
+        return amount;
+    }
+
     @Column(name="max_coupon_amount")
     private Double max_amount;
+
+    public Double getMax_amount() {
+        return max_amount;
+    }
 
     @Column(name="fk_currency_id")
     private Long currency_id;
@@ -51,6 +63,10 @@ public class CouponDetails {
 
     @Column(name="discount_type_name")
     private String discount_type_name;
+
+    public String getDiscount_type_name() {
+        return discount_type_name;
+    }
 
     @Column(name="coupon_start_date")
     private Date start_date;
@@ -70,6 +86,10 @@ public class CouponDetails {
 
     @Column(name="min_shopping_amount")
     private Double min_shopping_amount;
+
+    public Double getMin_shopping_amount() {
+        return min_shopping_amount;
+    }
 
     @OneToMany(mappedBy = "couponDetails")
     private List<CouponShopList> shopList;

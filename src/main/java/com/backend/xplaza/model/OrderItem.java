@@ -1,6 +1,7 @@
 package com.backend.xplaza.model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -24,6 +25,10 @@ public class OrderItem {
 
     @Column(name="fk_order_id")
     private Long order_id;
+
+    public void setOrder_id(Long order_id) {
+        this.order_id = order_id;
+    }
 
     public Long getOrder_id() {
         return order_id;
@@ -73,6 +78,10 @@ public class OrderItem {
         return unit_price;
     }
 
+    public void setUnit_price(Double unit_price) {
+        this.unit_price = unit_price;
+    }
+
     @ApiModelProperty(hidden=true)
     @Column(name="order_item_total_price")
     private Double item_total_price;
@@ -90,6 +99,28 @@ public class OrderItem {
 
     @Column(name="fk_currency_id")
     private Long currency_id;
+
+    @ManyToOne
+    @JsonBackReference
+    @JoinColumn(name="order_id",insertable = false,updatable = false)
+    private OrderPlace orderPlace;
+
+//    public OrderItem(OrderItem oi){
+//        OrderItem orderItem = new OrderItem();
+//        orderItem.id = oi.id;
+//        orderItem.order_id = oi.order_id;
+//        orderItem.product_id = oi.product_id;
+//        orderItem.item_name = oi.item_name;
+//        orderItem.item_var_type_name = oi.item_var_type_name;
+//        orderItem.item_var_type_value = oi.item_var_type_value;
+//        orderItem.item_category = oi.item_category;
+//        orderItem.quantity = oi.quantity;
+//        orderItem.quantity_type = oi.quantity_type;
+//        orderItem.unit_price = oi.unit_price;
+//        orderItem.item_total_price = oi.item_total_price;
+//        orderItem.item_image = oi.item_image;
+//        orderItem.currency_id = oi.currency_id;
+//    }
 
     public OrderItem(){}
 }

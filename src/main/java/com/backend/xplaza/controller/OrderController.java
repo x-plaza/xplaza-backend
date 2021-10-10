@@ -1,9 +1,7 @@
 package com.backend.xplaza.controller;
 
 import com.backend.xplaza.common.ApiResponse;
-import com.backend.xplaza.model.Order;
-import com.backend.xplaza.model.OrderDetails;
-import com.backend.xplaza.model.OrderList;
+import com.backend.xplaza.model.*;
 import com.backend.xplaza.service.OrderService;
 import com.backend.xplaza.service.RoleService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -43,31 +41,31 @@ public class OrderController {
     }
 
     @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getOrders(@RequestParam(value ="user_id",required = true) @Valid Long user_id,
+    public ResponseEntity<String> getOrdersByAdmin (@RequestParam(value ="user_id",required = true) @Valid Long admin_user_id,
                                             @RequestParam(value ="status",required = false) @Valid String status,
                                             @RequestParam(value ="order_date",required = false) @Valid String order_date)
                                             throws JsonProcessingException, JSONException, ParseException {
         start = new Date();
         List<OrderList> dtos;
         SimpleDateFormat formatter=new SimpleDateFormat("dd-MM-yyyy");
-        String role_name = roleService.getRoleNameByUserID(user_id);
+        String role_name = roleService.getRoleNameByUserID(admin_user_id);
         if(role_name == null) dtos = null;
         else if(role_name.equals("Master Admin")) {
-            if (status == null && order_date == null) dtos = orderService.listOrders();
-            else if (status!=null && order_date == null) dtos = orderService.listOrdersByStatus(status);
+            if (status == null && order_date == null) dtos = orderService.listOrdersByAdmin();
+            else if (status!=null && order_date == null) dtos = orderService.listOrdersByStatusByAdmin(status);
             else {
                 if (status == null) status = "Pending";
                 Date date = formatter.parse(order_date);
-                dtos = orderService.listOrdersByFilter(status,date);
+                dtos = orderService.listOrdersByFilterByAdmin(status,date);
             }
         }
         else{
-            if (status == null && order_date == null) dtos = orderService.listOrdersByUserID(user_id);
-            else if (status!=null && order_date == null) dtos = orderService.listOrdersByStatusAndUserID(status,user_id);
+            if (status == null && order_date == null) dtos = orderService.listOrdersByAdminUserID(admin_user_id);
+            else if (status!=null && order_date == null) dtos = orderService.listOrdersByStatusAndAdminUserID(status,admin_user_id);
             else {
                 if (status == null) status = "Pending";
                 Date date = formatter.parse(order_date);
-                dtos = orderService.listOrdersByFilterAndUserID(status,date,user_id);
+                dtos = orderService.listOrdersByFilterAndAdminUserID(status,date,admin_user_id);
             }
         }
         end = new Date();
@@ -84,9 +82,9 @@ public class OrderController {
     }
 
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getOrderDetails(@PathVariable @Valid Long id) throws JsonProcessingException {
+    public ResponseEntity<String> getOrderDetailsByAdmin (@PathVariable @Valid Long id) throws JsonProcessingException {
         start = new Date();
-        OrderDetails dtos = orderService.listOrderDetails(id);
+        OrderDetails dtos = orderService.listOrderDetailsByAdmin(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         ObjectMapper mapper = new ObjectMapper();
@@ -100,17 +98,77 @@ public class OrderController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping(value= "/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> addOrder (@RequestBody @Valid Order order) {
+
+    @GetMapping(value = { "/by-customer" }, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getOrdersByCustomer (@RequestParam(value ="customer_id",required = true) @Valid Long customer_id,
+                                                    @RequestParam(value ="status",required = false) @Valid String status,
+                                                    @RequestParam(value ="order_date",required = false) @Valid String order_date)
+            throws JsonProcessingException, JSONException, ParseException {
         start = new Date();
-        orderService.addOrder(order);
+        List<OrderPlaceList> dtos = null;
+        SimpleDateFormat formatter=new SimpleDateFormat("dd-MM-yyyy");
+        if (status == null && order_date == null) dtos = orderService.listOrdersByCustomer(customer_id);
+        else if (status!=null && order_date == null) dtos = orderService.listOrdersByStatusByCustomer(customer_id,status);
+        else if (status!=null && order_date != null)
+        {
+            Date date = formatter.parse(order_date);
+            dtos = orderService.listOrdersByFilterByCustomer(customer_id,status,date);
+        }
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        ObjectMapper mapper = new ObjectMapper();
+        String response= "{\n" +
+                "  \"responseTime\": "+ responseTime + ",\n" +
+                "  \"responseType\": \"Order List\",\n" +
+                "  \"status\": 200,\n" +
+                "  \"response\": \"Success\",\n" +
+                "  \"msg\": \"\",\n" +
+                "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping(value = {"/by-customer/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getOrderDetailsByCustomer (@PathVariable @Valid Long id) throws JsonProcessingException {
+        start = new Date();
+        OrderDetails dtos = orderService.listOrderDetailsByAdmin(id);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        ObjectMapper mapper = new ObjectMapper();
+        String response= "{\n" +
+                "  \"responseTime\": "+ responseTime + ",\n" +
+                "  \"responseType\": \"Order Details\",\n" +
+                "  \"status\": 200,\n" +
+                "  \"response\": \"Success\",\n" +
+                "  \"msg\": \"\",\n" +
+                "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+    @PostMapping(value= "/add", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiResponse> addOrder (@RequestBody @Valid OrderPlace order) throws ParseException {
+        start = new Date();
+
+        // Set Order Prices
+        order = orderService.setOrderPrices(order);
+
+        // Validate Coupon
+        if(order.getCoupon_id() != null) {
+            if (orderService.checkCouponValidity(order)) orderService.addOrder(order);
+            else {
+                end = new Date();
+                responseTime = end.getTime() - start.getTime();
+                return new ResponseEntity<>(new ApiResponse(responseTime, "Add Order", HttpStatus.CREATED.value(),"Error", "Coupon is not valid!",null), HttpStatus.FORBIDDEN);
+            }
+        } else orderService.addOrder(order);
+
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         return new ResponseEntity<>(new ApiResponse(responseTime, "Add Order", HttpStatus.CREATED.value(),"Success", "Order has been created.",null), HttpStatus.CREATED);
     }
 
     @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> updateOrder (@RequestBody @Valid Order order) {
+    public ResponseEntity<ApiResponse> updateOrder (@RequestBody @Valid OrderPlace order) {
         start = new Date();
         orderService.updateOrder(order);
         end = new Date();

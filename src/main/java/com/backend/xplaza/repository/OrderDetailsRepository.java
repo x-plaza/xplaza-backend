@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.Query;
 public interface OrderDetailsRepository extends JpaRepository<OrderDetails, Long> {
     @Query(value = "select od.* from order_details od " +
             "where od.order_id = ?1", nativeQuery = true)
-    OrderDetails findOrderDetailsById(Long id);
+    OrderDetails findOrderDetailsByIdByAdmin(Long id);
 }
