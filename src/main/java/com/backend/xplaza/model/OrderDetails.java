@@ -31,6 +31,9 @@ public class OrderDetails {
     @Column(name="discount_amount")
     private Double discount_amount;
 
+    @Column(name="net_total")
+    private Double net_total;
+
     @Column(name="grand_total_price")
     private Double grand_total_price;
 

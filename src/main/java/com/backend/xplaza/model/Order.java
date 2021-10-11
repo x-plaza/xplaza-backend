@@ -41,6 +41,21 @@ public class Order {
         return discount_amount;
     }
 
+    public void setDiscount_amount(Double discount_amount) {
+        this.discount_amount = discount_amount;
+    }
+
+    @Column(name="net_total")
+    private Double net_total;
+
+    public Double getNet_total() {
+        return net_total;
+    }
+
+    public void setNet_total(Double net_total) {
+        this.net_total = net_total;
+    }
+
     @Column(name="grand_total_price")
     private Double grand_total_price;
 
@@ -68,6 +83,10 @@ public class Order {
 
     @Column(name="coupon_id")
     private Long coupon_id;
+
+    public Long getCoupon_id() {
+        return coupon_id;
+    }
 
     @Column(name="received_time")
     private Date received_time;
@@ -97,13 +116,29 @@ public class Order {
     private Time delivery_schedule_end;
 
     @Column(name="delivery_cost")
-    private Long delivery_cost;
+    private Double delivery_cost;
+
+    public Double getDelivery_cost() {
+        return delivery_cost;
+    }
+
+    public void setDelivery_cost(Double delivery_cost) {
+        this.delivery_cost = delivery_cost;
+    }
 
     @Column(name="coupon_code")
     private String coupon_code;
 
     @Column(name="coupon_amount")
-    private Long coupon_amount;
+    private Double coupon_amount;
+
+    public Double getCoupon_amount() {
+        return coupon_amount;
+    }
+
+    public void setCoupon_amount(Double coupon_amount) {
+        this.coupon_amount = coupon_amount;
+    }
 
     @Column(name="mobile_no")
     private String mobile_no;

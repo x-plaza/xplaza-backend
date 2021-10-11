@@ -32,6 +32,10 @@ public class DeliveryCostService {
         deliveryCostRepo.deleteById(id);
     }
 
+//    public List<DeliveryCost> listDeliveryCost() {
+//        return deliveryCostRepo.findAll();
+//    }
+
     public List<DeliveryCostList> listDeliveryCosts() {
         return deliveryCostListRepo.findAllDeliveryCost();
     }

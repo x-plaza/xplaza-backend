@@ -24,11 +24,23 @@ public class DeliveryCost {
     @Column(name="delivery_slab_start_range")
     private Double start_range;
 
+    public Double getStart_range() {
+        return start_range;
+    }
+
     @Column(name="delivery_slab_end_range")
     private Double end_range;
 
+    public Double getEnd_range() {
+        return end_range;
+    }
+
     @Column(name="delivery_cost")
     private Double cost;
+
+    public Double getCost() {
+        return cost;
+    }
 
     @Column(name="fk_currency_id")
     private Long currency_id;

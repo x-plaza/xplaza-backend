@@ -1,10 +1,7 @@
 package com.backend.xplaza.service;
 
-import com.backend.xplaza.model.Order;
-import com.backend.xplaza.model.OrderItem;
-import com.backend.xplaza.repository.OrderItemRepository;
-import com.backend.xplaza.repository.OrderRepository;
-import com.backend.xplaza.repository.ProductRepository;
+import com.backend.xplaza.model.*;
+import com.backend.xplaza.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,20 +16,50 @@ public class OrderItemService {
     private OrderRepository orderRepo;
     @Autowired
     private ProductRepository productRepo;
+    @Autowired
+    private DeliveryCostRepository deliveryCostRepo;
+    @Autowired
+    private CouponDetailsRepository couponDetailsRepo;
 
     @Transactional
     public void addOrderItem(OrderItem orderItem) {
         Order order = orderRepo.findOrderById(orderItem.getOrder_id());
+        Product product = productRepo.findProductById(orderItem.getProduct_id());
+        Double original_price = product.getSelling_price();
         orderItem.setItem_total_price(orderItem.getUnit_price() * orderItem.getQuantity());
-
         Double item_total_price = orderItem.getItem_total_price();
+        Double net_total = order.getNet_total();
         Double total_price = order.getTotal_price();
-        Double total_discount = order.getDiscount_amount();
-        total_price = total_price + item_total_price;
-        Double grand_total = total_price - total_discount;
 
+        net_total += item_total_price;
+        total_price += original_price * orderItem.getQuantity();
+        Double total_discount = total_price - net_total;
+
+        // Check updated delivery cost
+        Double delivery_cost = order.getDelivery_cost();
+        List<DeliveryCost> dcList = deliveryCostRepo.findAll();
+        for (DeliveryCost dc: dcList)
+        {
+            if(net_total >= dc.getStart_range() && net_total <= dc.getEnd_range()) delivery_cost = dc.getCost();
+        }
+        // Check updated coupon value
+        Double coupon_amount = order.getCoupon_amount();
+        if(order.getCoupon_id() != null) {
+            CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsById(order.getCoupon_id());
+            if(couponDetails.getDiscount_type_name() == "Percentage") {
+                coupon_amount = (order.getNet_total() *  couponDetails.getAmount())/100;
+                if(coupon_amount > couponDetails.getMax_amount())
+                    coupon_amount = couponDetails.getMax_amount();
+            }
+        }
+        Double grand_total = net_total + delivery_cost - coupon_amount;
         order.setTotal_price(total_price);
+        order.setNet_total(net_total);
+        order.setDelivery_cost(delivery_cost);
+        order.setDiscount_amount(total_discount);
+        order.setCoupon_amount(coupon_amount);
         order.setGrand_total_price(grand_total);
+
         orderItemRepo.save(orderItem);
         orderRepo.save(order);
     }
@@ -47,8 +74,12 @@ public class OrderItemService {
 
     @Transactional
     public void deleteOrderItem(Long id) {
-        OrderItem item = orderItemRepo.findOrderItemById(id);
+        /*OrderItem item = orderItemRepo.findOrderItemById(id);
         Order order = orderRepo.findOrderById(item.getOrder_id());
+        Product product = productRepo.findProductById(item.getProduct_id());
+
+        Double original_price = product.getSelling_price();
+        Long old_quantity = item.getQuantity();
 
         Double item_total_price = item.getItem_total_price();
         Double total_price = order.getTotal_price();
@@ -59,6 +90,57 @@ public class OrderItemService {
         order.setTotal_price(total_price);
         order.setGrand_total_price(grand_total);
         orderItemRepo.deleteById(id);
+        orderRepo.save(order);*/
+
+        // This approach is basically instead of deleting the product, I am making it's quantity to zero.
+        long new_quantity = 0;
+        OrderItem item = orderItemRepo.findOrderItemById(id);
+        Order order = orderRepo.findOrderById(item.getOrder_id());
+        Product product = productRepo.findProductById(item.getProduct_id());
+
+        // Get the old values:
+        Double original_price = product.getSelling_price();
+        Long old_quantity = item.getQuantity();
+        Double unit_price = item.getUnit_price();
+        Double old_item_total_price = item.getItem_total_price();
+        Double total_price = order.getTotal_price();
+        Double net_total = order.getNet_total();
+
+        // Calculate the new values:
+        Double new_item_total_price = unit_price * new_quantity;
+        net_total = net_total - old_item_total_price + new_item_total_price;
+        total_price = total_price - (old_quantity * original_price) + (new_quantity * original_price);
+        Double total_discount = total_price - net_total;
+
+        // Check updated delivery cost
+        Double delivery_cost = order.getDelivery_cost();
+        List<DeliveryCost> dcList = deliveryCostRepo.findAll();
+        for (DeliveryCost dc: dcList)
+        {
+            if(net_total >= dc.getStart_range() && net_total <= dc.getEnd_range()) delivery_cost = dc.getCost();
+        }
+        // Check updated coupon value
+        Double coupon_amount = order.getCoupon_amount();
+        if(order.getCoupon_id() != null) {
+            CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsById(order.getCoupon_id());
+            if(couponDetails.getDiscount_type_name() == "Percentage") {
+                coupon_amount = (order.getNet_total() *  couponDetails.getAmount())/100;
+                if(coupon_amount > couponDetails.getMax_amount())
+                    coupon_amount = couponDetails.getMax_amount();
+            }
+        }
+        Double grand_total = net_total + delivery_cost - coupon_amount;
+
+        // Set the new values and save them:
+        order.setTotal_price(total_price);
+        order.setNet_total(net_total);
+        order.setDelivery_cost(delivery_cost);
+        order.setDiscount_amount(total_discount);
+        order.setCoupon_amount(coupon_amount);
+        order.setGrand_total_price(grand_total);
+        item.setItem_total_price(new_item_total_price);
+        item.setQuantity(new_quantity);
+        orderItemRepo.save(item);
         orderRepo.save(order);
     }
 
@@ -66,28 +148,50 @@ public class OrderItemService {
     public void updateOrderItem(Long order_item_id, Long new_quantity) {
         OrderItem item = orderItemRepo.findOrderItemById(order_item_id);
         Order order = orderRepo.findOrderById(item.getOrder_id());
-        //Product product = productRepo.findProductById(item.getProduct_id());
+        Product product = productRepo.findProductById(item.getProduct_id());
 
         // Get the old values:
-        //Double original_price = product.getSelling_price();
+        Double original_price = product.getSelling_price();
+        Long old_quantity = item.getQuantity();
         Double unit_price = item.getUnit_price();
         Double old_item_total_price = item.getItem_total_price();
-        //Long old_quantity = item.getQuantity();
         Double total_price = order.getTotal_price();
-        Double total_discount = order.getDiscount_amount();
+        Double net_total = order.getNet_total();
 
         // Calculate the new values:
-        //Double per_unit_discount = original_price - unit_price;
-        //Double total_discount_per_item = per_unit_discount * old_quantity;
         Double new_item_total_price = unit_price * new_quantity;
-        total_price = total_price - old_item_total_price + new_item_total_price;
-        Double grand_total = total_price - total_discount;
+        net_total = net_total - old_item_total_price + new_item_total_price;
+        total_price = total_price - (old_quantity * original_price) + (new_quantity * original_price);
+        Double total_discount = total_price - net_total;
+
+        // Check updated delivery cost
+        Double delivery_cost = order.getDelivery_cost();
+        List<DeliveryCost> dcList = deliveryCostRepo.findAll();
+        for (DeliveryCost dc: dcList)
+        {
+            if(net_total >= dc.getStart_range() && net_total <= dc.getEnd_range()) delivery_cost = dc.getCost();
+        }
+        // Check updated coupon value
+        Double coupon_amount = order.getCoupon_amount();
+        if(order.getCoupon_id() != null) {
+            CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsById(order.getCoupon_id());
+            if(couponDetails.getDiscount_type_name() == "Percentage") {
+                coupon_amount = (order.getNet_total() *  couponDetails.getAmount())/100;
+                if(coupon_amount > couponDetails.getMax_amount())
+                    coupon_amount = couponDetails.getMax_amount();
+            }
+        }
+        Double grand_total = net_total + delivery_cost - coupon_amount;
 
         // Set the new values and save them:
+        order.setTotal_price(total_price);
+        order.setNet_total(net_total);
+        order.setDelivery_cost(delivery_cost);
+        order.setDiscount_amount(total_discount);
+        order.setCoupon_amount(coupon_amount);
+        order.setGrand_total_price(grand_total);
         item.setItem_total_price(new_item_total_price);
         item.setQuantity(new_quantity);
-        order.setTotal_price(total_price);
-        order.setGrand_total_price(grand_total);
         orderItemRepo.save(item);
         orderRepo.save(order);
     }
