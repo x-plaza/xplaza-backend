@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.hibernate.annotations.TypeDef;
@@ -81,6 +82,7 @@ public class OrderPlace {
     @Column(name="fk_currency_id")
     private Long currency_id;
 
+    @ApiModelProperty(hidden=true)
     @Column(name="total_price")
     private Double total_price;
 
@@ -92,6 +94,7 @@ public class OrderPlace {
         this.total_price = total_price;
     }
 
+    @ApiModelProperty(hidden=true)
     @Column(name="net_total")
     private Double net_total;
 
@@ -103,6 +106,7 @@ public class OrderPlace {
         this.net_total = net_total;
     }
 
+    @ApiModelProperty(hidden=true)
     @Column(name="discount_amount")
     private Double discount_amount;
 
@@ -124,6 +128,7 @@ public class OrderPlace {
     @Column(name="coupon_code")
     private String coupon_code;
 
+    @ApiModelProperty(hidden=true)
     @Column(name="coupon_amount")
     private Double coupon_amount;
 
@@ -138,6 +143,7 @@ public class OrderPlace {
         return delivery_cost_id;
     }
 
+    @ApiModelProperty(hidden=true)
     @Column(name="delivery_cost")
     private Double delivery_cost;
 
@@ -145,6 +151,7 @@ public class OrderPlace {
         this.delivery_cost = delivery_cost;
     }
 
+    @ApiModelProperty(hidden=true)
     @Column(name="grand_total_price")
     private Double grand_total_price;
 
