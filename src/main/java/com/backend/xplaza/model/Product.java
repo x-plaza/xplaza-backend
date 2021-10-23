@@ -3,13 +3,12 @@ package com.backend.xplaza.model;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import java.util.List;
 
-@Data
+//@Data
 @Entity
 @AllArgsConstructor
 @Table(name="products")

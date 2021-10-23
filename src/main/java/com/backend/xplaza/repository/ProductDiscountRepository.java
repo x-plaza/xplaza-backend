@@ -12,6 +12,11 @@ public interface ProductDiscountRepository extends JpaRepository<ProductDiscount
             "where pd.fk_product_id = ?1", nativeQuery = true)
     String getName(Long id);
 
-    @Query(value = "select COALESCE(discount_amount,0) as discount_amount from product_discounts where fk_product_id = ?1", nativeQuery = true)
+    @Query(value = "SELECT SUM(discount_amount) AS discount_amount \n" +
+            "from (\n" +
+            "select coalesce(discount_amount, 0.0) as discount_amount \n" +
+            "from product_discounts \n" +
+            "where fk_product_id = ?1 and now() between discount_start_date and discount_end_date\n" +
+            "UNION ALL SELECT 0 AS discount_amount) as forcedrow", nativeQuery = true)
     Double findProductDiscountByProductId(Long product_id);
 }
