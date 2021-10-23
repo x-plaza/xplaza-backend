@@ -19,4 +19,7 @@ public interface ProductDiscountRepository extends JpaRepository<ProductDiscount
             "where fk_product_id = ?1 and now() between discount_start_date and discount_end_date\n" +
             "UNION ALL SELECT 0 AS discount_amount) as forcedrow", nativeQuery = true)
     Double findProductDiscountByProductId(Long product_id);
+
+    @Query(value = "select pd.* from product_discounts pd where fk_product_id = ?1 and now() between pd.discount_start_date and pd.discount_end_date", nativeQuery = true)
+    ProductDiscount findByProductId(Long product_id);
 }

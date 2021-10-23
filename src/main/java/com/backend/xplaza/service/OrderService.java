@@ -10,6 +10,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class OrderService {
@@ -35,23 +36,54 @@ public class OrderService {
     private DeliveryCostListRepository deliveryCostListRepo;
 
     @Transactional
+    public ProductInventory checkProductAvailability (OrderPlace order){
+        ProductInventory productInventory = new ProductInventory();
+        productInventory.setIs_available(true);
+        for (OrderItem item : order.getOrderItemList()) {
+            Product product = productRepo.findProductById(item.getProduct_id());
+            if(product.getQuantity() < item.getQuantity()) {
+                productInventory.setId(product.getId());
+                productInventory.setName(product.getName());
+                productInventory.setMax_available_quantity(product.getQuantity());
+                productInventory.setIs_available(false);
+                break;
+            }
+        }
+        return productInventory;
+    }
+
+    @Transactional
     public OrderPlace setOrderPrices (OrderPlace order){
         Double total_price = 0.0;
         Double total_discount = 0.0;
+        Double net_total = 0.0;
         for (OrderItem item : order.getOrderItemList()) {
             Product product = productRepo.findProductById(item.getProduct_id());
             Double original_price = product.getSelling_price();
-            Double discount_amount = productDiscountRepo.findProductDiscountByProductId(item.getProduct_id());
-            Double unit_price = original_price - discount_amount;
+            // check discount amount with validity and discount type
+            Double discount_amount = 0.0;
+            ProductDiscount productDiscount = productDiscountRepo.findByProductId(item.getProduct_id());
+            if(productDiscount != null)
+            {
+                discount_amount = productDiscount.getDiscount_amount();
+                Long discount_type = productDiscount.getDiscount_type_id();
+                if(discount_type == 2) // Percentage
+                {
+                    discount_amount = original_price * (discount_amount/100);
+                }
+            }
+            Double unit_price = original_price - discount_amount; // here unit price is basically the discounted price
             item.setUnit_price(unit_price);
             item.setItem_total_price(unit_price * item.getQuantity());
-            total_price += original_price;
-            total_discount += discount_amount;
+            total_price += original_price * item.getQuantity();
+            net_total += item.getItem_total_price();
         }
+        total_discount = total_price - net_total;
         order.setTotal_price(total_price);
         order.setDiscount_amount(total_discount);
-        order.setNet_total(total_price-total_discount); // sum of item total for an order
+        order.setNet_total(net_total); // sum of item total for an order after discount
 
+        // set delivery cost
         Double delivery_cost = 0.0;
         if(order.getDelivery_cost_id() != null){
             DeliveryCostList dc = deliveryCostListRepo.findDeliveryCostById(order.getDelivery_cost_id());
@@ -59,6 +91,7 @@ public class OrderService {
         }
         order.setDelivery_cost(delivery_cost);
 
+        // set coupon amount
         Double coupon_amount = 0.0;
         if(order.getCoupon_id() != null) {
             CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsById(order.getCoupon_id());
@@ -70,12 +103,12 @@ public class OrderService {
             }
         }
         order.setCoupon_amount(coupon_amount);
-        order.setGrand_total_price(order.getNet_total() + delivery_cost - coupon_amount);
+        order.setGrand_total_price(net_total + delivery_cost - coupon_amount);
         return order;
     }
 
+    @Transactional
     public boolean checkCouponValidity(OrderPlace order) throws ParseException {
-
         CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsById(order.getCoupon_id());
         Date received_time = order.getReceived_time();
         SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy");
@@ -93,6 +126,11 @@ public class OrderService {
         for (OrderItem oi : order.getOrderItemList()) {
             oi.setOrder_id(order.getInvoice_number());
             orderItemRepo.save(oi);
+            // update product inventory
+            Product product = productRepo.findProductById(oi.getProduct_id());
+            Long original_quantity = product.getQuantity();
+            Long new_quantity = original_quantity - oi.getQuantity();
+            productRepo.updateProductInventory(product.getId(), new_quantity);
         }
     }
 
@@ -104,8 +142,22 @@ public class OrderService {
         }
     }
 
+    @Transactional
     public void updateOrderStatus(Long order_id, String remarks, Long status) {
         orderRepo.updateOrderStatus(order_id,remarks,status);
+        if(status == 6) // If Order is Cancelled, revert Product Inventory
+        {
+            OrderPlace order = new OrderPlace();
+            Optional<OrderPlace> orderPlace = orderPlaceRepo.findById(order_id);
+            if (orderPlace.isPresent()) order = orderPlace.get();
+            // update product inventory
+            for (OrderItem oi : order.getOrderItemList()) {
+                Product product = productRepo.findProductById(oi.getProduct_id());
+                Long original_quantity = product.getQuantity();
+                Long new_quantity = original_quantity + oi.getQuantity();
+                productRepo.updateProductInventory(product.getId(), new_quantity);
+            }
+        }
     }
 
     public void deleteOrder(Long id) {

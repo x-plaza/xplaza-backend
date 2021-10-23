@@ -28,6 +28,10 @@ public class Product {
     @Column(name="product_name")
     private String name;
 
+    public String getName() {
+        return name;
+    }
+
     @Column(name="product_description")
     private String description;
 
@@ -60,6 +64,10 @@ public class Product {
 
     @Column(name="quantity")
     private Long quantity;
+
+    public Long getQuantity() {
+        return quantity;
+    }
 
     public void setQuantity(Long quantity) {
         this.quantity = quantity;

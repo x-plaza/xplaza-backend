@@ -80,6 +80,14 @@ public class ProductDiscountController {
     @PostMapping(value= "/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> addProductDiscount (@RequestBody @Valid ProductDiscount productDiscount) throws JSONException, JsonProcessingException {
         start = new Date();
+        // check if discount is greater than the product price
+        if(!productDiscountService.checkDiscountValidity(productDiscount))
+        {
+            end = new Date();
+            responseTime = end.getTime() - start.getTime();
+            return new ResponseEntity<>(new ApiResponse(responseTime, "Add Product Discount", HttpStatus.FORBIDDEN.value(),"Error", "Discount cannot be greater than the original price!",
+                    null), HttpStatus.FORBIDDEN);
+        }
         productDiscountService.addProductDiscount(productDiscount);
         end = new Date();
         responseTime = end.getTime() - start.getTime();

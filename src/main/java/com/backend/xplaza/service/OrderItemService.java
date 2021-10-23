@@ -20,14 +20,32 @@ public class OrderItemService {
     private DeliveryCostRepository deliveryCostRepo;
     @Autowired
     private CouponDetailsRepository couponDetailsRepo;
+    @Autowired
+    private ProductDiscountRepository productDiscountRepo;
 
     @Transactional
     public void addOrderItem(OrderItem orderItem) {
         Order order = orderRepo.findOrderById(orderItem.getOrder_id());
         Product product = productRepo.findProductById(orderItem.getProduct_id());
         Double original_price = product.getSelling_price();
+
+        // check discount amount with validity and discount type
+        Double discount_amount = 0.0;
+        ProductDiscount productDiscount = productDiscountRepo.findByProductId(orderItem.getProduct_id());
+        if(productDiscount != null)
+        {
+            discount_amount = productDiscount.getDiscount_amount();
+            Long discount_type = productDiscount.getDiscount_type_id();
+            if(discount_type == 2) // Percentage
+            {
+                discount_amount = original_price * (discount_amount/100);
+            }
+        }
+        Double unit_price = original_price - discount_amount; // here unit price is basically the discounted price
+        orderItem.setUnit_price(unit_price);
         orderItem.setItem_total_price(orderItem.getUnit_price() * orderItem.getQuantity());
         Double item_total_price = orderItem.getItem_total_price();
+
         Double net_total = order.getNet_total();
         Double total_price = order.getTotal_price();
 
@@ -42,6 +60,7 @@ public class OrderItemService {
         {
             if(net_total >= dc.getStart_range() && net_total <= dc.getEnd_range()) delivery_cost = dc.getCost();
         }
+
         // Check updated coupon value
         Double coupon_amount = order.getCoupon_amount();
         if(order.getCoupon_id() != null) {
@@ -92,7 +111,7 @@ public class OrderItemService {
         orderItemRepo.deleteById(id);
         orderRepo.save(order);*/
 
-        // This approach is basically instead of deleting the product, I am making it's quantity to zero.
+        // This approach is basically instead of deleting the product, I am making quantity to zero.
         long new_quantity = 0;
         OrderItem item = orderItemRepo.findOrderItemById(id);
         Order order = orderRepo.findOrderById(item.getOrder_id());
@@ -119,6 +138,7 @@ public class OrderItemService {
         {
             if(net_total >= dc.getStart_range() && net_total <= dc.getEnd_range()) delivery_cost = dc.getCost();
         }
+
         // Check updated coupon value
         Double coupon_amount = order.getCoupon_amount();
         if(order.getCoupon_id() != null) {
@@ -153,7 +173,7 @@ public class OrderItemService {
         // Get the old values:
         Double original_price = product.getSelling_price();
         Long old_quantity = item.getQuantity();
-        Double unit_price = item.getUnit_price();
+        Double unit_price = item.getUnit_price(); // discount amount ta alada kore check korinai, sorasori ager item er unit price ta niye nisi
         Double old_item_total_price = item.getItem_total_price();
         Double total_price = order.getTotal_price();
         Double net_total = order.getNet_total();
@@ -171,6 +191,7 @@ public class OrderItemService {
         {
             if(net_total >= dc.getStart_range() && net_total <= dc.getEnd_range()) delivery_cost = dc.getCost();
         }
+
         // Check updated coupon value
         Double coupon_amount = order.getCoupon_amount();
         if(order.getCoupon_id() != null) {
