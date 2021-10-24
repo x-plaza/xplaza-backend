@@ -29,7 +29,7 @@ public class Permission {
     @ManyToOne
     @JsonBackReference
     @JoinColumn(name="admin_user_id",insertable = false,updatable = false)
-    private Login login;
+    private AdminLogin adminLogin;
 
     public Permission() {}
 }

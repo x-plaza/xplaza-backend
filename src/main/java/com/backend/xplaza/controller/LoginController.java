@@ -3,7 +3,7 @@ package com.backend.xplaza.controller;
 import com.backend.xplaza.common.ApiResponse;
 import com.backend.xplaza.model.AdminUser;
 import com.backend.xplaza.model.ConfirmationToken;
-import com.backend.xplaza.model.Login;
+import com.backend.xplaza.model.AdminLogin;
 import com.backend.xplaza.service.AdminUserService;
 import com.backend.xplaza.service.ConfirmationTokenService;
 import com.backend.xplaza.service.LoginService;
@@ -50,7 +50,7 @@ public class LoginController {
     @PostMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> loginAdminUser (@RequestParam("username") @Valid String username, @RequestParam("password") @Valid String password) throws IOException {
         start = new Date();
-        Login dtos = loginService.getAdminUserDetails(username.toLowerCase());
+        AdminLogin dtos = loginService.getAdminUserDetails(username.toLowerCase());
         if (dtos != null) {
             Boolean isValidUser = loginService.isVaidUser(username.toLowerCase(), password);
             if(isValidUser) {
@@ -61,7 +61,7 @@ public class LoginController {
                 dtos.setPermissions(null);
             }
         } else {
-            dtos = new Login();
+            dtos = new AdminLogin();
             dtos.setAuthentication(false);
             dtos.setAuthData(null);
             dtos.setShopList(null);
