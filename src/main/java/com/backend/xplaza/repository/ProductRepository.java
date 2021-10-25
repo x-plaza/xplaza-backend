@@ -16,5 +16,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Modifying
     @Transactional
     @Query(value = "update products set quantity = ?2 where product_id = ?1", nativeQuery = true)
-    Product updateProductInventory(Long id, Long new_quantity);
+    void updateProductInventory(Long id, Long new_quantity);
 }
