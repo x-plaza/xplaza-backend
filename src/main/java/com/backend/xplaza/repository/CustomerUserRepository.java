@@ -6,8 +6,12 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
-public interface CustomerSignupRepository extends JpaRepository<CustomerDetails, Long> {
+public interface CustomerUserRepository extends JpaRepository<CustomerDetails, Long> {
+    @Query(value = "select email from customers where customer_id = ?1", nativeQuery = true)
+    String getUsername(Long id);
 
+    @Query(value = "select * from customers where email = ?1", nativeQuery = true)
+    CustomerDetails findCustomerByUsername(String username);
 
     @Modifying
     @Transactional

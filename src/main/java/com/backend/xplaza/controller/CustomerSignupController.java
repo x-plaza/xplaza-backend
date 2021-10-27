@@ -1,12 +1,10 @@
 package com.backend.xplaza.controller;
 
 import com.backend.xplaza.common.ApiResponse;
-import com.backend.xplaza.model.Brand;
+import com.backend.xplaza.model.ConfirmationToken;
 import com.backend.xplaza.model.CustomerDetails;
-import com.backend.xplaza.service.CustomerSignupService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONException;
+import com.backend.xplaza.model.CustomerLogin;
+import com.backend.xplaza.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,15 +13,27 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
-import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @RestController
-@RequestMapping("/api/signup")
+@RequestMapping("/api/customer-signup")
 public class CustomerSignupController {
-
     @Autowired
-    private CustomerSignupService signupService;
+    private CustomerSignupService customerSignupService;
+    @Autowired
+    private CustomerUserService customerUserService;
+    @Autowired
+    private SecurityService securityService;
+    @Autowired
+    private RoleService roleService;
+    @Autowired
+    private CustomerLoginService customerLoginService;
+    @Autowired
+    private ConfirmationTokenService confirmationTokenService;
+
     private Date start, end;
     private Long responseTime;
 
@@ -36,46 +46,48 @@ public class CustomerSignupController {
         response.setHeader("Set-Cookie", "type=ninja");
     }
 
-    @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getCustomers() throws JsonProcessingException, JSONException {
+    @PostMapping(value= "", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiResponse> signupCustomer (@RequestBody @Valid CustomerDetails customerDetails) {
         start = new Date();
-        List<CustomerDetails> dtos = signupService.listCustomers();
+        ConfirmationToken token = confirmationTokenService.getConfirmationToken(customerDetails.getOtp());
+        if(token == null) {
+            end = new Date();
+            responseTime = end.getTime() - start.getTime();
+            return new ResponseEntity<>(new ApiResponse(responseTime, "Signup Customer", HttpStatus.FORBIDDEN.value(),
+                    "Failed", "Confirmation code does not match!", null), HttpStatus.FORBIDDEN);
+        }
+        if(!token.getEmail().equals(customerDetails.getEmail().toLowerCase())) {
+            end = new Date();
+            responseTime = end.getTime() - start.getTime();
+            return new ResponseEntity<>(new ApiResponse(responseTime, "Signup Customer", HttpStatus.FORBIDDEN.value(),
+                    "Failed", "Confirmation code does not match!", null), HttpStatus.FORBIDDEN);
+        }
+        CustomerLogin customerLogin = customerLoginService.getCustomerLoginDetails(customerDetails.getEmail().toLowerCase());
+        if(customerLogin != null) {
+            end = new Date();
+            responseTime = end.getTime() - start.getTime();
+            return new ResponseEntity<>(new ApiResponse(responseTime, "Signup Customer", HttpStatus.FORBIDDEN.value(),
+                    "Failed", "User Already Exist!", null), HttpStatus.FORBIDDEN);
+        }
+        // Encrypt Password with Salt
+        String temp_password = customerDetails.getPassword();
+        byte[] byteSalt = null;
+        try {
+            byteSalt = securityService.getSalt();
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger("Salt error").log(Level.SEVERE, null, ex);
+        }
+        byte[] biteDigestPsw = securityService.getSaltedHashSHA512(customerDetails.getPassword(), byteSalt);
+        String strDigestPsw = securityService.toHex(biteDigestPsw);
+        String strSalt = securityService.toHex(byteSalt);
+        customerDetails.setPassword(strDigestPsw);
+        customerDetails.setSalt(strSalt);
+        customerDetails.setEmail(customerDetails.getEmail().toLowerCase());
+        customerSignupService.signupCustomer(customerDetails);
+        customerSignupService.sendLoginDetails(customerDetails.getEmail(),temp_password);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        ObjectMapper mapper = new ObjectMapper();
-        String response= "{\n" +
-                "  \"responseTime\": "+ responseTime + ",\n" +
-                "  \"responseType\": \"Customer List\",\n" +
-                "  \"status\": 200,\n" +
-                "  \"response\": \"Success\",\n" +
-                "  \"msg\": \"\",\n" +
-                "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getCustomer(@PathVariable @Valid String email) throws JsonProcessingException {
-        start = new Date();
-        CustomerDetails dtos = signupService.listCustomer(email);
-        end = new Date();
-        responseTime = end.getTime() - start.getTime();
-        ObjectMapper mapper = new ObjectMapper();
-        String response= "{\n" +
-                "  \"responseTime\": "+ responseTime + ",\n" +
-                "  \"responseType\": \"A Customer Detail\",\n" +
-                "  \"status\": 200,\n" +
-                "  \"response\": \"Success\",\n" +
-                "  \"msg\": \"\",\n" +
-                "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    @PostMapping(value= "/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> addCustomer (@RequestBody @Valid CustomerDetails customerDetails) {
-        start = new Date();
-        signupService.addCustomer(customerDetails);
-        end = new Date();
-        responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Customer", HttpStatus.CREATED.value(),"Success", "Customer has been created.",null), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Signup Customer", HttpStatus.CREATED.value(),"Success",
+                "Customer account has been created successfully.",null), HttpStatus.CREATED);
     }
 }

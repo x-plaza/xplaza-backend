@@ -52,23 +52,45 @@ public class CustomerDetails {
     @Column(name="email")
     private String email;
 
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
     @Column(name="date_of_birth")
     private Date date_of_birth;
-
-    @Column(name="password")
-    private String password;
-
-    @Column(name="salt")
-    private String salt;
 
     @Column(name="otp")
     private String otp;
 
-    @Column(name="created_at")
-    private Date created_at;
+    public String getOtp() {
+        return otp;
+    }
 
-    @Column(name="updated_at")
-    private Date updated_at;
+    @Column(name="salt")
+    private String salt;
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
+    }
+
+    @Column(name="password")
+    private String password;
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
     public CustomerDetails() {}
 

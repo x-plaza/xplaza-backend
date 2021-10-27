@@ -1,12 +1,10 @@
 package com.backend.xplaza.service;
 
-import com.backend.xplaza.model.Brand;
 import com.backend.xplaza.model.CustomerDetails;
 import com.backend.xplaza.repository.CustomerSignupRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class CustomerSignupService {
@@ -15,25 +13,16 @@ public class CustomerSignupService {
     @Autowired
     private EmailSenderService emailSenderService;
 
-    public void addCustomer(CustomerDetails customer) {customerSignupRepo.save(customer);}
-    public void updateCustomer(CustomerDetails customer) {
-        customerSignupRepo.save(customer);
-    }
-    public String getCustomerNameByID(Long id) {
-        return customerSignupRepo.getUsername(id);
-    }
-    public void deleteCustomer(Long id) {
-        customerSignupRepo.deleteById(id);
-    }
-    public List<CustomerDetails> listCustomers() {
-        return customerSignupRepo.findAll();
-    }
-    public CustomerDetails listCustomer(String email) {
-        return customerSignupRepo.findUserByUsername(email);
-    }
+    public void signupCustomer(CustomerDetails customer) {customerSignupRepo.save(customer);}
 
-    public void changeCustomerPassword(String new_password, String salt, String user_name) {
-        customerSignupRepo.changePassword(new_password,salt,user_name);
+    public void sendLoginDetails(String email, String temp_password) {
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(email);
+        mailMessage.setSubject("X-Plaza Login Details!");
+        mailMessage.setText("Congratulations! Your X-Plaza Customer account has been created successfully.\n\n" +
+                "Use the following login details to login to the X-Plaza account.\n\n" +
+                "Username : " + email + "\n" + "Password : " + temp_password);
+        emailSenderService.sendEmail(mailMessage);
     }
 
 }

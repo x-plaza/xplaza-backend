@@ -23,8 +23,8 @@ public class ConfirmationTokenService {
         confirmationTokenRepo.save(confirmationToken);
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(email);
-        mailMessage.setSubject("Complete Registration!");
-        mailMessage.setText("To confirm your X-plaza Admin account, use the Code below:\n\n" +confirmationToken.getConfirmation_token());
+        mailMessage.setSubject("Complete Registration!!");
+        mailMessage.setText("To confirm your X-plaza Admin account, please use the Code below:\n\n" +confirmationToken.getConfirmation_token());
         emailSenderService.sendEmail(mailMessage);
     }
 
@@ -34,8 +34,30 @@ public class ConfirmationTokenService {
         confirmationTokenRepo.save(confirmationToken);
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(email);
-        mailMessage.setSubject("One Time Password!");
-        mailMessage.setText("To reset your X-plaza Admin account password, use the OTP below:\n\n" +confirmationToken.getConfirmation_token());
+        mailMessage.setSubject("One Time Password!!");
+        mailMessage.setText("To reset your X-plaza Admin account password, please use the OTP below:\n\n" +confirmationToken.getConfirmation_token());
+        emailSenderService.sendEmail(mailMessage);
+    }
+
+    public void sendConfirmationTokenToCustomer(String email) {
+        // Send authentication token in the user email
+        ConfirmationToken confirmationToken = new ConfirmationToken(email,"Code");
+        confirmationTokenRepo.save(confirmationToken);
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(email);
+        mailMessage.setSubject("Complete Registration!!");
+        mailMessage.setText("To confirm your email, please use the Code below:\n\n" +confirmationToken.getConfirmation_token());
+        emailSenderService.sendEmail(mailMessage);
+    }
+
+    public void sendOTPToCustomer(String email) {
+        // Send OTP in the user email
+        ConfirmationToken confirmationToken = new ConfirmationToken(email,"OTP");
+        confirmationTokenRepo.save(confirmationToken);
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(email);
+        mailMessage.setSubject("One Time Password!!");
+        mailMessage.setText("To reset your X-plaza account password, please use the OTP below:\n\n" +confirmationToken.getConfirmation_token());
         emailSenderService.sendEmail(mailMessage);
     }
 }
