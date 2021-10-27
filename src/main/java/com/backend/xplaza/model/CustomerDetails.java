@@ -7,6 +7,7 @@ import lombok.Data;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Data
@@ -62,6 +63,11 @@ public class CustomerDetails {
 
     @Column(name="date_of_birth")
     private Date date_of_birth;
+
+    public String getDate_of_birth() {
+        if(date_of_birth != null) return new SimpleDateFormat("dd MMM yyyy").format(date_of_birth);
+        return null;
+    }
 
     @Column(name="otp")
     private String otp;
