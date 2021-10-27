@@ -1,8 +1,6 @@
 package com.backend.xplaza.model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.AllArgsConstructor;
 import org.hibernate.annotations.TypeDef;
@@ -10,26 +8,28 @@ import org.hibernate.annotations.TypeDef;
 import javax.persistence.*;
 
 @Entity
-@Table(name="permissions")
 @AllArgsConstructor
+@Table(name="customers")
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @TypeDef(name = "json", typeClass = JsonStringType.class)
-public class Permission {
+public class CustomerLogin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="customer_id")
     //@ApiModelProperty(hidden=true)
-    @JsonIgnore
     private Long id;
 
-    private String menu_name;
+    @Column(name="customer_name")
+    private String name;
 
-    @Embedded
-    private ACL acl;
+    @Column(name="email")
+    private String email;
 
-    @ManyToOne
-    @JsonBackReference
-    @JoinColumn(name="admin_user_id",insertable = false,updatable = false)
-    private AdminLogin adminLogin;
+    private boolean authentication;
 
-    public Permission() {}
+    public void setAuthentication(boolean authentication) {
+        this.authentication = authentication;
+    }
+
+    public CustomerLogin() {}
 }

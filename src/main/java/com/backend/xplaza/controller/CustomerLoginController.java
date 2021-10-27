@@ -1,12 +1,11 @@
 package com.backend.xplaza.controller;
 
 import com.backend.xplaza.common.ApiResponse;
-import com.backend.xplaza.model.AdminUser;
 import com.backend.xplaza.model.ConfirmationToken;
-import com.backend.xplaza.model.AdminLogin;
-import com.backend.xplaza.service.AdminUserService;
+import com.backend.xplaza.model.CustomerLogin;
 import com.backend.xplaza.service.ConfirmationTokenService;
-import com.backend.xplaza.service.LoginService;
+import com.backend.xplaza.service.CustomerLoginService;
+import com.backend.xplaza.service.CustomerUserService;
 import com.backend.xplaza.service.SecurityService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +23,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @RestController
-@RequestMapping("/api/login")
-public class LoginController {
+@RequestMapping("/api/customer-login")
+public class CustomerLoginController {
     @Autowired
-    private LoginService loginService;
+    private CustomerLoginService customerLoginService;
     @Autowired
-    private AdminUserService adminUserService;
+    private CustomerUserService customerUserService;
     @Autowired
     private ConfirmationTokenService confirmationTokenService;
     @Autowired
@@ -47,25 +46,17 @@ public class LoginController {
         response.setHeader("Set-Cookie", "type=ninja");
     }
 
-    @PostMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> loginAdminUser (@RequestParam("username") @Valid String username, @RequestParam("password") @Valid String password) throws IOException {
+    @PostMapping(value = { "" }, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> loginCustomerUser (@RequestParam("username") @Valid String username,
+                                                  @RequestParam("password") @Valid String password) throws IOException {
         start = new Date();
-        AdminLogin dtos = loginService.getAdminUserDetails(username.toLowerCase());
-        if (dtos != null) {
-            Boolean isValidUser = loginService.isVaidUser(username.toLowerCase(), password);
-            if(isValidUser) {
-                dtos.setAuthentication(true);
-            } else {
-                dtos.setAuthData(null);
-                dtos.setShopList(null);
-                dtos.setPermissions(null);
-            }
+        Boolean isValidUser = customerLoginService.isVaidUser(username.toLowerCase(), password);
+        CustomerLogin dtos = new CustomerLogin();
+        if(isValidUser) {
+            dtos = customerLoginService.getCustomerLoginDetails(username.toLowerCase());
+            dtos.setAuthentication(true);
         } else {
-            dtos = new AdminLogin();
             dtos.setAuthentication(false);
-            dtos.setAuthData(null);
-            dtos.setShopList(null);
-            dtos.setPermissions(null);
         }
         end = new Date();
         responseTime = end.getTime() - start.getTime();
@@ -73,7 +64,7 @@ public class LoginController {
         ObjectMapper mapper = new ObjectMapper();
         String response= "{\n" +
                 "  \"responseTime\": "+ responseTime + ",\n" +
-                "  \"responseType\": \"Authentication And ACL\",\n" +
+                "  \"responseType\": \"Customer Authentication\",\n" +
                 "  \"status\": 200,\n" +
                 "  \"response\": \"Success\",\n" +
                 "  \"msg\": \"\",\n" +
@@ -85,18 +76,18 @@ public class LoginController {
     @PostMapping(value = { "/send-otp" }, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> sendOTP (@RequestParam("username") @Valid String username) throws IOException {
         start = new Date();
-        AdminUser user = adminUserService.listAdminUser(username.toLowerCase());
-        if(user == null) {
+        CustomerLogin customer = customerLoginService.getCustomerLoginDetails(username.toLowerCase());
+        if(customer == null) {
             end = new Date();
             responseTime = end.getTime() - start.getTime();
             return new ResponseEntity<>(new ApiResponse(responseTime, "Send OTP", HttpStatus.FORBIDDEN.value(),
                     "Failed", "User Does Not Exist!", null), HttpStatus.FORBIDDEN);
         }
-        confirmationTokenService.sendOTP(username.toLowerCase());
+        confirmationTokenService.sendOTPToCustomer(username.toLowerCase());
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         return new ResponseEntity<>(new ApiResponse(responseTime, "Send OTP", HttpStatus.CREATED.value(),
-                "Success", "An OTP has been sent to the email.",null), HttpStatus.CREATED);
+                "Success", "An OTP has been sent to your email.",null), HttpStatus.CREATED);
     }
 
     @PostMapping(value = { "/validate-otp" }, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -118,12 +109,13 @@ public class LoginController {
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         return new ResponseEntity<>(new ApiResponse(responseTime, "Validate OTP", HttpStatus.OK.value(),
-                "Success", "OTP matched.",null), HttpStatus.OK);
+                "Success", "OTP matched!",null), HttpStatus.OK);
     }
 
     @PostMapping(value = { "/change-password" }, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> changeAdminUserPassword (@RequestParam("username") @Valid String username,
-                                                                @RequestParam("newPassword") @Valid String newPassword) throws IOException {
+    public ResponseEntity<ApiResponse> changeUserPassword (@RequestParam("username") @Valid String username,
+                                                                @RequestParam("newPassword") @Valid String newPassword)
+            throws IOException {
         start = new Date();
         byte[] byteSalt = null;
         try {
@@ -134,9 +126,11 @@ public class LoginController {
         byte[] biteDigestPsw = securityService.getSaltedHashSHA512(newPassword, byteSalt);
         String strDigestPsw = securityService.toHex(biteDigestPsw);
         String strSalt = securityService.toHex(byteSalt);
-        adminUserService.changeAdminUserPassword(strDigestPsw,strSalt,username.toLowerCase());
+        customerUserService.changeCustomerPassword(strDigestPsw,strSalt,username.toLowerCase());
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Change Admin User Password", HttpStatus.OK.value(),"Success", "Password has been updated successfully.",null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Change Customer User Password",
+                HttpStatus.OK.value(),"Success", "Password has been updated successfully.",null), HttpStatus.OK);
     }
+
 }

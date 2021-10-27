@@ -1,7 +1,7 @@
 package com.backend.xplaza.service;
 
 import com.backend.xplaza.model.AdminUser;
-import com.backend.xplaza.model.Login;
+import com.backend.xplaza.model.AdminLogin;
 import com.backend.xplaza.repository.LoginRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ public class LoginService {
         return result;
     }
 
-    public Login getAdminUserDetails(String username) {
+    public AdminLogin getAdminUserDetails(String username) {
         return loginRepo.findUserByUsername(username);
     }
 }

@@ -16,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @TypeDef(name = "json", typeClass = JsonStringType.class)
-public class Login {
+public class AdminLogin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="admin_user_id")
@@ -36,19 +36,19 @@ public class Login {
         this.authData = authData;
     }
 
-    @OneToMany(mappedBy = "login")
+    @OneToMany(mappedBy = "adminLogin")
     private List<LoginUserShopList> shopList;
 
     public void setShopList(List<LoginUserShopList> shopList) {
         this.shopList = shopList;
     }
 
-    @OneToMany(mappedBy = "login")
+    @OneToMany(mappedBy = "adminLogin")
     private List<Permission> permissions;
 
     public void setPermissions(List<Permission> permissions) {
         this.permissions = permissions;
     }
 
-    public Login() {}
+    public AdminLogin() {}
 }
