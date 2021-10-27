@@ -47,7 +47,8 @@ public class CustomerLoginController {
     }
 
     @PostMapping(value = { "" }, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> loginAdminUser (@RequestParam("username") @Valid String username, @RequestParam("password") @Valid String password) throws IOException {
+    public ResponseEntity<String> loginCustomerUser (@RequestParam("username") @Valid String username,
+                                                  @RequestParam("password") @Valid String password) throws IOException {
         start = new Date();
         Boolean isValidUser = customerLoginService.isVaidUser(username.toLowerCase(), password);
         CustomerLogin dtos = new CustomerLogin();

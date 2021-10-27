@@ -20,6 +20,7 @@ public class CustomerLoginService {
 
     public Boolean isVaidUser (String username, String password) throws IOException {
         CustomerDetails customer = customerUserService.listCustomer(username);
+        if (customer == null) return false;
         String strOrgSalt = customer.getSalt();
         byte[] byteSalt = securityService.fromHex(strOrgSalt);
         byte[] loginPassword = securityService.getSaltedHashSHA512(password,byteSalt);
