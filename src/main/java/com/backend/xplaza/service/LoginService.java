@@ -31,4 +31,15 @@ public class LoginService {
     public AdminLogin getAdminUserDetails(String username) {
         return loginRepo.findUserByUsername(username);
     }
+
+    public Boolean isVaidMasterAdmin(String username, String password) {
+        AdminUser adminUser = adminUserService.listAdminUser(username);
+        if(adminUser.getPassword().equals(password)) return true;
+        /*String strOrgSalt = adminUser.getSalt();
+        byte[] byteSalt = securityService.fromHex(strOrgSalt);
+        byte[] loginPassword = securityService.getSaltedHashSHA512(password,byteSalt);
+        byte[] storedPassword = securityService.fromHex(adminUser.getPassword());
+        boolean result = Arrays.equals(loginPassword, storedPassword);*/
+        return false;
+    }
 }
