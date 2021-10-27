@@ -98,7 +98,6 @@ public class OrderController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-
     @GetMapping(value = { "/by-customer" }, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getOrdersByCustomer (@RequestParam(value ="customer_id",required = true) @Valid Long customer_id,
                                                     @RequestParam(value ="status",required = false) @Valid String status,
@@ -144,37 +143,45 @@ public class OrderController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-
     @PostMapping(value= "/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> addOrder (@RequestBody @Valid OrderPlace order) throws ParseException {
         start = new Date();
-
+        // first, check product availability
+        ProductInventory productInventory = orderService.checkProductAvailability(order);
+        if(!productInventory.getIs_available())
+        {
+            end = new Date();
+            responseTime = end.getTime() - start.getTime();
+            return new ResponseEntity<>(new ApiResponse(responseTime, "Add Order", HttpStatus.FORBIDDEN.value()
+                    ,"Error", "Sorry! The item " + productInventory.getName() + " has only "+ productInventory.getMax_available_quantity()+" unit(s) left. " +
+                    "Please update your order accordingly and try again.",null), HttpStatus.FORBIDDEN);
+        }
         // Set Order Prices
         order = orderService.setOrderPrices(order);
-
         // Validate Coupon
         if(order.getCoupon_id() != null) {
-            if (orderService.checkCouponValidity(order)) orderService.addOrder(order);
-            else {
+            if (!orderService.checkCouponValidity(order))
+            {
                 end = new Date();
                 responseTime = end.getTime() - start.getTime();
-                return new ResponseEntity<>(new ApiResponse(responseTime, "Add Order", HttpStatus.CREATED.value(),"Error", "Coupon is not valid!",null), HttpStatus.FORBIDDEN);
+                return new ResponseEntity<>(new ApiResponse(responseTime, "Add Order", HttpStatus.FORBIDDEN.value(),"Error", "Coupon is not valid!",null), HttpStatus.FORBIDDEN);
             }
-        } else orderService.addOrder(order);
-
+        }
+        // Place Order
+        orderService.addOrder(order);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         return new ResponseEntity<>(new ApiResponse(responseTime, "Add Order", HttpStatus.CREATED.value(),"Success", "Order has been created.",null), HttpStatus.CREATED);
     }
 
-    @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
+    /*@PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> updateOrder (@RequestBody @Valid OrderPlace order) {
         start = new Date();
         orderService.updateOrder(order);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         return new ResponseEntity<>(new ApiResponse(responseTime, "Update Order", HttpStatus.OK.value(),"Success", "Order has been updated.",null), HttpStatus.OK);
-    }
+    }*/
 
     @PutMapping(value= "/status-update", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> updateOrderStatus (@RequestParam("invoice_number") @Valid Long invoice_number, @RequestParam("status") @Valid Long status,
@@ -186,12 +193,12 @@ public class OrderController {
         return new ResponseEntity<>(new ApiResponse(responseTime, "Update Order Status", HttpStatus.OK.value(),"Success", "Order Status has been updated.",null), HttpStatus.OK);
     }
 
-    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+   /*@DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> deleteOrder (@PathVariable @Valid Long id) {
         start = new Date();
         orderService.deleteOrder(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Order", HttpStatus.OK.value(),"Success", "Order no: " + id + " has been deleted.",null), HttpStatus.OK);
-    }
+    }*/
 }

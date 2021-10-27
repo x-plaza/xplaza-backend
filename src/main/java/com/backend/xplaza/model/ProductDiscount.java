@@ -25,11 +25,23 @@ public class ProductDiscount {
     @Column(name="fk_product_id")
     private Long product_id;
 
+    public Long getProduct_id() {
+        return product_id;
+    }
+
     @Column(name="fk_discount_type_id")
     private Long discount_type_id;
 
+    public Long getDiscount_type_id() {
+        return discount_type_id;
+    }
+
     @Column(name="discount_amount")
     private Double discount_amount;
+
+    public Double getDiscount_amount() {
+        return discount_amount;
+    }
 
     @Column(name="fk_currency_id")
     private Long currency_id;
