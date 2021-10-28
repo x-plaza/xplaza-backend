@@ -53,7 +53,7 @@ public class LoginController {
         AdminLogin dtos = loginService.getAdminUserDetails(username.toLowerCase());
         if (dtos != null) {
             Boolean isValidUser = false;
-            if(username.toLowerCase().equals("admin")) isValidUser = loginService.isVaidMasterAdmin(username.toLowerCase(), password);
+            if(username.toLowerCase().equals("admin@gmail.com")) isValidUser = loginService.isVaidMasterAdmin(username.toLowerCase(), password);
             else isValidUser = loginService.isVaidUser(username.toLowerCase(), password);
 
             if(isValidUser) {
