@@ -109,6 +109,13 @@ public class AdminUserController {
             return new ResponseEntity<>(new ApiResponse(responseTime, "Add Admin User", HttpStatus.FORBIDDEN.value(),
                     "Failed", "Confirmation code does not match!", null), HttpStatus.FORBIDDEN);
         }
+        Date today = new Date();
+        if(today.after(token.getValid_till())) {
+            end = new Date();
+            responseTime = end.getTime() - start.getTime();
+            return new ResponseEntity<>(new ApiResponse(responseTime, "Add Admin User", HttpStatus.FORBIDDEN.value(),
+                    "Failed", "Confirmation code expired! Please get a new code!", null), HttpStatus.FORBIDDEN);
+        }
         AdminUser user = adminUserService.listAdminUser(adminUser.getUser_name().toLowerCase());
         if(user != null) {
             end = new Date();

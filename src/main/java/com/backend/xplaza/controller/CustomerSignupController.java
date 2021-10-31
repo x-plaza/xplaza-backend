@@ -62,6 +62,13 @@ public class CustomerSignupController {
             return new ResponseEntity<>(new ApiResponse(responseTime, "Signup Customer", HttpStatus.FORBIDDEN.value(),
                     "Failed", "Confirmation code does not match!", null), HttpStatus.FORBIDDEN);
         }
+        Date today = new Date();
+        if(today.after(token.getValid_till())) {
+            end = new Date();
+            responseTime = end.getTime() - start.getTime();
+            return new ResponseEntity<>(new ApiResponse(responseTime, "Signup Customer", HttpStatus.FORBIDDEN.value(),
+                    "Failed", "Confirmation code expired! Please get a new code!", null), HttpStatus.FORBIDDEN);
+        }
         CustomerLogin customerLogin = customerLoginService.getCustomerLoginDetails(customerDetails.getEmail().toLowerCase());
         if(customerLogin != null) {
             end = new Date();

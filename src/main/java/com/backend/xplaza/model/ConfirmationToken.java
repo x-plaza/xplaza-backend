@@ -7,6 +7,7 @@ import lombok.Data;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
 
@@ -39,6 +40,13 @@ public class ConfirmationToken {
     @Temporal(TemporalType.TIMESTAMP)
     private Date created_date;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date valid_till;
+
+    public Date getValid_till() {
+        return valid_till;
+    }
+
     public ConfirmationToken(String email, String type) {
         Random rnd = new Random();
         int number;
@@ -51,6 +59,9 @@ public class ConfirmationToken {
         }
         this.email = email;
         created_date = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MINUTE, 30);
+        this.valid_till = calendar.getTime();
     }
 
     /*

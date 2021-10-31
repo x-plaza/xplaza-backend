@@ -95,7 +95,7 @@ public class CustomerUserController {
         customerUserService.deleteCustomer(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Customer", HttpStatus.OK.value(),"Success", customer_name + " has been deleted.",null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Customer", HttpStatus.OK.value(),"Success","User " + customer_name + " has been deleted.",null), HttpStatus.OK);
     }
 
     @PostMapping(value= "/change-password", produces = MediaType.APPLICATION_JSON_VALUE)
