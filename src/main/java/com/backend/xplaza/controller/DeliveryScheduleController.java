@@ -74,7 +74,7 @@ public class DeliveryScheduleController {
         deliveryScheduleService.addSchedule(deliverySchedule);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Schedule", HttpStatus.CREATED.value(),"Success", "Schedule has been created.",null), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Delivery Schedule", HttpStatus.CREATED.value(),"Success", "Delivery Schedule has been created.",null), HttpStatus.CREATED);
     }
 
     @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -83,7 +83,7 @@ public class DeliveryScheduleController {
         deliveryScheduleService.updateSchedule(deliverySchedule);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Schedule", HttpStatus.OK.value(),"Success", "Schedule has been updated.",null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Delivery Schedule", HttpStatus.OK.value(),"Success", "Delivery Schedule has been updated.",null), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -92,7 +92,7 @@ public class DeliveryScheduleController {
         deliveryScheduleService.deleteSchedule(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Schedule", HttpStatus.OK.value(),"Success",  "Schedule has been deleted.",null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Delivery Schedule", HttpStatus.OK.value(),"Success",  "Delivery Schedule has been deleted.",null), HttpStatus.OK);
     }
 
 }

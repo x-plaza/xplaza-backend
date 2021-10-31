@@ -27,6 +27,7 @@ public class DeliveryScheduleList {
     private String day_name;
 
     @OneToMany(mappedBy = "deliveryScheduleList")
+    @OrderBy("delivery_schedule_start ASC")
     private List<DeliverySchedule> delivery_schedules;
 
     public DeliveryScheduleList() {}
