@@ -63,4 +63,8 @@ public class ProductService {
     public List<ProductList> listProductsByShopID(Long shop_id) {
         return productListRepo.findAllProductListByShopID(shop_id);
     }
+
+    public List<ProductList> listProductsByCategory(Long shop_id, Long category_id) {
+        return productListRepo.findAllProductListByCategory(shop_id,category_id);
+    }
 }
