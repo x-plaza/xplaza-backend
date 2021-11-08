@@ -3,6 +3,7 @@ package com.backend.xplaza.controller;
 import com.backend.xplaza.common.ApiResponse;
 import com.backend.xplaza.model.Product;
 import com.backend.xplaza.model.ProductList;
+import com.backend.xplaza.model.ProductSearch;
 import com.backend.xplaza.service.ProductService;
 import com.backend.xplaza.service.RoleService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -81,6 +82,24 @@ public class ProductController {
     public ResponseEntity<String> getProductsByShop(@RequestParam(value ="shop_id",required = true) @Valid Long shop_id) throws JsonProcessingException {
         start = new Date();
         List<ProductList> dtos = productService.listProductsByShopID(shop_id);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        ObjectMapper mapper = new ObjectMapper();
+        String response= "{\n" +
+                "  \"responseTime\": "+ responseTime + ",\n" +
+                "  \"responseType\": \"Product List\",\n" +
+                "  \"status\": 200,\n" +
+                "  \"response\": \"Success\",\n" +
+                "  \"msg\": \"\",\n" +
+                "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping(value = { "/by-name" }, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> searchProductsByName(@RequestParam(value ="shop_id",required = true) @Valid Long shop_id,
+                                                       @RequestParam(value ="product_name",required = true) @Valid String product_name) throws JsonProcessingException {
+        start = new Date();
+        List<ProductSearch> dtos = productService.listProductsByName(shop_id, product_name);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         ObjectMapper mapper = new ObjectMapper();

@@ -41,4 +41,8 @@ public class ShopService {
     public List<ShopList> listShopsByUserID(Long user_id) {
         return shopListRepo.findAllShopListByUserID(user_id);
     }
+
+    public List<ShopList> listShopByLocation(Long id) {
+        return shopListRepo.findShopListByLocationId(id);
+    }
 }
