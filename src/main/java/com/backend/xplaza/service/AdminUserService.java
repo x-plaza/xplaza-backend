@@ -67,6 +67,10 @@ public class AdminUserService {
         return adminUserListRepo.findAllUsers();
     }
 
+    public List<AdminUserList> listAdminUsersByRoleName(String role_name) {
+        return adminUserListRepo.findAllAdminUsersByRoleName(role_name);
+    }
+
     public AdminUserList listAdminUser(Long id) {
         return adminUserListRepo.findUserById(id);
     }

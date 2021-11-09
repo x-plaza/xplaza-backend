@@ -23,6 +23,10 @@ public class AdminUserList {
     @ApiModelProperty(hidden= true)
     private Long id;
 
+    public Long getId() {
+        return id;
+    }
+
     @Column(name="full_name")
     private String full_name;
 

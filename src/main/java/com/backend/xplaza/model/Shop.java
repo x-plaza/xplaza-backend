@@ -21,6 +21,10 @@ public class Shop {
     //@ApiModelProperty(hidden=true)
     private Long id;
 
+    public Long getId() {
+        return id;
+    }
+
     @Column(name="shop_name")
     private String name;
 
