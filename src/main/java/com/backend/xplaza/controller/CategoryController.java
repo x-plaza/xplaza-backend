@@ -2,6 +2,7 @@ package com.backend.xplaza.controller;
 
 import com.backend.xplaza.common.ApiResponse;
 import com.backend.xplaza.model.Category;
+import com.backend.xplaza.model.CategoryList;
 import com.backend.xplaza.service.CategoryService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,7 +37,7 @@ public class CategoryController {
     @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getCategories() throws JsonProcessingException {
         start = new Date();
-        List<Category> dtos = categoryService.listCategories();
+        List<CategoryList> dtos = categoryService.listCategories();
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         ObjectMapper mapper = new ObjectMapper();
@@ -53,7 +54,7 @@ public class CategoryController {
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getCategory(@PathVariable @Valid Long id) throws JsonProcessingException {
         start = new Date();
-        Category dtos = categoryService.listCategory(id);
+        CategoryList dtos = categoryService.listCategory(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         ObjectMapper mapper = new ObjectMapper();

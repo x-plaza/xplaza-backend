@@ -1,6 +1,8 @@
 package com.backend.xplaza.service;
 
 import com.backend.xplaza.model.Category;
+import com.backend.xplaza.model.CategoryList;
+import com.backend.xplaza.repository.CategoryListRepository;
 import com.backend.xplaza.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,6 +13,8 @@ import java.util.List;
 public class CategoryService {
     @Autowired
     private CategoryRepository categoryRepo;
+    @Autowired
+    private CategoryListRepository categoryListRepo;
 
     public void addCategory(Category category) {
         categoryRepo.save(category);
@@ -28,11 +32,11 @@ public class CategoryService {
         categoryRepo.deleteById(id);
     }
 
-    public List<Category> listCategories() {
-        return categoryRepo.findAll();
+    public List<CategoryList> listCategories() {
+        return categoryListRepo.findAllCategories();
     }
 
-    public Category listCategory(Long id) {
-        return categoryRepo.findCategoryById(id);
+    public CategoryList listCategory(Long id) {
+        return categoryListRepo.findCategoryById(id);
     }
 }
