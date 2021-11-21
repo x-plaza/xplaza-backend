@@ -41,6 +41,17 @@ public class OrderItem {
         return product_id;
     }
 
+    @Column(name="product_selling_price")
+    private Double product_selling_price;
+
+    public Double getProduct_selling_price() {
+        return product_selling_price;
+    }
+
+    public void setProduct_selling_price(Double product_selling_price) {
+        this.product_selling_price = product_selling_price;
+    }
+
     @Column(name="order_item_name")
     private String item_name;
 
@@ -102,7 +113,7 @@ public class OrderItem {
 
     @ManyToOne
     @JsonBackReference
-    @JoinColumn(name="order_id",insertable = false,updatable = false)
+    @JoinColumn(name="fk_order_id",insertable = false,updatable = false)
     private OrderPlace orderPlace;
 
 //    public OrderItem(OrderItem oi){

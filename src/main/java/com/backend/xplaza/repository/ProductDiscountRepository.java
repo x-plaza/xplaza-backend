@@ -5,11 +5,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface ProductDiscountRepository extends JpaRepository<ProductDiscount, Long> {
-    @Query(value = "select concat(p.product_name,' ', p.product_var_type_value,' ', pvt.var_type_name) as product_name " +
-            "from product_discounts pd " +
-            "left join products p on pd.fk_product_id = p.product_id " +
-            "left join product_variation_types pvt on p.fk_product_variation_type_id = pvt.product_variation_type " +
-            "where pd.fk_product_id = ?1", nativeQuery = true)
+    @Query(value = "select concat(p.product_name,' (', p.product_var_type_value,' ', pvt.var_type_name, ')') as product_name \n" +
+            "from product_discounts pd \n" +
+            "left join products p on pd.fk_product_id = p.product_id \n" +
+            "left join product_variation_types pvt on p.fk_product_var_type_id = pvt.product_var_type_id \n" +
+            "where pd.product_discount_id = ?1", nativeQuery = true)
     String getName(Long id);
 
     @Query(value = "SELECT SUM(discount_amount) AS discount_amount \n" +

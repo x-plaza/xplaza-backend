@@ -153,7 +153,7 @@ public class OrderController {
             end = new Date();
             responseTime = end.getTime() - start.getTime();
             return new ResponseEntity<>(new ApiResponse(responseTime, "Add Order", HttpStatus.FORBIDDEN.value()
-                    ,"Error", "Sorry! The item " + productInventory.getName() + " has only "+ productInventory.getMax_available_quantity()+" unit(s) left. " +
+                    ,"Error", "Sorry! The item " + productInventory.getName() + " has "+ productInventory.getMax_available_quantity()+" unit(s) left. " +
                     "Please update your order accordingly and try again.",null), HttpStatus.FORBIDDEN);
         }
         // Set Order Prices
