@@ -77,6 +77,14 @@ public class CouponController {
     @PostMapping(value= "/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> addCoupon (@RequestBody @Valid Coupon coupon) {
         start = new Date();
+        // check if same coupon already exists?
+        if(couponService.isExist(coupon))
+        {
+            end = new Date();
+            responseTime = end.getTime() - start.getTime();
+            return new ResponseEntity<>(new ApiResponse(responseTime, "Add Coupon", HttpStatus.FORBIDDEN.value(),
+                    "Error", "Coupon already exists! Please use different coupon code.",null), HttpStatus.FORBIDDEN);
+        }
         couponService.addCoupon(coupon);
         end = new Date();
         responseTime = end.getTime() - start.getTime();

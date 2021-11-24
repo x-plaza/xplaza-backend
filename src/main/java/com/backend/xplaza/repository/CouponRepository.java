@@ -18,4 +18,7 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
             "fk_discount_type_id=?6, is_active=?7, min_shopping_amount=?8 where coupon_id=?9", nativeQuery = true)
     void update(Double coupon_amount, Long currency_id, Date coupon_start_date, Date coupon_end_date, Double max_coupon_amount,
                 Long fk_discount_type_id, Boolean is_active, Double min_shopping_amount, Long coupon_id);
+
+    @Query(value = "select coalesce ((select true from coupons c where c.coupon_code = ?1), false)", nativeQuery = true)
+    boolean existsByName(String coupon_code);
 }

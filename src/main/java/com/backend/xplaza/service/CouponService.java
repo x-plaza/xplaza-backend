@@ -61,4 +61,8 @@ public class CouponService {
     public List<CouponList> listCouponsByUserID(Long user_id) {
         return couponListRepo.findCouponsByUserID(user_id);
     }
+
+    public boolean isExist(Coupon coupon) {
+        return couponRepo.existsByName(coupon.getCoupon_code());
+    }
 }
