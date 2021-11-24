@@ -24,6 +24,10 @@ public class Brand {
     @Column(name="brand_name")
     private String name;
 
+    public String getName() {
+        return name;
+    }
+
     @Column(name="brand_description")
     private String description;
 

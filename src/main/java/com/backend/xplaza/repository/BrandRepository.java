@@ -10,4 +10,7 @@ public interface BrandRepository extends JpaRepository<Brand, Long> {
 
     @Query(value = "select * from brands where brand_id = ?1", nativeQuery = true)
     Brand findBrandById(Long id);
+
+    @Query(value = "select coalesce ((select true from brands b where b.brand_name = ?1), false)", nativeQuery = true)
+    boolean existsByName(String name);
 }

@@ -24,6 +24,10 @@ public class Category {
     @Column(name="category_name")
     private String name;
 
+    public String getName() {
+        return name;
+    }
+
     @Column(name="category_description")
     private String description;
 

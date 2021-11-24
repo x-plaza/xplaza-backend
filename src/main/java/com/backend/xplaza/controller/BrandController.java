@@ -71,6 +71,14 @@ public class BrandController {
     @PostMapping(value= "/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> addBrand (@RequestBody @Valid Brand brand) {
         start = new Date();
+        // check if same brand already exists?
+        if(brandService.isExist(brand))
+        {
+            end = new Date();
+            responseTime = end.getTime() - start.getTime();
+            return new ResponseEntity<>(new ApiResponse(responseTime, "Add Brand", HttpStatus.FORBIDDEN.value(),
+                    "Error", "Brand already exists! Please use different brand name.",null), HttpStatus.FORBIDDEN);
+        }
         brandService.addBrand(brand);
         end = new Date();
         responseTime = end.getTime() - start.getTime();

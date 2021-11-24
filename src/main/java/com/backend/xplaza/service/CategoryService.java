@@ -39,4 +39,8 @@ public class CategoryService {
     public CategoryList listCategory(Long id) {
         return categoryListRepo.findCategoryById(id);
     }
+
+    public boolean isExist(Category category) {
+        return categoryRepo.existsByName(category.getName());
+    }
 }

@@ -7,4 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 public interface CategoryRepository extends JpaRepository<Category, Long> {
     @Query(value = "select category_name from categories where category_id = ?1", nativeQuery = true)
     String getName(Long id);
+
+    @Query(value = "select coalesce ((select true from categories c where c.category_name = ?1), false)", nativeQuery = true)
+    boolean existsByName(String name);
 }

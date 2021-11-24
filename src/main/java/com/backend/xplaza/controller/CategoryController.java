@@ -71,6 +71,14 @@ public class CategoryController {
     @PostMapping(value= "/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> addCategory (@RequestBody @Valid Category category) {
         start = new Date();
+        // check if same category already exists?
+        if(categoryService.isExist(category))
+        {
+            end = new Date();
+            responseTime = end.getTime() - start.getTime();
+            return new ResponseEntity<>(new ApiResponse(responseTime, "Add Category", HttpStatus.FORBIDDEN.value(),
+                    "Error", "Category already exists! Please use different category name.",null), HttpStatus.FORBIDDEN);
+        }
         categoryService.addCategory(category);
         end = new Date();
         responseTime = end.getTime() - start.getTime();

@@ -35,4 +35,8 @@ public class BrandService {
     public Brand listBrand(Long id) {
         return brandRepo.findBrandById(id);
     }
+
+    public boolean isExist(Brand brand) {
+        return brandRepo.existsByName(brand.getName());
+    }
 }
