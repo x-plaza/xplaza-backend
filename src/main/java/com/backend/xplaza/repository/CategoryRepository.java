@@ -10,4 +10,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     @Query(value = "select coalesce ((select true from categories c where c.category_name = ?1), false)", nativeQuery = true)
     boolean existsByName(String name);
+
+    @Query(value = "select coalesce ((select true from categories c where c.parent_category = ?1 limit 1), false)", nativeQuery = true)
+    boolean hasChildCategory(Long id);
 }

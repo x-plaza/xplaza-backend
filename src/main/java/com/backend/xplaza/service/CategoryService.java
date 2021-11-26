@@ -43,4 +43,8 @@ public class CategoryService {
     public boolean isExist(Category category) {
         return categoryRepo.existsByName(category.getName());
     }
+
+    public boolean hasChildCategory(Long id) {
+        return categoryRepo.hasChildCategory(id);
+    }
 }

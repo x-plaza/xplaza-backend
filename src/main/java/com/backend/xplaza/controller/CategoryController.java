@@ -98,9 +98,17 @@ public class CategoryController {
     public ResponseEntity<ApiResponse> deleteCategory (@PathVariable @Valid Long id) {
         String category_name = categoryService.getCategoryNameByID(id);
         start = new Date();
+        // check if a category has still child category?
+        if(categoryService.hasChildCategory(id)){
+            end = new Date();
+            responseTime = end.getTime() - start.getTime();
+            return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Category", HttpStatus.FORBIDDEN.value(),
+                    "Error", "Cannot delete " + category_name + ". It still has child category.",null), HttpStatus.FORBIDDEN);
+        }
         categoryService.deleteCategory(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Category", HttpStatus.OK.value(),"Success", category_name + " has been deleted.",null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Category", HttpStatus.OK.value(),
+                "Success", category_name + " has been deleted.",null), HttpStatus.OK);
     }
 }
