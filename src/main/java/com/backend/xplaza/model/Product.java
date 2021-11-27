@@ -80,6 +80,10 @@ public class Product {
         return productImage;
     }
 
+    public void setProductImage(List<ProductImage> productImage) {
+        this.productImage = productImage;
+    }
+
     public Product() {}
 }
 

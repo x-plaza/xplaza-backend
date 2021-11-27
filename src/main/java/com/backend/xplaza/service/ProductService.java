@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -37,10 +38,13 @@ public class ProductService {
     @Transactional
     public void updateProduct(Product product) {
         productImageRepo.deleteImagesByProductId(product.getId());
+        List<ProductImage> updatedImageList = new ArrayList<ProductImage>();
         for (ProductImage productImage : product.getProductImage()) {
             productImage.setProduct_id(product.getId());
-            productImageRepo.save(productImage);
+            ProductImage updatedImage = productImageRepo.save(productImage);
+            updatedImageList.add(updatedImage);
         }
+        product.setProductImage(updatedImageList);
         productRepo.save(product);
     }
 
