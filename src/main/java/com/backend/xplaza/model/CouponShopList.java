@@ -24,6 +24,10 @@ public class CouponShopList {
 
     private Long shop_id;
 
+    public Long getShop_id() {
+        return shop_id;
+    }
+
     private String shop_name;
 
     @ManyToOne

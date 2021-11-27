@@ -94,5 +94,9 @@ public class CouponDetails {
     @OneToMany(mappedBy = "couponDetails")
     private List<CouponShopList> shopList;
 
+    public List<CouponShopList> getShopList() {
+        return shopList;
+    }
+
     public CouponDetails() {}
 }

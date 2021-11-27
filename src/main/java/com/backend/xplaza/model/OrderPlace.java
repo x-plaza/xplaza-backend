@@ -35,6 +35,10 @@ public class OrderPlace {
     @Column(name="shop_id")
     private Long shop_id;
 
+    public Long getShop_id() {
+        return shop_id;
+    }
+
     @Column(name="shop_name")
     private String shop_name;
 

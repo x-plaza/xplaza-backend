@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
@@ -72,6 +73,25 @@ public class CouponController {
                 "  \"msg\": \"\",\n" +
                 "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping(value= "/validate-coupon", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiResponse> validateCoupon (@RequestParam(value ="coupon_code",required = true) @Valid String coupon_code,
+                                                       @RequestParam(value ="net_order_amount",required = true) @Valid Double net_order_amount,
+                                                       @RequestParam(value ="shop_id",required = true) @Valid Long shop_id) throws ParseException {
+        start = new Date();
+        if(!couponService.checkCouponValidity(coupon_code,net_order_amount,shop_id))
+        {
+            end = new Date();
+            responseTime = end.getTime() - start.getTime();
+            return new ResponseEntity<>(new ApiResponse(responseTime, "Validate Coupon", HttpStatus.FORBIDDEN.value(),
+                    "Error", "Coupon is not valid!",null), HttpStatus.FORBIDDEN);
+        }
+        Double coupon_amount = couponService.calculateCouponAmount(coupon_code,net_order_amount);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Validate Coupon", HttpStatus.OK.value(),"Success",
+                "Coupon is valid.", coupon_amount.toString()), HttpStatus.OK);
     }
 
     @PostMapping(value= "/add", produces = MediaType.APPLICATION_JSON_VALUE)

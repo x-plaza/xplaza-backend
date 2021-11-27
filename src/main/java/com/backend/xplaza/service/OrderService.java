@@ -95,11 +95,13 @@ public class OrderService {
         Double coupon_amount = 0.0;
         if(order.getCoupon_id() != null) {
             CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsById(order.getCoupon_id());
-            if(couponDetails.getDiscount_type_name() == "Fixed Amount") coupon_amount= couponDetails.getAmount();
+            if(couponDetails.getDiscount_type_name().equals("Fixed Amount")) coupon_amount= couponDetails.getAmount();
             else { // for percentage
                 coupon_amount = (order.getNet_total() *  couponDetails.getAmount())/100;
-                if(coupon_amount > couponDetails.getMax_amount())
-                    coupon_amount = couponDetails.getMax_amount();
+                if(couponDetails.getMax_amount() != null) {
+                    if (coupon_amount > couponDetails.getMax_amount())
+                        coupon_amount = couponDetails.getMax_amount();
+                }
             }
         }
         order.setCoupon_amount(coupon_amount);
@@ -117,7 +119,18 @@ public class OrderService {
             return false;
         if (!couponDetails.getIs_active())  return false;
         if (order.getNet_total() < couponDetails.getMin_shopping_amount()) return false;
-        return true;
+
+        // check if coupon is available for this shop?
+        boolean is_valid = false;
+        for(CouponShopList shop : couponDetails.getShopList())
+        {
+            if (shop.getShop_id() == order.getShop_id())
+            {
+                is_valid = true;
+                break;
+            }
+        }
+        return is_valid;
     }
 
     @Transactional

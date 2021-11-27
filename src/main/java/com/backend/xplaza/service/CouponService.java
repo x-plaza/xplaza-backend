@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -64,5 +67,46 @@ public class CouponService {
 
     public boolean isExist(Coupon coupon) {
         return couponRepo.existsByName(coupon.getCoupon_code());
+    }
+
+    @Transactional
+    public boolean checkCouponValidity(String coupon_code, Double net_order_amount, Long shop_id) throws ParseException {
+        if (!couponRepo.existsByName(coupon_code)) return false;
+        CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsByCode(coupon_code);
+        Date received_time = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy");
+        if (!(received_time.compareTo(formatter.parse(couponDetails.getStart_date())) >= 0
+                && received_time.compareTo(formatter.parse(couponDetails.getEnd_date())) <= 0))
+            return false;
+        if (!couponDetails.getIs_active())  return false;
+        if(couponDetails.getMin_shopping_amount() != null) {
+            if (net_order_amount < couponDetails.getMin_shopping_amount()) return false;
+        }
+        // check if coupon is available for this shop?
+        boolean is_valid = false;
+        for(CouponShopList shop : couponDetails.getShopList())
+        {
+            if (shop.getShop_id() == shop_id)
+            {
+                is_valid = true;
+                break;
+            }
+        }
+        return is_valid;
+    }
+
+    @Transactional
+    public Double calculateCouponAmount(String coupon_code, Double net_order_amount) {
+        Double coupon_amount = 0.0;
+        CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsByCode(coupon_code);
+        if(couponDetails.getDiscount_type_name().equals("Fixed Amount")) coupon_amount= couponDetails.getAmount();
+        else { // for percentage
+            coupon_amount = (net_order_amount *  couponDetails.getAmount())/100;
+            if(couponDetails.getMax_amount() != null) {
+                if (coupon_amount > couponDetails.getMax_amount())
+                    coupon_amount = couponDetails.getMax_amount();
+            }
+        }
+        return coupon_amount;
     }
 }
