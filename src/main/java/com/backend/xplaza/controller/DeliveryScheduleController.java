@@ -2,6 +2,7 @@ package com.backend.xplaza.controller;
 
 import com.backend.xplaza.common.ApiResponse;
 import com.backend.xplaza.model.DeliverySchedule;
+import com.backend.xplaza.model.DeliveryScheduleDetails;
 import com.backend.xplaza.model.DeliveryScheduleList;
 import com.backend.xplaza.service.DeliveryScheduleService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -54,7 +55,7 @@ public class DeliveryScheduleController {
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getDeliverySchedule(@PathVariable @Valid Long id) throws JsonProcessingException {
         start = new Date();
-        DeliveryScheduleList dtos = deliveryScheduleService.listDeliverySchedule(id);
+        DeliveryScheduleDetails dtos = deliveryScheduleService.listDeliveryScheduleDetails(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         ObjectMapper mapper = new ObjectMapper();

@@ -1,7 +1,9 @@
 package com.backend.xplaza.service;
 
 import com.backend.xplaza.model.DeliverySchedule;
+import com.backend.xplaza.model.DeliveryScheduleDetails;
 import com.backend.xplaza.model.DeliveryScheduleList;
+import com.backend.xplaza.repository.DeliveryScheduleDetailsRepository;
 import com.backend.xplaza.repository.DeliveryScheduleListRepository;
 import com.backend.xplaza.repository.DeliveryScheduleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,8 @@ public class DeliveryScheduleService {
 
     @Autowired
     private DeliveryScheduleRepository deliveryScheduleRepo;
+    @Autowired
+    private DeliveryScheduleDetailsRepository deliveryScheduleDetailsRepo;
 
     @Autowired
     private DeliveryScheduleListRepository deliveryScheduleListRepo;
@@ -28,7 +32,8 @@ public class DeliveryScheduleService {
         return deliveryScheduleListRepo.findAllItem();
     }
 
-    public DeliveryScheduleList listDeliverySchedule(Long id) { return deliveryScheduleListRepo.findDeliveryScheduleListByDayId(id); }
+    public DeliveryScheduleDetails listDeliveryScheduleDetails(Long id)
+    { return deliveryScheduleDetailsRepo.findDeliveryScheduleDetailsById(id); }
 
     public void deleteSchedule(Long id) {
         deliveryScheduleRepo.deleteById(id);
