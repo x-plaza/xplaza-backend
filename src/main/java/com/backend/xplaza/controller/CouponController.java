@@ -105,6 +105,14 @@ public class CouponController {
             return new ResponseEntity<>(new ApiResponse(responseTime, "Add Coupon", HttpStatus.FORBIDDEN.value(),
                     "Error", "Coupon already exists! Please use different coupon code.",null), HttpStatus.FORBIDDEN);
         }
+        // check if the coupon date is valid?
+        if(!couponService.checkDateValidity(coupon))
+        {
+            end = new Date();
+            responseTime = end.getTime() - start.getTime();
+            return new ResponseEntity<>(new ApiResponse(responseTime, "Add Coupon", HttpStatus.FORBIDDEN.value(),
+                    "Error", "Coupon date is not valid! Please change coupon date.",null), HttpStatus.FORBIDDEN);
+        }
         couponService.addCoupon(coupon);
         end = new Date();
         responseTime = end.getTime() - start.getTime();

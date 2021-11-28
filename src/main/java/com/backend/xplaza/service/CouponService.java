@@ -74,7 +74,7 @@ public class CouponService {
         if (!couponRepo.existsByName(coupon_code)) return false;
         CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsByCode(coupon_code);
         Date received_time = new Date();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy");
+        SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy HH:mm:ss");
         if (!(received_time.compareTo(formatter.parse(couponDetails.getStart_date())) >= 0
                 && received_time.compareTo(formatter.parse(couponDetails.getEnd_date())) <= 0))
             return false;
@@ -108,5 +108,13 @@ public class CouponService {
             }
         }
         return coupon_amount;
+    }
+
+    public boolean checkDateValidity(Coupon coupon) {
+        Date current_date = new Date();
+        if (current_date.after(coupon.getStart_date())) return false;
+        if (current_date.after(coupon.getEnd_date())) return false;
+        if (coupon.getStart_date().after(coupon.getEnd_date())) return false;
+        return true;
     }
 }
