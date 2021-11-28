@@ -52,14 +52,46 @@ public class ProductList {
     @Column(name="product_buying_price")
     private Double buying_price;
 
+    public void setBuying_price(Double buying_price) {
+        this.buying_price = buying_price;
+    }
+
     @Column(name="product_selling_price")
     private Double selling_price;
+
+    public Double getSelling_price() {
+        return selling_price;
+    }
+
+    @Column(name="discount_amount")
+    private Double discount_amount;
+
+    public Double getDiscount_amount() {
+        return discount_amount;
+    }
+
+    @Column(name="discount_type_name")
+    private String discount_type_name;
+
+    public String getDiscount_type_name() {
+        return discount_type_name;
+    }
+
+    @Column(name="discounted_price")
+    private Double discounted_price;
+
+    public void setDiscounted_price(Double discounted_price) {
+        this.discounted_price = discounted_price;
+    }
 
     @Column(name="fk_currency_id")
     private Long currency_id;
 
     @Column(name="currency_name")
     private String currency_name;
+
+    @Column(name="currency_sign")
+    private String currency_sign;
 
     @Column(name="fk_shop_id")
     private Long shop_id;

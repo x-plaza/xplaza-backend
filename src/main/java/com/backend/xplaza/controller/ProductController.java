@@ -95,11 +95,11 @@ public class ProductController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping(value = { "/by-name" }, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> searchProductsByName(@RequestParam(value ="shop_id",required = true) @Valid Long shop_id,
-                                                       @RequestParam(value ="product_name",required = true) @Valid String product_name) throws JsonProcessingException {
+    @GetMapping(value = { "/by-category" }, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getProductsByCategory(@RequestParam(value ="shop_id",required = true) @Valid Long shop_id,
+                                                        @RequestParam(value ="category_id",required = true) @Valid Long category_id) throws JsonProcessingException {
         start = new Date();
-        List<ProductSearch> dtos = productService.listProductsByName(shop_id, product_name);
+        List<ProductList> dtos = productService.listProductsByCategory(shop_id,category_id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         ObjectMapper mapper = new ObjectMapper();
@@ -113,11 +113,11 @@ public class ProductController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping(value = { "/by-category" }, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getProductsByCategory(@RequestParam(value ="shop_id",required = true) @Valid Long shop_id,
-                                                        @RequestParam(value ="category_id",required = true) @Valid Long category_id) throws JsonProcessingException {
+    @GetMapping(value = { "/by-name" }, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> searchProductsByName(@RequestParam(value ="shop_id",required = true) @Valid Long shop_id,
+                                                       @RequestParam(value ="product_name",required = true) @Valid String product_name) throws JsonProcessingException {
         start = new Date();
-        List<ProductList> dtos = productService.listProductsByCategory(shop_id,category_id);
+        List<ProductSearch> dtos = productService.listProductsByName(shop_id, product_name);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         ObjectMapper mapper = new ObjectMapper();
