@@ -5,12 +5,11 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 
-@Data
+//@Data
 @Entity
 @AllArgsConstructor
 @Table(name="order_items")

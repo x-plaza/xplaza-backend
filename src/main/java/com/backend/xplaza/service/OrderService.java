@@ -73,10 +73,12 @@ public class OrderService {
                 }
             }
             Double unit_price = original_price - discount_amount; // here unit price is basically the discounted price
-            item.setUnit_price(unit_price);
-            item.setItem_total_price(unit_price * item.getQuantity());
             total_price += original_price * item.getQuantity();
             net_total += item.getItem_total_price();
+            // set prices to the item
+            item.setUnit_price(unit_price);
+            item.setProduct_selling_price(original_price);
+            item.setItem_total_price(unit_price * item.getQuantity());
         }
         total_discount = total_price - net_total;
         order.setTotal_price(total_price);
