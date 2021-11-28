@@ -106,6 +106,8 @@ public class CouponController {
                     "Error", "Coupon already exists! Please use different coupon code.",null), HttpStatus.FORBIDDEN);
         }
         // check if the coupon date is valid?
+        coupon.setStart_date(couponService.convertDateToStartOfTheDay(coupon.getStart_date()));
+        coupon.setEnd_date(couponService.convertDateToEndOfTheDay(coupon.getEnd_date()));
         if(!couponService.checkDateValidity(coupon))
         {
             end = new Date();

@@ -11,8 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.*;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class CouponService {
@@ -86,7 +88,7 @@ public class CouponService {
         boolean is_valid = false;
         for(CouponShopList shop : couponDetails.getShopList())
         {
-            if (shop.getShop_id() == shop_id)
+            if (Objects.equals(shop.getShop_id(), shop_id))
             {
                 is_valid = true;
                 break;
@@ -110,10 +112,29 @@ public class CouponService {
         return coupon_amount;
     }
 
+    public Date convertDateToStartOfTheDay(Date date){
+        Instant inst = date.toInstant();
+        LocalDate localDate = inst.atZone(ZoneId.systemDefault()).toLocalDate();
+        Instant dayInst = localDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
+        date = Date.from(dayInst);
+        return date;
+    }
+
+    public Date convertDateToEndOfTheDay(Date date){
+        Instant inst = date.toInstant();
+        LocalDate localDate = inst.atZone(ZoneId.systemDefault()).toLocalDate();
+        Instant dayInst = LocalTime.MAX.atDate(localDate).toInstant(ZoneId.systemDefault().getRules().getOffset(inst));
+        date = Date.from(dayInst);
+        return date;
+    }
+
     public boolean checkDateValidity(Coupon coupon) {
         Date current_date = new Date();
-        if (current_date.after(coupon.getStart_date())) return false;
-        if (current_date.after(coupon.getEnd_date())) return false;
+        current_date = convertDateToStartOfTheDay(current_date);
+        Date start_date = coupon.getStart_date();
+        Date end_date = coupon.getEnd_date();
+        if (current_date.after(start_date)) return false;
+        if (current_date.after(end_date)) return false;
         if (coupon.getStart_date().after(coupon.getEnd_date())) return false;
         return true;
     }
