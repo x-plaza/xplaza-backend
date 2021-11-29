@@ -8,6 +8,8 @@ import lombok.Data;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -75,6 +77,22 @@ public class ProductList {
 
     public String getDiscount_type_name() {
         return discount_type_name;
+    }
+
+    @Column(name="discount_start_date")
+    private Date discount_start_date;
+
+    public String getDiscount_start_date() {
+        if(discount_start_date != null) return new SimpleDateFormat("dd MMM yyyy HH:mm:ss").format(discount_start_date);
+        return null;
+    }
+
+    @Column(name="discount_end_date")
+    private Date discount_end_date;
+
+    public String getDiscount_end_date() {
+        if(discount_end_date != null) return new SimpleDateFormat("dd MMM yyyy HH:mm:ss").format(discount_end_date);
+        return null;
     }
 
     @Column(name="discounted_price")

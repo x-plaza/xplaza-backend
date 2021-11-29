@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
@@ -41,7 +42,7 @@ public class ProductController {
     }
 
     @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getProducts(@RequestParam(value ="user_id",required = true) @Valid Long user_id) throws JsonProcessingException {
+    public ResponseEntity<String> getProducts(@RequestParam(value ="user_id",required = true) @Valid Long user_id) throws JsonProcessingException, ParseException {
         start = new Date();
         List<ProductList> dtos;
         String role_name = roleService.getRoleNameByUserID(user_id);
@@ -62,7 +63,7 @@ public class ProductController {
     }
 
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getProduct(@PathVariable @Valid Long id) throws JsonProcessingException {
+    public ResponseEntity<String> getProduct(@PathVariable @Valid Long id) throws JsonProcessingException, ParseException {
         start = new Date();
         ProductList dtos = productService.listProduct(id);
         end = new Date();
@@ -78,8 +79,25 @@ public class ProductController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @GetMapping(value = { "/by-shop-by-admin" }, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getProductsByShopByAdmin(@RequestParam(value ="shop_id",required = true) @Valid Long shop_id) throws JsonProcessingException, ParseException {
+        start = new Date();
+        List<ProductList> dtos = productService.listProductsByShopIDByAdmin(shop_id);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        ObjectMapper mapper = new ObjectMapper();
+        String response= "{\n" +
+                "  \"responseTime\": "+ responseTime + ",\n" +
+                "  \"responseType\": \"Product List\",\n" +
+                "  \"status\": 200,\n" +
+                "  \"response\": \"Success\",\n" +
+                "  \"msg\": \"\",\n" +
+                "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     @GetMapping(value = { "/by-shop" }, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getProductsByShop(@RequestParam(value ="shop_id",required = true) @Valid Long shop_id) throws JsonProcessingException {
+    public ResponseEntity<String> getProductsByShop(@RequestParam(value ="shop_id",required = true) @Valid Long shop_id) throws JsonProcessingException, ParseException {
         start = new Date();
         List<ProductList> dtos = productService.listProductsByShopID(shop_id);
         end = new Date();
@@ -97,7 +115,7 @@ public class ProductController {
 
     @GetMapping(value = { "/by-category" }, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getProductsByCategory(@RequestParam(value ="shop_id",required = true) @Valid Long shop_id,
-                                                        @RequestParam(value ="category_id",required = true) @Valid Long category_id) throws JsonProcessingException {
+                                                        @RequestParam(value ="category_id",required = true) @Valid Long category_id) throws JsonProcessingException, ParseException {
         start = new Date();
         List<ProductList> dtos = productService.listProductsByCategory(shop_id,category_id);
         end = new Date();

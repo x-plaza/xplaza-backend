@@ -10,6 +10,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -130,7 +131,7 @@ public class OrderService {
         else couponDetails = couponDetailsRepo.findCouponDetailsById(order.getCoupon_id());
 
         Date received_time = order.getReceived_time();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy");
+        SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy HH:mm:ss");
         if (!(received_time.compareTo(formatter.parse(couponDetails.getStart_date())) >= 0
                 && received_time.compareTo(formatter.parse(couponDetails.getEnd_date())) <= 0))
             return false;
@@ -141,7 +142,7 @@ public class OrderService {
         boolean is_valid = false;
         for(CouponShopList shop : couponDetails.getShopList())
         {
-            if (shop.getShop_id() == order.getShop_id())
+            if (Objects.equals(shop.getShop_id(), order.getShop_id()))
             {
                 is_valid = true;
                 break;

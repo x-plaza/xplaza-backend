@@ -108,7 +108,7 @@ public class CouponController {
         // check if the coupon date is valid?
         coupon.setStart_date(couponService.convertDateToStartOfTheDay(coupon.getStart_date()));
         coupon.setEnd_date(couponService.convertDateToEndOfTheDay(coupon.getEnd_date()));
-        if(!couponService.checkDateValidity(coupon))
+        if(!couponService.checkCouponDateValidity(coupon))
         {
             end = new Date();
             responseTime = end.getTime() - start.getTime();

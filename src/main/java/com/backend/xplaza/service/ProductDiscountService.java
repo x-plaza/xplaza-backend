@@ -1,5 +1,6 @@
 package com.backend.xplaza.service;
 
+import com.backend.xplaza.common.DateConverter;
 import com.backend.xplaza.model.Product;
 import com.backend.xplaza.model.ProductDiscount;
 import com.backend.xplaza.model.ProductDiscountList;
@@ -9,10 +10,11 @@ import com.backend.xplaza.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
-public class ProductDiscountService {
+public class ProductDiscountService extends DateConverter {
     @Autowired
     private ProductDiscountRepository productDiscountRepo;
     @Autowired
@@ -52,4 +54,15 @@ public class ProductDiscountService {
     public ProductDiscountList listProductDiscount(Long id) { return productDiscountListRepo.findProductDiscountById(id); }
 
     public List<ProductDiscountList> listProductDiscountsByUserID(Long user_id) { return productDiscountListRepo.findAllProductDiscountByUserID(user_id); }
+
+    public boolean checkDiscountDateValidity(ProductDiscount productDiscount) {
+        Date current_date = new Date();
+        current_date = convertDateToStartOfTheDay(current_date);
+        Date start_date = productDiscount.getStart_date();
+        Date end_date = productDiscount.getEnd_date();
+        if (current_date.after(start_date)) return false;
+        if (current_date.after(end_date)) return false;
+        if (start_date.after(end_date)) return false;
+        return true;
+    }
 }

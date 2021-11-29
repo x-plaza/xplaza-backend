@@ -88,6 +88,16 @@ public class ProductDiscountController {
             return new ResponseEntity<>(new ApiResponse(responseTime, "Add Product Discount", HttpStatus.FORBIDDEN.value(),"Error", "Discount cannot be greater than the original price!",
                     null), HttpStatus.FORBIDDEN);
         }
+        // check if the product discount date is valid?
+        productDiscount.setStart_date(productDiscountService.convertDateToStartOfTheDay(productDiscount.getStart_date()));
+        productDiscount.setEnd_date(productDiscountService.convertDateToEndOfTheDay(productDiscount.getEnd_date()));
+        if(!productDiscountService.checkDiscountDateValidity(productDiscount))
+        {
+            end = new Date();
+            responseTime = end.getTime() - start.getTime();
+            return new ResponseEntity<>(new ApiResponse(responseTime, "Add Product Discount", HttpStatus.FORBIDDEN.value(),
+                    "Error", "Discount date is not valid! Please change discount date.",null), HttpStatus.FORBIDDEN);
+        }
         productDiscountService.addProductDiscount(productDiscount);
         end = new Date();
         responseTime = end.getTime() - start.getTime();

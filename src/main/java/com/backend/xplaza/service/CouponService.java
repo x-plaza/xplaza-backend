@@ -1,5 +1,6 @@
 package com.backend.xplaza.service;
 
+import com.backend.xplaza.common.DateConverter;
 import com.backend.xplaza.model.*;
 import com.backend.xplaza.repository.CouponDetailsRepository;
 import com.backend.xplaza.repository.CouponListRepository;
@@ -11,13 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.*;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
 @Service
-public class CouponService {
+public class CouponService extends DateConverter{
     @Autowired
     private CouponRepository couponRepo;
     @Autowired
@@ -112,23 +112,7 @@ public class CouponService {
         return coupon_amount;
     }
 
-    public Date convertDateToStartOfTheDay(Date date){
-        Instant inst = date.toInstant();
-        LocalDate localDate = inst.atZone(ZoneId.systemDefault()).toLocalDate();
-        Instant dayInst = localDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
-        date = Date.from(dayInst);
-        return date;
-    }
-
-    public Date convertDateToEndOfTheDay(Date date){
-        Instant inst = date.toInstant();
-        LocalDate localDate = inst.atZone(ZoneId.systemDefault()).toLocalDate();
-        Instant dayInst = LocalTime.MAX.atDate(localDate).toInstant(ZoneId.systemDefault().getRules().getOffset(inst));
-        date = Date.from(dayInst);
-        return date;
-    }
-
-    public boolean checkDateValidity(Coupon coupon) {
+    public boolean checkCouponDateValidity(Coupon coupon) {
         Date current_date = new Date();
         current_date = convertDateToStartOfTheDay(current_date);
         Date start_date = coupon.getStart_date();
