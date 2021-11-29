@@ -107,14 +107,28 @@ public class OrderService {
                 }
             }
         }
+        else if(order.getCoupon_code() != null) {
+            CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsByCode(order.getCoupon_code());
+            if(couponDetails.getDiscount_type_name().equals("Fixed Amount")) coupon_amount= couponDetails.getAmount();
+            else { // for percentage
+                coupon_amount = (order.getNet_total() *  couponDetails.getAmount())/100;
+                if(couponDetails.getMax_amount() != null) {
+                    if (coupon_amount > couponDetails.getMax_amount())
+                        coupon_amount = couponDetails.getMax_amount();
+                }
+            }
+        }
         order.setCoupon_amount(coupon_amount);
         order.setGrand_total_price(net_total + delivery_cost - coupon_amount);
         return order;
     }
 
     @Transactional
-    public boolean checkCouponValidity(OrderPlace order) throws ParseException {
-        CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsById(order.getCoupon_id());
+    public boolean checkCouponValidity(OrderPlace order, String type) throws ParseException {
+        CouponDetails couponDetails = null;
+        if(type.equals("Code")) couponDetails = couponDetailsRepo.findCouponDetailsByCode(order.getCoupon_code());
+        else couponDetails = couponDetailsRepo.findCouponDetailsById(order.getCoupon_id());
+
         Date received_time = order.getReceived_time();
         SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy");
         if (!(received_time.compareTo(formatter.parse(couponDetails.getStart_date())) >= 0

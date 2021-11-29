@@ -146,7 +146,8 @@ public class OrderController {
     @PostMapping(value= "/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> addOrder (@RequestBody @Valid OrderPlace order) throws ParseException {
         start = new Date();
-        // first, check product availability
+
+        // Check product availability
         ProductInventory productInventory = orderService.checkProductAvailability(order);
         if(!productInventory.getIs_available())
         {
@@ -154,19 +155,30 @@ public class OrderController {
             responseTime = end.getTime() - start.getTime();
             return new ResponseEntity<>(new ApiResponse(responseTime, "Add Order", HttpStatus.FORBIDDEN.value()
                     ,"Error", "Sorry! The item " + productInventory.getName() + " has "+ productInventory.getMax_available_quantity()+" unit(s) left. " +
-                    "Please update your order accordingly and try again.",null), HttpStatus.FORBIDDEN);
+                    "Please update your order accordingly.",null), HttpStatus.FORBIDDEN);
         }
-        // Set Order Prices
-        order = orderService.setOrderPrices(order);
+
         // Validate Coupon
         if(order.getCoupon_id() != null) {
-            if (!orderService.checkCouponValidity(order))
+            if (!orderService.checkCouponValidity(order,"id"))
             {
                 end = new Date();
                 responseTime = end.getTime() - start.getTime();
                 return new ResponseEntity<>(new ApiResponse(responseTime, "Add Order", HttpStatus.FORBIDDEN.value(),"Error", "Coupon is not valid!",null), HttpStatus.FORBIDDEN);
             }
         }
+        else if(order.getCoupon_id() != null) {
+            if (!orderService.checkCouponValidity(order,"code"))
+            {
+                end = new Date();
+                responseTime = end.getTime() - start.getTime();
+                return new ResponseEntity<>(new ApiResponse(responseTime, "Add Order", HttpStatus.FORBIDDEN.value(),"Error", "Coupon is not valid!",null), HttpStatus.FORBIDDEN);
+            }
+        }
+
+        // Set Order Prices
+        order = orderService.setOrderPrices(order);
+
         // Place Order
         orderService.addOrder(order);
         end = new Date();

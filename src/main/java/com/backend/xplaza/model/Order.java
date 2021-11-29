@@ -129,6 +129,10 @@ public class Order {
     @Column(name="coupon_code")
     private String coupon_code;
 
+    public String getCoupon_code() {
+        return coupon_code;
+    }
+
     @Column(name="coupon_amount")
     private Double coupon_amount;
 

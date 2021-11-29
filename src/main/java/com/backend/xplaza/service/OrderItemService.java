@@ -73,6 +73,14 @@ public class OrderItemService {
                     coupon_amount = couponDetails.getMax_amount();
             }
         }
+        else if(order.getCoupon_code() != null) {
+            CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsByCode(order.getCoupon_code());
+            if(couponDetails.getDiscount_type_name() == "Percentage") {
+                coupon_amount = (order.getNet_total() *  couponDetails.getAmount())/100;
+                if(coupon_amount > couponDetails.getMax_amount())
+                    coupon_amount = couponDetails.getMax_amount();
+            }
+        }
         Double grand_total = net_total + delivery_cost - coupon_amount;
         order.setTotal_price(total_price);
         order.setNet_total(net_total);
@@ -159,6 +167,14 @@ public class OrderItemService {
                     coupon_amount = couponDetails.getMax_amount();
             }
         }
+        else if(order.getCoupon_code() != null) {
+            CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsByCode(order.getCoupon_code());
+            if(couponDetails.getDiscount_type_name() == "Percentage") {
+                coupon_amount = (order.getNet_total() *  couponDetails.getAmount())/100;
+                if(coupon_amount > couponDetails.getMax_amount())
+                    coupon_amount = couponDetails.getMax_amount();
+            }
+        }
         Double grand_total = net_total + delivery_cost - coupon_amount;
 
         // Set the new values and save them:
@@ -215,6 +231,14 @@ public class OrderItemService {
         Double coupon_amount = order.getCoupon_amount();
         if(order.getCoupon_id() != null) {
             CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsById(order.getCoupon_id());
+            if(couponDetails.getDiscount_type_name() == "Percentage") {
+                coupon_amount = (order.getNet_total() *  couponDetails.getAmount())/100;
+                if(coupon_amount > couponDetails.getMax_amount())
+                    coupon_amount = couponDetails.getMax_amount();
+            }
+        }
+        else if(order.getCoupon_code() != null) {
+            CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsByCode(order.getCoupon_code());
             if(couponDetails.getDiscount_type_name() == "Percentage") {
                 coupon_amount = (order.getNet_total() *  couponDetails.getAmount())/100;
                 if(coupon_amount > couponDetails.getMax_amount())
