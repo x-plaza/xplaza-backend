@@ -127,6 +127,16 @@ public class CouponController {
         for (CouponShopLink csl : coupon.getCouponShopLinks()) {
             csl.setCoupon_id(coupon.getId());
         }
+        // check if the coupon date is valid?
+        coupon.setStart_date(couponService.convertDateToStartOfTheDay(coupon.getStart_date()));
+        coupon.setEnd_date(couponService.convertDateToEndOfTheDay(coupon.getEnd_date()));
+        if(!couponService.checkCouponDateValidity(coupon))
+        {
+            end = new Date();
+            responseTime = end.getTime() - start.getTime();
+            return new ResponseEntity<>(new ApiResponse(responseTime, "Update Coupon", HttpStatus.FORBIDDEN.value(),
+                    "Error", "Coupon date is not valid! Please change coupon date.",null), HttpStatus.FORBIDDEN);
+        }
         couponService.updateCoupon(coupon);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
