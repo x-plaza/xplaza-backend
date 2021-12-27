@@ -140,6 +140,7 @@ public class LoginController {
         adminUserService.changeAdminUserPassword(strDigestPsw,strSalt,username.toLowerCase());
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Change Admin User Password", HttpStatus.OK.value(),"Success", "Password has been updated successfully.",null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Change Admin User Password", HttpStatus.OK.value(),
+                "Success", "Password has been updated successfully.",null), HttpStatus.OK);
     }
 }

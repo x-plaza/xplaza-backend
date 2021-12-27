@@ -19,9 +19,11 @@ import java.util.List;
 @TypeDef(name = "json", typeClass = JsonStringType.class)
 public class OrderPlaceList {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="order_id")
-    private Long invoice_number;
+    private Long order_id;
+
+    private String invoice_number;
 
     @Column(name="shop_id")
     private Long shop_id;

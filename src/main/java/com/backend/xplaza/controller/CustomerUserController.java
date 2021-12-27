@@ -85,7 +85,8 @@ public class CustomerUserController {
         customerUserService.updateCustomer(customerDetails);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Customer", HttpStatus.OK.value(),"Success", "Customer has been updated.",null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Customer", HttpStatus.OK.value(),
+                "Success", "Customer has been updated.",null), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -95,7 +96,8 @@ public class CustomerUserController {
         customerUserService.deleteCustomer(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Customer", HttpStatus.OK.value(),"Success","User " + customer_name + " has been deleted.",null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Customer", HttpStatus.OK.value(),
+                "Success","User " + customer_name + " has been deleted.",null), HttpStatus.OK);
     }
 
     @PostMapping(value= "/change-password", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -105,7 +107,8 @@ public class CustomerUserController {
         start = new Date();
         boolean isValidUser = customerLoginService.isVaidUser(username.toLowerCase(), oldPassword);
         if(!isValidUser) {
-            return new ResponseEntity<>(new ApiResponse(responseTime, "Change Customer User Password", HttpStatus.FORBIDDEN.value(),"Failure", "Old Password does not match.",null), HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(new ApiResponse(responseTime, "Change Customer User Password",
+                    HttpStatus.FORBIDDEN.value(),"Failure", "Old Password does not match.",null), HttpStatus.FORBIDDEN);
         }
         byte[] byteSalt = null;
         try {
@@ -119,7 +122,8 @@ public class CustomerUserController {
         customerUserService.changeCustomerPassword(strDigestPsw,strSalt,username.toLowerCase());
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Change Customer User Password", HttpStatus.OK.value(),"Success", "Password has been updated successfully.",null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Change Customer User Password",
+                HttpStatus.OK.value(),"Success", "Password has been updated successfully.",null), HttpStatus.OK);
     }
 
 }

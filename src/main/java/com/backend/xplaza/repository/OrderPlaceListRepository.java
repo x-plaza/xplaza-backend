@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 public interface OrderPlaceListRepository extends JpaRepository<OrderPlaceList, Long> {
-    @Query(value = "select o.order_id, o.shop_id, o.shop_name," +
+    @Query(value = "select o.order_id, o.shop_id, o.shop_name, null as invoice_number," +
             "o.customer_id, o.customer_name, o.mobile_no, o.delivery_address, o.additional_info, o.remarks," +
             "concat(o.delivery_schedule_start, '-' , o.delivery_schedule_end) as allotted_time,  o.received_time, o.date_to_deliver," +
             "o.fk_status_id, st.status_name," +
@@ -21,7 +21,7 @@ public interface OrderPlaceListRepository extends JpaRepository<OrderPlaceList, 
             "order by o.order_id desc", nativeQuery = true)
     List<OrderPlaceList> findAllOrdersByCustomer(Long customer_id);
 
-    @Query(value = "select o.order_id, o.shop_id, o.shop_name," +
+    @Query(value = "select o.order_id, o.shop_id, o.shop_name,null as invoice_number," +
             "o.customer_id, o.customer_name, o.mobile_no, o.delivery_address, o.additional_info, o.remarks," +
             "concat(o.delivery_schedule_start, '-' , o.delivery_schedule_end) as allotted_time,  o.received_time, o.date_to_deliver," +
             "o.fk_status_id, st.status_name," +
@@ -34,7 +34,7 @@ public interface OrderPlaceListRepository extends JpaRepository<OrderPlaceList, 
             "order by o.order_id desc", nativeQuery = true)
     List<OrderPlaceList> findAllOrdersByStatusByCustomer(Long customer_id, String status);
 
-    @Query(value = "select o.order_id, o.shop_id, o.shop_name," +
+    @Query(value = "select o.order_id, o.shop_id, o.shop_name,null as invoice_number," +
             "o.customer_id, o.customer_name, o.mobile_no, o.delivery_address, o.additional_info, o.remarks," +
             "concat(o.delivery_schedule_start, '-' , o.delivery_schedule_end) as allotted_time,  o.received_time, o.date_to_deliver," +
             "o.fk_status_id, st.status_name," +

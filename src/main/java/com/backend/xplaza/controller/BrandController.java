@@ -82,7 +82,8 @@ public class BrandController {
         brandService.addBrand(brand);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Brand", HttpStatus.CREATED.value(),"Success", "Brand has been created.",null), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Brand", HttpStatus.CREATED.value(),
+                "Success", "Brand has been created.",null), HttpStatus.CREATED);
     }
 
     @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -91,7 +92,8 @@ public class BrandController {
         brandService.updateBrand(brand);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Brand", HttpStatus.OK.value(),"Success", "Brand has been updated.",null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Brand", HttpStatus.OK.value(),
+                "Success", "Brand has been updated.",null), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -101,6 +103,7 @@ public class BrandController {
         brandService.deleteBrand(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Brand", HttpStatus.OK.value(),"Success", brand_name + " has been deleted.",null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Brand", HttpStatus.OK.value(),
+                "Success", brand_name + " has been deleted.",null), HttpStatus.OK);
     }
 }

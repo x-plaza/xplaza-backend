@@ -20,10 +20,12 @@ import java.util.List;
 @TypeDef(name = "json", typeClass = JsonStringType.class)
 public class OrderDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="order_id")
     @ApiModelProperty(hidden=true)
-    private Long invoice_number;
+    private Long order_id;
+
+    private String invoice_number;
 
     @Column(name="total_price")
     private Double total_price;

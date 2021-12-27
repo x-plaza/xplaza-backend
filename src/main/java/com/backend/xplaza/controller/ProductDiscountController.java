@@ -85,8 +85,8 @@ public class ProductDiscountController {
         {
             end = new Date();
             responseTime = end.getTime() - start.getTime();
-            return new ResponseEntity<>(new ApiResponse(responseTime, "Add Product Discount", HttpStatus.FORBIDDEN.value(),"Error", "Discount cannot be greater than the original price!",
-                    null), HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(new ApiResponse(responseTime, "Add Product Discount", HttpStatus.FORBIDDEN.value(),
+                    "Error", "Discount cannot be greater than the original price!", null), HttpStatus.FORBIDDEN);
         }
         // check if the product discount date is valid?
         productDiscount.setStart_date(productDiscountService.convertDateToStartOfTheDay(productDiscount.getStart_date()));
@@ -101,8 +101,8 @@ public class ProductDiscountController {
         productDiscountService.addProductDiscount(productDiscount);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Product Discount", HttpStatus.CREATED.value(),"Success", "Discount on product has been created.",
-                null), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Product Discount", HttpStatus.CREATED.value(),
+                "Success", "Discount on product has been created.", null), HttpStatus.CREATED);
     }
 
     @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -113,8 +113,8 @@ public class ProductDiscountController {
         {
             end = new Date();
             responseTime = end.getTime() - start.getTime();
-            return new ResponseEntity<>(new ApiResponse(responseTime, "Update Product Discount", HttpStatus.FORBIDDEN.value(),"Error", "Discount cannot be greater than the original price!",
-                    null), HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(new ApiResponse(responseTime, "Update Product Discount", HttpStatus.FORBIDDEN.value(),
+                    "Error", "Discount cannot be greater than the original price!", null), HttpStatus.FORBIDDEN);
         }
         // check if the product discount date is valid?
         productDiscount.setStart_date(productDiscountService.convertDateToStartOfTheDay(productDiscount.getStart_date()));
@@ -129,8 +129,8 @@ public class ProductDiscountController {
         productDiscountService.updateProductDiscount(productDiscount);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Product Discount", HttpStatus.OK.value(),"Success", "Discount on product has been updated.",
-                null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Product Discount", HttpStatus.OK.value(),
+                "Success", "Discount on product has been updated.", null), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -140,7 +140,7 @@ public class ProductDiscountController {
         productDiscountService.deleteProductDiscount(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Product Discount", HttpStatus.OK.value(),"Success", "Discount on " + product_name + " has been deleted.",
-                null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Product Discount", HttpStatus.OK.value(),
+                "Success", "Discount on " + product_name + " has been deleted.", null), HttpStatus.OK);
     }
 }

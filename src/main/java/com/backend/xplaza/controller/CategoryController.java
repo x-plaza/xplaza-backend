@@ -82,7 +82,8 @@ public class CategoryController {
         categoryService.addCategory(category);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Category", HttpStatus.CREATED.value(),"Success", "Category has been created.",null), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Category", HttpStatus.CREATED.value(),
+                "Success", "Category has been created.",null), HttpStatus.CREATED);
     }
 
     @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -91,7 +92,8 @@ public class CategoryController {
         categoryService.updateCategory(category);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Category", HttpStatus.OK.value(),"Success", "Category has been updated.",null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Category", HttpStatus.OK.value(),
+                "Success", "Category has been updated.",null), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -152,7 +152,7 @@ public class OrderService {
     }
 
     @Transactional
-    public void addOrder(OrderPlace order) {
+    public OrderPlace addOrder(OrderPlace order) {
         order = orderPlaceRepo.save(order);
         for (OrderItem oi : order.getOrderItemList()) {
             oi.setOrder_id(order.getInvoice_number());
@@ -163,6 +163,7 @@ public class OrderService {
             Long new_quantity = original_quantity - oi.getQuantity();
             productRepo.updateProductInventory(product.getId(), new_quantity);
         }
+        return order;
     }
 
     @Transactional
@@ -220,7 +221,7 @@ public class OrderService {
     }
 
     // For any admin user
-    public OrderDetails listOrderDetailsByAdmin(Long id) { return orderDetailsRepo.findOrderDetailsByIdByAdmin(id); }
+    public OrderDetails listOrderDetails(Long id) { return orderDetailsRepo.findOrderDetails(id); }
 
     // For any customer user
     public List<OrderPlaceList> listOrdersByCustomer(Long customer_id) { return orderPlaceListRepo.findAllOrdersByCustomer(customer_id); }

@@ -75,7 +75,8 @@ public class DeliveryCostController {
         deliveryCostService.addDeliveryCost(deliveryCost);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Delivery Cost", HttpStatus.CREATED.value(),"Success", "Delivery Cost has been created.",null), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Delivery Cost", HttpStatus.CREATED.value(),
+                "Success", "Delivery Cost has been created.",null), HttpStatus.CREATED);
     }
 
     @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -84,7 +85,8 @@ public class DeliveryCostController {
         deliveryCostService.updateDeliveryCost(deliveryCost);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Delivery Cost", HttpStatus.OK.value(),"Success", "Delivery Cost has been updated.",null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Delivery Cost", HttpStatus.OK.value(),
+                "Success", "Delivery Cost has been updated.",null), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -94,7 +96,7 @@ public class DeliveryCostController {
         deliveryCostService.deleteDeliveryCost(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Delivery Cost", HttpStatus.OK.value(),"Success", "Delivery cost of "+
-                delivery_slab + " order range has been deleted.",null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Delivery Cost", HttpStatus.OK.value(),
+                "Success", "Delivery cost of "+ delivery_slab + " order range has been deleted.",null), HttpStatus.OK);
     }
 }

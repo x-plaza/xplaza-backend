@@ -73,7 +73,8 @@ public class CountryController {
         countryService.addCountry(country);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Country", HttpStatus.CREATED.value(),"Success", "Country has been created.",null), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Country", HttpStatus.CREATED.value(),
+                "Success", "Country has been created.",null), HttpStatus.CREATED);
     }
 
     @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -82,7 +83,8 @@ public class CountryController {
         countryService.updateCountry(country);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Country", HttpStatus.OK.value(),"Success", "Country has been updated.",null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Country", HttpStatus.OK.value(),
+                "Success", "Country has been updated.",null), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -92,6 +94,7 @@ public class CountryController {
         countryService.deleteCountry(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Country", HttpStatus.OK.value(),"Success", country_name + " has been deleted.",null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Country", HttpStatus.OK.value(),
+                "Success", country_name + " has been deleted.",null), HttpStatus.OK);
     }
 }

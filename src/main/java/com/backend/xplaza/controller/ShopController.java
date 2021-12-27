@@ -101,7 +101,8 @@ public class ShopController {
         shopService.addShop(shop);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Shop", HttpStatus.CREATED.value(),"Success", "Shop has been created.",null), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Shop", HttpStatus.CREATED.value(),
+                "Success", "Shop has been created.",null), HttpStatus.CREATED);
     }
 
     @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -110,7 +111,8 @@ public class ShopController {
         shopService.updateShop(shop);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Shop", HttpStatus.OK.value(),"Success", "Shop has been updated.",null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Shop", HttpStatus.OK.value(),
+                "Success", "Shop has been updated.",null), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -120,6 +122,7 @@ public class ShopController {
         shopService.deleteShop(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Shop", HttpStatus.OK.value(),"Success", shop_name + " has been deleted.",null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Shop", HttpStatus.OK.value(),
+                "Success", shop_name + " has been deleted.",null), HttpStatus.OK);
     }
 }

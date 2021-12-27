@@ -155,8 +155,8 @@ public class ProductController {
         productService.addProduct(product);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Product", HttpStatus.CREATED.value(),"Success", "Product has been created.",
-                null), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Product", HttpStatus.CREATED.value(),
+                "Success", "Product has been created.", null), HttpStatus.CREATED);
     }
 
     @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -165,8 +165,8 @@ public class ProductController {
         productService.updateProduct(product);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Product", HttpStatus.OK.value(),"Success", "Product has been updated.",
-                null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Product", HttpStatus.OK.value(),
+                "Success", "Product has been updated.", null), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -176,7 +176,7 @@ public class ProductController {
         productService.deleteProduct(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Product", HttpStatus.OK.value(),"Success", product_name + " has been deleted.",
-                null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Product", HttpStatus.OK.value(),
+                "Success", product_name + " has been deleted.", null), HttpStatus.OK);
     }
 }

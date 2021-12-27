@@ -141,8 +141,8 @@ public class AdminUserController {
         adminUserService.sendLoginDetails(adminUser.getUser_name(),temp_password);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Admin User", HttpStatus.CREATED.value(),"Success",
-                "Admin User has been created successfully.",null), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Admin User", HttpStatus.CREATED.value(),
+                "Success", "Admin User has been created successfully.",null), HttpStatus.CREATED);
     }
 
     /*@RequestMapping(value="/confirm-account", method= {RequestMethod.GET, RequestMethod.POST})
@@ -171,7 +171,8 @@ public class AdminUserController {
         start = new Date();
         boolean isValidUser = loginService.isVaidUser(username.toLowerCase(), oldPassword);
         if(!isValidUser) {
-            return new ResponseEntity<>(new ApiResponse(responseTime, "Change Admin User Password", HttpStatus.FORBIDDEN.value(),"Failure", "Old Password does not match.",null), HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(new ApiResponse(responseTime, "Change Admin User Password",
+                    HttpStatus.FORBIDDEN.value(),"Failure", "Old Password does not match.",null), HttpStatus.FORBIDDEN);
         }
         byte[] byteSalt = null;
         try {
@@ -185,7 +186,8 @@ public class AdminUserController {
         adminUserService.changeAdminUserPassword(strDigestPsw,strSalt,username.toLowerCase());
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Change Admin User Password", HttpStatus.OK.value(),"Success", "Password has been updated successfully.",null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Change Admin User Password",
+                HttpStatus.OK.value(),"Success", "Password has been updated successfully.",null), HttpStatus.OK);
     }
 
     @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -197,7 +199,8 @@ public class AdminUserController {
         adminUserService.updateAdminUser(adminUser);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Admin User", HttpStatus.OK.value(),"Success", "Admin User has been updated.",null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Admin User", HttpStatus.OK.value(),
+                "Success", "Admin User has been updated.",null), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -207,6 +210,7 @@ public class AdminUserController {
         adminUserService.deleteAdminUser(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Admin User", HttpStatus.OK.value(),"Success", admin_user_name + " has been deleted.",null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Admin User", HttpStatus.OK.value(),
+                "Success", admin_user_name + " has been deleted.",null), HttpStatus.OK);
     }
 }

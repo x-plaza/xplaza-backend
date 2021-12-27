@@ -74,7 +74,8 @@ public class ModuleController {
         moduleService.addModule(module);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Module", HttpStatus.CREATED.value(),"Success", "Module has been created.",null), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Add Module", HttpStatus.CREATED.value(),
+                "Success", "Module has been created.",null), HttpStatus.CREATED);
     }
 
     @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -83,7 +84,8 @@ public class ModuleController {
         moduleService.updateModule(module);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Module", HttpStatus.OK.value(),"Success", "Module has been updated.",null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Update Module", HttpStatus.OK.value(),
+                "Success", "Module has been updated.",null), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -93,6 +95,7 @@ public class ModuleController {
         moduleService.deleteModule(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
-        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Module", HttpStatus.OK.value(),"Success", module_name + " has been deleted.",null), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Module", HttpStatus.OK.value(),
+                "Success", module_name + " has been deleted.",null), HttpStatus.OK);
     }
 }
