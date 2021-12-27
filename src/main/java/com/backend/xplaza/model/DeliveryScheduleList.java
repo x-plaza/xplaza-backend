@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.hibernate.annotations.TypeDef;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.List;
@@ -29,7 +28,7 @@ public class DeliveryScheduleList {
 
     @OneToMany(mappedBy = "deliveryScheduleList")
     @OrderBy("delivery_schedule_start ASC")
-    @Where(clause = "delivery_schedule_start > localtime") // start time ta current time er por theke nisi
+    //@Where(clause = "delivery_schedule_start > localtime") // start time ta current time er por theke nisi
     private List<DeliverySchedule> delivery_schedules;
 
     public DeliveryScheduleList() {}
