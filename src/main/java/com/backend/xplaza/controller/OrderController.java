@@ -74,7 +74,7 @@ public class OrderController {
 
         // Update Invoice number
         PlatformInfo platformInfo = platformInfoService.listPlatform();
-        dtos.forEach( (i) -> { i.setInvoice_number(platformInfo.getInvoice() + "#" + i.getInvoice_number()); } );
+        dtos.forEach((i) -> { i.setInvoice_number(platformInfo.getInvoice() + "#" + i.getOrder_id()); });
 
         end = new Date();
         responseTime = end.getTime() - start.getTime();

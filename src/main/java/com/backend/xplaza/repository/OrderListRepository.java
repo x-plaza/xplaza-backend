@@ -8,7 +8,8 @@ import java.util.Date;
 import java.util.List;
 
 public interface OrderListRepository extends JpaRepository<OrderList, Long> {
-    @Query(value = "select o.order_id, o.total_price, o.discount_amount, o.net_total, o.grand_total_price, o.delivery_address, o.customer_id, " +
+    @Query(value = "select o.order_id, o.total_price, o.discount_amount, o.net_total, o.grand_total_price, " +
+            "o.delivery_address, o.customer_id, null as invoice_number," +
             "o.date_to_deliver, o.customer_name, " +
             "o.mobile_no, o.received_time, o.shop_id, o.shop_name, o.fk_status_id, st.status_name, " +
             "concat(o.delivery_schedule_start, '-' , o.delivery_schedule_end) as allotted_time, " +
@@ -20,7 +21,7 @@ public interface OrderListRepository extends JpaRepository<OrderList, Long> {
     List<OrderList> findAllOrdersByAdmin();
 
     @Query(value = "select o.order_id, o.total_price, o.discount_amount, o.net_total, o.grand_total_price, o.delivery_address, o.customer_id, " +
-            "o.date_to_deliver, o.customer_name, " +
+            "o.date_to_deliver, o.customer_name, null as invoice_number," +
             "o.mobile_no, o.received_time, o.shop_id, o.shop_name, o.fk_status_id, st.status_name, " +
             "concat(o.delivery_schedule_start, '-' , o.delivery_schedule_end) as allotted_time, " +
             "o.fk_currency_id, cur.currency_name, cur.currency_sign " +
@@ -31,7 +32,7 @@ public interface OrderListRepository extends JpaRepository<OrderList, Long> {
     List<OrderList> findAllOrdersByStatusByAdmin(String status);
 
     @Query(value = "select o.order_id, o.total_price, o.discount_amount, o.net_total, o.grand_total_price, o.delivery_address, o.customer_id, " +
-            "o.date_to_deliver, o.customer_name, " +
+            "o.date_to_deliver, o.customer_name, null as invoice_number," +
             "o.mobile_no, o.received_time, o.shop_id, o.shop_name, o.fk_status_id, st.status_name, " +
             "concat(o.delivery_schedule_start, '-' , o.delivery_schedule_end) as allotted_time, " +
             "o.fk_currency_id, cur.currency_name, cur.currency_sign " +
@@ -42,7 +43,7 @@ public interface OrderListRepository extends JpaRepository<OrderList, Long> {
     List<OrderList> findAllOrdersByFilterByAdmin(String status, Date order_date);
 
     @Query(value = "select o.order_id, o.total_price, o.discount_amount, o.net_total, o.grand_total_price, o.delivery_address, o.customer_id, " +
-            "o.date_to_deliver, o.customer_name, " +
+            "o.date_to_deliver, o.customer_name, null as invoice_number," +
             "o.mobile_no, o.received_time, o.shop_id, o.shop_name, o.fk_status_id, st.status_name, " +
             "concat(o.delivery_schedule_start, '-' , o.delivery_schedule_end) as allotted_time, " +
             "o.fk_currency_id, cur.currency_name, cur.currency_sign " +
@@ -54,7 +55,7 @@ public interface OrderListRepository extends JpaRepository<OrderList, Long> {
     List<OrderList> findAllOrdersAdminUserID(Long user_id);
 
     @Query(value = "select o.order_id, o.total_price, o.discount_amount, o.net_total, o.grand_total_price, o.delivery_address, o.customer_id, " +
-            "o.date_to_deliver, o.customer_name, " +
+            "o.date_to_deliver, o.customer_name, null as invoice_number," +
             "o.mobile_no, o.received_time, o.shop_id, o.shop_name, o.fk_status_id, st.status_name, " +
             "concat(o.delivery_schedule_start, '-' , o.delivery_schedule_end) as allotted_time, " +
             "o.fk_currency_id, cur.currency_name, cur.currency_sign " +
@@ -66,7 +67,7 @@ public interface OrderListRepository extends JpaRepository<OrderList, Long> {
     List<OrderList> findAllOrdersByStatusAndAdminUserID(String status, Long user_id);
 
     @Query(value = "select o.order_id, o.total_price, o.discount_amount, o.net_total, o.grand_total_price, o.delivery_address, o.customer_id, " +
-            "o.date_to_deliver, o.customer_name, " +
+            "o.date_to_deliver, o.customer_name, null as invoice_number," +
             "o.mobile_no, o.received_time, o.shop_id, o.shop_name, o.fk_status_id, st.status_name, " +
             "concat(o.delivery_schedule_start, '-' , o.delivery_schedule_end) as allotted_time, " +
             "o.fk_currency_id, cur.currency_name, cur.currency_sign " +
