@@ -3,6 +3,7 @@ package com.backend.xplaza.service;
 import com.backend.xplaza.model.*;
 import com.backend.xplaza.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +36,12 @@ public class OrderService {
     private CouponDetailsRepository couponDetailsRepo;
     @Autowired
     private DeliveryCostListRepository deliveryCostListRepo;
+    @Autowired
+    private EmailSenderService emailSenderService;
+    @Autowired
+    private CustomerUserRepository customerUserRepo;
+    @Autowired
+    private AdminUserRepository adminUserRepo;
 
     @Transactional
     public ProductInventory checkProductAvailability (OrderPlace order){
@@ -232,5 +239,42 @@ public class OrderService {
 
     public List<OrderPlaceList> listOrdersByFilterByCustomer(Long customer_id, String status, Date order_date) {
         return orderPlaceListRepo.findAllOrdersByFilterByCustomer(customer_id,status,order_date);
+    }
+
+    public void sendOrderDetailsToCustomer(OrderPlace order, OrderResponse dtos, PlatformInfo platformInfo) {
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        String email = customerUserRepo.getUsername(order.getCustomer_id());
+        mailMessage.setTo(email);
+        mailMessage.setSubject("Your "+ platformInfo.getName()+".com Order.");
+        mailMessage.setText("Dear "+ order.getCustomer_name() +",\n\n" +
+                "Thank you for your order. We’ll let you know once your item(s) have dispatched.\n\n" +
+                "You can view the status of your order by visiting Your Orders on Xwinkel.com\n\n" +
+                        "Invoice no : " + dtos.getInvoice_number() + "\n" +
+                        "Grand Total : " + dtos.getGrand_total_price() + "\n" +
+                        "Delivery Date : " + order.getDate_to_deliver() + "\n" +
+                        "Delivery Schedule : " + order.getDelivery_schedule_start() + "-" + order.getDelivery_schedule_end()
+        );
+        emailSenderService.sendEmail(mailMessage);
+    }
+
+    public void sendOrderDetailsToShopAdmin(OrderPlace order, OrderResponse dtos, PlatformInfo platformInfo) {
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        List<String> emailList = adminUserRepo.getEmailList(order.getShop_id());
+        for (String email: emailList) {
+            if (email.equals("admin@gmail.com")) continue;
+            else {
+                mailMessage.setTo(email);
+                mailMessage.setSubject(platformInfo.getName()+".com Customer Order.");
+                mailMessage.setText("Hello,\n\n" +
+                        "The following order has been placed by the customer : " + order.getCustomer_name() +".\n\n" +
+                        "You can view the order details by visiting Pending Orders on admin.xwinkel.com\n\n" +
+                        "Invoice no : " + dtos.getInvoice_number() + "\n" +
+                        "Grand Total : " + dtos.getGrand_total_price() + "\n" +
+                        "Delivery Date : " + order.getDate_to_deliver() + "\n" +
+                        "Delivery Schedule : " + order.getDelivery_schedule_start() + "-" + order.getDelivery_schedule_end()
+                );
+                emailSenderService.sendEmail(mailMessage);
+            }
+        }
     }
 }

@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 public interface AdminUserRepository extends JpaRepository<AdminUser, Long> {
     @Query(value = "select user_name from admin_users where admin_user_id = ?1", nativeQuery = true)
     String getName(Long id);
@@ -27,4 +29,9 @@ public interface AdminUserRepository extends JpaRepository<AdminUser, Long> {
     @Transactional
     @Query(value = "update admin_users set is_confirmed=?2 where admin_user_id=?1", nativeQuery = true)
     void updateConfirmStatus(Long user_id, Boolean is_confirmed);*/
+
+    @Query(value = "select user_name from admin_users au " +
+            "left join admin_user_shop_link ausl on au.admin_user_id = ausl.admin_user_id " +
+            "where ausl.shop_id = ?1", nativeQuery = true)
+    List<String> getEmailList(Long id);
 }

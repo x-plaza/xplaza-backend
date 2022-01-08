@@ -48,7 +48,8 @@ public class LoginController {
     }
 
     @PostMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> loginAdminUser (@RequestParam("username") @Valid String username, @RequestParam("password") @Valid String password) throws IOException {
+    public ResponseEntity<String> loginAdminUser (@RequestParam("username") @Valid String username,
+                                                  @RequestParam("password") @Valid String password) throws IOException {
         start = new Date();
         AdminLogin dtos = loginService.getAdminUserDetails(username.toLowerCase());
         if (dtos != null) {
@@ -103,7 +104,8 @@ public class LoginController {
     }
 
     @PostMapping(value = { "/validate-otp" }, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> validateOTP (@RequestParam("username") @Valid String username, @RequestParam("OTP") @Valid String OTP) throws IOException {
+    public ResponseEntity<ApiResponse> validateOTP (@RequestParam("username") @Valid String username,
+                                                    @RequestParam("OTP") @Valid String OTP) throws IOException {
         start = new Date();
         ConfirmationToken token = confirmationTokenService.getConfirmationToken(OTP);
         if(token == null) {
