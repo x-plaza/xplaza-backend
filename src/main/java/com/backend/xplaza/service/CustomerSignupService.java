@@ -1,6 +1,7 @@
 package com.backend.xplaza.service;
 
 import com.backend.xplaza.model.CustomerDetails;
+import com.backend.xplaza.model.PlatformInfo;
 import com.backend.xplaza.repository.CustomerSignupRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
@@ -12,16 +13,21 @@ public class CustomerSignupService {
     private CustomerSignupRepository customerSignupRepo;
     @Autowired
     private EmailSenderService emailSenderService;
+    @Autowired
+    private PlatformInfoService platformInfoService;
 
     public void signupCustomer(CustomerDetails customer) {customerSignupRepo.save(customer);}
 
-    public void sendLoginDetails(String email, String temp_password) {
+    public void sendLoginDetails(String email, String password) {
+        // Get platform info
+        PlatformInfo platformInfo = platformInfoService.listPlatform();
+        // Send email
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(email);
-        mailMessage.setSubject("X-Plaza Login Details!");
-        mailMessage.setText("Congratulations! Your X-Plaza Customer account has been created successfully.\n\n" +
-                "Use the following login details to login to the X-Plaza account.\n\n" +
-                "Username : " + email + "\n" + "Password : " + temp_password);
+        mailMessage.setSubject("Your " + platformInfo.getName() + ".com Login Details!");
+        mailMessage.setText("Congratulations! Your "+  platformInfo.getName() + ".com Customer account has been created successfully.\n\n" +
+                "Please use the following login details to login to the "+ platformInfo.getName() +" account.\n\n" +
+                "Email : " + email + "\n" + "Password : " + password);
         emailSenderService.sendEmail(mailMessage);
     }
 
