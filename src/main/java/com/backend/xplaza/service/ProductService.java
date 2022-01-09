@@ -80,7 +80,7 @@ public class ProductService {
     public List<ProductList> listProductsByShopIDByAdmin(Long shop_id) throws ParseException {
         List<ProductList> listOfProducts = productListRepo.findAllProductListByShopID(shop_id);
         listOfProducts = updateDiscountedPrice(listOfProducts,"admin");
-        listOfProducts.forEach((i) -> i.setName(i.getName()+" ("+i.getProduct_var_type_value()+" "+i.getProduct_var_type_name()+")")); // Lambda function
+        listOfProducts.forEach((i) -> i.setName(i.getName()+" ("+i.getProduct_var_type_value()+i.getProduct_var_type_name()+")")); // Lambda function
         return listOfProducts;
     }
 
