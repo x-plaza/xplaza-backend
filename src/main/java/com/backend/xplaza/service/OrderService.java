@@ -262,7 +262,8 @@ public class OrderService {
                         "Order No : " + dtos.getInvoice_number() + "\n" +
                         "Grand Total : " + dtos.getGrand_total_price() + " "+ currency_name +"\n" +
                         "Delivery Date : " + delivery_date + "\n" +
-                        "Delivery Schedule : " + delivery_schedule + "\n\n" +
+                        "Delivery Schedule : " + delivery_schedule + "\n" +
+                        "Delivery Address : " + order.getDelivery_address() + "\n\n" +
                 "You can view the details of your order by visiting My Orders on https://"+ platformInfo.getName().toLowerCase()+".com.\n\n" +
                 "With Regards,\n"+ "Team Xwinkel"
         );
@@ -294,7 +295,9 @@ public class OrderService {
                         "Order No : " + dtos.getInvoice_number() + "\n" +
                         "Grand Total : " + dtos.getGrand_total_price() + " "+ currency_name +"\n" +
                         "Delivery Date : " + delivery_date + "\n" +
-                        "Delivery Schedule : " + delivery_schedule
+                        "Delivery Schedule : " + delivery_schedule + "\n" +
+                        "Delivery Address : " + order.getDelivery_address() + "\n\n" +
+                        "With Regards,\n"+ "Team Xwinkel"
                 );
                 emailSenderService.sendEmail(mailMessage);
             }
