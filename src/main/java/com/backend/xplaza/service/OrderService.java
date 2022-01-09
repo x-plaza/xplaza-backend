@@ -258,12 +258,12 @@ public class OrderService {
         mailMessage.setSubject("Your "+ platformInfo.getName()+".com Order.");
         mailMessage.setText("Dear "+ order.getCustomer_name() +",\n\n" +
                 "Thank you for your order. We’ll let you know once your item(s) have dispatched.\n\n" +
-                "The summary of your order is as follows:\n" +
+                "The summary of your order is as follows:\n\n" +
                         "Order No : " + dtos.getInvoice_number() + "\n" +
                         "Grand Total : " + dtos.getGrand_total_price() + " "+ currency_name +"\n" +
                         "Delivery Date : " + delivery_date + "\n" +
                         "Delivery Schedule : " + delivery_schedule + "\n\n" +
-                "You can view the details of your order by visiting My Orders on https://"+ platformInfo.getName()+".com.\n\n" +
+                "You can view the details of your order by visiting My Orders on https://"+ platformInfo.getName().toLowerCase()+".com.\n\n" +
                 "With Regards,\n"+ "Team Xwinkel"
         );
         emailSenderService.sendEmail(mailMessage);
