@@ -9,10 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class OrderService {
@@ -241,23 +238,27 @@ public class OrderService {
         return orderPlaceListRepo.findAllOrdersByFilterByCustomer(customer_id,status,order_date);
     }
 
-    public void sendOrderDetailsToCustomer(OrderPlace order, OrderResponse dtos, PlatformInfo platformInfo) {
+    public void sendOrderDetailsToCustomer(OrderPlace order, OrderResponse dtos, PlatformInfo platformInfo) throws ParseException {
+        SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy");
+        Date delivery_date = formatter.parse(order.getDate_to_deliver().toString());
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         String email = customerUserRepo.getUsername(order.getCustomer_id());
         mailMessage.setTo(email);
         mailMessage.setSubject("Your "+ platformInfo.getName()+".com Order.");
         mailMessage.setText("Dear "+ order.getCustomer_name() +",\n\n" +
                 "Thank you for your order. We’ll let you know once your item(s) have dispatched.\n\n" +
-                "You can view the status of your order by visiting Your Orders on Xwinkel.com\n\n" +
+                "You can view the details of your order by visiting Your Orders on "+ platformInfo.getName()+".com.\n\n" +
                         "Invoice no : " + dtos.getInvoice_number() + "\n" +
                         "Grand Total : " + dtos.getGrand_total_price() + "\n" +
-                        "Delivery Date : " + order.getDate_to_deliver() + "\n" +
+                        "Delivery Date : " + delivery_date + "\n" +
                         "Delivery Schedule : " + order.getDelivery_schedule_start() + "-" + order.getDelivery_schedule_end()
         );
         emailSenderService.sendEmail(mailMessage);
     }
 
-    public void sendOrderDetailsToShopAdmin(OrderPlace order, OrderResponse dtos, PlatformInfo platformInfo) {
+    public void sendOrderDetailsToShopAdmin(OrderPlace order, OrderResponse dtos, PlatformInfo platformInfo) throws ParseException {
+        SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy");
+        Date delivery_date = formatter.parse(order.getDate_to_deliver().toString());
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         List<String> emailList = adminUserRepo.getEmailList(order.getShop_id());
         for (String email: emailList) {
@@ -267,10 +268,10 @@ public class OrderService {
                 mailMessage.setSubject(platformInfo.getName()+".com Customer Order.");
                 mailMessage.setText("Hello,\n\n" +
                         "The following order has been placed by the customer : " + order.getCustomer_name() +".\n\n" +
-                        "You can view the order details by visiting Pending Orders on admin.xwinkel.com\n\n" +
+                        "You can view the order details by visiting Pending Orders on admin."+ platformInfo.getName().toLowerCase() + ".com.\n\n" +
                         "Invoice no : " + dtos.getInvoice_number() + "\n" +
                         "Grand Total : " + dtos.getGrand_total_price() + "\n" +
-                        "Delivery Date : " + order.getDate_to_deliver() + "\n" +
+                        "Delivery Date : " + delivery_date + "\n" +
                         "Delivery Schedule : " + order.getDelivery_schedule_start() + "-" + order.getDelivery_schedule_end()
                 );
                 emailSenderService.sendEmail(mailMessage);
