@@ -39,6 +39,8 @@ public class OrderService {
     private CustomerUserRepository customerUserRepo;
     @Autowired
     private AdminUserRepository adminUserRepo;
+    @Autowired
+    private CurrencyRepository currencyRepo;
 
     @Transactional
     public ProductInventory checkProductAvailability (OrderPlace order){
@@ -239,9 +241,16 @@ public class OrderService {
     }
 
     public void sendOrderDetailsToCustomer(OrderPlace order, OrderResponse dtos, PlatformInfo platformInfo) {
-        // format delivery date
-        SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy");
-        String delivery_date = formatter.format(order.getDate_to_deliver());
+        // get currency
+        String currency = currencyRepo.getName(order.getCurrency_id());
+
+        // format date and time
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd MMM yyyy");
+        String delivery_date = dateFormatter.format(order.getDate_to_deliver());
+        SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm");
+        String delivery_schedule = timeFormatter.format(order.getDelivery_schedule_start()) + "-" +
+                timeFormatter.format(order.getDelivery_schedule_end());
+
         // send email to customer
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         String email = customerUserRepo.getUsername(order.getCustomer_id());
@@ -251,17 +260,24 @@ public class OrderService {
                 "Thank you for your order. We’ll let you know once your item(s) have dispatched.\n\n" +
                 "You can view the details of your order by visiting Your Orders on "+ platformInfo.getName()+".com.\n\n" +
                         "Invoice no : " + dtos.getInvoice_number() + "\n" +
-                        "Grand Total : " + dtos.getGrand_total_price() + "\n" +
+                        "Grand Total : " + currency + " " + dtos.getGrand_total_price() + "\n" +
                         "Delivery Date : " + delivery_date + "\n" +
-                        "Delivery Schedule : " + order.getDelivery_schedule_start() + "-" + order.getDelivery_schedule_end()
+                        "Delivery Schedule : " + delivery_schedule
         );
         emailSenderService.sendEmail(mailMessage);
     }
 
     public void sendOrderDetailsToShopAdmin(OrderPlace order, OrderResponse dtos, PlatformInfo platformInfo) {
-        // format delivery date
-        SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy");
-        String delivery_date = formatter.format(order.getDate_to_deliver());
+        // get currency
+        String currency = currencyRepo.getName(order.getCurrency_id());
+
+        // format date and time
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd MMM yyyy");
+        String delivery_date = dateFormatter.format(order.getDate_to_deliver());
+        SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm");
+        String delivery_schedule = timeFormatter.format(order.getDelivery_schedule_start()) + "-" +
+                timeFormatter.format(order.getDelivery_schedule_end());
+
         // send email to shop admins
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         List<String> emailList = adminUserRepo.getEmailList(order.getShop_id());
@@ -274,9 +290,9 @@ public class OrderService {
                         "The following order has been placed by the customer : " + order.getCustomer_name() +".\n\n" +
                         "You can view the order details by visiting Pending Orders on admin."+ platformInfo.getName().toLowerCase() + ".com.\n\n" +
                         "Invoice no : " + dtos.getInvoice_number() + "\n" +
-                        "Grand Total : " + dtos.getGrand_total_price() + "\n" +
+                        "Grand Total : " + currency + " " + dtos.getGrand_total_price() + "\n" +
                         "Delivery Date : " + delivery_date + "\n" +
-                        "Delivery Schedule : " + order.getDelivery_schedule_start() + "-" + order.getDelivery_schedule_end()
+                        "Delivery Schedule : " + delivery_schedule
                 );
                 emailSenderService.sendEmail(mailMessage);
             }
