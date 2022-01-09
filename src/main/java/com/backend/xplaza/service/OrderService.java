@@ -238,9 +238,11 @@ public class OrderService {
         return orderPlaceListRepo.findAllOrdersByFilterByCustomer(customer_id,status,order_date);
     }
 
-    public void sendOrderDetailsToCustomer(OrderPlace order, OrderResponse dtos, PlatformInfo platformInfo) throws ParseException {
+    public void sendOrderDetailsToCustomer(OrderPlace order, OrderResponse dtos, PlatformInfo platformInfo) {
+        // format delivery date
         SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy");
-        Date delivery_date = formatter.parse(order.getDate_to_deliver().toString());
+        String delivery_date = formatter.format(order.getDate_to_deliver());
+        // send email to customer
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         String email = customerUserRepo.getUsername(order.getCustomer_id());
         mailMessage.setTo(email);
@@ -256,9 +258,11 @@ public class OrderService {
         emailSenderService.sendEmail(mailMessage);
     }
 
-    public void sendOrderDetailsToShopAdmin(OrderPlace order, OrderResponse dtos, PlatformInfo platformInfo) throws ParseException {
+    public void sendOrderDetailsToShopAdmin(OrderPlace order, OrderResponse dtos, PlatformInfo platformInfo) {
+        // format delivery date
         SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy");
-        Date delivery_date = formatter.parse(order.getDate_to_deliver().toString());
+        String delivery_date = formatter.format(order.getDate_to_deliver());
+        // send email to shop admins
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         List<String> emailList = adminUserRepo.getEmailList(order.getShop_id());
         for (String email: emailList) {
