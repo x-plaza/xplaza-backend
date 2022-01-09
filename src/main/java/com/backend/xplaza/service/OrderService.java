@@ -3,15 +3,13 @@ package com.backend.xplaza.service;
 import com.backend.xplaza.model.*;
 import com.backend.xplaza.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class OrderService {
@@ -35,6 +33,14 @@ public class OrderService {
     private CouponDetailsRepository couponDetailsRepo;
     @Autowired
     private DeliveryCostListRepository deliveryCostListRepo;
+    @Autowired
+    private EmailSenderService emailSenderService;
+    @Autowired
+    private CustomerUserRepository customerUserRepo;
+    @Autowired
+    private AdminUserRepository adminUserRepo;
+    @Autowired
+    private CurrencyRepository currencyRepo;
 
     @Transactional
     public ProductInventory checkProductAvailability (OrderPlace order){
@@ -232,5 +238,69 @@ public class OrderService {
 
     public List<OrderPlaceList> listOrdersByFilterByCustomer(Long customer_id, String status, Date order_date) {
         return orderPlaceListRepo.findAllOrdersByFilterByCustomer(customer_id,status,order_date);
+    }
+
+    public void sendOrderDetailsToCustomer(OrderPlace order, OrderResponse dtos, PlatformInfo platformInfo) {
+        // get currency
+        String currency_name = currencyRepo.getName(order.getCurrency_id());
+
+        // format date and time
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd MMM yyyy");
+        String delivery_date = dateFormatter.format(order.getDate_to_deliver());
+        SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm");
+        String delivery_schedule = timeFormatter.format(order.getDelivery_schedule_start()) + " - " +
+                timeFormatter.format(order.getDelivery_schedule_end());
+
+        // send email to customer
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        String email = customerUserRepo.getUsername(order.getCustomer_id());
+        mailMessage.setTo(email);
+        mailMessage.setSubject("Your "+ platformInfo.getName()+".com Order.");
+        mailMessage.setText("Dear "+ order.getCustomer_name() +",\n\n" +
+                "Thank you for your order. We’ll let you know once your item(s) have dispatched.\n\n" +
+                "The summary of your order is as follows:\n\n" +
+                        "Order No : " + dtos.getInvoice_number() + "\n" +
+                        "Grand Total : " + dtos.getGrand_total_price() + " "+ currency_name +"\n" +
+                        "Delivery Date : " + delivery_date + "\n" +
+                        "Delivery Schedule : " + delivery_schedule + "\n" +
+                        "Delivery Address : " + order.getDelivery_address() + "\n\n" +
+                "You can view the details of your order by visiting My Orders on https://"+ platformInfo.getName().toLowerCase()+".com.\n\n" +
+                "With Regards,\n"+ "Team Xwinkel"
+        );
+        emailSenderService.sendEmail(mailMessage);
+    }
+
+    public void sendOrderDetailsToShopAdmin(OrderPlace order, OrderResponse dtos, PlatformInfo platformInfo) {
+        // get currency
+        String currency_name = currencyRepo.getName(order.getCurrency_id());
+
+        // format date and time
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd MMM yyyy");
+        String delivery_date = dateFormatter.format(order.getDate_to_deliver());
+        SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm");
+        String delivery_schedule = timeFormatter.format(order.getDelivery_schedule_start()) + " - " +
+                timeFormatter.format(order.getDelivery_schedule_end());
+
+        // send email to shop admins
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        List<String> emailList = adminUserRepo.getEmailList(order.getShop_id());
+        for (String email: emailList) {
+            if (email.equals("admin@gmail.com")) continue;
+            else {
+                mailMessage.setTo(email);
+                mailMessage.setSubject(platformInfo.getName()+".com Customer Order.");
+                mailMessage.setText("Hello,\n\n" +
+                        "The following order has been placed by the customer: " + order.getCustomer_name() +".\n\n" +
+                        "You can view the order details by visiting Pending Orders on https://admin."+ platformInfo.getName().toLowerCase() + ".com.\n\n" +
+                        "Order No : " + dtos.getInvoice_number() + "\n" +
+                        "Grand Total : " + dtos.getGrand_total_price() + " "+ currency_name +"\n" +
+                        "Delivery Date : " + delivery_date + "\n" +
+                        "Delivery Schedule : " + delivery_schedule + "\n" +
+                        "Delivery Address : " + order.getDelivery_address() + "\n\n" +
+                        "With Regards,\n"+ "Team Xwinkel"
+                );
+                emailSenderService.sendEmail(mailMessage);
+            }
+        }
     }
 }

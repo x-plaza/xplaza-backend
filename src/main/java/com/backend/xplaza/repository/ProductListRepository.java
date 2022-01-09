@@ -46,7 +46,8 @@ public interface ProductListRepository extends JpaRepository<ProductList, Long> 
             "where ausl.admin_user_id = ?1", nativeQuery = true)
     List<ProductList> findAllProductListByUserID(Long user_id);
 
-    @Query(value = "select pd.discount_amount, dt.discount_type_name, pd.discount_start_date, pd.discount_end_date, null as discounted_price, p.*, b.brand_name, s.shop_name,\n" +
+    @Query(value = "select pd.discount_amount, dt.discount_type_name, pd.discount_start_date, pd.discount_end_date, " +
+            "null as discounted_price, p.*, b.brand_name, s.shop_name,\n" +
             "c.category_name, var.var_type_name, cur.currency_name, cur.currency_sign \n" +
             "from products p \n" +
             "left join product_discounts pd on p.product_id = pd.fk_product_id \n" +
@@ -59,7 +60,8 @@ public interface ProductListRepository extends JpaRepository<ProductList, Long> 
             "where  s.shop_id = ?1", nativeQuery = true)
     List<ProductList> findAllProductListByShopID(Long shop_id);
 
-    @Query(value = "select pd.discount_amount, dt.discount_type_name, pd.discount_start_date, pd.discount_end_date, null as discounted_price, p.*, b.brand_name, s.shop_name,\n" +
+    @Query(value = "select pd.discount_amount, dt.discount_type_name, pd.discount_start_date, pd.discount_end_date, " +
+            "null as discounted_price, p.*, b.brand_name, s.shop_name,\n" +
             "c.category_name, var.var_type_name, cur.currency_name, cur.currency_sign \n" +
             "from products p \n" +
             "left join product_discounts pd on p.product_id = pd.fk_product_id \n" +

@@ -80,12 +80,12 @@ public class ProductService {
     public List<ProductList> listProductsByShopIDByAdmin(Long shop_id) throws ParseException {
         List<ProductList> listOfProducts = productListRepo.findAllProductListByShopID(shop_id);
         listOfProducts = updateDiscountedPrice(listOfProducts,"admin");
+        listOfProducts.forEach((i) -> i.setName(i.getName()+" ("+i.getProduct_var_type_value()+i.getProduct_var_type_name()+")")); // Lambda function
         return listOfProducts;
     }
 
     public List<ProductList> listProductsByShopID(Long shop_id) throws ParseException {
         List<ProductList> listOfProducts = productListRepo.findAllProductListByShopID(shop_id);
-        //listOfProducts.forEach((i) -> i.setBuying_price(null)); // Lambda function
         listOfProducts = updateDiscountedPrice(listOfProducts,"customer");
         return listOfProducts;
     }

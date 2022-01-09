@@ -42,7 +42,8 @@ public class ProductController {
     }
 
     @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getProducts(@RequestParam(value ="user_id",required = true) @Valid Long user_id) throws JsonProcessingException, ParseException {
+    public ResponseEntity<String> getProducts(@RequestParam(value ="user_id",required = true) @Valid Long user_id)
+            throws JsonProcessingException, ParseException {
         start = new Date();
         List<ProductList> dtos;
         String role_name = roleService.getRoleNameByUserID(user_id);
@@ -63,7 +64,8 @@ public class ProductController {
     }
 
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getProduct(@PathVariable @Valid Long id) throws JsonProcessingException, ParseException {
+    public ResponseEntity<String> getProduct(@PathVariable @Valid Long id)
+            throws JsonProcessingException, ParseException {
         start = new Date();
         ProductList dtos = productService.listProduct(id);
         end = new Date();
@@ -80,7 +82,8 @@ public class ProductController {
     }
 
     @GetMapping(value = { "/by-shop-by-admin" }, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getProductsByShopByAdmin(@RequestParam(value ="shop_id",required = true) @Valid Long shop_id) throws JsonProcessingException, ParseException {
+    public ResponseEntity<String> getProductsByShopByAdmin(@RequestParam(value ="shop_id",required = true) @Valid Long shop_id)
+            throws JsonProcessingException, ParseException {
         start = new Date();
         List<ProductList> dtos = productService.listProductsByShopIDByAdmin(shop_id);
         end = new Date();
@@ -97,7 +100,8 @@ public class ProductController {
     }
 
     @GetMapping(value = { "/by-shop" }, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getProductsByShop(@RequestParam(value ="shop_id",required = true) @Valid Long shop_id) throws JsonProcessingException, ParseException {
+    public ResponseEntity<String> getProductsByShop(@RequestParam(value ="shop_id",required = true) @Valid Long shop_id)
+            throws JsonProcessingException, ParseException {
         start = new Date();
         List<ProductList> dtos = productService.listProductsByShopID(shop_id);
         end = new Date();
@@ -115,7 +119,8 @@ public class ProductController {
 
     @GetMapping(value = { "/by-category" }, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getProductsByCategory(@RequestParam(value ="shop_id",required = true) @Valid Long shop_id,
-                                                        @RequestParam(value ="category_id",required = true) @Valid Long category_id) throws JsonProcessingException, ParseException {
+                                                        @RequestParam(value ="category_id",required = true) @Valid Long category_id)
+            throws JsonProcessingException, ParseException {
         start = new Date();
         List<ProductList> dtos = productService.listProductsByCategory(shop_id,category_id);
         end = new Date();
@@ -133,7 +138,8 @@ public class ProductController {
 
     @GetMapping(value = { "/by-name" }, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> searchProductsByName(@RequestParam(value ="shop_id",required = true) @Valid Long shop_id,
-                                                       @RequestParam(value ="product_name",required = true) @Valid String product_name) throws JsonProcessingException {
+                                                       @RequestParam(value ="product_name",required = true) @Valid String product_name)
+            throws JsonProcessingException {
         start = new Date();
         List<ProductSearch> dtos = productService.listProductsByName(shop_id, product_name);
         end = new Date();
@@ -150,7 +156,8 @@ public class ProductController {
     }
 
     @PostMapping(value= "/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> addProduct (@RequestBody @Valid Product product) throws JSONException, JsonProcessingException {
+    public ResponseEntity<ApiResponse> addProduct (@RequestBody @Valid Product product)
+            throws JSONException, JsonProcessingException {
         start = new Date();
         productService.addProduct(product);
         end = new Date();

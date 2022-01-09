@@ -188,6 +188,10 @@ public class OrderController {
         dtos.setInvoice_number(platformInfo.getInvoice() + "#" + order.getInvoice_number());
         dtos.setGrand_total_price(order.getGrand_total_price());
 
+        // Send email
+        orderService.sendOrderDetailsToCustomer(order, dtos, platformInfo);
+        orderService.sendOrderDetailsToShopAdmin(order, dtos, platformInfo);
+
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         return new ResponseEntity<>(new ApiResponse(responseTime, "Add Order", HttpStatus.CREATED.value(),
