@@ -127,6 +127,10 @@ public class OrderService {
         }
         order.setCoupon_amount(coupon_amount);
         order.setGrand_total_price(net_total + delivery_cost - coupon_amount);
+
+        // set payment type
+        order.setPayment_type_id(1L); // Since only COD exist with ID 1.
+
         return order;
     }
 

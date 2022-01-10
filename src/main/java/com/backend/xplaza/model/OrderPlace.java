@@ -167,6 +167,14 @@ public class OrderPlace {
         this.grand_total_price = grand_total_price;
     }
 
+    @ApiModelProperty(hidden=true)
+    @Column(name="fk_payment_type_id")
+    private Long payment_type_id;
+
+    public void setPayment_type_id(Long payment_type_id) {
+        this.payment_type_id = payment_type_id;
+    }
+
     @OneToMany(mappedBy = "orderPlace")
     private List<OrderItem> orderItemList;
 

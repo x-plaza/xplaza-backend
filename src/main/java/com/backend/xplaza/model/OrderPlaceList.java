@@ -56,7 +56,7 @@ public class OrderPlaceList {
     private Date received_time;
 
     public String getReceived_time() {
-        if(received_time != null) return new SimpleDateFormat("dd MMM yyyy").format(received_time);
+        if(received_time != null) return new SimpleDateFormat("dd MMM yyyy HH:mm").format(received_time);
         return null;
     }
 
@@ -133,6 +133,12 @@ public class OrderPlaceList {
     public void setGrand_total_price(Double grand_total_price) {
         this.grand_total_price = grand_total_price;
     }
+
+    @Column(name="fk_payment_type_id")
+    private Long payment_type_id;
+
+    @Column(name="payment_type_name")
+    private String payment_type_name;
 
     @OneToMany(mappedBy = "orderPlaceList")
     private List<OrderItemPlaceList> orderItemPlaceLists;
