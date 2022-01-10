@@ -87,6 +87,9 @@ public class OrderService {
 
             total_price += original_price * item.getQuantity();
             net_total += item.getItem_total_price();
+
+            // set order item quantity type
+            item.setQuantity_type("pc"); // fixed it since it will always be pc.
         }
         total_discount = total_price - net_total;
         order.setTotal_price(total_price);
