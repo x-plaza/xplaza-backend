@@ -26,6 +26,16 @@ public class OrderItemPlaceList {
     @Column(name="order_item_name")
     private String item_name;
 
+    public String getItem_name() {
+        return item_name + " ("+ item_var_type_value+ item_var_type_name + ")";
+    }
+
+    @Column(name="order_item_var_type_name")
+    private String item_var_type_name;
+
+    @Column(name="order_item_var_type_value")
+    private Long item_var_type_value;
+
     @Column(name="order_item_category")
     private String item_category;
 

@@ -56,7 +56,7 @@ public class OrderList {
     private Date received_time;
 
     public String getReceived_time() {
-        if(received_time != null) return new SimpleDateFormat("dd MMM yyyy").format(received_time);
+        if(received_time != null) return new SimpleDateFormat("dd MMM yyyy HH:mm").format(received_time);
         return null;
     }
 

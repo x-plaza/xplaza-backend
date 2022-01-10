@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class OrderItemService {
@@ -67,7 +68,7 @@ public class OrderItemService {
         Double coupon_amount = order.getCoupon_amount();
         if(order.getCoupon_id() != null) {
             CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsById(order.getCoupon_id());
-            if(couponDetails.getDiscount_type_name() == "Percentage") {
+            if(Objects.equals(couponDetails.getDiscount_type_name(), "Percentage")) {
                 coupon_amount = (order.getNet_total() *  couponDetails.getAmount())/100;
                 if(coupon_amount > couponDetails.getMax_amount())
                     coupon_amount = couponDetails.getMax_amount();
@@ -75,7 +76,7 @@ public class OrderItemService {
         }
         else if(order.getCoupon_code() != null) {
             CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsByCode(order.getCoupon_code());
-            if(couponDetails.getDiscount_type_name() == "Percentage") {
+            if(Objects.equals(couponDetails.getDiscount_type_name(), "Percentage")) {
                 coupon_amount = (order.getNet_total() *  couponDetails.getAmount())/100;
                 if(coupon_amount > couponDetails.getMax_amount())
                     coupon_amount = couponDetails.getMax_amount();
@@ -89,16 +90,16 @@ public class OrderItemService {
         order.setCoupon_amount(coupon_amount);
         order.setGrand_total_price(grand_total);
 
+        // set order item quantity type
+        orderItem.setQuantity_type("pc"); // fixed it since it will always be pc.
+
         orderItemRepo.save(orderItem);
         orderRepo.save(order);
 
         // Update product inventory
-        // Product product = productRepo.findProductById(orderItem.getProduct_id());
-        if (product != null) {
-            Long original_quantity = product.getQuantity();
-            Long updated_quantity = original_quantity - orderItem.getQuantity();
-            productRepo.updateProductInventory(product.getId(), updated_quantity);
-        }
+        Long original_quantity = product.getQuantity();
+        Long updated_quantity = original_quantity - orderItem.getQuantity();
+        productRepo.updateProductInventory(product.getId(), updated_quantity);
     }
 
     public List<OrderItem> listOrderItems() { return orderItemRepo.findAll(); }
@@ -111,24 +112,6 @@ public class OrderItemService {
 
     @Transactional
     public void deleteOrderItem(Long id) {
-        /*OrderItem item = orderItemRepo.findOrderItemById(id);
-        Order order = orderRepo.findOrderById(item.getOrder_id());
-        Product product = productRepo.findProductById(item.getProduct_id());
-
-        Double original_price = product.getSelling_price();
-        Long old_quantity = item.getQuantity();
-
-        Double item_total_price = item.getItem_total_price();
-        Double total_price = order.getTotal_price();
-        Double total_discount = order.getDiscount_amount();
-        total_price = total_price - item_total_price;
-        Double grand_total = total_price - total_discount;
-
-        order.setTotal_price(total_price);
-        order.setGrand_total_price(grand_total);
-        orderItemRepo.deleteById(id);
-        orderRepo.save(order);*/
-
         // This approach is basically instead of deleting the product, I am making quantity to zero.
         long new_quantity = 0;
         OrderItem item = orderItemRepo.findOrderItemById(id);
@@ -161,7 +144,7 @@ public class OrderItemService {
         Double coupon_amount = order.getCoupon_amount();
         if(order.getCoupon_id() != null) {
             CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsById(order.getCoupon_id());
-            if(couponDetails.getDiscount_type_name() == "Percentage") {
+            if(Objects.equals(couponDetails.getDiscount_type_name(), "Percentage")) {
                 coupon_amount = (order.getNet_total() *  couponDetails.getAmount())/100;
                 if(coupon_amount > couponDetails.getMax_amount())
                     coupon_amount = couponDetails.getMax_amount();
@@ -169,7 +152,7 @@ public class OrderItemService {
         }
         else if(order.getCoupon_code() != null) {
             CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsByCode(order.getCoupon_code());
-            if(couponDetails.getDiscount_type_name() == "Percentage") {
+            if(Objects.equals(couponDetails.getDiscount_type_name(), "Percentage")) {
                 coupon_amount = (order.getNet_total() *  couponDetails.getAmount())/100;
                 if(coupon_amount > couponDetails.getMax_amount())
                     coupon_amount = couponDetails.getMax_amount();
@@ -202,10 +185,8 @@ public class OrderItemService {
     public void updateOrderItem(Long order_item_id, Long new_quantity) {
         OrderItem item = orderItemRepo.findOrderItemById(order_item_id);
         Order order = orderRepo.findOrderById(item.getOrder_id());
-        // Product product = productRepo.findProductById(item.getProduct_id());
 
         // Get the old values:
-        // Double original_price = product.getSelling_price();
         Double original_price = item.getProduct_selling_price();
         Long old_quantity = item.getQuantity();
         Double unit_price = item.getUnit_price(); // discount amount ta alada kore check korinai, sorasori ager item er unit price ta niye nisi
@@ -231,7 +212,7 @@ public class OrderItemService {
         Double coupon_amount = order.getCoupon_amount();
         if(order.getCoupon_id() != null) {
             CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsById(order.getCoupon_id());
-            if(couponDetails.getDiscount_type_name() == "Percentage") {
+            if(Objects.equals(couponDetails.getDiscount_type_name(), "Percentage")) {
                 coupon_amount = (order.getNet_total() *  couponDetails.getAmount())/100;
                 if(coupon_amount > couponDetails.getMax_amount())
                     coupon_amount = couponDetails.getMax_amount();
@@ -239,7 +220,7 @@ public class OrderItemService {
         }
         else if(order.getCoupon_code() != null) {
             CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsByCode(order.getCoupon_code());
-            if(couponDetails.getDiscount_type_name() == "Percentage") {
+            if(Objects.equals(couponDetails.getDiscount_type_name(), "Percentage")) {
                 coupon_amount = (order.getNet_total() *  couponDetails.getAmount())/100;
                 if(coupon_amount > couponDetails.getMax_amount())
                     coupon_amount = couponDetails.getMax_amount();
@@ -256,6 +237,9 @@ public class OrderItemService {
         order.setGrand_total_price(grand_total);
         item.setItem_total_price(new_item_total_price);
         item.setQuantity(new_quantity);
+        // set order item quantity type
+        item.setQuantity_type("pc"); // fixed it since it will always be pc.
+
         orderItemRepo.save(item);
         orderRepo.save(order);
 

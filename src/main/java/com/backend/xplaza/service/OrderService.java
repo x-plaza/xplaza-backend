@@ -87,6 +87,9 @@ public class OrderService {
 
             total_price += original_price * item.getQuantity();
             net_total += item.getItem_total_price();
+
+            // set order item quantity type
+            item.setQuantity_type("pc"); // fixed it since it will always be pc.
         }
         total_discount = total_price - net_total;
         order.setTotal_price(total_price);
@@ -127,6 +130,10 @@ public class OrderService {
         }
         order.setCoupon_amount(coupon_amount);
         order.setGrand_total_price(net_total + delivery_cost - coupon_amount);
+
+        // set payment type
+        order.setPayment_type_id(1L); // Since only COD exist with ID 1.
+
         return order;
     }
 
