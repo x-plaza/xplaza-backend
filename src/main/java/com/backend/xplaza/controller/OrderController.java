@@ -141,7 +141,8 @@ public class OrderController {
     }
 
     @PostMapping(value= "/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse> addOrder (@RequestBody @Valid OrderPlace order) throws ParseException, JsonProcessingException {
+    public ResponseEntity<ApiResponse> addOrder (@RequestBody @Valid OrderPlace order)
+            throws ParseException, JsonProcessingException {
         start = new Date();
 
         // Check product availability

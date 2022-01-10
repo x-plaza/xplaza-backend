@@ -27,7 +27,9 @@ public class CustomerSignupService {
         mailMessage.setSubject("Your " + platformInfo.getName() + ".com Login Details!");
         mailMessage.setText("Congratulations! Your "+  platformInfo.getName() + ".com Customer account has been created successfully.\n\n" +
                 "Please use the following login details to login to the "+ platformInfo.getName() +" account.\n\n" +
-                "Email : " + email + "\n" + "Password : " + password);
+                "Email : " + email + "\n" + "Password : " + password+ "\n\n" +
+                "With Regards,\n"+ "Team " + platformInfo.getName()
+        );
         emailSenderService.sendEmail(mailMessage);
     }
 

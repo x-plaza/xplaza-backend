@@ -3,6 +3,7 @@ package com.backend.xplaza.service;
 import com.backend.xplaza.model.AdminUser;
 import com.backend.xplaza.model.AdminUserList;
 import com.backend.xplaza.model.AdminUserShopLink;
+import com.backend.xplaza.model.PlatformInfo;
 import com.backend.xplaza.repository.AdminUserListRepository;
 import com.backend.xplaza.repository.AdminUserRepository;
 import com.backend.xplaza.repository.AdminUserShopLinkRepository;
@@ -26,6 +27,8 @@ public class AdminUserService {
     private ConfirmationTokenRepository confirmationTokenRepo;
     @Autowired
     private EmailSenderService emailSenderService;
+    @Autowired
+    private PlatformInfoService platformInfoService;
 
     @Transactional
     public void addAdminUser(AdminUser adminUser) {
@@ -84,12 +87,15 @@ public class AdminUserService {
     }
 
     public void sendLoginDetails(String email, String temp_password) {
+        // Get platform info
+        PlatformInfo platformInfo = platformInfoService.listPlatform();
+        // Send email
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(email);
-        mailMessage.setSubject("Login Details!");
-        mailMessage.setText("Congratulations! Your X-plaza Admin account has been created successfully.\n\n" +
-                "Use the login details below to login to the admin panel and please change the password immediately.\n\n" +
-                "Username : " + email + "\n" + "Password : " + temp_password);
+        mailMessage.setSubject("Your " + platformInfo.getName() + ".com Admin Login Details!");
+        mailMessage.setText("Congratulations! Your "+ platformInfo.getName() +" Admin account has been created successfully.\n\n" +
+                "Please use the following login details to login to the admin panel and please change the password immediately.\n\n" +
+                "Email : " + email + "\n" + "Password : " + temp_password);
         emailSenderService.sendEmail(mailMessage);
     }
 

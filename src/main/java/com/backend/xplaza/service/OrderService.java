@@ -272,7 +272,7 @@ public class OrderService {
                         "Delivery Schedule : " + delivery_schedule + "\n" +
                         "Delivery Address : " + order.getDelivery_address() + "\n\n" +
                 "You can view the details of your order by visiting My Orders on https://"+ platformInfo.getName().toLowerCase()+".com.\n\n" +
-                "With Regards,\n"+ "Team Xwinkel"
+                "With Regards,\n"+ "Team " + platformInfo.getName()
         );
         emailSenderService.sendEmail(mailMessage);
     }
@@ -304,7 +304,7 @@ public class OrderService {
                         "Delivery Date : " + delivery_date + "\n" +
                         "Delivery Schedule : " + delivery_schedule + "\n" +
                         "Delivery Address : " + order.getDelivery_address() + "\n\n" +
-                        "With Regards,\n"+ "Team Xwinkel"
+                        "With Regards,\n"+ "Team " + platformInfo.getName()
                 );
                 emailSenderService.sendEmail(mailMessage);
             }

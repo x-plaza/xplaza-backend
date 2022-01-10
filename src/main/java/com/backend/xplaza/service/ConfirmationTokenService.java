@@ -31,7 +31,9 @@ public class ConfirmationTokenService {
         mailMessage.setTo(email);
         mailMessage.setSubject("Complete "+ platformInfo.getName() +".com Sign Up!");
         mailMessage.setText("To confirm your "+ platformInfo.getName() +".com Admin account, " +
-                "please use the following Code:\n\n" +confirmationToken.getConfirmation_token());
+                "please use the following Code:\n\n" +confirmationToken.getConfirmation_token()+ "\n\n" +
+                "With Regards,\n"+ "Team " + platformInfo.getName()
+        );
         emailSenderService.sendEmail(mailMessage);
     }
 
@@ -46,7 +48,9 @@ public class ConfirmationTokenService {
         mailMessage.setTo(email);
         mailMessage.setSubject("One Time Password!");
         mailMessage.setText("To reset your "+ platformInfo.getName() + ".com Admin account password, " +
-                "please use the following OTP:\n\n" + confirmationToken.getConfirmation_token());
+                "please use the following OTP:\n\n" + confirmationToken.getConfirmation_token()+ "\n\n" +
+                "With Regards,\n"+ "Team " + platformInfo.getName()
+        );
         emailSenderService.sendEmail(mailMessage);
     }
 
@@ -61,7 +65,9 @@ public class ConfirmationTokenService {
         mailMessage.setTo(email);
         mailMessage.setSubject("Complete "+ platformInfo.getName() +".com Sign Up!");
         mailMessage.setText("To confirm your email, please use the following Code:\n\n"
-                + confirmationToken.getConfirmation_token());
+                + confirmationToken.getConfirmation_token()+ "\n\n" +
+                "With Regards,\n"+ "Team " + platformInfo.getName()
+        );
         emailSenderService.sendEmail(mailMessage);
     }
 
@@ -77,7 +83,9 @@ public class ConfirmationTokenService {
         mailMessage.setSubject("One Time Password!");
         mailMessage.setText("To reset your "+ platformInfo.getName() +".com account password, " +
                 "please use the following OTP:\n\n"
-                + confirmationToken.getConfirmation_token());
+                + confirmationToken.getConfirmation_token() + "\n\n" +
+                "With Regards,\n"+ "Team " + platformInfo.getName()
+        );
         emailSenderService.sendEmail(mailMessage);
     }
 }
