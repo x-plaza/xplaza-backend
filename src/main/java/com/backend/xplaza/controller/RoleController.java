@@ -37,6 +37,7 @@ public class RoleController {
     public ResponseEntity<String> getRoles() throws JsonProcessingException {
         start = new Date();
         List<Role> dtos = roleService.listRoles();
+        dtos.removeIf(r-> r.getName().equals("Master Admin")); // Removed Master Admin Role purposefully.
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         ObjectMapper mapper = new ObjectMapper();
