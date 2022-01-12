@@ -95,7 +95,9 @@ public class AdminUserService {
         mailMessage.setSubject("Your " + platformInfo.getName() + ".com Admin Login Details!");
         mailMessage.setText("Congratulations! Your "+ platformInfo.getName() +" Admin account has been created successfully.\n\n" +
                 "Please use the following login details to login to the admin panel and please change the password immediately.\n\n" +
-                "Email : " + email + "\n" + "Password : " + temp_password);
+                "Email : " + email + "\n" + "Password : " + temp_password + "\n\n" +
+                "With Regards,\n"+ "Team " + platformInfo.getName()
+        );
         emailSenderService.sendEmail(mailMessage);
     }
 

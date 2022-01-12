@@ -51,6 +51,17 @@ public class OrderItem {
         this.product_selling_price = product_selling_price;
     }
 
+    @Column(name="product_buying_price")
+    private Double product_buying_price;
+
+    public Double getProduct_buying_price() {
+        return product_buying_price;
+    }
+
+    public void setProduct_buying_price(Double product_buying_price) {
+        this.product_buying_price = product_buying_price;
+    }
+
     @Column(name="order_item_name")
     private String item_name;
 
