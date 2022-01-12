@@ -48,4 +48,23 @@ public class DashboardController {
                 mapper.writeValueAsString(dtos) + "\n}";
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @PostMapping(value = { "/monthly-profit" }, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getMonthlyProfit (@RequestParam(value ="shop_id",required = true) @Valid Long shop_id,
+                                                    @RequestParam(value ="month",required = true) @Valid int month) throws IOException {
+        start = new Date();
+        Double dtos = dashboardService.getMonthlyProfit(shop_id, month);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        ObjectMapper mapper = new ObjectMapper();
+        String response= "{\n" +
+                "  \"responseTime\": "+ responseTime + ",\n" +
+                "  \"responseType\": \"Monthly Profit\",\n" +
+                "  \"status\": 200,\n" +
+                "  \"response\": \"Success\",\n" +
+                "  \"msg\": \"\",\n" +
+                "  \"data\":" +
+                mapper.writeValueAsString(dtos) + "\n}";
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }
