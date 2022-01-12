@@ -49,6 +49,10 @@ public class Product {
     @Column(name="product_buying_price")
     private Double buying_price;
 
+    public Double getBuying_price() {
+        return buying_price;
+    }
+
     @Column(name="product_selling_price")
     private Double selling_price;
 

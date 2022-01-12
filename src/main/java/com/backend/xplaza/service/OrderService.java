@@ -66,7 +66,8 @@ public class OrderService {
         Double net_total = 0.0;
         for (OrderItem item : order.getOrderItemList()) {
             Product product = productRepo.findProductById(item.getProduct_id());
-            Double original_price = product.getSelling_price();
+            Double original_selling_price = product.getSelling_price();
+            Double buying_price = product.getBuying_price();
             // check discount amount with validity and discount type
             Double discount_amount = 0.0;
             ProductDiscount productDiscount = productDiscountRepo.findByProductId(item.getProduct_id());
@@ -76,16 +77,17 @@ public class OrderService {
                 Long discount_type = productDiscount.getDiscount_type_id();
                 if(discount_type == 2) // Percentage
                 {
-                    discount_amount = original_price * (discount_amount/100);
+                    discount_amount = original_selling_price * (discount_amount/100);
                 }
             }
             // set prices to the item
-            Double unit_price = original_price - discount_amount; // here unit price is basically the discounted price
+            Double unit_price = original_selling_price - discount_amount; // here unit price is basically the discounted price
             item.setUnit_price(unit_price);
-            item.setProduct_selling_price(original_price);
+            item.setProduct_selling_price(original_selling_price);
+            item.setProduct_buying_price(buying_price);
             item.setItem_total_price(unit_price * item.getQuantity());
 
-            total_price += original_price * item.getQuantity();
+            total_price += original_selling_price * item.getQuantity();
             net_total += item.getItem_total_price();
 
             // set order item quantity type

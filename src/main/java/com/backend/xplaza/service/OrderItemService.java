@@ -28,8 +28,10 @@ public class OrderItemService {
     public void addOrderItem(OrderItem orderItem) {
         Order order = orderRepo.findOrderById(orderItem.getOrder_id());
         Product product = productRepo.findProductById(orderItem.getProduct_id());
-        Double original_price = product.getSelling_price();
-        orderItem.setProduct_selling_price(original_price);
+        Double original_selling_price = product.getSelling_price();
+        Double buying_price = product.getBuying_price();
+        orderItem.setProduct_selling_price(original_selling_price);
+        orderItem.setProduct_buying_price(buying_price);
 
         // check discount amount with validity and discount type
         Double discount_amount = 0.0;
@@ -40,10 +42,10 @@ public class OrderItemService {
             Long discount_type = productDiscount.getDiscount_type_id();
             if(discount_type == 2) // Percentage
             {
-                discount_amount = original_price * (discount_amount/100);
+                discount_amount = original_selling_price * (discount_amount/100);
             }
         }
-        Double unit_price = original_price - discount_amount; // here unit price is basically the discounted price
+        Double unit_price = original_selling_price - discount_amount; // here unit price is basically the discounted price
         orderItem.setUnit_price(unit_price);
         orderItem.setItem_total_price(orderItem.getUnit_price() * orderItem.getQuantity());
         Double item_total_price = orderItem.getItem_total_price();
@@ -52,7 +54,7 @@ public class OrderItemService {
         Double total_price = order.getTotal_price();
 
         net_total += item_total_price;
-        total_price += original_price * orderItem.getQuantity();
+        total_price += original_selling_price * orderItem.getQuantity();
         Double total_discount = total_price - net_total;
 
         // Check updated delivery cost
