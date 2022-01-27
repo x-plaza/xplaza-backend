@@ -9,6 +9,7 @@ import com.backend.xplaza.repository.AdminUserRepository;
 import com.backend.xplaza.repository.AdminUserShopLinkRepository;
 import com.backend.xplaza.repository.ConfirmationTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +30,8 @@ public class AdminUserService {
     private EmailSenderService emailSenderService;
     @Autowired
     private PlatformInfoService platformInfoService;
+    @Autowired
+    private Environment env;
 
     @Transactional
     public void addAdminUser(AdminUser adminUser) {
@@ -91,6 +94,7 @@ public class AdminUserService {
         PlatformInfo platformInfo = platformInfoService.listPlatform();
         // Send email
         SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setFrom(env.getProperty("user.mail"));
         mailMessage.setTo(email);
         mailMessage.setSubject("Your " + platformInfo.getName() + ".com Admin Login Details!");
         mailMessage.setText("Congratulations! Your "+ platformInfo.getName() +" Admin account has been created successfully.\n\n" +

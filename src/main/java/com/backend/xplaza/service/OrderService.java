@@ -3,6 +3,7 @@ package com.backend.xplaza.service;
 import com.backend.xplaza.model.*;
 import com.backend.xplaza.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +42,8 @@ public class OrderService {
     private AdminUserRepository adminUserRepo;
     @Autowired
     private CurrencyRepository currencyRepo;
+    @Autowired
+    private Environment env;
 
     @Transactional
     public ProductInventory checkProductAvailability (OrderPlace order){
@@ -263,6 +266,7 @@ public class OrderService {
         // send email to customer
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         String email = customerUserRepo.getUsername(order.getCustomer_id());
+        mailMessage.setFrom(env.getProperty("user.mail"));
         mailMessage.setTo(email);
         mailMessage.setSubject("Your "+ platformInfo.getName()+".com Order.");
         mailMessage.setText("Dear "+ order.getCustomer_name() +",\n\n" +

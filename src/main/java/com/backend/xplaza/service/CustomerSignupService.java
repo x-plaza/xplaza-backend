@@ -4,6 +4,7 @@ import com.backend.xplaza.model.CustomerDetails;
 import com.backend.xplaza.model.PlatformInfo;
 import com.backend.xplaza.repository.CustomerSignupRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,8 @@ public class CustomerSignupService {
     private EmailSenderService emailSenderService;
     @Autowired
     private PlatformInfoService platformInfoService;
+    @Autowired
+    private Environment env;
 
     public void signupCustomer(CustomerDetails customer) {customerSignupRepo.save(customer);}
 
@@ -23,6 +26,7 @@ public class CustomerSignupService {
         PlatformInfo platformInfo = platformInfoService.listPlatform();
         // Send email
         SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setFrom(env.getProperty("user.mail"));
         mailMessage.setTo(email);
         mailMessage.setSubject("Your " + platformInfo.getName() + ".com Login Details!");
         mailMessage.setText("Congratulations! Your "+  platformInfo.getName() + ".com Customer account has been created successfully.\n\n" +
