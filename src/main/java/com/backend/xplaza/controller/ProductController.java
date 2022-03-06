@@ -117,6 +117,24 @@ public class ProductController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @GetMapping(value = { "/by-trending" }, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getProductsByTrending(@RequestParam(value ="shop_id",required = true) @Valid Long shop_id)
+            throws JsonProcessingException, ParseException {
+        start = new Date();
+        List<ProductList> dtos = productService.listProductsByTrending(shop_id);
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        ObjectMapper mapper = new ObjectMapper();
+        String response= "{\n" +
+                "  \"responseTime\": "+ responseTime + ",\n" +
+                "  \"responseType\": \"Product List\",\n" +
+                "  \"status\": 200,\n" +
+                "  \"response\": \"Success\",\n" +
+                "  \"msg\": \"\",\n" +
+                "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     @GetMapping(value = { "/by-category" }, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getProductsByCategory(@RequestParam(value ="shop_id",required = true) @Valid Long shop_id,
                                                         @RequestParam(value ="category_id",required = true) @Valid Long category_id)
