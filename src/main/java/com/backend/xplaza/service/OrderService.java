@@ -300,6 +300,7 @@ public class OrderService {
         for (String email: emailList) {
             if (email.equals("admin@gmail.com")) continue;
             else {
+                mailMessage.setFrom(env.getProperty("user.mail"));
                 mailMessage.setTo(email);
                 mailMessage.setSubject(platformInfo.getName()+".com Customer Order.");
                 mailMessage.setText("Hello,\n\n" +
