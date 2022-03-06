@@ -120,7 +120,7 @@ public class ProductService {
         }
         return listOfProducts;
     }
-    // for individual product
+    // for an individual product
     public ProductList updateDiscountedPrice(ProductList p, String type) throws ParseException {
         if (type.equals("customer")) p.setBuying_price(null);
         if(p.getDiscount_amount() != null && p.getDiscount_type_name() != null) {
@@ -137,5 +137,11 @@ public class ProductService {
             }
         }
         return p;
+    }
+
+    public List<ProductList> listProductsByTrending(Long shop_id) throws ParseException {
+        List<ProductList> listOfProducts = productListRepo.findAllProductListByTrending(shop_id);
+        listOfProducts = updateDiscountedPrice(listOfProducts,"customer");
+        return listOfProducts;
     }
 }
