@@ -295,9 +295,9 @@ public class OrderService {
                 timeFormatter.format(order.getDelivery_schedule_end());
 
         // send email to shop admins
-        SimpleMailMessage mailMessage = new SimpleMailMessage();
         List<String> emailList = adminUserRepo.getEmailList(order.getShop_id());
         for (String email: emailList) {
+            SimpleMailMessage mailMessage = new SimpleMailMessage();
             if (email.equals("admin@gmail.com")) continue;
             else {
                 mailMessage.setFrom(env.getProperty("user.mail"));
