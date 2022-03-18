@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.text.NumberFormat;
 import java.util.*;
 
 @Service
@@ -263,6 +264,10 @@ public class OrderService {
         String delivery_schedule = timeFormatter.format(order.getDelivery_schedule_start()) + " - " +
                 timeFormatter.format(order.getDelivery_schedule_end());
 
+        // formatter for decimal to 2 places
+        NumberFormat nf= NumberFormat.getInstance();
+        nf.setMaximumFractionDigits(2);
+
         // send email to customer
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         String email = customerUserRepo.getUsername(order.getCustomer_id());
@@ -273,7 +278,7 @@ public class OrderService {
                 "Thank you for your order. We’ll let you know once your item(s) have dispatched.\n\n" +
                 "The summary of your order is as follows:\n\n" +
                         "Order No : " + dtos.getInvoice_number() + "\n" +
-                        "Grand Total : " + dtos.getGrand_total_price() + " "+ currency_name +"\n" +
+                        "Grand Total : " + nf.format(dtos.getGrand_total_price()) + " "+ currency_name +"\n" +
                         "Delivery Date : " + delivery_date + "\n" +
                         "Delivery Schedule : " + delivery_schedule + "\n" +
                         "Delivery Address : " + order.getDelivery_address() + "\n\n" +
@@ -294,6 +299,10 @@ public class OrderService {
         String delivery_schedule = timeFormatter.format(order.getDelivery_schedule_start()) + " - " +
                 timeFormatter.format(order.getDelivery_schedule_end());
 
+        // formatter for decimal to 2 places
+        NumberFormat nf= NumberFormat.getInstance();
+        nf.setMaximumFractionDigits(2);
+
         // send email to shop admins
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         List<String> emailList = adminUserRepo.getEmailList(order.getShop_id());
@@ -307,7 +316,7 @@ public class OrderService {
                         "The following order has been placed by the customer: " + order.getCustomer_name() +".\n\n" +
                         "You can view the order details by visiting Pending Orders on https://admin."+ platformInfo.getName().toLowerCase() + ".com.\n\n" +
                         "Order No : " + dtos.getInvoice_number() + "\n" +
-                        "Grand Total : " + dtos.getGrand_total_price() + " "+ currency_name +"\n" +
+                        "Grand Total : " + nf.format(dtos.getGrand_total_price())+ " "+ currency_name +"\n" +
                         "Delivery Date : " + delivery_date + "\n" +
                         "Delivery Schedule : " + delivery_schedule + "\n" +
                         "Delivery Address : " + order.getDelivery_address() + "\n\n" +
