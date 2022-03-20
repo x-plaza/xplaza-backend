@@ -13,4 +13,8 @@ public class PlatformInfoService {
     public PlatformInfo listPlatform (){
         return platformInfoRepo.findAll().get(0); // for single row
     }
+
+    public void updatePlatformInfo(PlatformInfo platformInfo) {
+        platformInfoRepo.update(platformInfo.getAdditional_info(), platformInfo.getCell_no(), platformInfo.getBanner_image(), platformInfo.getBanner_image_path());
+    }
 }
