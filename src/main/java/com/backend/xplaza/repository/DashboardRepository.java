@@ -1,6 +1,7 @@
 package com.backend.xplaza.repository;
 
 import com.backend.xplaza.model.Dashboard;
+import com.backend.xplaza.model.MonthlySales;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -16,4 +17,13 @@ public interface DashboardRepository extends JpaRepository<Dashboard, Long> {
             "and o.date_to_deliver >= TO_DATE(?2, 'YYYY-MM-01') " +
             "and o.date_to_deliver <= TO_DATE(?2, 'YYYY-MM-01') + interval '1 month - 1 day'", nativeQuery = true)
     Double findProfitByMonthByShopId(Long shop_id, String date_of_a_month);
+
+
+    @Query(value = "select coalesce (sum(o.total_price) - sum(o.discount_amount), 0) as monthly_sales " +
+            "from orders o " +
+            "where o.shop_id = ?1 " +
+            "and o.fk_status_id = 5 " +
+            "and o.date_to_deliver >= TO_DATE(?2, 'YYYY-MM-01') " +
+            "and o.date_to_deliver <= TO_DATE(?2, 'YYYY-MM-01') + interval '1 month - 1 day'", nativeQuery = true)
+    Double findSalesByMonthByShopId(Long shop_id, String date_of_a_month);
 }

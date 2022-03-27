@@ -18,6 +18,10 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.telesign.MessagingClient;
+import com.telesign.RestClient;
+import com.telesign.Util;
+
 @RestController
 @RequestMapping("/api/customer-signup")
 public class CustomerSignupController {
@@ -96,5 +100,27 @@ public class CustomerSignupController {
         responseTime = end.getTime() - start.getTime();
         return new ResponseEntity<>(new ApiResponse(responseTime, "Signup Customer", HttpStatus.CREATED.value(),"Success",
                 "Customer account has been created successfully.",null), HttpStatus.CREATED);
+    }
+
+
+    @PostMapping(value= "/send-otp", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiResponse> sendOTP (@RequestParam("cell_no") @Valid String cell_no) {
+        start = new Date();
+        String customerId = "D22F37FA-1914-48E3-B018-ACFF0E611C3C";
+        String apiKey = "1UKbxwwvd0J7q5ne4vtTAlnE4DVqoVqQ+yvKKyHEISDXUu35Jzv7UIeXTlFcR4IYlIp/+uj2EpvXLbksmu/xkA==";
+        String phoneNumber = cell_no;
+        String verifyCode = Util.randomWithNDigits(5);
+        String message = String.format("Your OTP is %s", verifyCode) + "\n\nTeam Xwinkel";
+        String messageType = "OTP";
+        try {
+            MessagingClient messagingClient = new MessagingClient(customerId, apiKey);
+            RestClient.TelesignResponse telesignResponse = messagingClient.message(phoneNumber, message, messageType, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        end = new Date();
+        responseTime = end.getTime() - start.getTime();
+        return new ResponseEntity<>(new ApiResponse(responseTime, "Send OTP", HttpStatus.CREATED.value(),"Success",
+                "An OTP has been sent to your phone.",null), HttpStatus.CREATED);
     }
 }
