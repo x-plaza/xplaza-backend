@@ -1,7 +1,9 @@
 package com.backend.xplaza.model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.hibernate.annotations.TypeDef;
@@ -20,7 +22,6 @@ public class CustomerDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="customer_id")
-    //@ApiModelProperty(hidden=true)
     private Long id;
 
     @Column(name="first_name")
@@ -36,7 +37,7 @@ public class CustomerDetails {
     private String street_name;
 
     @Column(name="postcode")
-    private Long postcode;
+    private String postcode;
 
     @Column(name="area")
     private String area;
@@ -50,6 +51,7 @@ public class CustomerDetails {
     @Column(name="mobile_no")
     private String mobile_no;
 
+    @ApiModelProperty(hidden=true)
     @Column(name="email")
     private String email;
 
@@ -68,7 +70,8 @@ public class CustomerDetails {
         if(date_of_birth != null) return new SimpleDateFormat("dd MMM yyyy").format(date_of_birth);
         return null;
     }
-
+    @JsonIgnore
+    @ApiModelProperty(hidden=true)
     @Column(name="otp")
     private String otp;
 
@@ -76,6 +79,8 @@ public class CustomerDetails {
         return otp;
     }
 
+    @JsonIgnore
+    @ApiModelProperty(hidden=true)
     @Column(name="salt")
     private String salt;
 
@@ -87,6 +92,8 @@ public class CustomerDetails {
         this.salt = salt;
     }
 
+    @JsonIgnore
+    @ApiModelProperty(hidden=true)
     @Column(name="password")
     private String password;
 
