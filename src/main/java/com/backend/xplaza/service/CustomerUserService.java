@@ -30,8 +30,8 @@ public class CustomerUserService {
         return customerUserRepo.findAll();
     }
 
-    public CustomerDetails listCustomer(String email) {
-        return customerUserRepo.findCustomerByUsername(email);
+    public CustomerDetails listCustomer(String username) {
+        return customerUserRepo.findCustomerByUsername(username);
     }
 
     public void changeCustomerPassword(String new_password, String salt, String user_name) {
