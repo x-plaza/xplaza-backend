@@ -63,9 +63,9 @@ public class CustomerUserController {
     }
 
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getCustomer(@PathVariable @Valid String email) throws JsonProcessingException {
+    public ResponseEntity<String> getCustomer(@RequestParam("username") @Valid String username) throws JsonProcessingException {
         start = new Date();
-        CustomerDetails dtos = customerUserService.listCustomer(email);
+        CustomerDetails dtos = customerUserService.listCustomer(username);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         ObjectMapper mapper = new ObjectMapper();
