@@ -10,8 +10,8 @@ public interface CustomerUserRepository extends JpaRepository<CustomerDetails, L
     @Query(value = "select email from customers where customer_id = ?1", nativeQuery = true)
     String getUsername(Long id);
 
-    @Query(value = "select * from customers where email = ?1", nativeQuery = true)
-    CustomerDetails findCustomerByUsername(String username);
+    @Query(value = "select * from customers where customer_id = ?1", nativeQuery = true)
+    CustomerDetails findCustomerByUsername(Long id);
 
     @Modifying
     @Transactional
