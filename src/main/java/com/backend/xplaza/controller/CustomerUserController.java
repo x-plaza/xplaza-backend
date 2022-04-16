@@ -62,10 +62,10 @@ public class CustomerUserController {
 //        return new ResponseEntity<>(response, HttpStatus.OK);
 //    }
 
-    @GetMapping(value = {"/{username}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getCustomer(@PathVariable @Valid String username) throws JsonProcessingException {
+    @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getCustomer(@PathVariable @Valid Long id) throws JsonProcessingException {
         start = new Date();
-        CustomerDetails dtos = customerUserService.listCustomer(username);
+        CustomerDetails dtos = customerUserService.listCustomer(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         ObjectMapper mapper = new ObjectMapper();
