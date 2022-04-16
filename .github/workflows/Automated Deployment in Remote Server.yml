@@ -16,4 +16,3 @@ jobs:
           heroku_app_name: "xplaza-backend"
           heroku_email: "mahiuddinalkamal@gmail.com"
           usedocker: false
-          docker_heroku_process_type
