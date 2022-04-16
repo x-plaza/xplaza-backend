@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -65,13 +66,13 @@ public class CustomerUserController {
     @GetMapping(value = {"/{id}"}, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getCustomer(@PathVariable @Valid Long id) throws JsonProcessingException {
         start = new Date();
-        CustomerDetails dtos = customerUserService.listCustomer(id);
+        CustomerDetails dtos = customerUserService.getCustomer(id);
         end = new Date();
         responseTime = end.getTime() - start.getTime();
         ObjectMapper mapper = new ObjectMapper();
         String response= "{\n" +
                 "  \"responseTime\": "+ responseTime + ",\n" +
-                "  \"responseType\": \"A Customer Detail\",\n" +
+                "  \"responseType\": \"Customer Details\",\n" +
                 "  \"status\": 200,\n" +
                 "  \"response\": \"Success\",\n" +
                 "  \"msg\": \"\",\n" +
