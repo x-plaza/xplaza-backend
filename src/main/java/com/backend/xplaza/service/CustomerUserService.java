@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CustomerUserService {
@@ -30,11 +31,15 @@ public class CustomerUserService {
         return customerUserRepo.findAll();
     }
 
-    public CustomerDetails listCustomer(Long id) {
-        return customerUserRepo.findCustomerByUsername(id);
+    public CustomerDetails listCustomer(String username) {
+        return customerUserRepo.findCustomerByUsername(username);
     }
 
     public void changeCustomerPassword(String new_password, String salt, String user_name) {
         customerUserRepo.changePassword(new_password,salt,user_name);
+    }
+
+    public CustomerDetails getCustomer(Long id) {
+        return customerUserRepo.findByCustomerId(id);
     }
 }
