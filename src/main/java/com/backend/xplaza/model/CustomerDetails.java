@@ -51,7 +51,7 @@ public class CustomerDetails {
     @Column(name="mobile_no")
     private String mobile_no;
 
-    @ApiModelProperty(hidden=true)
+    //@ApiModelProperty(hidden=true)
     @Column(name="email")
     private String email;
 
@@ -70,8 +70,8 @@ public class CustomerDetails {
         if(date_of_birth != null) return new SimpleDateFormat("dd MMM yyyy").format(date_of_birth);
         return null;
     }
-    @JsonIgnore
-    @ApiModelProperty(hidden=true)
+    //@JsonIgnore
+    //@ApiModelProperty(hidden=true)
     @Column(name="otp")
     private String otp;
 
@@ -92,8 +92,8 @@ public class CustomerDetails {
         this.salt = salt;
     }
 
-    @JsonIgnore
-    @ApiModelProperty(hidden=true)
+    //@JsonIgnore
+    //@ApiModelProperty(hidden=true)
     @Column(name="password")
     private String password;
 
