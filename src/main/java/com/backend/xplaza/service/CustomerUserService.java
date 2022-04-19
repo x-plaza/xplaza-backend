@@ -1,6 +1,8 @@
 package com.backend.xplaza.service;
 
+import com.backend.xplaza.model.Customer;
 import com.backend.xplaza.model.CustomerDetails;
+import com.backend.xplaza.repository.CustomerRepository;
 import com.backend.xplaza.repository.CustomerUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,10 +15,12 @@ public class CustomerUserService {
     @Autowired
     private CustomerUserRepository customerUserRepo;
     @Autowired
+    private CustomerRepository customerRepo;
+    @Autowired
     private EmailSenderService emailSenderService;
 
-    public void updateCustomer(CustomerDetails customer) {
-        customerUserRepo.save(customer);
+    public void updateCustomer(Customer customer) {
+        customerRepo.save(customer);
     }
 
     public String getCustomerNameByID(Long id) {
@@ -39,7 +43,7 @@ public class CustomerUserService {
         customerUserRepo.changePassword(new_password,salt,user_name);
     }
 
-    public CustomerDetails getCustomer(Long id) {
-        return customerUserRepo.findByCustomerId(id);
+    public Optional<Customer> getCustomer(Long id) {
+        return customerRepo.findById(id);
     }
 }
