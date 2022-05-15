@@ -89,6 +89,6 @@ public interface ProductListRepository extends JpaRepository<ProductList, Long> 
             "select product_id\n" +
             "from order_items oi \n" +
             "group by product_id \n" +
-            "order by count(*) desc) limit 15", nativeQuery = true)
+            "order by count(*) desc) limit 16", nativeQuery = true)
     List<ProductList> findAllProductListByTrending(Long shop_id);
 }
