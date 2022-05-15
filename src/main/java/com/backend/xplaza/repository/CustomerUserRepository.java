@@ -17,7 +17,4 @@ public interface CustomerUserRepository extends JpaRepository<CustomerDetails, L
     @Transactional
     @Query(value = "update customers set password=?1, salt=?2 where email=?3", nativeQuery = true)
     void changePassword(String new_password, String salt, String user_name);
-
-    @Query(value = "select * from customers where customer_id = ?1", nativeQuery = true)
-    CustomerDetails findByCustomerId(Long id);
 }
