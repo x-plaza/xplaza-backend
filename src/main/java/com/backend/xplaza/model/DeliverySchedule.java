@@ -11,7 +11,7 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-import com.backend.xplaza.common.SqlTimeDeserializer;
+import com.backend.xplaza.common.util.SqlTimeDeserializer;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;

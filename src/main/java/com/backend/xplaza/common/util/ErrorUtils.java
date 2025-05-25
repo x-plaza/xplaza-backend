@@ -2,9 +2,9 @@
  * Copyright (c) 2025 Xplaza or Xplaza affiliate company. All rights reserved.
  * Author: Mahiuddin Al Kamal <mahiuddinalkamal>
  */
-package com.backend.xplaza.common;
+package com.backend.xplaza.common.util;
 
-import static com.backend.xplaza.common.PathProvider.getCurrentPath;
+import static com.backend.xplaza.common.util.PathProvider.getCurrentPath;
 
 import java.util.Locale;
 import java.util.stream.Collectors;

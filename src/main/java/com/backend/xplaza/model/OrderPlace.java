@@ -18,7 +18,7 @@ import lombok.Setter;
 
 import org.hibernate.proxy.HibernateProxy;
 
-import com.backend.xplaza.common.SqlTimeDeserializer;
+import com.backend.xplaza.common.util.SqlTimeDeserializer;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 

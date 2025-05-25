@@ -11,8 +11,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 @Getter
 @Setter
 @Entity
@@ -21,8 +19,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Table(name = "platform_info")
 public class PlatformInfo {
   @Id
-  @JsonIgnore
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private String name;
 
   private String invoice;

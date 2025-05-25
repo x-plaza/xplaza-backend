@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.backend.xplaza.common.ApiResponse;
+import com.backend.xplaza.common.util.ApiResponse;
 import com.backend.xplaza.service.ConfirmationTokenService;
 
 @RestController

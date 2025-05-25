@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.backend.xplaza.common.DateConverter;
+import com.backend.xplaza.common.util.DateConverter;
 import com.backend.xplaza.model.*;
 import com.backend.xplaza.repository.CouponDetailsRepository;
 import com.backend.xplaza.repository.CouponListRepository;

@@ -13,5 +13,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ACL {
-  private Boolean full, view, add, update, delete;
+  private Boolean all_of_them, view, add, update, delete;
 }

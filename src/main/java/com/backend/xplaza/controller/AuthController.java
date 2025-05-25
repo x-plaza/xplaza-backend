@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.backend.xplaza.common.util.JwtUtil;
 import com.backend.xplaza.model.AuthenticationRequest;
 import com.backend.xplaza.model.AuthenticationResponse;
 import com.backend.xplaza.service.AuthUserDetailsService;
-import com.backend.xplaza.util.JwtUtil;
 
 @Controller
 @RequestMapping("/authenticate")

@@ -19,7 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.backend.xplaza.common.ApiResponse;
+import com.backend.xplaza.common.util.ApiResponse;
 import com.backend.xplaza.model.AdminLogin;
 import com.backend.xplaza.model.AdminUser;
 import com.backend.xplaza.model.ConfirmationToken;

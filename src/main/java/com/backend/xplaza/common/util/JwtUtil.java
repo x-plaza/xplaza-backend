@@ -2,7 +2,7 @@
  * Copyright (c) 2025 Xplaza or Xplaza affiliate company. All rights reserved.
  * Author: Mahiuddin Al Kamal <mahiuddinalkamal>
  */
-package com.backend.xplaza.util;
+package com.backend.xplaza.common.util;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
