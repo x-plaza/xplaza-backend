@@ -43,7 +43,7 @@ public class SecurityConfiguration {
         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .csrf(csrf -> csrf.disable()) // Disable CSRF protection
         .authorizeHttpRequests(authorize -> authorize
-            .requestMatchers("/authenticate", "/v3/api-docs", "/swagger-resources/**", "/swagger-ui/**")
+            .requestMatchers("/authenticate", "/v3/api-docs/**", "/swagger-ui/**")
             .permitAll()
             .anyRequest().authenticated())
         .addFilterBefore(filterApiRequest, UsernamePasswordAuthenticationFilter.class)

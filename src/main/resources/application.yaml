@@ -1,17 +1,22 @@
 spring:
   mvc:
     throw-exception-if-no-handler-found: true
+
   web:
     resources:
       add-mappings: false
+
   profiles:
     active: local
+
   application:
     name: Xplaza-Backend
+
   messages:
     basename: messages.messages
     fallback-to-system-locale: false
     encoding: UTF-8
+
   servlet:
     multipart:
       max-file-size: 100MB

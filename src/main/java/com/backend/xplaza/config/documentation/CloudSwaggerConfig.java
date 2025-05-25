@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Xplaza or Xplaza affiliate company. All rights reserved.
+ * Copyright (c) 2024 Xplaza or Xplaza affiliate company. All rights reserved.
  * Author: Mahiuddin Al Kamal <mahiuddinalkamal>
  */
 package com.backend.xplaza.config.documentation;
@@ -13,9 +13,11 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
-public class SwaggerConfig {
+@Profile("cloud")
+public class CloudSwaggerConfig {
   @Bean
   public GroupedOpenApi publicApis() {
     return GroupedOpenApi.builder()
