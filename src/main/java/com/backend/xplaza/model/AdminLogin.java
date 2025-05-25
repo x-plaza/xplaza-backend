@@ -1,54 +1,38 @@
+/*
+ * Copyright (c) 2025 Xplaza or Xplaza affiliate company. All rights reserved.
+ * Author: Mahiuddin Al Kamal <mahiuddinalkamal>
+ */
 package com.backend.xplaza.model;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.vladmihalcea.hibernate.type.json.JsonStringType;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import org.hibernate.annotations.TypeDef;
-
-import javax.persistence.*;
 import java.util.List;
 
-@Data
+import jakarta.persistence.*;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
 @Entity
-@Table(name="login")
+@NoArgsConstructor
 @AllArgsConstructor
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-@TypeDef(name = "json", typeClass = JsonStringType.class)
+@Table(name = "login")
 public class AdminLogin {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="admin_user_id")
-    @ApiModelProperty(hidden=true)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "admin_user_id")
+  private Long id;
 
-    private Boolean authentication;
+  private Boolean authentication;
 
-    public void setAuthentication(Boolean auth) {
-        this.authentication = auth;
-    }
+  @Embedded
+  private AuthData authData;
 
-    @Embedded
-    private AuthData authData;
+  @OneToMany(mappedBy = "adminLogin")
+  private List<LoginUserShopList> shopList;
 
-    public void setAuthData(AuthData authData) {
-        this.authData = authData;
-    }
-
-    @OneToMany(mappedBy = "adminLogin")
-    private List<LoginUserShopList> shopList;
-
-    public void setShopList(List<LoginUserShopList> shopList) {
-        this.shopList = shopList;
-    }
-
-    @OneToMany(mappedBy = "adminLogin")
-    private List<Permission> permissions;
-
-    public void setPermissions(List<Permission> permissions) {
-        this.permissions = permissions;
-    }
-
-    public AdminLogin() {}
+  @OneToMany(mappedBy = "adminLogin")
+  private List<Permission> permissions;
 }

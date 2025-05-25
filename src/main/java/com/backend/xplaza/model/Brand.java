@@ -1,35 +1,31 @@
+/*
+ * Copyright (c) 2025 Xplaza or Xplaza affiliate company. All rights reserved.
+ * Author: Mahiuddin Al Kamal <mahiuddinalkamal>
+ */
 package com.backend.xplaza.model;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.vladmihalcea.hibernate.type.json.JsonStringType;
+import jakarta.persistence.*;
+
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import org.hibernate.annotations.TypeDef;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.persistence.*;
-
-@Data
+@Getter
+@Setter
 @Entity
+@NoArgsConstructor
 @AllArgsConstructor
-@Table(name="brands")
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-@TypeDef(name = "json", typeClass = JsonStringType.class)
+@Table(name = "brands")
 public class Brand {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="brand_id")
-    //@ApiModelProperty(hidden=true)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "brand_id")
+  private Long id;
 
-    @Column(name="brand_name")
-    private String name;
+  @Column(name = "brand_name")
+  private String name;
 
-    public String getName() {
-        return name;
-    }
-
-    @Column(name="brand_description")
-    private String description;
-
-    public Brand() {}
+  @Column(name = "brand_description")
+  private String description;
 }

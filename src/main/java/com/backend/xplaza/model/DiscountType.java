@@ -1,29 +1,28 @@
+/*
+ * Copyright (c) 2025 Xplaza or Xplaza affiliate company. All rights reserved.
+ * Author: Mahiuddin Al Kamal <mahiuddinalkamal>
+ */
 package com.backend.xplaza.model;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.vladmihalcea.hibernate.type.json.JsonStringType;
-import io.swagger.annotations.ApiModelProperty;
+import jakarta.persistence.*;
+
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import org.hibernate.annotations.TypeDef;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.persistence.*;
-
-@Data
+@Getter
+@Setter
 @Entity
+@NoArgsConstructor
 @AllArgsConstructor
-@Table(name="discount_types")
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-@TypeDef(name = "json", typeClass = JsonStringType.class)
+@Table(name = "discount_types")
 public class DiscountType {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="discount_type_id")
-    @ApiModelProperty(hidden= true)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "discount_type_id")
+  private Long id;
 
-    @Column(name="discount_type_name")
-    private String name;
-
-    public DiscountType() {}
+  @Column(name = "discount_type_name")
+  private String name;
 }

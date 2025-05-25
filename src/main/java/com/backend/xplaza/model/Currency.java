@@ -1,32 +1,31 @@
+/*
+ * Copyright (c) 2025 Xplaza or Xplaza affiliate company. All rights reserved.
+ * Author: Mahiuddin Al Kamal <mahiuddinalkamal>
+ */
 package com.backend.xplaza.model;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.vladmihalcea.hibernate.type.json.JsonStringType;
+import jakarta.persistence.*;
+
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import org.hibernate.annotations.TypeDef;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.persistence.*;
-
-@Data
+@Getter
+@Setter
 @Entity
+@NoArgsConstructor
 @AllArgsConstructor
-@Table(name="currencies")
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-@TypeDef(name = "json", typeClass = JsonStringType.class)
+@Table(name = "currencies")
 public class Currency {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="currency_id")
-    //@ApiModelProperty(hidden=true)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "currency_id")
+  private Long id;
 
-    @Column(name="currency_name")
-    private String name;
+  @Column(name = "currency_name")
+  private String name;
 
-    @Column(name="currency_sign")
-    private String sign;
-
-    public Currency() {}
+  @Column(name = "currency_sign")
+  private String sign;
 }
-

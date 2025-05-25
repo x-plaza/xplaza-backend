@@ -1,39 +1,36 @@
+/*
+ * Copyright (c) 2025 Xplaza or Xplaza affiliate company. All rights reserved.
+ * Author: Mahiuddin Al Kamal <mahiuddinalkamal>
+ */
 package com.backend.xplaza.model;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.vladmihalcea.hibernate.type.json.JsonStringType;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import org.hibernate.annotations.TypeDef;
+import jakarta.persistence.*;
 
-import javax.persistence.*;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 @Entity
+@NoArgsConstructor
 @AllArgsConstructor
-@Table(name="countries")
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-@TypeDef(name = "json", typeClass = JsonStringType.class)
+@Table(name = "countries")
 public class Country {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="country_id")
-    //@ApiModelProperty(hidden=true)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "country_id")
+  private Long id;
 
-    @Column(name="country_name")
-    private String name;
+  @Column(name = "country_name")
+  private String name;
 
-    @Column(name="iso")
-    private String code;
+  @Column(name = "iso")
+  private String code;
 
-    private String nicename;
+  private String nicename;
 
-    private String iso3;
+  private String iso3;
 
-    private String numcode;
+  private String numcode;
 
-    private Long phonecode;
-
-    public Country() {}
+  private Long phonecode;
 }

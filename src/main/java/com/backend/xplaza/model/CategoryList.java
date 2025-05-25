@@ -1,37 +1,34 @@
+/*
+ * Copyright (c) 2025 Xplaza or Xplaza affiliate company. All rights reserved.
+ * Author: Mahiuddin Al Kamal <mahiuddinalkamal>
+ */
 package com.backend.xplaza.model;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.vladmihalcea.hibernate.type.json.JsonStringType;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import org.hibernate.annotations.TypeDef;
+import jakarta.persistence.*;
 
-import javax.persistence.*;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 @Entity
+@NoArgsConstructor
 @AllArgsConstructor
-@Table(name="categories")
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-@TypeDef(name = "json", typeClass = JsonStringType.class)
+@Table(name = "categories")
 public class CategoryList {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="category_id")
-    //@ApiModelProperty(hidden=true)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "category_id")
+  private Long id;
 
-    @Column(name="category_name")
-    private String name;
+  @Column(name = "category_name")
+  private String name;
 
-    @Column(name="category_description")
-    private String description;
+  @Column(name = "category_description")
+  private String description;
 
-    @Column(name="parent_category")
-    private Long parent_category_id;
+  @Column(name = "parent_category")
+  private Long parent_category_id;
 
-    @Column(name="parent_category_name")
-    private String parent_category_name;
-
-    public CategoryList() {}
+  @Column(name = "parent_category_name")
+  private String parent_category_name;
 }

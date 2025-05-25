@@ -1,102 +1,77 @@
+/*
+ * Copyright (c) 2025 Xplaza or Xplaza affiliate company. All rights reserved.
+ * Author: Mahiuddin Al Kamal <mahiuddinalkamal>
+ */
 package com.backend.xplaza.model;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.vladmihalcea.hibernate.type.json.JsonStringType;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import org.hibernate.annotations.TypeDef;
-
-import javax.persistence.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-@Data
+import jakarta.persistence.*;
+
+import lombok.*;
+
+@Getter
+@Setter
 @Entity
+@NoArgsConstructor
 @AllArgsConstructor
-@Table(name="coupons")
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-@TypeDef(name = "json", typeClass = JsonStringType.class)
+@Table(name = "coupons")
 public class CouponDetails {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="coupon_id")
-    @ApiModelProperty(hidden=true)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "coupon_id")
+  private Long id;
 
-    @Column(name="coupon_code")
-    private String coupon_code;
+  @Column(name = "coupon_code")
+  private String coupon_code;
 
-    @Column(name="is_active")
-    private Boolean is_active;
+  @Column(name = "is_active")
+  private Boolean is_active;
 
-    public Boolean getIs_active() {
-        return is_active;
-    }
+  @Column(name = "coupon_amount")
+  private Double amount;
 
-    @Column(name="coupon_amount")
-    private Double amount;
+  @Column(name = "max_coupon_amount")
+  private Double max_amount;
 
-    public Double getAmount() {
-        return amount;
-    }
+  @Column(name = "fk_currency_id")
+  private Long currency_id;
 
-    @Column(name="max_coupon_amount")
-    private Double max_amount;
+  @Column(name = "currency_name")
+  private String currency_name;
 
-    public Double getMax_amount() {
-        return max_amount;
-    }
+  @Column(name = "currency_sign")
+  private String currency_sign;
 
-    @Column(name="fk_currency_id")
-    private Long currency_id;
+  @Column(name = "fk_discount_type_id")
+  private Long discount_type_id;
 
-    @Column(name="currency_name")
-    private String currency_name;
+  @Column(name = "discount_type_name")
+  private String discount_type_name;
 
-    @Column(name="currency_sign")
-    private String currency_sign;
+  @Column(name = "coupon_start_date")
+  private Date start_date;
 
-    @Column(name="fk_discount_type_id")
-    private Long discount_type_id;
+  public String getStart_date() {
+    if (start_date != null)
+      return new SimpleDateFormat("dd MMM yyyy HH:mm:ss").format(start_date);
+    return null;
+  }
 
-    @Column(name="discount_type_name")
-    private String discount_type_name;
+  @Column(name = "coupon_end_date")
+  private Date end_date;
 
-    public String getDiscount_type_name() {
-        return discount_type_name;
-    }
+  public String getEnd_date() {
+    if (end_date != null)
+      return new SimpleDateFormat("dd MMM yyyy HH:mm:ss").format(end_date);
+    return null;
+  }
 
-    @Column(name="coupon_start_date")
-    private Date start_date;
+  @Column(name = "min_shopping_amount")
+  private Double min_shopping_amount;
 
-    public String getStart_date() {
-        if(start_date != null) return new SimpleDateFormat("dd MMM yyyy HH:mm:ss").format(start_date);
-        return null;
-    }
-
-    @Column(name="coupon_end_date")
-    private Date end_date;
-
-    public String getEnd_date() {
-        if(end_date != null) return new SimpleDateFormat("dd MMM yyyy HH:mm:ss").format(end_date);
-        return null;
-    }
-
-    @Column(name="min_shopping_amount")
-    private Double min_shopping_amount;
-
-    public Double getMin_shopping_amount() {
-        return min_shopping_amount;
-    }
-
-    @OneToMany(mappedBy = "couponDetails")
-    private List<CouponShopList> shopList;
-
-    public List<CouponShopList> getShopList() {
-        return shopList;
-    }
-
-    public CouponDetails() {}
+  @OneToMany(mappedBy = "couponDetails")
+  private List<CouponShopList> shopList;
 }

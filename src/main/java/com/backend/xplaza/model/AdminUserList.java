@@ -1,53 +1,48 @@
+/*
+ * Copyright (c) 2025 Xplaza or Xplaza affiliate company. All rights reserved.
+ * Author: Mahiuddin Al Kamal <mahiuddinalkamal>
+ */
 package com.backend.xplaza.model;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.vladmihalcea.hibernate.type.json.JsonStringType;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import org.hibernate.annotations.TypeDef;
-
-import javax.persistence.*;
 import java.util.List;
 
-@Data
+import jakarta.persistence.*;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
 @Entity
+@NoArgsConstructor
 @AllArgsConstructor
-@Table(name="admin_users")
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-@TypeDef(name = "json", typeClass = JsonStringType.class)
+@Table(name = "admin_users")
 public class AdminUserList {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="admin_user_id")
-    @ApiModelProperty(hidden= true)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "admin_user_id")
+  private Long id;
 
-    public Long getId() {
-        return id;
-    }
+  @Column(name = "full_name")
+  private String full_name;
 
-    @Column(name="full_name")
-    private String full_name;
+  @Column(name = "user_name")
+  private String user_name;
 
-    @Column(name="user_name")
-    private String user_name;
+  @Column(name = "password")
+  private String password;
 
-    @Column(name="password")
-    private String password;
+  @Column(name = "salt")
+  private String salt;
 
-    @ApiModelProperty(hidden= true)
-    @Column(name="salt")
-    private String salt;
+  @Column(name = "fk_role_id")
+  private Long role_id;
 
-    @Column(name="fk_role_id")
-    private Long role_id;
+  @Column(name = "role_name")
+  private String role_name;
 
-    @Column(name="role_name")
-    private String role_name;
-
-    @OneToMany(mappedBy = "adminUserList")
-    private List<AdminUserShopList> shopList;
-
-    public AdminUserList() {}
+  @OneToMany(mappedBy = "adminUserList")
+  private List<AdminUserShopList> shopList;
 }

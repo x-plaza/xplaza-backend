@@ -1,35 +1,35 @@
+/*
+ * Copyright (c) 2025 Xplaza or Xplaza affiliate company. All rights reserved.
+ * Author: Mahiuddin Al Kamal <mahiuddinalkamal>
+ */
 package com.backend.xplaza.model;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.vladmihalcea.hibernate.type.json.JsonStringType;
-import io.swagger.annotations.ApiModelProperty;
+import jakarta.persistence.*;
+
 import lombok.AllArgsConstructor;
-import org.hibernate.annotations.TypeDef;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.persistence.*;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
+@Getter
+@Setter
 @Entity
-@Table(name="admin_user_shop_list")
+@NoArgsConstructor
 @AllArgsConstructor
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-@TypeDef(name = "json", typeClass = JsonStringType.class)
+@Table(name = "admin_user_shop_list")
 public class LoginUserShopList {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ApiModelProperty(hidden=true)
-    @JsonIgnore
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    private Long shop_id;
+  private Long shop_id;
 
-    private String shop_name;
+  private String shop_name;
 
-    @ManyToOne
-    @JsonBackReference
-    @JoinColumn(name="admin_user_id",insertable = false,updatable = false)
-    private AdminLogin adminLogin;
-
-    public LoginUserShopList() {}
+  @ManyToOne
+  @JsonBackReference
+  @JoinColumn(name = "admin_user_id", insertable = false, updatable = false)
+  private AdminLogin adminLogin;
 }

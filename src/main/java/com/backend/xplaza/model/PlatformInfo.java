@@ -1,60 +1,37 @@
+/*
+ * Copyright (c) 2025 Xplaza or Xplaza affiliate company. All rights reserved.
+ * Author: Mahiuddin Al Kamal <mahiuddinalkamal>
+ */
 package com.backend.xplaza.model;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.vladmihalcea.hibernate.type.json.JsonStringType;
-import io.swagger.annotations.ApiModelProperty;
+import jakarta.persistence.*;
+
 import lombok.AllArgsConstructor;
-import org.hibernate.annotations.TypeDef;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
+@Getter
+@Setter
 @Entity
-@Table(name="platform_info")
+@NoArgsConstructor
 @AllArgsConstructor
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-@TypeDef(name = "json", typeClass = JsonStringType.class)
+@Table(name = "platform_info")
 public class PlatformInfo {
-    @Id
-    @JsonIgnore
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ApiModelProperty(hidden=true)
-    private String name;
+  @Id
+  @JsonIgnore
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private String name;
 
-    public String getName() {
-        return name;
-    }
+  private String invoice;
 
-    @ApiModelProperty(hidden=true)
-    private String invoice;
+  private String cell_no;
 
-    public String getInvoice() {
-        return invoice;
-    }
+  private String additional_info;
 
-    private String cell_no;
+  private String banner_image;
 
-    public String getCell_no() {
-        return cell_no;
-    }
-
-    private String additional_info;
-
-    public String getAdditional_info() {
-        return additional_info;
-    }
-
-    private String banner_image;
-
-    public String getBanner_image() {
-        return banner_image;
-    }
-
-    private String banner_image_path;
-
-    public String getBanner_image_path() {
-        return banner_image_path;
-    }
-
-    public PlatformInfo() {}
+  private String banner_image_path;
 }

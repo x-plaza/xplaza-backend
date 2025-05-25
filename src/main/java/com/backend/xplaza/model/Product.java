@@ -1,93 +1,62 @@
+/*
+ * Copyright (c) 2025 Xplaza or Xplaza affiliate company. All rights reserved.
+ * Author: Mahiuddin Al Kamal <mahiuddinalkamal>
+ */
 package com.backend.xplaza.model;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.vladmihalcea.hibernate.type.json.JsonStringType;
-import lombok.AllArgsConstructor;
-import org.hibernate.annotations.TypeDef;
-
-import javax.persistence.*;
 import java.util.List;
 
-//@Data
+import jakarta.persistence.*;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
 @Entity
+@NoArgsConstructor
 @AllArgsConstructor
-@Table(name="products")
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-@TypeDef(name = "json", typeClass = JsonStringType.class)
+@Table(name = "products")
 public class Product {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="product_id")
-    //@ApiModelProperty(hidden=true)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "product_id")
+  private Long id;
 
-    public Long getId() {
-        return id;
-    }
+  @Column(name = "product_name")
+  private String name;
 
-    @Column(name="product_name")
-    private String name;
+  @Column(name = "product_description")
+  private String description;
 
-    public String getName() {
-        return name;
-    }
+  @Column(name = "fk_brand_id")
+  private Long brand_id;
 
-    @Column(name="product_description")
-    private String description;
+  @Column(name = "fk_category_id")
+  private Long category_id;
 
-    @Column(name="fk_brand_id")
-    private Long brand_id;
+  @Column(name = "fk_product_var_type_id")
+  private Long product_var_type_id;
 
-    @Column(name="fk_category_id")
-    private Long category_id;
+  private Double product_var_type_value;
 
-    @Column(name="fk_product_var_type_id")
-    private Long product_var_type_id;
+  @Column(name = "product_buying_price")
+  private Double buying_price;
 
-    private Double product_var_type_value;
+  @Column(name = "product_selling_price")
+  private Double selling_price;
 
-    @Column(name="product_buying_price")
-    private Double buying_price;
+  @Column(name = "fk_currency_id")
+  private Long currency_id;
 
-    public Double getBuying_price() {
-        return buying_price;
-    }
+  @Column(name = "fk_shop_id")
+  private Long shop_id;
 
-    @Column(name="product_selling_price")
-    private Double selling_price;
+  @Column(name = "quantity")
+  private Long quantity;
 
-    public Double getSelling_price() {
-        return selling_price;
-    }
-
-    @Column(name="fk_currency_id")
-    private Long currency_id;
-
-    @Column(name="fk_shop_id")
-    private Long shop_id;
-
-    @Column(name="quantity")
-    private Long quantity;
-
-    public Long getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Long quantity) {
-        this.quantity = quantity;
-    }
-
-    @OneToMany(mappedBy = "product")
-    private List<ProductImage> productImage;
-
-    public List<ProductImage> getProductImage() {
-        return productImage;
-    }
-
-    public void setProductImage(List<ProductImage> productImage) {
-        this.productImage = productImage;
-    }
-
-    public Product() {}
+  @OneToMany(mappedBy = "product")
+  private List<ProductImage> productImage;
 }
-
