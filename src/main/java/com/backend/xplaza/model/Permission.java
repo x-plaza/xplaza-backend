@@ -1,35 +1,38 @@
+/*
+ * Copyright (c) 2025 Xplaza or Xplaza affiliate company. All rights reserved.
+ * Author: Mahiuddin Al Kamal <mahiuddinalkamal>
+ */
 package com.backend.xplaza.model;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import jakarta.persistence.*;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.vladmihalcea.hibernate.type.json.JsonStringType;
-import lombok.AllArgsConstructor;
-import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.*;
-
+@Getter
+@Setter
 @Entity
-@Table(name="permission")
+@NoArgsConstructor
 @AllArgsConstructor
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-@TypeDef(name = "json", typeClass = JsonStringType.class)
+@Table(name = "permission")
 public class Permission {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    //@ApiModelProperty(hidden=true)
-    @JsonIgnore
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @JsonIgnore
+  private Long id;
 
-    private String menu_name;
+  private String menu_name;
 
-    @Embedded
-    private ACL acl;
+  @Embedded
+  private ACL acl;
 
-    @ManyToOne
-    @JsonBackReference
-    @JoinColumn(name="admin_user_id",insertable = false,updatable = false)
-    private AdminLogin adminLogin;
-
-    public Permission() {}
+  @ManyToOne
+  @JsonBackReference
+  @JoinColumn(name = "admin_user_id", insertable = false, updatable = false)
+  private AdminLogin adminLogin;
 }

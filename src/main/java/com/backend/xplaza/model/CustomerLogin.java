@@ -1,35 +1,33 @@
+/*
+ * Copyright (c) 2025 Xplaza or Xplaza affiliate company. All rights reserved.
+ * Author: Mahiuddin Al Kamal <mahiuddinalkamal>
+ */
 package com.backend.xplaza.model;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.vladmihalcea.hibernate.type.json.JsonStringType;
+import jakarta.persistence.*;
+
 import lombok.AllArgsConstructor;
-import org.hibernate.annotations.TypeDef;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.persistence.*;
-
+@Getter
+@Setter
 @Entity
+@NoArgsConstructor
 @AllArgsConstructor
-@Table(name="customers")
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-@TypeDef(name = "json", typeClass = JsonStringType.class)
+@Table(name = "customers")
 public class CustomerLogin {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="customer_id")
-    //@ApiModelProperty(hidden=true)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "customer_id")
+  private Long id;
 
-    @Column(name="customer_name")
-    private String name;
+  @Column(name = "customer_name")
+  private String name;
 
-    @Column(name="email")
-    private String email;
+  @Column(name = "email")
+  private String email;
 
-    private boolean authentication;
-
-    public void setAuthentication(boolean authentication) {
-        this.authentication = authentication;
-    }
-
-    public CustomerLogin() {}
+  private boolean authentication;
 }

@@ -1,83 +1,56 @@
+/*
+ * Copyright (c) 2025 Xplaza or Xplaza affiliate company. All rights reserved.
+ * Author: Mahiuddin Al Kamal <mahiuddinalkamal>
+ */
 package com.backend.xplaza.model;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.vladmihalcea.hibernate.type.json.JsonStringType;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import org.hibernate.annotations.TypeDef;
-
-import javax.persistence.*;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Random;
 
-@Data
+import jakarta.persistence.*;
+
+import lombok.*;
+
+@Getter
+@Setter
 @Entity
+@NoArgsConstructor
 @AllArgsConstructor
-@Table(name="confirmation_tokens")
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-@TypeDef(name = "json", typeClass = JsonStringType.class)
+@Table(name = "confirmation_tokens")
 public class ConfirmationToken {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="token_id")
-    private Long token_id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "token_id")
+  private Long token_id;
 
-    @Column(name="confirmation_token")
-    private String confirmation_token;
+  @Column(name = "confirmation_token")
+  private String confirmation_token;
 
-    public String getConfirmation_token() {
-        return confirmation_token;
+  @Column(name = "user_email")
+  private String email;
+
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date created_date;
+
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date valid_till;
+
+  public ConfirmationToken(String email, String type) {
+    Random rnd = new Random();
+    int number;
+    if (Objects.equals(type, "OTP")) {
+      number = rnd.nextInt(99999999);
+      confirmation_token = String.format("%08d", number);
+    } else {
+      number = rnd.nextInt(999999);
+      confirmation_token = String.format("%06d", number);
     }
-
-    @Column(name="user_email")
-    private String email;
-
-    public String getEmail() {
-        return email;
-    }
-
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date created_date;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date valid_till;
-
-    public Date getValid_till() {
-        return valid_till;
-    }
-
-    public ConfirmationToken(String email, String type) {
-        Random rnd = new Random();
-        int number;
-        if(type == "OTP") {
-            number = rnd.nextInt(99999999);
-            confirmation_token = String.format("%08d", number);
-        } else {
-            number = rnd.nextInt(999999);
-            confirmation_token = String.format("%06d", number);
-        }
-        this.email = email;
-        created_date = new Date();
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MINUTE, 30);
-        this.valid_till = calendar.getTime();
-    }
-
-    /*
-    @OneToOne(targetEntity = AdminUser.class, fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false, name = "admin_user_id")
-    private AdminUser adminUser;
-
-    public AdminUser getAdminUser() {
-        return adminUser;
-    }
-
-    public ConfirmationToken(AdminUser adminUser) {
-        this.adminUser = adminUser;
-        created_date = new Date();
-        confirmation_token = UUID.randomUUID().toString();
-    }*/
-
-    public ConfirmationToken() {}
+    this.email = email;
+    created_date = new Date();
+    Calendar calendar = Calendar.getInstance();
+    calendar.add(Calendar.MINUTE, 30);
+    this.valid_till = calendar.getTime();
+  }
 }

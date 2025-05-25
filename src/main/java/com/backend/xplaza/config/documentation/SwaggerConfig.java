@@ -1,75 +1,52 @@
+/*
+ * Copyright (c) 2025 Xplaza or Xplaza affiliate company. All rights reserved.
+ * Author: Mahiuddin Al Kamal <mahiuddinalkamal>
+ */
 package com.backend.xplaza.config.documentation;
 
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.*;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spi.service.contexts.SecurityContext;
-import springfox.documentation.spring.data.rest.configuration.SpringDataRestConfiguration;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 @Configuration
-@EnableSwagger2
-@Import(SpringDataRestConfiguration.class)
 public class SwaggerConfig {
-/*
-    @Bean
-    public Docket api() {
-        return new Docket(DocumentationType.SWAGGER_2)
-                .apiInfo(getApiInfo())
-                .select()
-                .apis(RequestHandlerSelectors.basePackage("com.backend.xplaza.controller"))
-                .paths(PathSelectors.any())
-                .build();
-    }
-*/
+  @Bean
+  public GroupedOpenApi publicApis() {
+    return GroupedOpenApi.builder()
+        .group("Public APIs")
+        .pathsToMatch("/api/public/**")
+        .build();
+  }
 
-    private ApiKey apiKey() {
-        return new ApiKey("JWT", "Authorization", "header");
-    }
+  @Bean
+  public GroupedOpenApi internalApis() {
+    return GroupedOpenApi.builder()
+        .group("Internal APIs")
+        .pathsToExclude("/api/public/**")
+        .build();
+  }
 
-    private SecurityContext securityContext() {
-        return SecurityContext.builder().securityReferences(defaultAuth()).build();
-    }
-
-    private List<SecurityReference> defaultAuth() {
-        AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything");
-        AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
-        authorizationScopes[0] = authorizationScope;
-        return Arrays.asList(new SecurityReference("JWT", authorizationScopes));
-    }
-
-    @Bean
-    public Docket api() {
-        return new Docket(DocumentationType.SWAGGER_2)
-                .apiInfo(apiInfo())
-                .securityContexts(Arrays.asList(securityContext()))
-                .securitySchemes(Arrays.asList(apiKey()))
-                .select()
-                .apis(RequestHandlerSelectors.any())
-                .paths(PathSelectors.any())
-                .build();
-    }
-
-    private ApiInfo apiInfo() {
-        Contact contact = new Contact("Mahiuddin Al Kamal", "https://mahiuddinalkamal.github.io", "mahiuddinalkamal@gmail.com");
-        return new ApiInfoBuilder()
-                .title("X-Plaza API Documentation")
-                .description("Documentation for X-Plaza Backend API's")
-                .version("1.0.0")
-                .license("Apache 2.0")
-                .licenseUrl("http://www.apache.org/licenses/LICENSE-2.0")
-                .contact(contact)
-                .build();
-    }
+  @Bean
+  public OpenAPI openAPI() {
+    final String securitySchemeName = "bearerAuth";
+    return new OpenAPI().info(new Info().title("Backend for X-Plaza Platform.")
+        .description("This API documentation enables you to perform operations on X-Plaza platform.")
+        .version("v1.0.0"))
+        // the following security scheme definition is needed for the API access
+        // validation
+        .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
+        .components(new Components()
+            .addSecuritySchemes(securitySchemeName,
+                new SecurityScheme()
+                    .bearerFormat("JWT")
+                    .description("This security scheme definition is needed for API validation.")
+                    .scheme("bearer")
+                    .type(SecurityScheme.Type.HTTP)));
+  }
 }

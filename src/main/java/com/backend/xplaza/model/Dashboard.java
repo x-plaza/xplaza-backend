@@ -1,39 +1,36 @@
+/*
+ * Copyright (c) 2025 Xplaza or Xplaza affiliate company. All rights reserved.
+ * Author: Mahiuddin Al Kamal <mahiuddinalkamal>
+ */
 package com.backend.xplaza.model;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.vladmihalcea.hibernate.type.json.JsonStringType;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import org.hibernate.annotations.TypeDef;
-
-import javax.persistence.*;
 import java.util.List;
 
-@Data
+import jakarta.persistence.*;
+
+import lombok.*;
+
+@Getter
+@Setter
 @Entity
-@Table(name="revenue")
+@NoArgsConstructor
 @AllArgsConstructor
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-@TypeDef(name = "json", typeClass = JsonStringType.class)
+@Table(name = "revenue")
 public class Dashboard {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="shop_id")
-    @ApiModelProperty(hidden= true)
-    private Long shop_id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "shop_id")
+  private Long shop_id;
 
-    @Embedded
-    private Revenue revenue;
+  @Embedded
+  private Revenue revenue;
 
-    @OneToMany(mappedBy = "dashboard")
-    private List<TopCustomer> topCustomers;
+  @OneToMany(mappedBy = "dashboard")
+  private List<TopCustomer> topCustomers;
 
-    @OneToMany(mappedBy = "dashboard")
-    private List<TopProduct> topProducts;
+  @OneToMany(mappedBy = "dashboard")
+  private List<TopProduct> topProducts;
 
-    @OneToMany(mappedBy = "dashboard")
-    private List<ProductToStock> productToStocks;
-
-    public Dashboard(){}
+  @OneToMany(mappedBy = "dashboard")
+  private List<ProductToStock> productToStocks;
 }

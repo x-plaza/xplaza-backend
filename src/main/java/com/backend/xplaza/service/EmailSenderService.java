@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2025 Xplaza or Xplaza affiliate company. All rights reserved.
+ * Author: Mahiuddin Al Kamal <mahiuddinalkamal>
+ */
 package com.backend.xplaza.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,15 +12,15 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class EmailSenderService {
-    private JavaMailSender javaMailSender;
+  private JavaMailSender javaMailSender;
 
-    @Autowired
-    public EmailSenderService(JavaMailSender javaMailSender) {
-        this.javaMailSender = javaMailSender;
-    }
+  @Autowired
+  public EmailSenderService(JavaMailSender javaMailSender) {
+    this.javaMailSender = javaMailSender;
+  }
 
-    @Async
-    public void sendEmail(SimpleMailMessage email) {
-        javaMailSender.send(email);
-    }
+  @Async
+  public void sendEmail(SimpleMailMessage email) {
+    javaMailSender.send(email);
+  }
 }

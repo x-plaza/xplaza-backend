@@ -1,0 +1,64 @@
+spring:
+  mvc:
+    throw-exception-if-no-handler-found: true
+  web:
+    resources:
+      add-mappings: false
+  profiles:
+    active: local
+  application:
+    name: Xplaza-Backend
+  messages:
+    basename: messages.messages
+    fallback-to-system-locale: false
+    encoding: UTF-8
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL_USERNAME}
+    password: ${EMAIL_PASSWORD}
+    properties:
+      mail:
+        debug: false
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+resilience4j.retry:
+  instances:
+    globalRetry:
+      maxRetryAttempts: 3
+      waitDuration: 1000
+      retryExceptions:
+        - java.net.SocketTimeoutException
+        - java.net.ConnectException
+        - org.springframework.dao.OptimisticLockingFailureException
+        - org.springframework.web.client.HttpServerErrorException
+
+logging:
+  level:
+    org:
+      springframework:
+        boot:
+          actuate: DEBUG
+        security: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+    endpoint:
+      health:
+        show-details: always
+
+server:
+  error:
+    include-messages: always
+    include-binding-errors: always
