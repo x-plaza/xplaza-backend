@@ -10,7 +10,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.backend.xplaza.common.DateConverter;
+import com.backend.xplaza.common.util.DateConverter;
 import com.backend.xplaza.model.Product;
 import com.backend.xplaza.model.ProductDiscount;
 import com.backend.xplaza.model.ProductDiscountList;

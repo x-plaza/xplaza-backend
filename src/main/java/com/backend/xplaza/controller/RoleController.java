@@ -16,7 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.backend.xplaza.common.ApiResponse;
+import com.backend.xplaza.common.util.ApiResponse;
 import com.backend.xplaza.model.Role;
 import com.backend.xplaza.service.RoleService;
 import com.fasterxml.jackson.core.JsonProcessingException;

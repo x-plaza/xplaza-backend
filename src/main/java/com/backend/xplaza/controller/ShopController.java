@@ -16,7 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.backend.xplaza.common.ApiResponse;
+import com.backend.xplaza.common.util.ApiResponse;
 import com.backend.xplaza.model.Shop;
 import com.backend.xplaza.model.ShopList;
 import com.backend.xplaza.service.RoleService;

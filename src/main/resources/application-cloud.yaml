@@ -1,0 +1,28 @@
+spring:
+  config:
+    activate:
+      on-profile: cloud
+
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+
+springdoc:
+  swagger-ui:
+    schemes:
+      - https
+
+server:
+  forward-headers-strategy: native
+  port: 10001
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 300000

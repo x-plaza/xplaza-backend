@@ -2,7 +2,7 @@
  * Copyright (c) 2025 Xplaza or Xplaza affiliate company. All rights reserved.
  * Author: Mahiuddin Al Kamal <mahiuddinalkamal>
  */
-package com.backend.xplaza.config.security;
+package com.backend.xplaza.common.config.security;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,7 +18,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.backend.xplaza.filter.JwtRequestFilter;
+import com.backend.xplaza.common.config.security.filter.JwtRequestFilter;
 
 @Configuration
 @EnableWebSecurity
