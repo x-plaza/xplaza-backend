@@ -4,25 +4,38 @@ spring:
       on-profile: cloud
 
   datasource:
-    url: ${DB_URL}
+    url: ${DB_URL}  # e.g., jdbc:postgresql://db-host:5432/dbname
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 30000
+      pool-name: HikariPool
+      max-lifetime: 1800000
+      connection-timeout: 30000
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate  # Use 'validate' or 'none' in production
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
+    properties:
+      hibernate.format_sql: true
+      hibernate.jdbc.lob.non_contextual_creation: true
+
+server:
+  port: 10001
+  forward-headers-strategy: native
 
 springdoc:
   swagger-ui:
     schemes:
       - https
-
-server:
-  forward-headers-strategy: native
-  port: 10001
+  api-docs:
+    path: /v3/api-docs
 
 jwt:
   secret: ${JWT_SECRET}
-  expiration: 300000
+  expiration: 300000  # 5 minutes in milliseconds
