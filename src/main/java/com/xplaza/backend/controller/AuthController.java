@@ -18,7 +18,7 @@ import com.xplaza.backend.model.AuthenticationResponse;
 import com.xplaza.backend.service.AuthUserDetailsService;
 
 @Controller
-@RequestMapping("/authenticate")
+@RequestMapping("/api/v1/authenticate")
 public class AuthController {
   @Autowired
   private JwtUtil jwtTokenUtil;

@@ -11,7 +11,6 @@ import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,7 +21,7 @@ import com.xplaza.backend.model.PlatformInfo;
 import com.xplaza.backend.service.PlatformInfoService;
 
 @RestController
-@RequestMapping("/api/platform-info")
+@RequestMapping("/api/v1/platform-info")
 public class PlatformInfoController {
   @Autowired
   PlatformInfoService platformInfoService;
@@ -39,7 +38,7 @@ public class PlatformInfoController {
     response.setHeader("Set-Cookie", "type=ninja");
   }
 
-  @GetMapping(value = { "" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping
   public ResponseEntity<String> getPlatformInfo() throws JsonProcessingException {
     start = new Date();
     PlatformInfo dtos = platformInfoService.listPlatform();
@@ -56,7 +55,7 @@ public class PlatformInfoController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping
   public ResponseEntity<ApiResponse> updatePlatformInfo(@RequestBody @Valid PlatformInfo platformInfo) {
     start = new Date();
     platformInfoService.updatePlatformInfo(platformInfo);

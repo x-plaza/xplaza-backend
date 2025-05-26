@@ -14,7 +14,6 @@ import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,18 +32,23 @@ import com.xplaza.backend.service.RoleService;
 import com.xplaza.backend.service.SecurityService;
 
 @RestController
-@RequestMapping("/api/customer-signup")
+@RequestMapping("/api/v1/customer-signup")
 public class CustomerSignupController {
   @Autowired
   private CustomerSignupService customerSignupService;
+
   @Autowired
   private CustomerUserService customerUserService;
+
   @Autowired
   private SecurityService securityService;
+
   @Autowired
   private RoleService roleService;
+
   @Autowired
   private CustomerLoginService customerLoginService;
+
   @Autowired
   private ConfirmationTokenService confirmationTokenService;
 
@@ -60,7 +64,7 @@ public class CustomerSignupController {
     response.setHeader("Set-Cookie", "type=ninja");
   }
 
-  @PostMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping
   public ResponseEntity<ApiResponse> signupCustomer(@RequestBody @Valid CustomerDetails customerDetails) {
     start = new Date();
     ConfirmationToken token = confirmationTokenService.getConfirmationToken(customerDetails.getOtp());
@@ -113,18 +117,17 @@ public class CustomerSignupController {
         "Customer account has been created successfully.", null), HttpStatus.CREATED);
   }
 
-  @PostMapping(value = "/send-otp", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping("/send-otp")
   public ResponseEntity<ApiResponse> sendOTP(@RequestParam("cell_no") @Valid String cell_no) {
     start = new Date();
     String customerId = "D22F37FA-1914-48E3-B018-ACFF0E611C3C";
     String apiKey = "1UKbxwwvd0J7q5ne4vtTAlnE4DVqoVqQ+yvKKyHEISDXUu35Jzv7UIeXTlFcR4IYlIp/+uj2EpvXLbksmu/xkA==";
-    String phoneNumber = cell_no;
     String verifyCode = Util.randomWithNDigits(5);
     String message = String.format("Your OTP is %s", verifyCode) + "\n\nTeam Xwinkel";
     String messageType = "OTP";
     try {
       MessagingClient messagingClient = new MessagingClient(customerId, apiKey);
-      RestClient.TelesignResponse telesignResponse = messagingClient.message(phoneNumber, message, messageType, null);
+      RestClient.TelesignResponse telesignResponse = messagingClient.message(cell_no, message, messageType, null);
     } catch (Exception e) {
       e.printStackTrace();
     }

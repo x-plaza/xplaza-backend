@@ -12,7 +12,6 @@ import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,12 +21,10 @@ import com.xplaza.backend.model.ProductImage;
 import com.xplaza.backend.service.ProductImageService;
 
 @RestController
-@RequestMapping("/api/productimage")
+@RequestMapping("/api/v1/product-image")
 public class ProductImageController {
   @Autowired
   private ProductImageService productImgService;
-  private Date start, end;
-  private Long responseTime;
 
   @ModelAttribute
   public void setResponseHeader(HttpServletResponse response) {
@@ -38,12 +35,12 @@ public class ProductImageController {
     response.setHeader("Set-Cookie", "type=ninja");
   }
 
-  @GetMapping(value = { "/{id}" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping("/{id}")
   public ResponseEntity<String> getProductImage(@PathVariable @Valid Long id) throws JsonProcessingException {
-    start = new Date();
+    Date start = new Date();
     List<ProductImage> dtos = productImgService.listProductImage(id);
-    end = new Date();
-    responseTime = end.getTime() - start.getTime();
+    Date end = new Date();
+    long responseTime = end.getTime() - start.getTime();
     ObjectMapper mapper = new ObjectMapper();
     String response = "{\n" +
         "  \"responseTime\": " + responseTime + ",\n" +

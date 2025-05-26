@@ -12,7 +12,6 @@ import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,10 +20,11 @@ import com.xplaza.backend.model.Dashboard;
 import com.xplaza.backend.service.DashboardService;
 
 @RestController
-@RequestMapping("/api/dashboard")
+@RequestMapping("/api/v1/dashboard")
 public class DashboardController {
   @Autowired
   private DashboardService dashboardService;
+
   private Date start, end;
   private Long responseTime;
 
@@ -37,8 +37,8 @@ public class DashboardController {
     response.setHeader("Set-Cookie", "type=ninja");
   }
 
-  @PostMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> dashboardDetails(@RequestParam(value = "shop_id", required = true) @Valid Long shop_id)
+  @PostMapping
+  public ResponseEntity<String> dashboardDetails(@RequestParam(value = "shop_id") @Valid Long shop_id)
       throws IOException {
     start = new Date();
     Dashboard dtos = dashboardService.getDashboardDetails(shop_id);
@@ -56,9 +56,9 @@ public class DashboardController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @PostMapping(value = { "/monthly-profit" }, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> getMonthlyProfit(@RequestParam(value = "shop_id", required = true) @Valid Long shop_id,
-      @RequestParam(value = "month", required = true) @Valid int month) throws IOException {
+  @PostMapping("/monthly-profit")
+  public ResponseEntity<String> getMonthlyProfit(@RequestParam(value = "shop_id") @Valid Long shop_id,
+      @RequestParam(value = "month") @Valid int month) throws IOException {
     start = new Date();
     Double dtos = dashboardService.getMonthlyProfit(shop_id, month);
     end = new Date();
@@ -75,9 +75,9 @@ public class DashboardController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @PostMapping(value = { "/monthly-sales" }, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> getMonthlySales(@RequestParam(value = "shop_id", required = true) @Valid Long shop_id,
-      @RequestParam(value = "month", required = true) @Valid int month) throws IOException {
+  @PostMapping("/monthly-sales")
+  public ResponseEntity<String> getMonthlySales(@RequestParam(value = "shop_id") @Valid Long shop_id,
+      @RequestParam(value = "month") @Valid int month) throws IOException {
     start = new Date();
     Double dtos = dashboardService.getMonthlySales(shop_id, month);
     end = new Date();

@@ -12,7 +12,6 @@ import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,10 +22,11 @@ import com.xplaza.backend.model.Country;
 import com.xplaza.backend.service.CountryService;
 
 @RestController
-@RequestMapping("/api/country")
+@RequestMapping("/api/v1/country")
 public class CountryController {
   @Autowired
   private CountryService countryService;
+
   private Date start, end;
   private Long responseTime;
 
@@ -39,7 +39,7 @@ public class CountryController {
     response.setHeader("Set-Cookie", "type=ninja");
   }
 
-  @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping
   public ResponseEntity<String> getCountries() throws JsonProcessingException {
     start = new Date();
     List<Country> dtos = countryService.listCountries();
@@ -56,7 +56,7 @@ public class CountryController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @GetMapping(value = { "/{id}" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping("/{id}")
   public ResponseEntity<String> getCountry(@PathVariable @Valid Long id) throws JsonProcessingException {
     start = new Date();
     Country dtos = countryService.listCountry(id);
@@ -73,7 +73,7 @@ public class CountryController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping
   public ResponseEntity<ApiResponse> addCountry(@RequestBody @Valid Country country) {
     start = new Date();
     countryService.addCountry(country);
@@ -83,7 +83,7 @@ public class CountryController {
         "Success", "Country has been created.", null), HttpStatus.CREATED);
   }
 
-  @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping
   public ResponseEntity<ApiResponse> updateCountry(@RequestBody @Valid Country country) {
     start = new Date();
     countryService.updateCountry(country);
@@ -93,7 +93,7 @@ public class CountryController {
         "Success", "Country has been updated.", null), HttpStatus.OK);
   }
 
-  @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @DeleteMapping("/{id}")
   public ResponseEntity<ApiResponse> deleteCountry(@PathVariable @Valid Long id) {
     String country_name = countryService.getCountryNameByID(id);
     start = new Date();

@@ -12,7 +12,6 @@ import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,10 +23,11 @@ import com.xplaza.backend.model.LocationList;
 import com.xplaza.backend.service.LocationService;
 
 @RestController
-@RequestMapping("/api/location")
+@RequestMapping("/api/v1/location")
 public class LocationController {
   @Autowired
   private LocationService locationService;
+
   private Date start, end;
   private Long responseTime;
 
@@ -40,7 +40,7 @@ public class LocationController {
     response.setHeader("Set-Cookie", "type=ninja");
   }
 
-  @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping
   public ResponseEntity<String> getLocations() throws JsonProcessingException {
     start = new Date();
     List<LocationList> dtos = locationService.listLocations();
@@ -57,7 +57,7 @@ public class LocationController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @GetMapping(value = { "/{id}" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping("/{id}")
   public ResponseEntity<String> getLocation(@PathVariable @Valid Long id) throws JsonProcessingException {
     start = new Date();
     LocationList dtos = locationService.listLocation(id);
@@ -74,7 +74,7 @@ public class LocationController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping
   public ResponseEntity<ApiResponse> addLocation(@RequestBody @Valid Location location) {
     start = new Date();
     locationService.addLocation(location);
@@ -84,7 +84,7 @@ public class LocationController {
         "Success", "Location has been created.", null), HttpStatus.CREATED);
   }
 
-  @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping
   public ResponseEntity<ApiResponse> updateLocation(@RequestBody @Valid Location location) {
     start = new Date();
     locationService.updateLocation(location);
@@ -94,7 +94,7 @@ public class LocationController {
         "Success", "Location has been updated.", null), HttpStatus.OK);
   }
 
-  @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @DeleteMapping("/{id}")
   public ResponseEntity<ApiResponse> deleteLocation(@PathVariable @Valid Long id) {
     String location_name = locationService.getLocationNameByID(id);
     start = new Date();

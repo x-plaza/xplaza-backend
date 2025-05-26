@@ -15,7 +15,6 @@ import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,14 +29,17 @@ import com.xplaza.backend.service.LoginService;
 import com.xplaza.backend.service.SecurityService;
 
 @RestController
-@RequestMapping("/api/login")
+@RequestMapping("/api/v1/login")
 public class LoginController {
   @Autowired
   private LoginService loginService;
+
   @Autowired
   private AdminUserService adminUserService;
+
   @Autowired
   private ConfirmationTokenService confirmationTokenService;
+
   @Autowired
   private SecurityService securityService;
 
@@ -53,14 +55,14 @@ public class LoginController {
     response.setHeader("Set-Cookie", "type=ninja");
   }
 
-  @PostMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping
   public ResponseEntity<String> loginAdminUser(@RequestParam("username") @Valid String username,
       @RequestParam("password") @Valid String password) throws IOException {
     start = new Date();
     AdminLogin dtos = loginService.getAdminUserDetails(username.toLowerCase());
     if (dtos != null) {
-      Boolean isValidUser = false;
-      if (username.toLowerCase().equals("admin@gmail.com"))
+      Boolean isValidUser;
+      if (username.equalsIgnoreCase("admin@gmail.com"))
         isValidUser = loginService.isVaidMasterAdmin(username.toLowerCase(), password);
       else
         isValidUser = loginService.isVaidUser(username.toLowerCase(), password);
@@ -94,8 +96,8 @@ public class LoginController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @PostMapping(value = { "/send-otp" }, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<ApiResponse> sendOTP(@RequestParam("username") @Valid String username) throws IOException {
+  @PostMapping("/send-otp")
+  public ResponseEntity<ApiResponse> sendOTP(@RequestParam("username") @Valid String username) {
     start = new Date();
     AdminUser user = adminUserService.listAdminUser(username.toLowerCase());
     if (user == null) {
@@ -111,9 +113,9 @@ public class LoginController {
         "Success", "An OTP has been sent to the email.", null), HttpStatus.CREATED);
   }
 
-  @PostMapping(value = { "/validate-otp" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping("/validate-otp")
   public ResponseEntity<ApiResponse> validateOTP(@RequestParam("username") @Valid String username,
-      @RequestParam("OTP") @Valid String OTP) throws IOException {
+      @RequestParam("OTP") @Valid String OTP) {
     start = new Date();
     ConfirmationToken token = confirmationTokenService.getConfirmationToken(OTP);
     if (token == null) {
@@ -134,9 +136,9 @@ public class LoginController {
         "Success", "OTP matched.", null), HttpStatus.OK);
   }
 
-  @PostMapping(value = { "/change-password" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping("/change-password")
   public ResponseEntity<ApiResponse> changeAdminUserPassword(@RequestParam("username") @Valid String username,
-      @RequestParam("newPassword") @Valid String newPassword) throws IOException {
+      @RequestParam("newPassword") @Valid String newPassword) {
     start = new Date();
     byte[] byteSalt = null;
     try {

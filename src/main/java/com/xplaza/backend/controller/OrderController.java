@@ -15,7 +15,6 @@ import jakarta.validation.Valid;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,12 +33,14 @@ import com.xplaza.backend.service.PlatformInfoService;
 import com.xplaza.backend.service.RoleService;
 
 @RestController
-@RequestMapping("/api/order")
+@RequestMapping("/api/v1/order")
 public class OrderController {
   @Autowired
   private OrderService orderService;
+
   @Autowired
   private RoleService roleService;
+
   @Autowired
   private PlatformInfoService platformInfoService;
 
@@ -55,9 +56,9 @@ public class OrderController {
     response.setHeader("Set-Cookie", "type=ninja");
   }
 
-  @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping
   public ResponseEntity<String> getOrdersByAdmin(
-      @RequestParam(value = "user_id", required = true) @Valid Long admin_user_id,
+      @RequestParam(value = "user_id") @Valid Long admin_user_id,
       @RequestParam(value = "status", required = false) @Valid String status,
       @RequestParam(value = "order_date", required = false) @Valid String order_date)
       throws JsonProcessingException, JSONException, ParseException {
@@ -93,9 +94,8 @@ public class OrderController {
 
     // Update Invoice number
     PlatformInfo platformInfo = platformInfoService.listPlatform();
-    dtos.forEach((i) -> {
-      i.setInvoice_number(platformInfo.getInvoice() + "#" + i.getOrder_id());
-    });
+    assert dtos != null;
+    dtos.forEach(i -> i.setInvoice_number(platformInfo.getInvoice() + "#" + i.getOrder_id()));
 
     end = new Date();
     responseTime = end.getTime() - start.getTime();
@@ -110,9 +110,9 @@ public class OrderController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @GetMapping(value = { "/by-customer" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping("/by-customer")
   public ResponseEntity<String> getOrdersByCustomer(
-      @RequestParam(value = "customer_id", required = true) @Valid Long customer_id,
+      @RequestParam(value = "customer_id") @Valid Long customer_id,
       @RequestParam(value = "status", required = false) @Valid String status,
       @RequestParam(value = "order_date", required = false) @Valid String order_date)
       throws JsonProcessingException, JSONException, ParseException {
@@ -129,9 +129,8 @@ public class OrderController {
     }
     // Update Invoice number
     PlatformInfo platformInfo = platformInfoService.listPlatform();
-    dtos.forEach((i) -> {
-      i.setInvoice_number(platformInfo.getInvoice() + "#" + i.getOrder_id());
-    });
+    assert dtos != null;
+    dtos.forEach(i -> i.setInvoice_number(platformInfo.getInvoice() + "#" + i.getOrder_id()));
 
     end = new Date();
     responseTime = end.getTime() - start.getTime();
@@ -146,7 +145,7 @@ public class OrderController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @GetMapping(value = { "/{id}", "/by-customer/{id}" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = { "/{id}", "/by-customer/{id}" })
   public ResponseEntity<String> getOrderDetails(@PathVariable @Valid Long id) throws JsonProcessingException {
     start = new Date();
     OrderDetails dtos = orderService.listOrderDetails(id);
@@ -166,7 +165,7 @@ public class OrderController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping
   public ResponseEntity<ApiResponse> addOrder(@RequestBody @Valid OrderPlace order)
       throws ParseException, JsonProcessingException {
     start = new Date();
@@ -191,7 +190,6 @@ public class OrderController {
         return new ResponseEntity<>(new ApiResponse(responseTime, "Add Order", HttpStatus.FORBIDDEN.value(),
             "Error", "Coupon is not valid!", null), HttpStatus.FORBIDDEN);
       }
-    } else if (order.getCoupon_id() != null) {
       if (!orderService.checkCouponValidity(order, "code")) {
         end = new Date();
         responseTime = end.getTime() - start.getTime();
@@ -223,7 +221,7 @@ public class OrderController {
         "Success", "Order has been created.", mapper.writeValueAsString(dtos)), HttpStatus.CREATED);
   }
 
-  @PutMapping(value = "/status-update", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping("/status-update")
   public ResponseEntity<ApiResponse> updateOrderStatus(@RequestParam("invoice_number") @Valid Long invoice_number,
       @RequestParam("status") @Valid Long status,
       @RequestParam(value = "remarks", required = false) @Valid String remarks) {

@@ -24,10 +24,11 @@ import com.xplaza.backend.model.CategoryList;
 import com.xplaza.backend.service.CategoryService;
 
 @RestController
-@RequestMapping("/api/category")
+@RequestMapping("/api/v1/category")
 public class CategoryController {
   @Autowired
   private CategoryService categoryService;
+
   private Date start, end;
   private Long responseTime;
 

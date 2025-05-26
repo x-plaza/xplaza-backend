@@ -12,7 +12,6 @@ import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +22,7 @@ import com.xplaza.backend.model.City;
 import com.xplaza.backend.service.CityService;
 
 @RestController
-@RequestMapping("/api/city")
+@RequestMapping("/api/v1/city")
 public class CityController {
   @Autowired
   private CityService cityService;
@@ -39,7 +38,7 @@ public class CityController {
     response.setHeader("Set-Cookie", "type=ninja");
   }
 
-  @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping
   public ResponseEntity<String> getCities() throws JsonProcessingException {
     start = new Date();
     List<City> dtos = cityService.listCities();
@@ -56,7 +55,7 @@ public class CityController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @GetMapping(value = { "/{id}" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping("/{id}")
   public ResponseEntity<String> getCity(@PathVariable @Valid Long id) throws JsonProcessingException {
     start = new Date();
     City dtos = cityService.listCity(id);
@@ -73,7 +72,7 @@ public class CityController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping
   public ResponseEntity<ApiResponse> addCity(@RequestBody @Valid City city) {
     start = new Date();
     cityService.addCity(city);
@@ -83,7 +82,7 @@ public class CityController {
         "Success", "City has been created.", null), HttpStatus.CREATED);
   }
 
-  @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping
   public ResponseEntity<ApiResponse> updateCity(@RequestBody @Valid City city) {
     start = new Date();
     cityService.updateCity(city);
@@ -93,7 +92,7 @@ public class CityController {
         "Success", "City has been updated.", null), HttpStatus.OK);
   }
 
-  @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @DeleteMapping("/{id}")
   public ResponseEntity<ApiResponse> deleteCity(@PathVariable @Valid Long id) {
     String city_name = cityService.getCityNameByID(id);
     start = new Date();

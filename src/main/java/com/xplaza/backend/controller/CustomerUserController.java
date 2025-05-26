@@ -16,7 +16,6 @@ import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +28,7 @@ import com.xplaza.backend.service.CustomerUserService;
 import com.xplaza.backend.service.SecurityService;
 
 @RestController
-@RequestMapping("/api/customer")
+@RequestMapping("/api/v1/customer")
 public class CustomerUserController {
   @Autowired
   private CustomerUserService customerUserService;
@@ -41,7 +40,6 @@ public class CustomerUserController {
   private SecurityService securityService;
 
   private Date start, end;
-
   private Long responseTime;
 
   @ModelAttribute
@@ -53,7 +51,7 @@ public class CustomerUserController {
     response.setHeader("Set-Cookie", "type=ninja");
   }
 
-  @GetMapping(value = { "/{id}" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping("/{id}")
   public ResponseEntity<String> getCustomer(@PathVariable @Valid Long id) throws JsonProcessingException {
     start = new Date();
     Optional<Customer> dtos = customerUserService.getCustomer(id);
@@ -70,7 +68,7 @@ public class CustomerUserController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping
   public ResponseEntity<ApiResponse> updateCustomer(@RequestBody @Valid Customer customer) {
     start = new Date();
     customerUserService.updateCustomer(customer);
@@ -80,7 +78,7 @@ public class CustomerUserController {
         "Success", "Customer has been updated.", null), HttpStatus.OK);
   }
 
-  @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @DeleteMapping("/{id}")
   public ResponseEntity<ApiResponse> deleteCustomer(@PathVariable @Valid Long id) {
     String customer_name = customerUserService.getCustomerNameByID(id);
     start = new Date();
@@ -91,7 +89,7 @@ public class CustomerUserController {
         "Success", "User " + customer_name + " has been deleted.", null), HttpStatus.OK);
   }
 
-  @PostMapping(value = "/change-password", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping("/change-password")
   public ResponseEntity<ApiResponse> changeCustomerUserPassword(@RequestParam("username") @Valid String username,
       @RequestParam("oldPassword") @Valid String oldPassword,
       @RequestParam("newPassword") @Valid String newPassword) throws IOException {

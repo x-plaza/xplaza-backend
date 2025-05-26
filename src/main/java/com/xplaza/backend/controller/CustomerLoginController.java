@@ -15,7 +15,6 @@ import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +28,7 @@ import com.xplaza.backend.service.CustomerUserService;
 import com.xplaza.backend.service.SecurityService;
 
 @RestController
-@RequestMapping("/api/customer-login")
+@RequestMapping("/api/v1/customer-login")
 public class CustomerLoginController {
   @Autowired
   private CustomerLoginService customerLoginService;
@@ -44,7 +43,6 @@ public class CustomerLoginController {
   private SecurityService securityService;
 
   private Date start, end;
-
   private Long responseTime;
 
   @ModelAttribute
@@ -56,7 +54,7 @@ public class CustomerLoginController {
     response.setHeader("Set-Cookie", "type=ninja");
   }
 
-  @PostMapping(value = { "" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping
   public ResponseEntity<String> loginCustomerUser(@RequestParam("username") @Valid String username,
       @RequestParam("password") @Valid String password) throws IOException {
     start = new Date();
@@ -83,7 +81,7 @@ public class CustomerLoginController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @PostMapping(value = { "/send-otp" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping("/send-otp")
   public ResponseEntity<ApiResponse> sendOTP(@RequestParam("username") @Valid String username) throws IOException {
     start = new Date();
     CustomerLogin customer = customerLoginService.getCustomerLoginDetails(username.toLowerCase());
@@ -100,7 +98,7 @@ public class CustomerLoginController {
         "Success", "An OTP has been sent to your email.", null), HttpStatus.CREATED);
   }
 
-  @PostMapping(value = { "/validate-otp" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping("/validate-otp")
   public ResponseEntity<ApiResponse> validateOTP(@RequestParam("username") @Valid String username,
       @RequestParam("OTP") @Valid String OTP) throws IOException {
     start = new Date();
@@ -123,7 +121,7 @@ public class CustomerLoginController {
         "Success", "OTP matched!", null), HttpStatus.OK);
   }
 
-  @PostMapping(value = { "/change-password" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping("/change-password")
   public ResponseEntity<ApiResponse> changeUserPassword(@RequestParam("username") @Valid String username,
       @RequestParam("newPassword") @Valid String newPassword)
       throws IOException {

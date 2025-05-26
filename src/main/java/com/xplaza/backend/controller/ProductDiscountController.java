@@ -13,7 +13,6 @@ import jakarta.validation.Valid;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,10 +25,11 @@ import com.xplaza.backend.service.ProductDiscountService;
 import com.xplaza.backend.service.RoleService;
 
 @RestController
-@RequestMapping("/api/product-discount")
+@RequestMapping("/api/v1/product-discount")
 public class ProductDiscountController {
   @Autowired
   private ProductDiscountService productDiscountService;
+
   @Autowired
   private RoleService roleService;
 
@@ -45,9 +45,9 @@ public class ProductDiscountController {
     response.setHeader("Set-Cookie", "type=ninja");
   }
 
-  @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping
   public ResponseEntity<String> getProductDiscounts(
-      @RequestParam(value = "user_id", required = true) @Valid Long user_id) throws JsonProcessingException {
+      @RequestParam(value = "user_id") @Valid Long user_id) throws JsonProcessingException {
     start = new Date();
     List<ProductDiscountList> dtos;
     String role_name = roleService.getRoleNameByUserID(user_id);
@@ -70,7 +70,7 @@ public class ProductDiscountController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @GetMapping(value = { "/{id}" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping("/{id}")
   public ResponseEntity<String> getProductDiscountByID(@PathVariable @Valid Long id) throws JsonProcessingException {
     start = new Date();
     ProductDiscountList dtos = productDiscountService.listProductDiscount(id);
@@ -87,11 +87,11 @@ public class ProductDiscountController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping
   public ResponseEntity<ApiResponse> addProductDiscount(@RequestBody @Valid ProductDiscount productDiscount)
-      throws JSONException, JsonProcessingException {
+      throws JSONException {
     start = new Date();
-    // check if discount is greater than the product price
+    // check if the discount is greater than the product price
     if (!productDiscountService.checkDiscountValidity(productDiscount)) {
       end = new Date();
       responseTime = end.getTime() - start.getTime();
@@ -114,10 +114,10 @@ public class ProductDiscountController {
         "Success", "Discount on product has been created.", null), HttpStatus.CREATED);
   }
 
-  @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping
   public ResponseEntity<ApiResponse> updateProductDiscount(@RequestBody @Valid ProductDiscount productDiscount) {
     start = new Date();
-    // check if discount is greater than the product price
+    // check if the discount is greater than the product price
     if (!productDiscountService.checkDiscountValidity(productDiscount)) {
       end = new Date();
       responseTime = end.getTime() - start.getTime();
@@ -140,7 +140,7 @@ public class ProductDiscountController {
         "Success", "Discount on product has been updated.", null), HttpStatus.OK);
   }
 
-  @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @DeleteMapping("/{id}")
   public ResponseEntity<ApiResponse> deleteProductDiscount(@PathVariable @Valid Long id) {
     String product_name = productDiscountService.getProductNameByID(id);
     start = new Date();
