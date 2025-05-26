@@ -3,54 +3,96 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
+	<!-- Model version -->
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.backend</groupId>
-	<artifactId>xplaza</artifactId>
-	<version>1.0.0</version>
+	<!-- Project coordinates -->
+	<groupId>com.github.xplaza</groupId>
+	<artifactId>backend</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.0</version>
-		<relativePath/>
-	</parent>
+	<!-- Project metadata -->
+	<name>xplaza-backend</name>
+	<description>Backend for X-Plaza.</description>
+	<url>https://github.com/x-plaza/xplaza-backend</url>
 
-	<properties>
-		<java.version>21</java.version>
-	</properties>
+	<!-- License declaration -->
+	<licenses>
+		<license>
+			<name>Proprietary</name>
+			<distribution>repo</distribution>
+			<comments>This software is proprietary and not licensed for redistribution.</comments>
+		</license>
+	</licenses>
 
+	<!-- Developer information -->
+	<developers>
+		<developer>
+			<id>xplaza</id>
+			<name>X-Plaza Team</name>
+			<url>https://github.com/x-plaza</url>
+		</developer>
+	</developers>
+
+	<!-- Source control management details -->
+	<scm>
+		<connection>scm:git:git://github.com/x-plaza/xplaza-backend.git</connection>
+		<developerConnection>scm:git:ssh://github.com/x-plaza/xplaza-backend.git</developerConnection>
+		<url>https://github.com/x-plaza/xplaza-backend</url>
+		<tag>HEAD</tag>
+	</scm>
+
+	<!-- Deployment repository for GitHub Packages -->
 	<distributionManagement>
 		<repository>
 			<id>github</id>
+			<name>GitHub Packages</name>
 			<url>https://maven.pkg.github.com/x-plaza/xplaza-backend</url>
 		</repository>
 	</distributionManagement>
 
+	<!-- Inherit from Spring Boot parent for dependency management -->
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.5.0</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+
+	<!-- Properties -->
+	<properties>
+		<java.version>21</java.version>
+	</properties>
+
+	<!-- Project dependencies -->
 	<dependencies>
-		<!-- Health check -->
+		<!-- Spring Boot Actuator for health checks -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 
+		<!-- H2 in-memory database for runtime -->
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 
+		<!-- Spring Data JPA -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 
+		<!-- Spring Web -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
+		<!-- Spring Boot DevTools for development-time features -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
@@ -58,22 +100,26 @@
 			<optional>true</optional>
 		</dependency>
 
+		<!-- Testing dependencies -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 
+		<!-- Spring Security -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 
+		<!-- Spring Mail -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
 
+		<!-- PostgreSQL driver -->
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
@@ -81,6 +127,7 @@
 			<version>42.7.2</version>
 		</dependency>
 
+		<!-- Lombok for boilerplate code reduction -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -88,17 +135,20 @@
 			<optional>true</optional>
 		</dependency>
 
+		<!-- Jackson module for Java 8 date/time types -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
 		</dependency>
 
+		<!-- Hibernate Types for advanced types support -->
 		<dependency>
 			<groupId>com.vladmihalcea</groupId>
 			<artifactId>hibernate-types-60</artifactId>
 			<version>2.21.1</version>
 		</dependency>
 
+		<!-- JetBrains annotations -->
 		<dependency>
 			<groupId>org.jetbrains</groupId>
 			<artifactId>annotations</artifactId>
@@ -106,42 +156,49 @@
 			<scope>compile</scope>
 		</dependency>
 
+		<!-- Jakarta Validation API -->
 		<dependency>
 			<groupId>jakarta.validation</groupId>
 			<artifactId>jakarta.validation-api</artifactId>
 			<version>3.0.2</version>
 		</dependency>
 
+		<!-- Jakarta XML Bind API -->
 		<dependency>
 			<groupId>jakarta.xml.bind</groupId>
 			<artifactId>jakarta.xml.bind-api</artifactId>
 			<version>3.0.1</version>
 		</dependency>
 
+		<!-- JSON library -->
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 			<version>20231013</version>
 		</dependency>
 
+		<!-- JSON Web Token library -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt</artifactId>
 			<version>0.12.6</version>
 		</dependency>
 
+		<!-- OkHttp HTTP client -->
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>
 			<artifactId>okhttp</artifactId>
 			<version>4.12.0</version>
 		</dependency>
 
+		<!-- Telesign client -->
 		<dependency>
 			<groupId>com.telesign</groupId>
 			<artifactId>telesign</artifactId>
 			<version>2.3.0</version>
 		</dependency>
 
+		<!-- OpenAPI UI for Spring -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
@@ -149,13 +206,16 @@
 		</dependency>
 	</dependencies>
 
+	<!-- Build plugins -->
 	<build>
 		<plugins>
+			<!-- Spring Boot Maven plugin -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<version>3.5.0</version>
 				<configuration>
+					<!-- Exclude Lombok from repackaging -->
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>
@@ -165,6 +225,7 @@
 				</configuration>
 			</plugin>
 
+			<!-- Cobertura code coverage plugin -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>cobertura-maven-plugin</artifactId>
@@ -178,6 +239,7 @@
 				</configuration>
 			</plugin>
 
+			<!-- Spotless code formatter plugin -->
 			<plugin>
 				<groupId>com.diffplug.spotless</groupId>
 				<artifactId>spotless-maven-plugin</artifactId>
@@ -210,17 +272,20 @@
 				</executions>
 			</plugin>
 
+			<!-- JaCoCo code coverage plugin -->
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<version>0.8.13</version>
 				<executions>
+					<!-- Prepare JaCoCo agent -->
 					<execution>
 						<id>prepare-agent</id>
 						<goals>
 							<goal>prepare-agent</goal>
 						</goals>
 					</execution>
+					<!-- Generate coverage report -->
 					<execution>
 						<id>report</id>
 						<phase>test</phase>

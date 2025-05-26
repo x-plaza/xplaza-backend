@@ -18,4 +18,4 @@ ENV PORT=10001
 EXPOSE $PORT
 
 # Run the Jar
-CMD ["java", "-jar", "target/xplaza-1.0.0.jar"]
+CMD ["java", "-jar", "target/backend-1.0.0-SNAPSHOT.jar"]
