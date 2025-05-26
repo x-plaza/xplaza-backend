@@ -33,7 +33,7 @@ import com.xplaza.backend.service.PlatformInfoService;
 import com.xplaza.backend.service.RoleService;
 
 @RestController
-@RequestMapping("/api/v1/order")
+@RequestMapping("/api/v1/orders")
 public class OrderController {
   @Autowired
   private OrderService orderService;
@@ -102,7 +102,7 @@ public class OrderController {
     ObjectMapper mapper = new ObjectMapper();
     String response = "{\n" +
         "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Order List\",\n" +
+        "  \"responseType\": \"Order List By Admin\",\n" +
         "  \"status\": 200,\n" +
         "  \"response\": \"Success\",\n" +
         "  \"msg\": \"\",\n" +
@@ -123,7 +123,7 @@ public class OrderController {
       dtos = orderService.listOrdersByCustomer(customer_id);
     else if (status != null && order_date == null)
       dtos = orderService.listOrdersByStatusByCustomer(customer_id, status);
-    else if (status != null && order_date != null) {
+    else if (status != null) {
       Date date = formatter.parse(order_date);
       dtos = orderService.listOrdersByFilterByCustomer(customer_id, status, date);
     }
@@ -137,7 +137,7 @@ public class OrderController {
     ObjectMapper mapper = new ObjectMapper();
     String response = "{\n" +
         "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Order List\",\n" +
+        "  \"responseType\": \"Order List By Customer\",\n" +
         "  \"status\": 200,\n" +
         "  \"response\": \"Success\",\n" +
         "  \"msg\": \"\",\n" +

@@ -21,7 +21,7 @@ import com.xplaza.backend.model.ProductImage;
 import com.xplaza.backend.service.ProductImageService;
 
 @RestController
-@RequestMapping("/api/v1/product-image")
+@RequestMapping("/api/v1/product-images")
 public class ProductImageController {
   @Autowired
   private ProductImageService productImgService;
@@ -44,7 +44,7 @@ public class ProductImageController {
     ObjectMapper mapper = new ObjectMapper();
     String response = "{\n" +
         "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Product Image List\",\n" +
+        "  \"responseType\": \"Product Image By ID\",\n" +
         "  \"status\": 200,\n" +
         "  \"response\": \"Success\",\n" +
         "  \"msg\": \"\",\n" +

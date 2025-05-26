@@ -23,7 +23,7 @@ import com.xplaza.backend.model.Brand;
 import com.xplaza.backend.service.BrandService;
 
 @RestController
-@RequestMapping("/api/v1/brand")
+@RequestMapping("/api/v1/brands")
 public class BrandController {
   @Autowired
   private BrandService brandService;

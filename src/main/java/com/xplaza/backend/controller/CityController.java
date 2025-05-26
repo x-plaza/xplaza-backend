@@ -22,7 +22,7 @@ import com.xplaza.backend.model.City;
 import com.xplaza.backend.service.CityService;
 
 @RestController
-@RequestMapping("/api/v1/city")
+@RequestMapping("/api/v1/cities")
 public class CityController {
   @Autowired
   private CityService cityService;
@@ -47,7 +47,7 @@ public class CityController {
     ObjectMapper mapper = new ObjectMapper();
     String response = "{\n" +
         "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Category List\",\n" +
+        "  \"responseType\": \"City List\",\n" +
         "  \"status\": 200,\n" +
         "  \"response\": \"Success\",\n" +
         "  \"msg\": \"\",\n" +
@@ -64,7 +64,7 @@ public class CityController {
     ObjectMapper mapper = new ObjectMapper();
     String response = "{\n" +
         "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"City List\",\n" +
+        "  \"responseType\": \"City By ID\",\n" +
         "  \"status\": 200,\n" +
         "  \"response\": \"Success\",\n" +
         "  \"msg\": \"\",\n" +

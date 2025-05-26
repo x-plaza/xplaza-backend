@@ -22,7 +22,7 @@ import com.xplaza.backend.model.Role;
 import com.xplaza.backend.service.RoleService;
 
 @RestController
-@RequestMapping("/api/v1/role")
+@RequestMapping("/api/v1/roles")
 public class RoleController {
   @Autowired
   private RoleService roleService;
@@ -66,7 +66,7 @@ public class RoleController {
     ObjectMapper mapper = new ObjectMapper();
     String response = "{\n" +
         "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Role List\",\n" +
+        "  \"responseType\": \"Role by ID\",\n" +
         "  \"status\": 200,\n" +
         "  \"response\": \"Success\",\n" +
         "  \"msg\": \"\",\n" +

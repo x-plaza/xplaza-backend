@@ -21,7 +21,7 @@ import com.xplaza.backend.model.PlatformInfo;
 import com.xplaza.backend.service.PlatformInfoService;
 
 @RestController
-@RequestMapping("/api/v1/platform-info")
+@RequestMapping("/api/v1/platform-infos")
 public class PlatformInfoController {
   @Autowired
   PlatformInfoService platformInfoService;

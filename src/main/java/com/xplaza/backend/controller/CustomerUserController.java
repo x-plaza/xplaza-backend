@@ -28,7 +28,7 @@ import com.xplaza.backend.service.CustomerUserService;
 import com.xplaza.backend.service.SecurityService;
 
 @RestController
-@RequestMapping("/api/v1/customer")
+@RequestMapping("/api/v1/customers")
 public class CustomerUserController {
   @Autowired
   private CustomerUserService customerUserService;

@@ -27,7 +27,7 @@ import com.xplaza.backend.service.ProductService;
 import com.xplaza.backend.service.RoleService;
 
 @RestController
-@RequestMapping("/api/v1/product")
+@RequestMapping("/api/v1/products")
 public class ProductController {
   @Autowired
   private ProductService productService;
@@ -82,7 +82,7 @@ public class ProductController {
     ObjectMapper mapper = new ObjectMapper();
     String response = "{\n" +
         "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Product List\",\n" +
+        "  \"responseType\": \"Product By ID\",\n" +
         "  \"status\": 200,\n" +
         "  \"response\": \"Success\",\n" +
         "  \"msg\": \"\",\n" +
@@ -101,7 +101,7 @@ public class ProductController {
     ObjectMapper mapper = new ObjectMapper();
     String response = "{\n" +
         "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Product List\",\n" +
+        "  \"responseType\": \"Product List By Shop By Admin\",\n" +
         "  \"status\": 200,\n" +
         "  \"response\": \"Success\",\n" +
         "  \"msg\": \"\",\n" +
@@ -119,7 +119,7 @@ public class ProductController {
     ObjectMapper mapper = new ObjectMapper();
     String response = "{\n" +
         "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Product List\",\n" +
+        "  \"responseType\": \"Product List By Shop\",\n" +
         "  \"status\": 200,\n" +
         "  \"response\": \"Success\",\n" +
         "  \"msg\": \"\",\n" +
@@ -138,7 +138,7 @@ public class ProductController {
     ObjectMapper mapper = new ObjectMapper();
     String response = "{\n" +
         "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Product List\",\n" +
+        "  \"responseType\": \"Product List By Trending\",\n" +
         "  \"status\": 200,\n" +
         "  \"response\": \"Success\",\n" +
         "  \"msg\": \"\",\n" +
@@ -158,7 +158,7 @@ public class ProductController {
     ObjectMapper mapper = new ObjectMapper();
     String response = "{\n" +
         "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Product List\",\n" +
+        "  \"responseType\": \"Product List By Category\",\n" +
         "  \"status\": 200,\n" +
         "  \"response\": \"Success\",\n" +
         "  \"msg\": \"\",\n" +
@@ -178,7 +178,7 @@ public class ProductController {
     ObjectMapper mapper = new ObjectMapper();
     String response = "{\n" +
         "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Product List\",\n" +
+        "  \"responseType\": \"Product List By Name\",\n" +
         "  \"status\": 200,\n" +
         "  \"response\": \"Success\",\n" +
         "  \"msg\": \"\",\n" +

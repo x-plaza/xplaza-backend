@@ -27,7 +27,7 @@ import com.xplaza.backend.service.CouponService;
 import com.xplaza.backend.service.RoleService;
 
 @RestController
-@RequestMapping("/api/v1/coupon")
+@RequestMapping("/api/v1/coupons")
 public class CouponController {
   @Autowired
   private CouponService couponService;
@@ -82,7 +82,7 @@ public class CouponController {
     ObjectMapper mapper = new ObjectMapper();
     String response = "{\n" +
         "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Coupon List\",\n" +
+        "  \"responseType\": \"Coupon By ID\",\n" +
         "  \"status\": 200,\n" +
         "  \"response\": \"Success\",\n" +
         "  \"msg\": \"\",\n" +

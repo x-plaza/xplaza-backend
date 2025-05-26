@@ -24,7 +24,7 @@ import com.xplaza.backend.model.DeliveryScheduleList;
 import com.xplaza.backend.service.DeliveryScheduleService;
 
 @RestController
-@RequestMapping("/api/v1/delivery-schedule")
+@RequestMapping("/api/v1/delivery-schedules")
 public class DeliveryScheduleController {
   @Autowired
   private DeliveryScheduleService deliveryScheduleService;

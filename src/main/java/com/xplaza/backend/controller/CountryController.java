@@ -22,7 +22,7 @@ import com.xplaza.backend.model.Country;
 import com.xplaza.backend.service.CountryService;
 
 @RestController
-@RequestMapping("/api/v1/country")
+@RequestMapping("/api/v1/countries")
 public class CountryController {
   @Autowired
   private CountryService countryService;
@@ -65,7 +65,7 @@ public class CountryController {
     ObjectMapper mapper = new ObjectMapper();
     String response = "{\n" +
         "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Country List\",\n" +
+        "  \"responseType\": \"Country By ID\",\n" +
         "  \"status\": 200,\n" +
         "  \"response\": \"Success\",\n" +
         "  \"msg\": \"\",\n" +

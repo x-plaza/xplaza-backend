@@ -82,7 +82,7 @@ public class CustomerLoginController {
   }
 
   @PostMapping("/send-otp")
-  public ResponseEntity<ApiResponse> sendOTP(@RequestParam("username") @Valid String username) throws IOException {
+  public ResponseEntity<ApiResponse> sendOTP(@RequestParam("username") @Valid String username) {
     start = new Date();
     CustomerLogin customer = customerLoginService.getCustomerLoginDetails(username.toLowerCase());
     if (customer == null) {
@@ -100,7 +100,7 @@ public class CustomerLoginController {
 
   @PostMapping("/validate-otp")
   public ResponseEntity<ApiResponse> validateOTP(@RequestParam("username") @Valid String username,
-      @RequestParam("OTP") @Valid String OTP) throws IOException {
+      @RequestParam("OTP") @Valid String OTP) {
     start = new Date();
     ConfirmationToken token = confirmationTokenService.getConfirmationToken(OTP);
     if (token == null) {

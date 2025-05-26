@@ -23,7 +23,7 @@ import com.xplaza.backend.model.LocationList;
 import com.xplaza.backend.service.LocationService;
 
 @RestController
-@RequestMapping("/api/v1/location")
+@RequestMapping("/api/v1/locations")
 public class LocationController {
   @Autowired
   private LocationService locationService;
@@ -66,7 +66,7 @@ public class LocationController {
     ObjectMapper mapper = new ObjectMapper();
     String response = "{\n" +
         "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Location List\",\n" +
+        "  \"responseType\": \"Location By ID\",\n" +
         "  \"status\": 200,\n" +
         "  \"response\": \"Success\",\n" +
         "  \"msg\": \"\",\n" +

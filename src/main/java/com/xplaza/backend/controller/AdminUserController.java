@@ -33,7 +33,7 @@ import com.xplaza.backend.service.RoleService;
 import com.xplaza.backend.service.SecurityService;
 
 @RestController
-@RequestMapping("/api/v1/admin-user")
+@RequestMapping("/api/v1/admin-users")
 public class AdminUserController {
   @Autowired
   private AdminUserService adminUserService;

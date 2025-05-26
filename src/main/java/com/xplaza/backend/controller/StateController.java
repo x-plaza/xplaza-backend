@@ -22,7 +22,7 @@ import com.xplaza.backend.model.State;
 import com.xplaza.backend.service.StateService;
 
 @RestController
-@RequestMapping("/api/v1/state")
+@RequestMapping("/api/v1/states")
 public class StateController {
   @Autowired
   private StateService stateService;
@@ -48,7 +48,7 @@ public class StateController {
     ObjectMapper mapper = new ObjectMapper();
     String response = "{\n" +
         "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Category List\",\n" +
+        "  \"responseType\": \"State List\",\n" +
         "  \"status\": 200,\n" +
         "  \"response\": \"Success\",\n" +
         "  \"msg\": \"\",\n" +
@@ -65,7 +65,7 @@ public class StateController {
     ObjectMapper mapper = new ObjectMapper();
     String response = "{\n" +
         "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"City List\",\n" +
+        "  \"responseType\": \"State\",\n" +
         "  \"status\": 200,\n" +
         "  \"response\": \"Success\",\n" +
         "  \"msg\": \"\",\n" +

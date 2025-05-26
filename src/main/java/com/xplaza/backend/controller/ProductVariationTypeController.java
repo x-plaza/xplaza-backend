@@ -22,7 +22,7 @@ import com.xplaza.backend.model.ProductVariationType;
 import com.xplaza.backend.service.ProductVariationTypeService;
 
 @RestController
-@RequestMapping("/api/v1/product-variation-type")
+@RequestMapping("/api/v1/product-variation-types")
 public class ProductVariationTypeController {
   @Autowired
   private ProductVariationTypeService prodVarTypeService;
@@ -65,7 +65,7 @@ public class ProductVariationTypeController {
     ObjectMapper mapper = new ObjectMapper();
     String response = "{\n" +
         "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Product Variation Type List\",\n" +
+        "  \"responseType\": \"Product Variation Type By ID\",\n" +
         "  \"status\": 200,\n" +
         "  \"response\": \"Success\",\n" +
         "  \"msg\": \"\",\n" +

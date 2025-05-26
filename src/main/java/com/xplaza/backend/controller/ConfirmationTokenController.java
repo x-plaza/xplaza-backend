@@ -20,7 +20,7 @@ import com.xplaza.backend.common.util.ApiResponse;
 import com.xplaza.backend.service.ConfirmationTokenService;
 
 @RestController
-@RequestMapping("/api/v1/confirmation-token")
+@RequestMapping("/api/v1/confirmation-tokens")
 public class ConfirmationTokenController {
   @Autowired
   private ConfirmationTokenService confirmationTokenService;

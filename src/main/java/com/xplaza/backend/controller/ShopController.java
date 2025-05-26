@@ -24,7 +24,7 @@ import com.xplaza.backend.service.RoleService;
 import com.xplaza.backend.service.ShopService;
 
 @RestController
-@RequestMapping("/api/v1/shop")
+@RequestMapping("/api/v1/shops")
 public class ShopController {
   @Autowired
   private ShopService shopService;
@@ -79,7 +79,7 @@ public class ShopController {
     ObjectMapper mapper = new ObjectMapper();
     String response = "{\n" +
         "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Shop List\",\n" +
+        "  \"responseType\": \"Shop by ID\",\n" +
         "  \"status\": 200,\n" +
         "  \"response\": \"Success\",\n" +
         "  \"msg\": \"\",\n" +
@@ -96,7 +96,7 @@ public class ShopController {
     ObjectMapper mapper = new ObjectMapper();
     String response = "{\n" +
         "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Shop List\",\n" +
+        "  \"responseType\": \"Shop List By Location\",\n" +
         "  \"status\": 200,\n" +
         "  \"response\": \"Success\",\n" +
         "  \"msg\": \"\",\n" +
