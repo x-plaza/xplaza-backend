@@ -10,23 +10,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.xplaza.backend.model.ProductVarType;
-import com.xplaza.backend.repository.ProductVarTypeRepository;
+import com.xplaza.backend.model.ProductVariationType;
+import com.xplaza.backend.repository.ProductVariationTypeRepository;
 
 @Service
-public class ProductVarTypeService {
+public class ProductVariationTypeService {
   @Autowired
-  private ProductVarTypeRepository prodVarTypeRepo;
+  private ProductVariationTypeRepository prodVarTypeRepo;
 
-  public void addProductVarType(ProductVarType productVarType) {
-    prodVarTypeRepo.save(productVarType);
+  public void addProductVarType(ProductVariationType productVariationType) {
+    prodVarTypeRepo.save(productVariationType);
   }
 
-  public void updateProductVarType(ProductVarType productVarType) {
-    prodVarTypeRepo.save(productVarType);
+  public void updateProductVarType(ProductVariationType productVariationType) {
+    prodVarTypeRepo.save(productVariationType);
   }
 
-  public List<ProductVarType> listProductVarTypes() {
+  public List<ProductVariationType> listProductVarTypes() {
     return prodVarTypeRepo.findAll(Sort.by(Sort.Direction.ASC, "name"));
   }
 
@@ -38,7 +38,7 @@ public class ProductVarTypeService {
     prodVarTypeRepo.deleteById(id);
   }
 
-  public ProductVarType listProductVarType(Long id) {
+  public ProductVariationType listProductVarType(Long id) {
     return prodVarTypeRepo.findProdVarTypeById(id);
   }
 }

@@ -13,7 +13,6 @@ import jakarta.validation.Valid;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,10 +24,11 @@ import com.xplaza.backend.model.DeliveryCostList;
 import com.xplaza.backend.service.DeliveryCostService;
 
 @RestController
-@RequestMapping("/api/delivery-cost")
+@RequestMapping("/api/v1/delivery-cost")
 public class DeliveryCostController {
   @Autowired
   private DeliveryCostService deliveryCostService;
+
   private Date start, end;
   private Long responseTime;
 
@@ -41,7 +41,7 @@ public class DeliveryCostController {
     response.setHeader("Set-Cookie", "type=ninja");
   }
 
-  @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping
   public ResponseEntity<String> getDeliveryCosts() throws JsonProcessingException, JSONException {
     start = new Date();
     List<DeliveryCostList> dtos = deliveryCostService.listDeliveryCosts();
@@ -58,7 +58,7 @@ public class DeliveryCostController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @GetMapping(value = { "/{id}" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping("/{id}")
   public ResponseEntity<String> getDeliveryCost(@PathVariable @Valid Long id) throws JsonProcessingException {
     start = new Date();
     DeliveryCostList dtos = deliveryCostService.listDeliveryCost(id);
@@ -75,7 +75,7 @@ public class DeliveryCostController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping
   public ResponseEntity<ApiResponse> addDeliveryCost(@RequestBody @Valid DeliveryCost deliveryCost) {
     start = new Date();
     deliveryCostService.addDeliveryCost(deliveryCost);
@@ -85,8 +85,8 @@ public class DeliveryCostController {
         "Success", "Delivery Cost has been created.", null), HttpStatus.CREATED);
   }
 
-  @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<ApiResponse> updateDeliveryCostd(@RequestBody @Valid DeliveryCost deliveryCost) {
+  @PutMapping
+  public ResponseEntity<ApiResponse> updateDeliveryCost(@RequestBody @Valid DeliveryCost deliveryCost) {
     start = new Date();
     deliveryCostService.updateDeliveryCost(deliveryCost);
     end = new Date();
@@ -95,7 +95,7 @@ public class DeliveryCostController {
         "Success", "Delivery Cost has been updated.", null), HttpStatus.OK);
   }
 
-  @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @DeleteMapping("/{id}")
   public ResponseEntity<ApiResponse> deleteDeliveryCost(@PathVariable @Valid Long id) {
     String delivery_slab = deliveryCostService.getDeliverySlabRangeNameByID(id);
     start = new Date();

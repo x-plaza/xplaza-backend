@@ -10,7 +10,6 @@ import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +20,7 @@ import com.xplaza.backend.common.util.ApiResponse;
 import com.xplaza.backend.service.ConfirmationTokenService;
 
 @RestController
-@RequestMapping("/api/confirmation-token")
+@RequestMapping("/api/v1/confirmation-token")
 public class ConfirmationTokenController {
   @Autowired
   private ConfirmationTokenService confirmationTokenService;
@@ -29,7 +28,7 @@ public class ConfirmationTokenController {
   private Date start, end;
   private Long responseTime;
 
-  @PostMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping
   public ResponseEntity<ApiResponse> sendConfirmationTokenToAdmin(@RequestParam("username") @Valid String username) {
     start = new Date();
     confirmationTokenService.sendConfirmationToken(username.toLowerCase());
@@ -39,7 +38,7 @@ public class ConfirmationTokenController {
         "Success", "A confirmation code has been sent to the email.", null), HttpStatus.CREATED);
   }
 
-  @PostMapping(value = "/to-customer", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping("/to-customer")
   public ResponseEntity<ApiResponse> sendConfirmationTokenToCustomer(@RequestParam("username") @Valid String username) {
     start = new Date();
     confirmationTokenService.sendConfirmationTokenToCustomer(username.toLowerCase());

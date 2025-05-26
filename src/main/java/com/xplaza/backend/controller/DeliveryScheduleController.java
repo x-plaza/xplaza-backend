@@ -12,7 +12,6 @@ import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,10 +24,11 @@ import com.xplaza.backend.model.DeliveryScheduleList;
 import com.xplaza.backend.service.DeliveryScheduleService;
 
 @RestController
-@RequestMapping("/api/delivery-schedules")
+@RequestMapping("/api/v1/delivery-schedule")
 public class DeliveryScheduleController {
   @Autowired
   private DeliveryScheduleService deliveryScheduleService;
+
   private Date start, end;
   private Long responseTime;
 
@@ -41,7 +41,7 @@ public class DeliveryScheduleController {
     response.setHeader("Set-Cookie", "type=ninja");
   }
 
-  @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping
   public ResponseEntity<String> getDeliverySchedules() throws JsonProcessingException {
     start = new Date();
     List<DeliveryScheduleList> dtos = deliveryScheduleService.listDeliverySchedules();
@@ -58,7 +58,7 @@ public class DeliveryScheduleController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @GetMapping(value = { "/{id}" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping("/{id}")
   public ResponseEntity<String> getDeliverySchedule(@PathVariable @Valid Long id) throws JsonProcessingException {
     start = new Date();
     DeliveryScheduleDetails dtos = deliveryScheduleService.listDeliveryScheduleDetails(id);
@@ -75,7 +75,7 @@ public class DeliveryScheduleController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping
   public ResponseEntity<ApiResponse> addSchedule(@RequestBody @Valid DeliverySchedule deliverySchedule) {
     start = new Date();
     deliveryScheduleService.addSchedule(deliverySchedule);
@@ -85,7 +85,7 @@ public class DeliveryScheduleController {
         "Success", "Delivery Schedule has been created.", null), HttpStatus.CREATED);
   }
 
-  @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping
   public ResponseEntity<ApiResponse> updateSchedule(@RequestBody @Valid DeliverySchedule deliverySchedule) {
     start = new Date();
     deliveryScheduleService.updateSchedule(deliverySchedule);
@@ -95,7 +95,7 @@ public class DeliveryScheduleController {
         "Success", "Delivery Schedule has been updated.", null), HttpStatus.OK);
   }
 
-  @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @DeleteMapping("/{id}")
   public ResponseEntity<ApiResponse> deleteSchedule(@PathVariable @Valid Long id) {
     start = new Date();
     deliveryScheduleService.deleteSchedule(id);

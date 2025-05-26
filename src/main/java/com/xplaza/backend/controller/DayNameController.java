@@ -12,7 +12,6 @@ import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,10 +22,11 @@ import com.xplaza.backend.model.Day;
 import com.xplaza.backend.service.DayNameService;
 
 @RestController
-@RequestMapping("/api/day_names")
+@RequestMapping("/api/v1/day-name")
 public class DayNameController {
   @Autowired
   private DayNameService dayNameService;
+
   private Date start, end;
   private Long responseTime;
 
@@ -39,7 +39,7 @@ public class DayNameController {
     response.setHeader("Set-Cookie", "type=ninja");
   }
 
-  @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping
   public ResponseEntity<String> getDays() throws JsonProcessingException {
     start = new Date();
     List<Day> dtos = dayNameService.listDays();
@@ -56,7 +56,7 @@ public class DayNameController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @GetMapping(value = { "/{id}" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping("/{id}")
   public ResponseEntity<String> getDay(@PathVariable @Valid Long id) throws JsonProcessingException {
     start = new Date();
     String dayName = dayNameService.getDayNameByID(id);
@@ -73,7 +73,7 @@ public class DayNameController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping
   public ResponseEntity<ApiResponse> addDay(@RequestBody @Valid Day day) {
     start = new Date();
     dayNameService.addDay(day);
@@ -83,7 +83,7 @@ public class DayNameController {
         "Success", "Day has been created.", null), HttpStatus.CREATED);
   }
 
-  @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping
   public ResponseEntity<ApiResponse> updateDay(@RequestBody @Valid Day day) {
     start = new Date();
     dayNameService.updateDay(day);
@@ -93,7 +93,7 @@ public class DayNameController {
         "Success", "Day has been updated.", null), HttpStatus.OK);
   }
 
-  @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @DeleteMapping("/{id}")
   public ResponseEntity<ApiResponse> deleteDay(@PathVariable @Valid Long id) {
     String day_name = dayNameService.getDayNameByID(id);
     start = new Date();

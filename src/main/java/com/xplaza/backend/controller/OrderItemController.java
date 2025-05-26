@@ -13,7 +13,6 @@ import jakarta.validation.Valid;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,10 +23,11 @@ import com.xplaza.backend.model.OrderItem;
 import com.xplaza.backend.service.OrderItemService;
 
 @RestController
-@RequestMapping("/api/order-items")
+@RequestMapping("/api/v1/order-item")
 public class OrderItemController {
   @Autowired
   private OrderItemService orderItemService;
+
   private Date start, end;
   private Long responseTime;
 
@@ -40,7 +40,7 @@ public class OrderItemController {
     response.setHeader("Set-Cookie", "type=ninja");
   }
 
-  @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping
   public ResponseEntity<String> getOrderItems() throws JsonProcessingException, JSONException {
     start = new Date();
     List<OrderItem> dtos = orderItemService.listOrderItems();
@@ -57,7 +57,7 @@ public class OrderItemController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @GetMapping(value = { "/{id}" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping("/{id}")
   public ResponseEntity<String> getOrderItem(@PathVariable @Valid Long id) throws JsonProcessingException {
     start = new Date();
     OrderItem dtos = orderItemService.listOrderItem(id);
@@ -74,7 +74,7 @@ public class OrderItemController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping
   public ResponseEntity<ApiResponse> addOrderItem(@RequestBody @Valid OrderItem orderItem) {
     start = new Date();
     orderItemService.addOrderItem(orderItem);
@@ -84,18 +84,7 @@ public class OrderItemController {
         "Success", "Order Item has been created.", null), HttpStatus.CREATED);
   }
 
-  /*
-   * @PutMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE)
-   * public ResponseEntity<ApiResponse> updateOrderItem (@RequestBody @Valid
-   * OrderItem orderItem) { start = new Date();
-   * orderItemService.updateOrderItem(orderItem); end = new Date(); responseTime =
-   * end.getTime() - start.getTime(); return new ResponseEntity<>(new
-   * ApiResponse(responseTime, "Update Order Items",
-   * HttpStatus.OK.value(),"Success", "Order Item has been updated.",null),
-   * HttpStatus.OK); }
-   */
-
-  @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping
   public ResponseEntity<ApiResponse> updateOrderItem(@RequestParam("order_item_id") @Valid Long order_item_id,
       @RequestParam("quantity") @Valid Long quantity) {
     start = new Date();
@@ -106,7 +95,7 @@ public class OrderItemController {
         "Success", "Order Item has been updated.", null), HttpStatus.OK);
   }
 
-  @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @DeleteMapping("/{id}")
   public ResponseEntity<ApiResponse> deleteOrderItem(@PathVariable @Valid Long id) {
     String order_item_name = orderItemService.getOrderItemNameByID(id);
     start = new Date();

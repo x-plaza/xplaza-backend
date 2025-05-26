@@ -13,7 +13,6 @@ import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,12 +27,14 @@ import com.xplaza.backend.service.CouponService;
 import com.xplaza.backend.service.RoleService;
 
 @RestController
-@RequestMapping("/api/coupon")
+@RequestMapping("/api/v1/coupon")
 public class CouponController {
   @Autowired
   private CouponService couponService;
+
   @Autowired
   private RoleService roleService;
+
   private Date start, end;
   private Long responseTime;
 
@@ -46,11 +47,11 @@ public class CouponController {
     response.setHeader("Set-Cookie", "type=ninja");
   }
 
-  @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping
   public ResponseEntity<String> getCoupons(@RequestParam(value = "user_id", required = true) @Valid Long user_id)
       throws JsonProcessingException {
     start = new Date();
-    List<CouponList> dtos = null;
+    List<CouponList> dtos;
     String role_name = roleService.getRoleNameByUserID(user_id);
     if (role_name == null)
       dtos = null;
@@ -72,7 +73,7 @@ public class CouponController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @GetMapping(value = { "/{id}" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping("/{id}")
   public ResponseEntity<String> getCouponDetails(@PathVariable @Valid Long id) throws JsonProcessingException {
     start = new Date();
     CouponDetails dtos = couponService.getCouponDetails(id);
@@ -89,7 +90,7 @@ public class CouponController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @PostMapping(value = "/validate-coupon", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping("/validate-coupon")
   public ResponseEntity<ApiResponse> validateCoupon(
       @RequestParam(value = "coupon_code", required = true) @Valid String coupon_code,
       @RequestParam(value = "net_order_amount", required = true) @Valid Double net_order_amount,
@@ -108,10 +109,10 @@ public class CouponController {
         "Coupon is valid.", coupon_amount.toString()), HttpStatus.OK);
   }
 
-  @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping
   public ResponseEntity<ApiResponse> addCoupon(@RequestBody @Valid Coupon coupon) {
     start = new Date();
-    // check if same coupon already exists?
+    // check if the same coupon already exists?
     if (couponService.isExist(coupon)) {
       end = new Date();
       responseTime = end.getTime() - start.getTime();
@@ -134,7 +135,7 @@ public class CouponController {
         "Success", "Coupon has been created.", null), HttpStatus.CREATED);
   }
 
-  @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping
   public ResponseEntity<ApiResponse> updateCoupon(@RequestBody @Valid Coupon coupon) {
     start = new Date();
     for (CouponShopLink csl : coupon.getCouponShopLinks()) {
@@ -156,7 +157,7 @@ public class CouponController {
         "Success", "Coupon has been updated.", null), HttpStatus.OK);
   }
 
-  @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @DeleteMapping("/{id}")
   public ResponseEntity<ApiResponse> deleteCoupon(@PathVariable @Valid Long id) {
     String coupon_name = couponService.getCouponNameByID(id);
     start = new Date();

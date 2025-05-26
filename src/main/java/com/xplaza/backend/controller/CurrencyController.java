@@ -13,7 +13,6 @@ import jakarta.validation.Valid;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,10 +23,11 @@ import com.xplaza.backend.model.Currency;
 import com.xplaza.backend.service.CurrencyService;
 
 @RestController
-@RequestMapping("/api/currency")
+@RequestMapping("/api/v1/currency")
 public class CurrencyController {
   @Autowired
   private CurrencyService currencyService;
+
   private Date start, end;
   private Long responseTime;
 
@@ -40,7 +40,7 @@ public class CurrencyController {
     response.setHeader("Set-Cookie", "type=ninja");
   }
 
-  @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping
   public ResponseEntity<String> getCurrencies() throws JsonProcessingException, JSONException {
     start = new Date();
     List<Currency> dtos = currencyService.listCurrencies();
@@ -57,7 +57,7 @@ public class CurrencyController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @GetMapping(value = { "/{id}" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping("/{id}")
   public ResponseEntity<String> getCurrency(@PathVariable @Valid Long id) throws JsonProcessingException {
     start = new Date();
     Currency dtos = currencyService.listCurrency(id);
@@ -74,7 +74,7 @@ public class CurrencyController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping
   public ResponseEntity<ApiResponse> addCurrency(@RequestBody @Valid Currency brand) {
     start = new Date();
     currencyService.addCurrency(brand);
@@ -84,7 +84,7 @@ public class CurrencyController {
         "Success", "Currency has been created.", null), HttpStatus.CREATED);
   }
 
-  @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping
   public ResponseEntity<ApiResponse> updateCurrency(@RequestBody @Valid Currency brand) {
     start = new Date();
     currencyService.updateCurrency(brand);
@@ -94,7 +94,7 @@ public class CurrencyController {
         "Success", "Currency has been updated.", null), HttpStatus.OK);
   }
 
-  @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @DeleteMapping("/{id}")
   public ResponseEntity<ApiResponse> deleteCurrency(@PathVariable @Valid Long id) {
     String currency_name = currencyService.getCurrencyNameByID(id);
     start = new Date();

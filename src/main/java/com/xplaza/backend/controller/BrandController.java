@@ -13,7 +13,6 @@ import jakarta.validation.Valid;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,10 +23,11 @@ import com.xplaza.backend.model.Brand;
 import com.xplaza.backend.service.BrandService;
 
 @RestController
-@RequestMapping("/api/brand")
+@RequestMapping("/api/v1/brand")
 public class BrandController {
   @Autowired
   private BrandService brandService;
+
   private Date start, end;
   private Long responseTime;
 
@@ -40,7 +40,7 @@ public class BrandController {
     response.setHeader("Set-Cookie", "type=ninja");
   }
 
-  @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping
   public ResponseEntity<String> getBrands() throws JsonProcessingException, JSONException {
     start = new Date();
     List<Brand> dtos = brandService.listBrands();
@@ -57,7 +57,7 @@ public class BrandController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @GetMapping(value = { "/{id}" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping("/{id}")
   public ResponseEntity<String> getBrand(@PathVariable @Valid Long id) throws JsonProcessingException {
     start = new Date();
     Brand dtos = brandService.listBrand(id);
@@ -74,10 +74,10 @@ public class BrandController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping
   public ResponseEntity<ApiResponse> addBrand(@RequestBody @Valid Brand brand) {
     start = new Date();
-    // check if same brand already exists?
+    // check if the same brand already exists?
     if (brandService.isExist(brand)) {
       end = new Date();
       responseTime = end.getTime() - start.getTime();
@@ -91,7 +91,7 @@ public class BrandController {
         "Success", "Brand has been created.", null), HttpStatus.CREATED);
   }
 
-  @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping
   public ResponseEntity<ApiResponse> updateBrand(@RequestBody @Valid Brand brand) {
     start = new Date();
     brandService.updateBrand(brand);
@@ -101,7 +101,7 @@ public class BrandController {
         "Success", "Brand has been updated.", null), HttpStatus.OK);
   }
 
-  @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @DeleteMapping("/{id}")
   public ResponseEntity<ApiResponse> deleteBrand(@PathVariable @Valid Long id) {
     String brand_name = brandService.getBrandNameByID(id);
     start = new Date();

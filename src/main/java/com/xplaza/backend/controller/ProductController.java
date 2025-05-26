@@ -14,7 +14,6 @@ import jakarta.validation.Valid;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,10 +27,11 @@ import com.xplaza.backend.service.ProductService;
 import com.xplaza.backend.service.RoleService;
 
 @RestController
-@RequestMapping("/api/product")
+@RequestMapping("/api/v1/product")
 public class ProductController {
   @Autowired
   private ProductService productService;
+
   @Autowired
   private RoleService roleService;
 
@@ -47,8 +47,8 @@ public class ProductController {
     response.setHeader("Set-Cookie", "type=ninja");
   }
 
-  @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> getProducts(@RequestParam(value = "user_id", required = true) @Valid Long user_id)
+  @GetMapping
+  public ResponseEntity<String> getProducts(@RequestParam(value = "user_id") @Valid Long user_id)
       throws JsonProcessingException, ParseException {
     start = new Date();
     List<ProductList> dtos;
@@ -72,7 +72,7 @@ public class ProductController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @GetMapping(value = { "/{id}" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping("/{id}")
   public ResponseEntity<String> getProduct(@PathVariable @Valid Long id)
       throws JsonProcessingException, ParseException {
     start = new Date();
@@ -90,9 +90,9 @@ public class ProductController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @GetMapping(value = { "/by-shop-by-admin" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping("/by-shop-by-admin")
   public ResponseEntity<String> getProductsByShopByAdmin(
-      @RequestParam(value = "shop_id", required = true) @Valid Long shop_id)
+      @RequestParam(value = "shop_id") @Valid Long shop_id)
       throws JsonProcessingException, ParseException {
     start = new Date();
     List<ProductList> dtos = productService.listProductsByShopIDByAdmin(shop_id);
@@ -109,8 +109,8 @@ public class ProductController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @GetMapping(value = { "/by-shop" }, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> getProductsByShop(@RequestParam(value = "shop_id", required = true) @Valid Long shop_id)
+  @GetMapping("/by-shop")
+  public ResponseEntity<String> getProductsByShop(@RequestParam(value = "shop_id") @Valid Long shop_id)
       throws JsonProcessingException, ParseException {
     start = new Date();
     List<ProductList> dtos = productService.listProductsByShopID(shop_id);
@@ -127,9 +127,9 @@ public class ProductController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @GetMapping(value = { "/by-trending" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping("/by-trending")
   public ResponseEntity<String> getProductsByTrending(
-      @RequestParam(value = "shop_id", required = true) @Valid Long shop_id)
+      @RequestParam(value = "shop_id") @Valid Long shop_id)
       throws JsonProcessingException, ParseException {
     start = new Date();
     List<ProductList> dtos = productService.listProductsByTrending(shop_id);
@@ -146,10 +146,10 @@ public class ProductController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @GetMapping(value = { "/by-category" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping("/by-category")
   public ResponseEntity<String> getProductsByCategory(
-      @RequestParam(value = "shop_id", required = true) @Valid Long shop_id,
-      @RequestParam(value = "category_id", required = true) @Valid Long category_id)
+      @RequestParam(value = "shop_id") @Valid Long shop_id,
+      @RequestParam(value = "category_id") @Valid Long category_id)
       throws JsonProcessingException, ParseException {
     start = new Date();
     List<ProductList> dtos = productService.listProductsByCategory(shop_id, category_id);
@@ -166,10 +166,10 @@ public class ProductController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @GetMapping(value = { "/by-name" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping("/by-name")
   public ResponseEntity<String> searchProductsByName(
-      @RequestParam(value = "shop_id", required = true) @Valid Long shop_id,
-      @RequestParam(value = "product_name", required = true) @Valid String product_name)
+      @RequestParam(value = "shop_id") @Valid Long shop_id,
+      @RequestParam(value = "product_name") @Valid String product_name)
       throws JsonProcessingException {
     start = new Date();
     List<ProductSearch> dtos = productService.listProductsByName(shop_id, product_name);
@@ -186,9 +186,9 @@ public class ProductController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping
   public ResponseEntity<ApiResponse> addProduct(@RequestBody @Valid Product product)
-      throws JSONException, JsonProcessingException {
+      throws JSONException {
     start = new Date();
     productService.addProduct(product);
     end = new Date();
@@ -197,7 +197,7 @@ public class ProductController {
         "Success", "Product has been created.", null), HttpStatus.CREATED);
   }
 
-  @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping
   public ResponseEntity<ApiResponse> updateProduct(@RequestBody @Valid Product product) {
     start = new Date();
     productService.updateProduct(product);
@@ -207,7 +207,7 @@ public class ProductController {
         "Success", "Product has been updated.", null), HttpStatus.OK);
   }
 
-  @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @DeleteMapping("/{id}")
   public ResponseEntity<ApiResponse> deleteProduct(@PathVariable @Valid Long id) {
     String product_name = productService.getProductNameByID(id);
     start = new Date();

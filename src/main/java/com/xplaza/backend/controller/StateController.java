@@ -12,7 +12,6 @@ import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,10 +22,11 @@ import com.xplaza.backend.model.State;
 import com.xplaza.backend.service.StateService;
 
 @RestController
-@RequestMapping("/api/state")
+@RequestMapping("/api/v1/state")
 public class StateController {
   @Autowired
   private StateService stateService;
+
   private Date start, end;
   private Long responseTime;
 
@@ -39,7 +39,7 @@ public class StateController {
     response.setHeader("Set-Cookie", "type=ninja");
   }
 
-  @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping
   public ResponseEntity<String> getStates() throws JsonProcessingException {
     start = new Date();
     List<State> dtos = stateService.listStates();
@@ -56,7 +56,7 @@ public class StateController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @GetMapping(value = { "/{id}" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping("/{id}")
   public ResponseEntity<String> getState(@PathVariable @Valid Long id) throws JsonProcessingException {
     start = new Date();
     State dtos = stateService.listState(id);
@@ -73,7 +73,7 @@ public class StateController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping
   public ResponseEntity<ApiResponse> addState(@RequestBody @Valid State state) {
     start = new Date();
     stateService.addState(state);
@@ -83,7 +83,7 @@ public class StateController {
         "Success", "State has been created.", null), HttpStatus.CREATED);
   }
 
-  @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping
   public ResponseEntity<ApiResponse> updateState(@RequestBody @Valid State state) {
     start = new Date();
     stateService.updateState(state);
@@ -93,7 +93,7 @@ public class StateController {
         "Success", "State has been updated.", null), HttpStatus.OK);
   }
 
-  @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @DeleteMapping("/{id}")
   public ResponseEntity<ApiResponse> deleteState(@PathVariable @Valid Long id) {
     String state_name = stateService.getStateNameByID(id);
     start = new Date();

@@ -12,7 +12,6 @@ import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,10 +24,11 @@ import com.xplaza.backend.service.RoleService;
 import com.xplaza.backend.service.ShopService;
 
 @RestController
-@RequestMapping("/api/shop")
+@RequestMapping("/api/v1/shop")
 public class ShopController {
   @Autowired
   private ShopService shopService;
+
   @Autowired
   private RoleService roleService;
 
@@ -45,8 +45,8 @@ public class ShopController {
     response.setHeader("msg", "");
   }
 
-  @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> getShops(@RequestParam(value = "user_id", required = true) @Valid Long user_id)
+  @GetMapping
+  public ResponseEntity<String> getShops(@RequestParam(value = "user_id") @Valid Long user_id)
       throws JsonProcessingException {
     start = new Date();
     List<ShopList> dtos;
@@ -70,7 +70,7 @@ public class ShopController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @GetMapping(value = { "/{id}" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping("/{id}")
   public ResponseEntity<String> getShop(@PathVariable @Valid Long id) throws JsonProcessingException {
     start = new Date();
     ShopList dtos = shopService.listShop(id);
@@ -87,7 +87,7 @@ public class ShopController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @GetMapping(value = { "/by-location/{id}" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping("/by-location/{id}")
   public ResponseEntity<String> getShopsByLocation(@PathVariable @Valid Long id) throws JsonProcessingException {
     start = new Date();
     List<ShopList> dtos = shopService.listShopByLocation(id);
@@ -104,7 +104,7 @@ public class ShopController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping
   public ResponseEntity<ApiResponse> addShop(@RequestBody @Valid Shop shop) {
     start = new Date();
     shopService.addShop(shop);
@@ -114,7 +114,7 @@ public class ShopController {
         "Success", "Shop has been created.", null), HttpStatus.CREATED);
   }
 
-  @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping
   public ResponseEntity<ApiResponse> updateShop(@RequestBody @Valid Shop shop) {
     start = new Date();
     shopService.updateShop(shop);
@@ -124,7 +124,7 @@ public class ShopController {
         "Success", "Shop has been updated.", null), HttpStatus.OK);
   }
 
-  @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @DeleteMapping("/{id}")
   public ResponseEntity<ApiResponse> deleteShop(@PathVariable @Valid Long id) {
     String shop_name = shopService.getShopNameByID(id);
     start = new Date();

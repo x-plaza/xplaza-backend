@@ -12,7 +12,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -25,12 +24,10 @@ import com.xplaza.backend.model.DiscountType;
 import com.xplaza.backend.service.DiscountTypeService;
 
 @RestController
-@RequestMapping("/api/discount-type")
+@RequestMapping("/api/v1/discount-type")
 public class DiscountTypeController {
   @Autowired
   private DiscountTypeService discountTypeService;
-  private Date start, end;
-  private Long responseTime;
 
   @ModelAttribute
   public void setResponseHeader(HttpServletResponse response) {
@@ -41,12 +38,12 @@ public class DiscountTypeController {
     response.setHeader("Set-Cookie", "type=ninja");
   }
 
-  @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping
   public ResponseEntity<String> getDiscountTypes() throws JsonProcessingException, JSONException {
-    start = new Date();
+    Date start = new Date();
     List<DiscountType> dtos = discountTypeService.listDiscountTypes();
-    end = new Date();
-    responseTime = end.getTime() - start.getTime();
+    Date end = new Date();
+    long responseTime = end.getTime() - start.getTime();
     ObjectMapper mapper = new ObjectMapper();
     String response = "{\n" +
         "  \"responseTime\": " + responseTime + ",\n" +
