@@ -22,7 +22,7 @@ import com.xplaza.backend.model.Day;
 import com.xplaza.backend.service.DayNameService;
 
 @RestController
-@RequestMapping("/api/v1/day-name")
+@RequestMapping("/api/v1/day-names")
 public class DayNameController {
   @Autowired
   private DayNameService dayNameService;
@@ -65,7 +65,7 @@ public class DayNameController {
     ObjectMapper mapper = new ObjectMapper();
     String response = "{\n" +
         "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Day List\",\n" +
+        "  \"responseType\": \"Day By ID\",\n" +
         "  \"status\": 200,\n" +
         "  \"response\": \"Success\",\n" +
         "  \"msg\": \"\",\n" +

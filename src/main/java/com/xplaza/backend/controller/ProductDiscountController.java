@@ -25,7 +25,7 @@ import com.xplaza.backend.service.ProductDiscountService;
 import com.xplaza.backend.service.RoleService;
 
 @RestController
-@RequestMapping("/api/v1/product-discount")
+@RequestMapping("/api/v1/product-discounts")
 public class ProductDiscountController {
   @Autowired
   private ProductDiscountService productDiscountService;
@@ -79,7 +79,7 @@ public class ProductDiscountController {
     ObjectMapper mapper = new ObjectMapper();
     String response = "{\n" +
         "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Product Discount List\",\n" +
+        "  \"responseType\": \"Product Discount By ID\",\n" +
         "  \"status\": 200,\n" +
         "  \"response\": \"Success\",\n" +
         "  \"msg\": \"\",\n" +

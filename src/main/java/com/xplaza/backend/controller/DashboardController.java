@@ -56,7 +56,7 @@ public class DashboardController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @PostMapping("/monthly-profit")
+  @PostMapping("/monthly-profits")
   public ResponseEntity<String> getMonthlyProfit(@RequestParam(value = "shop_id") @Valid Long shop_id,
       @RequestParam(value = "month") @Valid int month) throws IOException {
     start = new Date();

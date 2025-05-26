@@ -24,7 +24,7 @@ import com.xplaza.backend.model.DeliveryCostList;
 import com.xplaza.backend.service.DeliveryCostService;
 
 @RestController
-@RequestMapping("/api/v1/delivery-cost")
+@RequestMapping("/api/v1/delivery-costs")
 public class DeliveryCostController {
   @Autowired
   private DeliveryCostService deliveryCostService;
@@ -67,7 +67,7 @@ public class DeliveryCostController {
     ObjectMapper mapper = new ObjectMapper();
     String response = "{\n" +
         "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Delivery Cost List\",\n" +
+        "  \"responseType\": \"Delivery Cost By ID\",\n" +
         "  \"status\": 200,\n" +
         "  \"response\": \"Success\",\n" +
         "  \"msg\": \"\",\n" +

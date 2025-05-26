@@ -4,16 +4,14 @@
  */
 package com.xplaza.backend.model;
 
-import java.io.Serializable;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-public class AuthenticationResponse implements Serializable {
-  private final String jwt;
-
-  public AuthenticationResponse(String jwt) {
-    this.jwt = jwt;
-  }
-
-  public String getJwt() {
-    return jwt;
-  }
+@Getter
+@Setter
+@AllArgsConstructor
+public class AuthenticationResponse {
+  private final String jwtToken;
+  private final String refreshToken;
 }

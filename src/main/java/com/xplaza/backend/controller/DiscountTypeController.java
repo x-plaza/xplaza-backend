@@ -24,7 +24,7 @@ import com.xplaza.backend.model.DiscountType;
 import com.xplaza.backend.service.DiscountTypeService;
 
 @RestController
-@RequestMapping("/api/v1/discount-type")
+@RequestMapping("/api/v1/discount-types")
 public class DiscountTypeController {
   @Autowired
   private DiscountTypeService discountTypeService;

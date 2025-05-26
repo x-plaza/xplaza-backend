@@ -23,7 +23,7 @@ import com.xplaza.backend.model.Currency;
 import com.xplaza.backend.service.CurrencyService;
 
 @RestController
-@RequestMapping("/api/v1/currency")
+@RequestMapping("/api/v1/currencies")
 public class CurrencyController {
   @Autowired
   private CurrencyService currencyService;
@@ -66,7 +66,7 @@ public class CurrencyController {
     ObjectMapper mapper = new ObjectMapper();
     String response = "{\n" +
         "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Currency List\",\n" +
+        "  \"responseType\": \"Currency By ID\",\n" +
         "  \"status\": 200,\n" +
         "  \"response\": \"Success\",\n" +
         "  \"msg\": \"\",\n" +

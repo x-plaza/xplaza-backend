@@ -12,7 +12,6 @@ import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +23,7 @@ import com.xplaza.backend.model.CategoryList;
 import com.xplaza.backend.service.CategoryService;
 
 @RestController
-@RequestMapping("/api/v1/category")
+@RequestMapping("/api/v1/categories")
 public class CategoryController {
   @Autowired
   private CategoryService categoryService;
@@ -41,7 +40,7 @@ public class CategoryController {
     response.setHeader("Set-Cookie", "type=ninja");
   }
 
-  @GetMapping(value = { "", "/" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping
   public ResponseEntity<String> getCategories() throws JsonProcessingException {
     start = new Date();
     List<CategoryList> dtos = categoryService.listCategories();
@@ -58,7 +57,7 @@ public class CategoryController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @GetMapping(value = { "/{id}" }, produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping("/{id}")
   public ResponseEntity<String> getCategory(@PathVariable @Valid Long id) throws JsonProcessingException {
     start = new Date();
     CategoryList dtos = categoryService.listCategory(id);
@@ -67,7 +66,7 @@ public class CategoryController {
     ObjectMapper mapper = new ObjectMapper();
     String response = "{\n" +
         "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Category List\",\n" +
+        "  \"responseType\": \"Category By ID\",\n" +
         "  \"status\": 200,\n" +
         "  \"response\": \"Success\",\n" +
         "  \"msg\": \"\",\n" +
@@ -75,10 +74,10 @@ public class CategoryController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping
   public ResponseEntity<ApiResponse> addCategory(@RequestBody @Valid Category category) {
     start = new Date();
-    // check if same category already exists?
+    // check if the same category already exists?
     if (categoryService.isExist(category)) {
       end = new Date();
       responseTime = end.getTime() - start.getTime();
@@ -92,7 +91,7 @@ public class CategoryController {
         "Success", "Category has been created.", null), HttpStatus.CREATED);
   }
 
-  @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping
   public ResponseEntity<ApiResponse> updateCategory(@RequestBody @Valid Category category) {
     start = new Date();
     categoryService.updateCategory(category);
@@ -102,7 +101,7 @@ public class CategoryController {
         "Success", "Category has been updated.", null), HttpStatus.OK);
   }
 
-  @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @DeleteMapping("/{id}")
   public ResponseEntity<ApiResponse> deleteCategory(@PathVariable @Valid Long id) {
     String category_name = categoryService.getCategoryNameByID(id);
     start = new Date();

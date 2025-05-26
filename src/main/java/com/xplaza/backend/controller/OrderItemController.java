@@ -23,7 +23,7 @@ import com.xplaza.backend.model.OrderItem;
 import com.xplaza.backend.service.OrderItemService;
 
 @RestController
-@RequestMapping("/api/v1/order-item")
+@RequestMapping("/api/v1/order-items")
 public class OrderItemController {
   @Autowired
   private OrderItemService orderItemService;
@@ -66,7 +66,7 @@ public class OrderItemController {
     ObjectMapper mapper = new ObjectMapper();
     String response = "{\n" +
         "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Order Item List\",\n" +
+        "  \"responseType\": \"Order Item By ID\",\n" +
         "  \"status\": 200,\n" +
         "  \"response\": \"Success\",\n" +
         "  \"msg\": \"\",\n" +

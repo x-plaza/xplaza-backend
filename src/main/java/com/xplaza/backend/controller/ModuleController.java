@@ -23,7 +23,7 @@ import com.xplaza.backend.model.Module;
 import com.xplaza.backend.service.ModuleService;
 
 @RestController
-@RequestMapping("/api/v1/module")
+@RequestMapping("/api/v1/modules")
 public class ModuleController {
   @Autowired
   private ModuleService moduleService;
@@ -66,7 +66,7 @@ public class ModuleController {
     ObjectMapper mapper = new ObjectMapper();
     String response = "{\n" +
         "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Module List\",\n" +
+        "  \"responseType\": \"Module List By ID\",\n" +
         "  \"status\": 200,\n" +
         "  \"response\": \"Success\",\n" +
         "  \"msg\": \"\",\n" +
