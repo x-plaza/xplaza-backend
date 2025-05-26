@@ -1,0 +1,36 @@
+/*
+ * Copyright (c) 2025 Xplaza or Xplaza affiliate company. All rights reserved.
+ * Author: Mahiuddin Al Kamal <mahiuddinalkamal>
+ */
+package com.xplaza.backend.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.xplaza.backend.common.util.JwtUtil;
+import com.xplaza.backend.model.AuthenticationRequest;
+import com.xplaza.backend.model.AuthenticationResponse;
+import com.xplaza.backend.service.AuthUserDetailsService;
+
+@Controller
+@RequestMapping("/authenticate")
+public class AuthController {
+  @Autowired
+  private JwtUtil jwtTokenUtil;
+
+  @Autowired
+  private AuthUserDetailsService authUserDetailsService;
+
+  @PostMapping
+  public ResponseEntity<AuthenticationResponse> createAuthenticationToken(
+      @RequestBody AuthenticationRequest authenticationRequest) {
+    UserDetails userDetails = authUserDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+    String jwt = jwtTokenUtil.generateJwtToken(userDetails);
+    return ResponseEntity.ok(new AuthenticationResponse(jwt));
+  }
+}
