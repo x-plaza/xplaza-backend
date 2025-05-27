@@ -94,8 +94,9 @@ public class OrderController {
 
     // Update Invoice number
     PlatformInfo platformInfo = platformInfoService.listPlatform();
-    assert dtos != null;
-    dtos.forEach(i -> i.setInvoice_number(platformInfo.getInvoice() + "#" + i.getOrder_id()));
+    if (dtos != null) {
+      dtos.forEach(i -> i.setInvoice_number(platformInfo.getInvoice() + "#" + i.getOrder_id()));
+    }
 
     end = new Date();
     responseTime = end.getTime() - start.getTime();
@@ -129,8 +130,9 @@ public class OrderController {
     }
     // Update Invoice number
     PlatformInfo platformInfo = platformInfoService.listPlatform();
-    assert dtos != null;
-    dtos.forEach(i -> i.setInvoice_number(platformInfo.getInvoice() + "#" + i.getOrder_id()));
+    if (dtos != null) {
+      dtos.forEach(i -> i.setInvoice_number(platformInfo.getInvoice() + "#" + i.getOrder_id()));
+    }
 
     end = new Date();
     responseTime = end.getTime() - start.getTime();
