@@ -21,8 +21,6 @@ public class CustomerUserService {
   private CustomerUserRepository customerUserRepo;
   @Autowired
   private CustomerRepository customerRepo;
-  @Autowired
-  private EmailSenderService emailSenderService;
 
   public void updateCustomer(Customer customer) {
     customerRepo.save(customer);

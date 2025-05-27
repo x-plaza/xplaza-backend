@@ -19,6 +19,8 @@ import lombok.Setter;
 @Table(name = "platform_info")
 public class PlatformInfo {
   @Id
+  private Long id;
+
   private String name;
 
   private String invoice;

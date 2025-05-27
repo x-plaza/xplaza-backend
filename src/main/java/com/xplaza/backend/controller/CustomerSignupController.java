@@ -18,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.telesign.MessagingClient;
-import com.telesign.RestClient;
 import com.telesign.Util;
 import com.xplaza.backend.common.util.ApiResponse;
 import com.xplaza.backend.model.ConfirmationToken;
@@ -27,8 +26,6 @@ import com.xplaza.backend.model.CustomerLogin;
 import com.xplaza.backend.service.ConfirmationTokenService;
 import com.xplaza.backend.service.CustomerLoginService;
 import com.xplaza.backend.service.CustomerSignupService;
-import com.xplaza.backend.service.CustomerUserService;
-import com.xplaza.backend.service.RoleService;
 import com.xplaza.backend.service.SecurityService;
 
 @RestController
@@ -38,13 +35,7 @@ public class CustomerSignupController {
   private CustomerSignupService customerSignupService;
 
   @Autowired
-  private CustomerUserService customerUserService;
-
-  @Autowired
   private SecurityService securityService;
-
-  @Autowired
-  private RoleService roleService;
 
   @Autowired
   private CustomerLoginService customerLoginService;
@@ -127,7 +118,7 @@ public class CustomerSignupController {
     String messageType = "OTP";
     try {
       MessagingClient messagingClient = new MessagingClient(customerId, apiKey);
-      RestClient.TelesignResponse telesignResponse = messagingClient.message(cell_no, message, messageType, null);
+      messagingClient.message(cell_no, message, messageType, null);
     } catch (Exception e) {
       e.printStackTrace();
     }

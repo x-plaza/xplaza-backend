@@ -10,8 +10,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.xplaza.backend.model.CouponShopLink;
+import com.xplaza.backend.model.CouponShopLinkId;
 
-public interface CouponShopLinkRepository extends JpaRepository<CouponShopLink, Long> {
+public interface CouponShopLinkRepository extends JpaRepository<CouponShopLink, CouponShopLinkId> {
   @Modifying
   @Transactional
   @Query(value = "insert into coupon_shop_link values(?1, ?2)", nativeQuery = true)

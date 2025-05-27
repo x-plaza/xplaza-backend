@@ -19,7 +19,6 @@ import com.xplaza.backend.model.PlatformInfo;
 import com.xplaza.backend.repository.AdminUserListRepository;
 import com.xplaza.backend.repository.AdminUserRepository;
 import com.xplaza.backend.repository.AdminUserShopLinkRepository;
-import com.xplaza.backend.repository.ConfirmationTokenRepository;
 
 @Service
 public class AdminUserService {
@@ -29,8 +28,6 @@ public class AdminUserService {
   private AdminUserListRepository adminUserListRepo;
   @Autowired
   private AdminUserShopLinkRepository adminUserShopLinkRepo;
-  @Autowired
-  private ConfirmationTokenRepository confirmationTokenRepo;
   @Autowired
   private EmailSenderService emailSenderService;
   @Autowired
@@ -44,17 +41,6 @@ public class AdminUserService {
     for (AdminUserShopLink ausl : adminUser.getAdminUserShopLinks()) {
       adminUserShopLinkRepo.insert(adminUser.getId(), ausl.getShop_id());
     }
-    // Send authentication token in user email
-    /*
-     * ConfirmationToken confirmationToken = new ConfirmationToken(adminUser);
-     * confirmationTokenRepo.save(confirmationToken); SimpleMailMessage mailMessage
-     * = new SimpleMailMessage(); mailMessage.setTo(adminUser.getUser_name());
-     * mailMessage.setSubject("Complete Registration!"); mailMessage.
-     * setText("To confirm your X-plaza Admin account, please click here: "
-     * +"https://xplaza-backend.herokuapp.com/api/adminuser/confirm-account?token="+
-     * confirmationToken.getConfirmation_token());
-     * emailSenderService.sendEmail(mailMessage);
-     */
   }
 
   @Transactional
@@ -68,7 +54,6 @@ public class AdminUserService {
 
   @Transactional
   public void deleteAdminUser(Long id) {
-    // confirmationTokenRepo.deleteByUserID(id);
     adminUserShopLinkRepo.deleteByAdminUserID(id);
     adminUserRepo.deleteById(id);
   }
@@ -113,9 +98,4 @@ public class AdminUserService {
         "With Regards,\n" + "Team " + platformInfo.getName());
     emailSenderService.sendEmail(mailMessage);
   }
-
-  /*
-   * public void updateAdminUserConfirmationStatus(Long user_id, Boolean
-   * is_confirmed) { adminUserRepo.updateConfirmStatus(user_id,is_confirmed); }
-   */
 }

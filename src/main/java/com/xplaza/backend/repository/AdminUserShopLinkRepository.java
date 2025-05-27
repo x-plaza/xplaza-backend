@@ -10,8 +10,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.xplaza.backend.model.AdminUserShopLink;
+import com.xplaza.backend.model.AdminUserShopLinkId;
 
-public interface AdminUserShopLinkRepository extends JpaRepository<AdminUserShopLink, Long> {
+public interface AdminUserShopLinkRepository extends JpaRepository<AdminUserShopLink, AdminUserShopLinkId> {
   @Modifying
   @Transactional
   @Query(value = "insert into admin_user_shop_link values(?1, ?2)", nativeQuery = true)
