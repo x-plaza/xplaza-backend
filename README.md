@@ -29,7 +29,7 @@ mvn spotless:apply
 This will run the application with the spring `local` profile with an embedded [H2 database](https://www.h2database.com/html/main.html) and unsecured HTTP Endpoints.
 
 ```console
-mvn spring-boot:run -Dspring-boot.run.profiles=local,local-h2-file
+mvn spring-boot:run -Dspring-boot.run.profiles=local
 ```
 
 The H2 local database file has the advantage to be used in IDE's directly.
