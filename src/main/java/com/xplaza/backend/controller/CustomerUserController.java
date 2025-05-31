@@ -11,7 +11,6 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +28,7 @@ import com.xplaza.backend.service.SecurityService;
 
 @RestController
 @RequestMapping("/api/v1/customers")
-public class CustomerUserController {
+public class CustomerUserController extends BaseController {
   @Autowired
   private CustomerUserService customerUserService;
 
@@ -41,15 +40,6 @@ public class CustomerUserController {
 
   private Date start, end;
   private Long responseTime;
-
-  @ModelAttribute
-  public void setResponseHeader(HttpServletResponse response) {
-    response.setHeader("Cache-Control", "no-store"); // HTTP 1.1.
-    response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
-    response.setHeader("Expires", "0"); // Proxies.
-    response.setHeader("Content-Type", "application/json");
-    response.setHeader("Set-Cookie", "type=ninja");
-  }
 
   @GetMapping("/{id}")
   public ResponseEntity<String> getCustomer(@PathVariable @Valid Long id) throws JsonProcessingException {

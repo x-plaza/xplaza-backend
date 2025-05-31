@@ -19,7 +19,7 @@ import com.xplaza.backend.service.AuthUserDetailsService;
 
 @RestController
 @RequestMapping("/api/v1/authenticate")
-public class AuthController {
+public class AuthController extends BaseController {
   @Autowired
   private JwtUtil jwtTokenUtil;
 

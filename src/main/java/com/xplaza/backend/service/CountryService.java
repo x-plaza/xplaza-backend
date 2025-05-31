@@ -5,39 +5,50 @@
 package com.xplaza.backend.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.xplaza.backend.model.Country;
-import com.xplaza.backend.repository.CountryRepository;
+import com.xplaza.backend.dao.CountryDAO;
+import com.xplaza.backend.dto.CountryRequestDTO;
+import com.xplaza.backend.dto.CountryResponseDTO;
+import com.xplaza.backend.entity.CountryEntity;
+import com.xplaza.backend.mapper.CountryMapper;
+import com.xplaza.backend.repository.CountryEntityRepository;
 
 @Service
 public class CountryService {
   @Autowired
-  private CountryRepository countryRepo;
+  private CountryEntityRepository countryEntityRepository;
 
-  public void addCountry(Country country) {
-    countryRepo.save(country);
+  @Autowired
+  private CountryMapper countryMapper;
+
+  public void addCountry(CountryRequestDTO dto) {
+    CountryEntity entity = countryMapper.toEntity(dto);
+    countryEntityRepository.save(entity);
   }
 
-  public void updateCountry(Country country) {
-    countryRepo.save(country);
-  }
-
-  public String getCountryNameByID(Long id) {
-    return countryRepo.getName(id);
+  public void updateCountry(CountryRequestDTO dto) {
+    CountryEntity entity = countryMapper.toEntity(dto);
+    countryEntityRepository.save(entity);
   }
 
   public void deleteCountry(Long id) {
-    countryRepo.deleteById(id);
+    countryEntityRepository.deleteById(id);
   }
 
-  public List<Country> listCountries() {
-    return countryRepo.findAll();
+  public CountryResponseDTO listCountry(Long id) {
+    CountryEntity entity = countryEntityRepository.findById(id).orElse(null);
+    CountryDAO dao = countryMapper.toDAO(entity);
+    return countryMapper.toResponseDTO(dao);
   }
 
-  public Country listCountry(Long id) {
-    return countryRepo.findCountryById(id);
+  public List<CountryResponseDTO> listCountries() {
+    return countryEntityRepository.findAll().stream()
+        .map(countryMapper::toDAO)
+        .map(countryMapper::toResponseDTO)
+        .collect(Collectors.toList());
   }
 }

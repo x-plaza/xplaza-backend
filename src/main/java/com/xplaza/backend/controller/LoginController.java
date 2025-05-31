@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +29,7 @@ import com.xplaza.backend.service.SecurityService;
 
 @RestController
 @RequestMapping("/api/v1/login")
-public class LoginController {
+public class LoginController extends BaseController {
   @Autowired
   private LoginService loginService;
 
@@ -45,15 +44,6 @@ public class LoginController {
 
   private Date start, end;
   private Long responseTime;
-
-  @ModelAttribute
-  public void setResponseHeader(HttpServletResponse response) {
-    response.setHeader("Cache-Control", "no-store"); // HTTP 1.1.
-    response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
-    response.setHeader("Expires", "0"); // Proxies.
-    response.setHeader("Content-Type", "application/json");
-    response.setHeader("Set-Cookie", "type=ninja");
-  }
 
   @PostMapping
   public ResponseEntity<String> loginAdminUser(@RequestParam("username") @Valid String username,
