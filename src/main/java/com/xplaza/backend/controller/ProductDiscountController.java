@@ -7,7 +7,6 @@ package com.xplaza.backend.controller;
 import java.util.Date;
 import java.util.List;
 
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 import org.json.JSONException;
@@ -19,14 +18,14 @@ import org.springframework.web.bind.annotation.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xplaza.backend.common.util.ApiResponse;
-import com.xplaza.backend.model.ProductDiscount;
-import com.xplaza.backend.model.ProductDiscountList;
+import com.xplaza.backend.dto.ProductDiscountRequestDTO;
+import com.xplaza.backend.dto.ProductDiscountResponseDTO;
 import com.xplaza.backend.service.ProductDiscountService;
 import com.xplaza.backend.service.RoleService;
 
 @RestController
 @RequestMapping("/api/v1/product-discounts")
-public class ProductDiscountController {
+public class ProductDiscountController extends BaseController {
   @Autowired
   private ProductDiscountService productDiscountService;
 
@@ -36,20 +35,11 @@ public class ProductDiscountController {
   private Date start, end;
   private Long responseTime;
 
-  @ModelAttribute
-  public void setResponseHeader(HttpServletResponse response) {
-    response.setHeader("Cache-Control", "no-store"); // HTTP 1.1.
-    response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
-    response.setHeader("Expires", "0"); // Proxies.
-    response.setHeader("Content-Type", "application/json");
-    response.setHeader("Set-Cookie", "type=ninja");
-  }
-
   @GetMapping
   public ResponseEntity<String> getProductDiscounts(
       @RequestParam(value = "user_id") @Valid Long user_id) throws JsonProcessingException {
     start = new Date();
-    List<ProductDiscountList> dtos;
+    List<ProductDiscountResponseDTO> dtos;
     String role_name = roleService.getRoleNameByUserID(user_id);
     if (role_name == null)
       dtos = null;
@@ -73,7 +63,7 @@ public class ProductDiscountController {
   @GetMapping("/{id}")
   public ResponseEntity<String> getProductDiscountByID(@PathVariable @Valid Long id) throws JsonProcessingException {
     start = new Date();
-    ProductDiscountList dtos = productDiscountService.listProductDiscount(id);
+    ProductDiscountResponseDTO dto = productDiscountService.listProductDiscount(id);
     end = new Date();
     responseTime = end.getTime() - start.getTime();
     ObjectMapper mapper = new ObjectMapper();
@@ -83,31 +73,28 @@ public class ProductDiscountController {
         "  \"status\": 200,\n" +
         "  \"response\": \"Success\",\n" +
         "  \"msg\": \"\",\n" +
-        "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
+        "  \"data\":" + mapper.writeValueAsString(dto) + "\n}";
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
   @PostMapping
-  public ResponseEntity<ApiResponse> addProductDiscount(@RequestBody @Valid ProductDiscount productDiscount)
+  public ResponseEntity<ApiResponse> addProductDiscount(
+      @RequestBody @Valid ProductDiscountRequestDTO productDiscountRequestDTO)
       throws JSONException {
     start = new Date();
-    // check if the discount is greater than the product price
-    if (!productDiscountService.checkDiscountValidity(productDiscount)) {
+    if (!productDiscountService.checkDiscountValidity(productDiscountRequestDTO)) {
       end = new Date();
       responseTime = end.getTime() - start.getTime();
       return new ResponseEntity<>(new ApiResponse(responseTime, "Add Product Discount", HttpStatus.FORBIDDEN.value(),
           "Error", "Discount cannot be greater than the original price!", null), HttpStatus.FORBIDDEN);
     }
-    // check if the product discount date is valid?
-    productDiscount.setStart_date(productDiscountService.convertDateToStartOfTheDay(productDiscount.getStart_date()));
-    productDiscount.setEnd_date(productDiscountService.convertDateToEndOfTheDay(productDiscount.getEnd_date()));
-    if (!productDiscountService.checkDiscountDateValidity(productDiscount)) {
+    if (!productDiscountService.checkDiscountDateValidity(productDiscountRequestDTO)) {
       end = new Date();
       responseTime = end.getTime() - start.getTime();
       return new ResponseEntity<>(new ApiResponse(responseTime, "Add Product Discount", HttpStatus.FORBIDDEN.value(),
           "Error", "Discount date is not valid! Please change discount date.", null), HttpStatus.FORBIDDEN);
     }
-    productDiscountService.addProductDiscount(productDiscount);
+    productDiscountService.addProductDiscount(productDiscountRequestDTO);
     end = new Date();
     responseTime = end.getTime() - start.getTime();
     return new ResponseEntity<>(new ApiResponse(responseTime, "Add Product Discount", HttpStatus.CREATED.value(),
@@ -115,25 +102,22 @@ public class ProductDiscountController {
   }
 
   @PutMapping
-  public ResponseEntity<ApiResponse> updateProductDiscount(@RequestBody @Valid ProductDiscount productDiscount) {
+  public ResponseEntity<ApiResponse> updateProductDiscount(
+      @RequestBody @Valid ProductDiscountRequestDTO productDiscountRequestDTO) {
     start = new Date();
-    // check if the discount is greater than the product price
-    if (!productDiscountService.checkDiscountValidity(productDiscount)) {
+    if (!productDiscountService.checkDiscountValidity(productDiscountRequestDTO)) {
       end = new Date();
       responseTime = end.getTime() - start.getTime();
       return new ResponseEntity<>(new ApiResponse(responseTime, "Update Product Discount", HttpStatus.FORBIDDEN.value(),
           "Error", "Discount cannot be greater than the original price!", null), HttpStatus.FORBIDDEN);
     }
-    // check if the product discount date is valid?
-    productDiscount.setStart_date(productDiscountService.convertDateToStartOfTheDay(productDiscount.getStart_date()));
-    productDiscount.setEnd_date(productDiscountService.convertDateToEndOfTheDay(productDiscount.getEnd_date()));
-    if (!productDiscountService.checkDiscountDateValidity(productDiscount)) {
+    if (!productDiscountService.checkDiscountDateValidity(productDiscountRequestDTO)) {
       end = new Date();
       responseTime = end.getTime() - start.getTime();
       return new ResponseEntity<>(new ApiResponse(responseTime, "Update Product Discount", HttpStatus.FORBIDDEN.value(),
           "Error", "Discount date is not valid! Please change discount date.", null), HttpStatus.FORBIDDEN);
     }
-    productDiscountService.updateProductDiscount(productDiscount);
+    productDiscountService.updateProductDiscount(productDiscountRequestDTO);
     end = new Date();
     responseTime = end.getTime() - start.getTime();
     return new ResponseEntity<>(new ApiResponse(responseTime, "Update Product Discount", HttpStatus.OK.value(),

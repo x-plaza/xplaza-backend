@@ -5,39 +5,50 @@
 package com.xplaza.backend.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.xplaza.backend.model.State;
-import com.xplaza.backend.repository.StateRepository;
+import com.xplaza.backend.dao.StateDAO;
+import com.xplaza.backend.dto.StateRequestDTO;
+import com.xplaza.backend.dto.StateResponseDTO;
+import com.xplaza.backend.entity.StateEntity;
+import com.xplaza.backend.mapper.StateMapper;
+import com.xplaza.backend.repository.StateEntityRepository;
 
 @Service
 public class StateService {
   @Autowired
-  private StateRepository stateRepo;
+  private StateEntityRepository stateEntityRepository;
 
-  public void addState(State city) {
-    stateRepo.save(city);
+  @Autowired
+  private StateMapper stateMapper;
+
+  public void addState(StateRequestDTO dto) {
+    StateEntity entity = stateMapper.toEntity(dto);
+    stateEntityRepository.save(entity);
   }
 
-  public void updateState(State city) {
-    stateRepo.save(city);
-  }
-
-  public String getStateNameByID(Long id) {
-    return stateRepo.getName(id);
+  public void updateState(StateRequestDTO dto) {
+    StateEntity entity = stateMapper.toEntity(dto);
+    stateEntityRepository.save(entity);
   }
 
   public void deleteState(Long id) {
-    stateRepo.deleteById(id);
+    stateEntityRepository.deleteById(id);
   }
 
-  public List<State> listStates() {
-    return stateRepo.findAll();
+  public StateResponseDTO listState(Long id) {
+    StateEntity entity = stateEntityRepository.findById(id).orElse(null);
+    StateDAO dao = stateMapper.toDAO(entity);
+    return stateMapper.toResponseDTO(dao);
   }
 
-  public State listState(Long id) {
-    return stateRepo.findStateById(id);
+  public List<StateResponseDTO> listStates() {
+    return stateEntityRepository.findAll().stream()
+        .map(stateMapper::toDAO)
+        .map(stateMapper::toResponseDTO)
+        .collect(Collectors.toList());
   }
 }

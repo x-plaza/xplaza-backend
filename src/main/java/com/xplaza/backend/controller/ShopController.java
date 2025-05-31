@@ -7,7 +7,6 @@ package com.xplaza.backend.controller;
 import java.util.Date;
 import java.util.List;
 
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +24,7 @@ import com.xplaza.backend.service.ShopService;
 
 @RestController
 @RequestMapping("/api/v1/shops")
-public class ShopController {
+public class ShopController extends BaseController {
   @Autowired
   private ShopService shopService;
 
@@ -35,56 +34,26 @@ public class ShopController {
   private Date start, end;
   private Long responseTime;
 
-  @ModelAttribute
-  public void setResponseHeader(HttpServletResponse response) {
-    response.setHeader("Cache-Control", "no-store"); // HTTP 1.1.
-    response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
-    response.setHeader("Expires", "0"); // Proxies.
-    response.setHeader("Content-Type", "application/json");
-    response.setHeader("Set-Cookie", "type=ninja");
-    response.setHeader("msg", "");
-  }
-
   @GetMapping
-  public ResponseEntity<String> getShops(@RequestParam(value = "user_id") @Valid Long user_id)
-      throws JsonProcessingException {
-    start = new Date();
-    List<ShopList> dtos;
-    String role_name = roleService.getRoleNameByUserID(user_id);
-    if (role_name == null)
-      dtos = null;
-    else if (role_name.equals("Master Admin"))
-      dtos = shopService.listShops();
-    else
-      dtos = shopService.listShopsByUserID(user_id);
-    end = new Date();
-    responseTime = end.getTime() - start.getTime();
-    ObjectMapper mapper = new ObjectMapper();
-    String response = "{\n" +
-        "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Shop List\",\n" +
-        "  \"status\": 200,\n" +
-        "  \"response\": \"Success\",\n" +
-        "  \"msg\": \"\",\n" +
-        "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
-    return new ResponseEntity<>(response, HttpStatus.OK);
+  public ResponseEntity<ApiResponse> getShops() throws Exception {
+    long start = System.currentTimeMillis();
+    List<ShopList> dtos = shopService.listShops();
+    long end = System.currentTimeMillis();
+    long responseTime = end - start;
+    String data = new ObjectMapper().writeValueAsString(dtos);
+    ApiResponse response = new ApiResponse(responseTime, "Shop List", HttpStatus.OK.value(), "Success", "", data);
+    return ResponseEntity.ok(response);
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<String> getShop(@PathVariable @Valid Long id) throws JsonProcessingException {
-    start = new Date();
-    ShopList dtos = shopService.listShop(id);
-    end = new Date();
-    responseTime = end.getTime() - start.getTime();
-    ObjectMapper mapper = new ObjectMapper();
-    String response = "{\n" +
-        "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Shop by ID\",\n" +
-        "  \"status\": 200,\n" +
-        "  \"response\": \"Success\",\n" +
-        "  \"msg\": \"\",\n" +
-        "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
-    return new ResponseEntity<>(response, HttpStatus.OK);
+  public ResponseEntity<ApiResponse> getShop(@PathVariable @Valid Long id) throws Exception {
+    long start = System.currentTimeMillis();
+    ShopList dto = shopService.listShop(id);
+    long end = System.currentTimeMillis();
+    long responseTime = end - start;
+    String data = new ObjectMapper().writeValueAsString(dto);
+    ApiResponse response = new ApiResponse(responseTime, "Shop By ID", HttpStatus.OK.value(), "Success", "", data);
+    return ResponseEntity.ok(response);
   }
 
   @GetMapping("/by-location/{id}")

@@ -7,7 +7,6 @@ package com.xplaza.backend.controller;
 import java.util.Date;
 import java.util.List;
 
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,21 +22,12 @@ import com.xplaza.backend.service.RoleService;
 
 @RestController
 @RequestMapping("/api/v1/roles")
-public class RoleController {
+public class RoleController extends BaseController {
   @Autowired
   private RoleService roleService;
 
   private Date start, end;
   private Long responseTime;
-
-  @ModelAttribute
-  public void setResponseHeader(HttpServletResponse response) {
-    response.setHeader("Cache-Control", "no-store"); // HTTP 1.1.
-    response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
-    response.setHeader("Expires", "0"); // Proxies.
-    response.setHeader("Content-Type", "application/json");
-    response.setHeader("Set-Cookie", "type=ninja");
-  }
 
   @GetMapping
   public ResponseEntity<String> getRoles() throws JsonProcessingException {

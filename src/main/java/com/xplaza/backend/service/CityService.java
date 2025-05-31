@@ -5,39 +5,50 @@
 package com.xplaza.backend.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.xplaza.backend.model.City;
-import com.xplaza.backend.repository.CityRepository;
+import com.xplaza.backend.dao.CityDAO;
+import com.xplaza.backend.dto.CityRequestDTO;
+import com.xplaza.backend.dto.CityResponseDTO;
+import com.xplaza.backend.entity.CityEntity;
+import com.xplaza.backend.mapper.CityMapper;
+import com.xplaza.backend.repository.CityEntityRepository;
 
 @Service
 public class CityService {
   @Autowired
-  private CityRepository cityRepo;
+  private CityEntityRepository cityEntityRepository;
 
-  public void addCity(City city) {
-    cityRepo.save(city);
+  @Autowired
+  private CityMapper cityMapper;
+
+  public void addCity(CityRequestDTO dto) {
+    CityEntity entity = cityMapper.toEntity(dto);
+    cityEntityRepository.save(entity);
   }
 
-  public void updateCity(City city) {
-    cityRepo.save(city);
-  }
-
-  public String getCityNameByID(Long id) {
-    return cityRepo.getName(id);
+  public void updateCity(CityRequestDTO dto) {
+    CityEntity entity = cityMapper.toEntity(dto);
+    cityEntityRepository.save(entity);
   }
 
   public void deleteCity(Long id) {
-    cityRepo.deleteById(id);
+    cityEntityRepository.deleteById(id);
   }
 
-  public List<City> listCities() {
-    return cityRepo.findAll();
+  public CityResponseDTO listCity(Long id) {
+    CityEntity entity = cityEntityRepository.findById(id).orElse(null);
+    CityDAO dao = cityMapper.toDAO(entity);
+    return cityMapper.toResponseDTO(dao);
   }
 
-  public City listCity(Long id) {
-    return cityRepo.findCityById(id);
+  public List<CityResponseDTO> listCities() {
+    return cityEntityRepository.findAll().stream()
+        .map(cityMapper::toDAO)
+        .map(cityMapper::toResponseDTO)
+        .collect(Collectors.toList());
   }
 }

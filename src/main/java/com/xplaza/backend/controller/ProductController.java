@@ -8,7 +8,6 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 import org.json.JSONException;
@@ -28,7 +27,7 @@ import com.xplaza.backend.service.RoleService;
 
 @RestController
 @RequestMapping("/api/v1/products")
-public class ProductController {
+public class ProductController extends BaseController {
   @Autowired
   private ProductService productService;
 
@@ -37,15 +36,6 @@ public class ProductController {
 
   private Date start, end;
   private Long responseTime;
-
-  @ModelAttribute
-  public void setResponseHeader(HttpServletResponse response) {
-    response.setHeader("Cache-Control", "no-store"); // HTTP 1.1.
-    response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
-    response.setHeader("Expires", "0"); // Proxies.
-    response.setHeader("Content-Type", "application/json");
-    response.setHeader("Set-Cookie", "type=ninja");
-  }
 
   @GetMapping
   public ResponseEntity<String> getProducts(@RequestParam(value = "user_id") @Valid Long user_id)

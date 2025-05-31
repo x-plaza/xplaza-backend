@@ -9,7 +9,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 import org.json.JSONException;
@@ -34,7 +33,7 @@ import com.xplaza.backend.service.RoleService;
 
 @RestController
 @RequestMapping("/api/v1/orders")
-public class OrderController {
+public class OrderController extends BaseController {
   @Autowired
   private OrderService orderService;
 
@@ -46,15 +45,6 @@ public class OrderController {
 
   private Date start, end;
   private Long responseTime;
-
-  @ModelAttribute
-  public void setResponseHeader(HttpServletResponse response) {
-    response.setHeader("Cache-Control", "no-store"); // HTTP 1.1.
-    response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
-    response.setHeader("Expires", "0"); // Proxies.
-    response.setHeader("Content-Type", "application/json");
-    response.setHeader("Set-Cookie", "type=ninja");
-  }
 
   @GetMapping
   public ResponseEntity<String> getOrdersByAdmin(

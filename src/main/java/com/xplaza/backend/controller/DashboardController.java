@@ -7,7 +7,6 @@ package com.xplaza.backend.controller;
 import java.io.IOException;
 import java.util.Date;
 
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,21 +20,12 @@ import com.xplaza.backend.service.DashboardService;
 
 @RestController
 @RequestMapping("/api/v1/dashboard")
-public class DashboardController {
+public class DashboardController extends BaseController {
   @Autowired
   private DashboardService dashboardService;
 
   private Date start, end;
   private Long responseTime;
-
-  @ModelAttribute
-  public void setResponseHeader(HttpServletResponse response) {
-    response.setHeader("Cache-Control", "no-store"); // HTTP 1.1.
-    response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
-    response.setHeader("Expires", "0"); // Proxies.
-    response.setHeader("Content-Type", "application/json");
-    response.setHeader("Set-Cookie", "type=ninja");
-  }
 
   @PostMapping
   public ResponseEntity<String> dashboardDetails(@RequestParam(value = "shop_id") @Valid Long shop_id)

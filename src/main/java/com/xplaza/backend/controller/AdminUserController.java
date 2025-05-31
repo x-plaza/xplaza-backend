@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +33,7 @@ import com.xplaza.backend.service.SecurityService;
 
 @RestController
 @RequestMapping("/api/v1/admin-users")
-public class AdminUserController {
+public class AdminUserController extends BaseController {
   @Autowired
   private AdminUserService adminUserService;
 
@@ -52,15 +51,6 @@ public class AdminUserController {
 
   private Date start, end;
   private Long responseTime;
-
-  @ModelAttribute
-  public void setResponseHeader(HttpServletResponse response) {
-    response.setHeader("Cache-Control", "no-store"); // HTTP 1.1.
-    response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
-    response.setHeader("Expires", "0"); // Proxies.
-    response.setHeader("Content-Type", "application/json");
-    response.setHeader("Set-Cookie", "type=ninja");
-  }
 
   @GetMapping
   public ResponseEntity<String> getAdminUsers(@RequestParam(value = "user_id") @Valid Long user_id)

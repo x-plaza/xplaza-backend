@@ -4,10 +4,8 @@
  */
 package com.xplaza.backend.controller;
 
-import java.util.Date;
 import java.util.List;
 
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,107 +13,73 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xplaza.backend.common.util.ApiResponse;
+import com.xplaza.backend.dto.CategoryRequestDTO;
+import com.xplaza.backend.dto.CategoryResponseDTO;
+import com.xplaza.backend.mapper.CategoryMapper;
 import com.xplaza.backend.model.Category;
 import com.xplaza.backend.model.CategoryList;
 import com.xplaza.backend.service.CategoryService;
 
 @RestController
 @RequestMapping("/api/v1/categories")
-public class CategoryController {
+public class CategoryController extends BaseController {
   @Autowired
   private CategoryService categoryService;
 
-  private Date start, end;
-  private Long responseTime;
-
-  @ModelAttribute
-  public void setResponseHeader(HttpServletResponse response) {
-    response.setHeader("Cache-Control", "no-store"); // HTTP 1.1.
-    response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
-    response.setHeader("Expires", "0"); // Proxies.
-    response.setHeader("Content-Type", "application/json");
-    response.setHeader("Set-Cookie", "type=ninja");
-  }
+  @Autowired
+  private CategoryMapper categoryMapper;
 
   @GetMapping
-  public ResponseEntity<String> getCategories() throws JsonProcessingException {
-    start = new Date();
-    List<CategoryList> dtos = categoryService.listCategories();
-    end = new Date();
-    responseTime = end.getTime() - start.getTime();
-    ObjectMapper mapper = new ObjectMapper();
-    String response = "{\n" +
-        "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Category List\",\n" +
-        "  \"status\": 200,\n" +
-        "  \"response\": \"Success\",\n" +
-        "  \"msg\": \"\",\n" +
-        "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
-    return new ResponseEntity<>(response, HttpStatus.OK);
+  public ResponseEntity<ApiResponse> getCategories() throws Exception {
+    long start = System.currentTimeMillis();
+    List<CategoryList> categoryLists = categoryService.listCategories();
+    List<CategoryResponseDTO> dtos = categoryLists.stream()
+        .map(categoryMapper::toResponseDTO)
+        .toList();
+    long end = System.currentTimeMillis();
+    long responseTime = end - start;
+    String data = new ObjectMapper().writeValueAsString(dtos);
+    ApiResponse response = new ApiResponse(responseTime, "Category List", HttpStatus.OK.value(), "Success", "", data);
+    return ResponseEntity.ok(response);
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<String> getCategory(@PathVariable @Valid Long id) throws JsonProcessingException {
-    start = new Date();
-    CategoryList dtos = categoryService.listCategory(id);
-    end = new Date();
-    responseTime = end.getTime() - start.getTime();
-    ObjectMapper mapper = new ObjectMapper();
-    String response = "{\n" +
-        "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Category By ID\",\n" +
-        "  \"status\": 200,\n" +
-        "  \"response\": \"Success\",\n" +
-        "  \"msg\": \"\",\n" +
-        "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
-    return new ResponseEntity<>(response, HttpStatus.OK);
+  public ResponseEntity<ApiResponse> getCategory(@PathVariable @Valid Long id) throws Exception {
+    long start = System.currentTimeMillis();
+    CategoryList categoryList = categoryService.listCategory(id);
+    CategoryResponseDTO dto = categoryMapper.toResponseDTO(categoryList);
+    long end = System.currentTimeMillis();
+    long responseTime = end - start;
+    String data = new ObjectMapper().writeValueAsString(dto);
+    ApiResponse response = new ApiResponse(responseTime, "Category By ID", HttpStatus.OK.value(), "Success", "", data);
+    return ResponseEntity.ok(response);
   }
 
   @PostMapping
-  public ResponseEntity<ApiResponse> addCategory(@RequestBody @Valid Category category) {
-    start = new Date();
-    // check if the same category already exists?
-    if (categoryService.isExist(category)) {
-      end = new Date();
-      responseTime = end.getTime() - start.getTime();
-      return new ResponseEntity<>(new ApiResponse(responseTime, "Add Category", HttpStatus.FORBIDDEN.value(),
-          "Error", "Category already exists! Please use different category name.", null), HttpStatus.FORBIDDEN);
-    }
+  public ResponseEntity<ApiResponse> addCategory(@RequestBody @Valid CategoryRequestDTO categoryRequestDTO) {
+    Category category = categoryMapper.toEntity(categoryRequestDTO);
     categoryService.addCategory(category);
-    end = new Date();
-    responseTime = end.getTime() - start.getTime();
-    return new ResponseEntity<>(new ApiResponse(responseTime, "Add Category", HttpStatus.CREATED.value(),
-        "Success", "Category has been created.", null), HttpStatus.CREATED);
+    ApiResponse response = new ApiResponse(0, "Add Category", HttpStatus.CREATED.value(), "Success",
+        "Category has been created.", null);
+    return new ResponseEntity<>(response, HttpStatus.CREATED);
   }
 
   @PutMapping
-  public ResponseEntity<ApiResponse> updateCategory(@RequestBody @Valid Category category) {
-    start = new Date();
+  public ResponseEntity<ApiResponse> updateCategory(@RequestBody @Valid CategoryRequestDTO categoryRequestDTO) {
+    Category category = categoryMapper.toEntity(categoryRequestDTO);
     categoryService.updateCategory(category);
-    end = new Date();
-    responseTime = end.getTime() - start.getTime();
-    return new ResponseEntity<>(new ApiResponse(responseTime, "Update Category", HttpStatus.OK.value(),
-        "Success", "Category has been updated.", null), HttpStatus.OK);
+    ApiResponse response = new ApiResponse(0, "Update Category", HttpStatus.OK.value(), "Success",
+        "Category has been updated.", null);
+    return ResponseEntity.ok(response);
   }
 
   @DeleteMapping("/{id}")
   public ResponseEntity<ApiResponse> deleteCategory(@PathVariable @Valid Long id) {
-    String category_name = categoryService.getCategoryNameByID(id);
-    start = new Date();
-    // check if a category has still child category?
-    if (categoryService.hasChildCategory(id)) {
-      end = new Date();
-      responseTime = end.getTime() - start.getTime();
-      return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Category", HttpStatus.FORBIDDEN.value(),
-          "Error", "Cannot delete " + category_name + ". It still has child category.", null), HttpStatus.FORBIDDEN);
-    }
     categoryService.deleteCategory(id);
-    end = new Date();
-    responseTime = end.getTime() - start.getTime();
-    return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Category", HttpStatus.OK.value(),
-        "Success", category_name + " has been deleted.", null), HttpStatus.OK);
+    ApiResponse response = new ApiResponse(0, "Delete Category", HttpStatus.OK.value(), "Success",
+        "Category has been deleted.", null);
+    return ResponseEntity.ok(response);
   }
 }
