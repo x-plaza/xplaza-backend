@@ -10,9 +10,9 @@ import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.xplaza.backend.jpa.repository.LoginRepository;
 import com.xplaza.backend.model.AdminLogin;
 import com.xplaza.backend.model.AdminUser;
-import com.xplaza.backend.repository.LoginRepository;
 
 @Service
 public class LoginService {

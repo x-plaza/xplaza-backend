@@ -9,18 +9,21 @@ import org.springframework.core.env.Environment;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 
+import com.xplaza.backend.jpa.repository.ConfirmationTokenRepository;
 import com.xplaza.backend.model.ConfirmationToken;
 import com.xplaza.backend.model.PlatformInfo;
-import com.xplaza.backend.repository.ConfirmationTokenRepository;
 
 @Service
 public class ConfirmationTokenService {
   @Autowired
   private ConfirmationTokenRepository confirmationTokenRepo;
+
   @Autowired
   private EmailSenderService emailSenderService;
+
   @Autowired
   private PlatformInfoService platformInfoService;
+
   @Autowired
   private Environment env;
 

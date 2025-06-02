@@ -10,8 +10,8 @@ import java.util.Calendar;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.xplaza.backend.model.Dashboard;
-import com.xplaza.backend.repository.DashboardRepository;
+import com.xplaza.backend.jpa.dao.Dashboard;
+import com.xplaza.backend.jpa.repository.DashboardRepository;
 
 @Service
 public class DashboardService {

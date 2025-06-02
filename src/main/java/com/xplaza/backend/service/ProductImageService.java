@@ -5,38 +5,47 @@
 package com.xplaza.backend.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.xplaza.backend.model.ProductImage;
-import com.xplaza.backend.repository.ProductImageRepository;
+import com.xplaza.backend.jpa.dao.City;
+import com.xplaza.backend.jpa.repository.ProductImageDAORepository;
+import com.xplaza.backend.mapper.ProductImageMapper;
+import com.xplaza.backend.service.entity.ProductImageEntity;
 
 @Service
 public class ProductImageService {
   @Autowired
-  private ProductImageRepository productImgRepo;
+  private ProductImageDAORepository productImageDAORepo;
+  @Autowired
+  private ProductImageMapper productImageMapper;
 
-  /*
-   * public void addProductImage(ProductImage productImage) {
-   * productImgRepo.save(productImage); }
-   * 
-   * public void updateProductImage(ProductImage productImage) {
-   * productImgRepo.save(productImage); }
-   * 
-   * public List<ProductImage> listProductImages() { return
-   * productImgRepo.findAll(Sort.by(Sort.Direction.ASC, "name")); }
-   * 
-   * public String getProductImageNameByID(Long id) { return
-   * productImgRepo.getName(id); }
-   * 
-   * public void deleteProductImage(Long id) { productImgRepo.deleteById(id); }
-   * 
-   * public void deleteImagesByProductId(Long id) {
-   * productImgRepo.deleteImagesByProductId(id); }
-   */
+  public void addProductImage(ProductImageEntity entity) {
+    City.ProductImage dao = productImageMapper.toDAO(entity);
+    productImageDAORepo.save(dao);
+  }
 
-  public List<ProductImage> listProductImage(Long id) {
-    return productImgRepo.findImageByProductId(id);
+  public void updateProductImage(ProductImageEntity entity) {
+    City.ProductImage dao = productImageMapper.toDAO(entity);
+    productImageDAORepo.save(dao);
+  }
+
+  public List<ProductImageEntity> listProductImages() {
+    return productImageDAORepo.findAll().stream().map(productImageMapper::toEntityFromDAO).collect(Collectors.toList());
+  }
+
+  public List<ProductImageEntity> listProductImage(Long productId) {
+    return productImageDAORepo.findByProductId(productId).stream().map(productImageMapper::toEntityFromDAO)
+        .collect(Collectors.toList());
+  }
+
+  public void deleteProductImage(Long id) {
+    productImageDAORepo.deleteById(id);
+  }
+
+  public void deleteImagesByProductId(Long productId) {
+    productImageDAORepo.deleteByProductId(productId);
   }
 }

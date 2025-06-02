@@ -11,18 +11,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.xplaza.backend.jpa.dao.OrderItem;
+import com.xplaza.backend.jpa.dao.ProductDiscount;
+import com.xplaza.backend.jpa.repository.CouponDetailsRepository;
+import com.xplaza.backend.jpa.repository.DeliveryCostRepository;
+import com.xplaza.backend.jpa.repository.OrderItemRepository;
+import com.xplaza.backend.jpa.repository.OrderRepository;
+import com.xplaza.backend.jpa.repository.ProductDiscountRepository;
+import com.xplaza.backend.jpa.repository.ProductRepository;
+import com.xplaza.backend.mapper.OrderItemMapper;
 import com.xplaza.backend.model.CouponDetails;
 import com.xplaza.backend.model.DeliveryCost;
 import com.xplaza.backend.model.Order;
-import com.xplaza.backend.model.OrderItem;
 import com.xplaza.backend.model.Product;
-import com.xplaza.backend.model.ProductDiscount;
-import com.xplaza.backend.repository.CouponDetailsRepository;
-import com.xplaza.backend.repository.DeliveryCostRepository;
-import com.xplaza.backend.repository.OrderItemRepository;
-import com.xplaza.backend.repository.OrderRepository;
-import com.xplaza.backend.repository.ProductDiscountRepository;
-import com.xplaza.backend.repository.ProductRepository;
+import com.xplaza.backend.service.entity.OrderItemEntity;
 
 @Service
 public class OrderItemService {
@@ -38,90 +40,88 @@ public class OrderItemService {
   private CouponDetailsRepository couponDetailsRepo;
   @Autowired
   private ProductDiscountRepository productDiscountRepo;
+  @Autowired
+  private OrderItemMapper orderItemMapper;
 
   @Transactional
-  public void addOrderItem(OrderItem orderItem) {
-    Order order = orderRepo.findOrderById(orderItem.getOrder_id());
-    Product product = productRepo.findProductById(orderItem.getProduct_id());
-    Double original_selling_price = product.getSelling_price();
-    Double buying_price = product.getBuying_price();
-    orderItem.setProduct_selling_price(original_selling_price);
-    orderItem.setProduct_buying_price(buying_price);
+  public void addOrderItem(OrderItemEntity orderItemEntity) {
+    OrderItem dao = orderItemMapper.toDAO(orderItemEntity);
+    Order order = orderRepo.findOrderById(dao.getOrderId());
+    Product product = productRepo.findProductById(dao.getProductId());
+    Double originalSellingPrice = product.getSelling_price();
+    Double buyingPrice = product.getBuying_price();
+    dao.setProductSellingPrice(originalSellingPrice);
+    dao.setProductBuyingPrice(buyingPrice);
 
-    // check discount amount with validity and discount type
-    Double discount_amount = 0.0;
-    ProductDiscount productDiscount = productDiscountRepo.findByProductId(orderItem.getProduct_id());
+    Double discountAmount = 0.0;
+    ProductDiscount productDiscount = productDiscountRepo.findByProductId(dao.getProductId());
     if (productDiscount != null) {
-      discount_amount = productDiscount.getDiscount_amount();
-      Long discount_type = productDiscount.getDiscount_type_id();
-      if (discount_type == 2) // Percentage
-      {
-        discount_amount = original_selling_price * (discount_amount / 100);
+      discountAmount = productDiscount.getDiscountAmount();
+      Long discountType = productDiscount.getDiscountTypeId();
+      if (discountType == 2) {
+        discountAmount = originalSellingPrice * (discountAmount / 100);
       }
     }
-    Double unit_price = original_selling_price - discount_amount; // here unit price is basically the discounted price
-    orderItem.setUnit_price(unit_price);
-    orderItem.setItem_total_price(orderItem.getUnit_price() * orderItem.getQuantity());
-    Double item_total_price = orderItem.getItem_total_price();
+    Double unitPrice = originalSellingPrice - discountAmount;
+    dao.setUnitPrice(unitPrice);
+    dao.setItemTotalPrice(dao.getUnitPrice() * dao.getQuantity());
+    Double itemTotalPrice = dao.getItemTotalPrice();
 
-    Double net_total = order.getNet_total();
-    Double total_price = order.getTotal_price();
+    Double netTotal = order.getNet_total();
+    Double totalPrice = order.getTotal_price();
 
-    net_total += item_total_price;
-    total_price += original_selling_price * orderItem.getQuantity();
-    Double total_discount = total_price - net_total;
+    netTotal += itemTotalPrice;
+    totalPrice += originalSellingPrice * dao.getQuantity();
+    Double totalDiscount = totalPrice - netTotal;
 
-    // Check updated delivery cost
-    Double delivery_cost = order.getDelivery_cost();
+    Double deliveryCost = order.getDelivery_cost();
     List<DeliveryCost> dcList = deliveryCostRepo.findAll();
     for (DeliveryCost dc : dcList) {
-      if (net_total >= dc.getStart_range() && net_total <= dc.getEnd_range())
-        delivery_cost = dc.getCost();
+      if (netTotal >= dc.getStart_range() && netTotal <= dc.getEnd_range())
+        deliveryCost = dc.getCost();
     }
 
-    // Check updated coupon value
-    Double coupon_amount = order.getCoupon_amount();
+    Double couponAmount = order.getCoupon_amount();
     if (order.getCoupon_id() != null) {
       CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsById(order.getCoupon_id());
       if (Objects.equals(couponDetails.getDiscount_type_name(), "Percentage")) {
-        coupon_amount = (order.getNet_total() * couponDetails.getAmount()) / 100;
-        if (coupon_amount > couponDetails.getMax_amount())
-          coupon_amount = couponDetails.getMax_amount();
+        couponAmount = (order.getNet_total() * couponDetails.getAmount()) / 100;
+        if (couponAmount > couponDetails.getMax_amount())
+          couponAmount = couponDetails.getMax_amount();
       }
     } else if (order.getCoupon_code() != null) {
       CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsByCode(order.getCoupon_code());
       if (Objects.equals(couponDetails.getDiscount_type_name(), "Percentage")) {
-        coupon_amount = (order.getNet_total() * couponDetails.getAmount()) / 100;
-        if (coupon_amount > couponDetails.getMax_amount())
-          coupon_amount = couponDetails.getMax_amount();
+        couponAmount = (order.getNet_total() * couponDetails.getAmount()) / 100;
+        if (couponAmount > couponDetails.getMax_amount())
+          couponAmount = couponDetails.getMax_amount();
       }
     }
-    Double grand_total = net_total + delivery_cost - coupon_amount;
-    order.setTotal_price(total_price);
-    order.setNet_total(net_total);
-    order.setDelivery_cost(delivery_cost);
-    order.setDiscount_amount(total_discount);
-    order.setCoupon_amount(coupon_amount);
-    order.setGrand_total_price(grand_total);
+    Double grandTotal = netTotal + deliveryCost - couponAmount;
+    order.setTotal_price(totalPrice);
+    order.setNet_total(netTotal);
+    order.setDelivery_cost(deliveryCost);
+    order.setDiscount_amount(totalDiscount);
+    order.setCoupon_amount(couponAmount);
+    order.setGrand_total_price(grandTotal);
 
-    // set order item quantity type
-    orderItem.setQuantity_type("pc"); // fixed it since it will always be pc.
+    dao.setQuantityType("pc");
 
-    orderItemRepo.save(orderItem);
+    orderItemRepo.save(dao);
     orderRepo.save(order);
 
-    // Update product inventory
-    Long original_quantity = product.getQuantity();
-    Long updated_quantity = original_quantity - orderItem.getQuantity();
-    productRepo.updateProductInventory(product.getId(), updated_quantity);
+    Long originalQuantity = product.getQuantity();
+    Long updatedQuantity = originalQuantity - dao.getQuantity();
+    productRepo.updateProductInventory(product.getId(), updatedQuantity);
   }
 
-  public List<OrderItem> listOrderItems() {
-    return orderItemRepo.findAll();
+  public List<OrderItemEntity> listOrderItems() {
+    return orderItemRepo.findAll().stream().map(orderItemMapper::toEntityFromDAO).toList();
   }
 
-  public OrderItem listOrderItem(Long id) {
-    return orderItemRepo.findOrderItemById(id);
+  public OrderItemEntity listOrderItem(Long id) {
+    OrderItem dao = orderItemRepo.findOrderItemById(id);
+    return orderItemMapper.toEntityFromDAO(dao);
   }
 
   public String getOrderItemNameByID(Long id) {
@@ -130,143 +130,128 @@ public class OrderItemService {
 
   @Transactional
   public void deleteOrderItem(Long id) {
-    // This approach is basically instead of deleting the product, I am making
-    // quantity to zero.
-    long new_quantity = 0;
-    OrderItem item = orderItemRepo.findOrderItemById(id);
-    Order order = orderRepo.findOrderById(item.getOrder_id());
+    OrderItem dao = orderItemRepo.findOrderItemById(id);
+    OrderItemEntity entity = orderItemMapper.toEntityFromDAO(dao);
+    Order order = orderRepo.findOrderById(entity.getOrderId());
 
-    // Get the old values:
-    // Double original_price = product.getSelling_price();
-    Double original_price = item.getProduct_selling_price();
-    Long old_quantity = item.getQuantity();
-    Double unit_price = item.getUnit_price();
-    Double old_item_total_price = item.getItem_total_price();
-    Double total_price = order.getTotal_price();
-    Double net_total = order.getNet_total();
+    Double originalPrice = entity.getProductSellingPrice();
+    Long oldQuantity = entity.getQuantity();
+    Double unitPrice = entity.getUnitPrice();
+    Double oldItemTotalPrice = entity.getItemTotalPrice();
+    Double totalPrice = order.getTotal_price();
+    Double netTotal = order.getNet_total();
 
-    // Calculate the new values:
-    Double new_item_total_price = unit_price * new_quantity;
-    net_total = net_total - old_item_total_price + new_item_total_price;
-    total_price = total_price - (old_quantity * original_price) + (new_quantity * original_price);
-    Double total_discount = total_price - net_total;
+    Double newItemTotalPrice = unitPrice * 0;
+    netTotal = netTotal - oldItemTotalPrice + newItemTotalPrice;
+    totalPrice = totalPrice - (oldQuantity * originalPrice);
+    Double totalDiscount = totalPrice - netTotal;
 
-    // Check updated delivery cost
-    Double delivery_cost = order.getDelivery_cost();
+    Double deliveryCost = order.getDelivery_cost();
     List<DeliveryCost> dcList = deliveryCostRepo.findAll();
     for (DeliveryCost dc : dcList) {
-      if (net_total >= dc.getStart_range() && net_total <= dc.getEnd_range())
-        delivery_cost = dc.getCost();
+      if (netTotal >= dc.getStart_range() && netTotal <= dc.getEnd_range())
+        deliveryCost = dc.getCost();
     }
 
-    // Check updated coupon value
-    Double coupon_amount = order.getCoupon_amount();
+    Double couponAmount = order.getCoupon_amount();
     if (order.getCoupon_id() != null) {
       CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsById(order.getCoupon_id());
       if (Objects.equals(couponDetails.getDiscount_type_name(), "Percentage")) {
-        coupon_amount = (order.getNet_total() * couponDetails.getAmount()) / 100;
-        if (coupon_amount > couponDetails.getMax_amount())
-          coupon_amount = couponDetails.getMax_amount();
+        couponAmount = (order.getNet_total() * couponDetails.getAmount()) / 100;
+        if (couponAmount > couponDetails.getMax_amount())
+          couponAmount = couponDetails.getMax_amount();
       }
     } else if (order.getCoupon_code() != null) {
       CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsByCode(order.getCoupon_code());
       if (Objects.equals(couponDetails.getDiscount_type_name(), "Percentage")) {
-        coupon_amount = (order.getNet_total() * couponDetails.getAmount()) / 100;
-        if (coupon_amount > couponDetails.getMax_amount())
-          coupon_amount = couponDetails.getMax_amount();
+        couponAmount = (order.getNet_total() * couponDetails.getAmount()) / 100;
+        if (couponAmount > couponDetails.getMax_amount())
+          couponAmount = couponDetails.getMax_amount();
       }
     }
-    Double grand_total = net_total + delivery_cost - coupon_amount;
+    Double grandTotal = netTotal + deliveryCost - couponAmount;
 
-    // Set the new values and save them:
-    order.setTotal_price(total_price);
-    order.setNet_total(net_total);
-    order.setDelivery_cost(delivery_cost);
-    order.setDiscount_amount(total_discount);
-    order.setCoupon_amount(coupon_amount);
-    order.setGrand_total_price(grand_total);
-    item.setItem_total_price(new_item_total_price);
-    item.setQuantity(new_quantity);
-    orderItemRepo.save(item);
+    order.setTotal_price(totalPrice);
+    order.setNet_total(netTotal);
+    order.setDelivery_cost(deliveryCost);
+    order.setDiscount_amount(totalDiscount);
+    order.setCoupon_amount(couponAmount);
+    order.setGrand_total_price(grandTotal);
+    entity.setItemTotalPrice(newItemTotalPrice);
+    entity.setQuantity(0L);
+    orderItemRepo.save(orderItemMapper.toDAO(entity));
     orderRepo.save(order);
 
-    // Update product inventory
-    Product product = productRepo.findProductById(item.getProduct_id());
+    Product product = productRepo.findProductById(entity.getProductId());
     if (product != null) {
-      Long original_quantity = product.getQuantity();
-      Long updated_quantity = original_quantity - item.getQuantity();
-      productRepo.updateProductInventory(product.getId(), updated_quantity);
+      Long originalQuantity = product.getQuantity();
+      Long updatedQuantity = originalQuantity - entity.getQuantity();
+      productRepo.updateProductInventory(product.getId(), updatedQuantity);
     }
   }
 
   @Transactional
-  public void updateOrderItem(Long order_item_id, Long new_quantity) {
-    OrderItem item = orderItemRepo.findOrderItemById(order_item_id);
-    Order order = orderRepo.findOrderById(item.getOrder_id());
+  public void updateOrderItem(Long orderItemId, Long newQuantity) {
+    OrderItem dao = orderItemRepo.findOrderItemById(orderItemId);
+    OrderItemEntity entity = orderItemMapper.toEntityFromDAO(dao);
+    Long oldQuantity = entity.getQuantity();
+    entity.setQuantity(newQuantity);
+    Order order = orderRepo.findOrderById(entity.getOrderId());
 
-    // Get the old values:
-    Double original_price = item.getProduct_selling_price();
-    Long old_quantity = item.getQuantity();
-    Double unit_price = item.getUnit_price(); // discount amount ta alada kore check korinai, sorasori ager item er unit
-                                              // price ta niye nisi
-    Double old_item_total_price = item.getItem_total_price();
-    Double total_price = order.getTotal_price();
-    Double net_total = order.getNet_total();
+    Double originalPrice = entity.getProductSellingPrice();
+    Double unitPrice = entity.getUnitPrice();
+    Double oldItemTotalPrice = entity.getItemTotalPrice();
+    Double totalPrice = order.getTotal_price();
+    Double netTotal = order.getNet_total();
 
-    // Calculate the new values:
-    Double new_item_total_price = unit_price * new_quantity;
-    net_total = net_total - old_item_total_price + new_item_total_price;
-    total_price = total_price - (old_quantity * original_price) + (new_quantity * original_price);
-    Double total_discount = total_price - net_total;
+    Double newItemTotalPrice = unitPrice * newQuantity;
+    netTotal = netTotal - oldItemTotalPrice + newItemTotalPrice;
+    totalPrice = totalPrice - (oldQuantity * originalPrice) + (newQuantity * originalPrice);
+    Double totalDiscount = totalPrice - netTotal;
 
-    // Check updated delivery cost
-    Double delivery_cost = order.getDelivery_cost();
+    Double deliveryCost = order.getDelivery_cost();
     List<DeliveryCost> dcList = deliveryCostRepo.findAll();
     for (DeliveryCost dc : dcList) {
-      if (net_total >= dc.getStart_range() && net_total <= dc.getEnd_range())
-        delivery_cost = dc.getCost();
+      if (netTotal >= dc.getStart_range() && netTotal <= dc.getEnd_range())
+        deliveryCost = dc.getCost();
     }
 
-    // Check updated coupon value
-    Double coupon_amount = order.getCoupon_amount();
+    Double couponAmount = order.getCoupon_amount();
     if (order.getCoupon_id() != null) {
       CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsById(order.getCoupon_id());
       if (Objects.equals(couponDetails.getDiscount_type_name(), "Percentage")) {
-        coupon_amount = (order.getNet_total() * couponDetails.getAmount()) / 100;
-        if (coupon_amount > couponDetails.getMax_amount())
-          coupon_amount = couponDetails.getMax_amount();
+        couponAmount = (order.getNet_total() * couponDetails.getAmount()) / 100;
+        if (couponAmount > couponDetails.getMax_amount())
+          couponAmount = couponDetails.getMax_amount();
       }
     } else if (order.getCoupon_code() != null) {
       CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsByCode(order.getCoupon_code());
       if (Objects.equals(couponDetails.getDiscount_type_name(), "Percentage")) {
-        coupon_amount = (order.getNet_total() * couponDetails.getAmount()) / 100;
-        if (coupon_amount > couponDetails.getMax_amount())
-          coupon_amount = couponDetails.getMax_amount();
+        couponAmount = (order.getNet_total() * couponDetails.getAmount()) / 100;
+        if (couponAmount > couponDetails.getMax_amount())
+          couponAmount = couponDetails.getMax_amount();
       }
     }
-    Double grand_total = net_total + delivery_cost - coupon_amount;
+    Double grandTotal = netTotal + deliveryCost - couponAmount;
 
-    // Set the new values and save them:
-    order.setTotal_price(total_price);
-    order.setNet_total(net_total);
-    order.setDelivery_cost(delivery_cost);
-    order.setDiscount_amount(total_discount);
-    order.setCoupon_amount(coupon_amount);
-    order.setGrand_total_price(grand_total);
-    item.setItem_total_price(new_item_total_price);
-    item.setQuantity(new_quantity);
-    // set order item quantity type
-    item.setQuantity_type("pc"); // fixed it since it will always be pc.
+    order.setTotal_price(totalPrice);
+    order.setNet_total(netTotal);
+    order.setDelivery_cost(deliveryCost);
+    order.setDiscount_amount(totalDiscount);
+    order.setCoupon_amount(couponAmount);
+    order.setGrand_total_price(grandTotal);
+    entity.setItemTotalPrice(newItemTotalPrice);
+    entity.setQuantity(newQuantity);
+    entity.setQuantityType("pc");
 
-    orderItemRepo.save(item);
+    orderItemRepo.save(orderItemMapper.toDAO(entity));
     orderRepo.save(order);
 
-    // Update product inventory
-    Product product = productRepo.findProductById(item.getProduct_id());
+    Product product = productRepo.findProductById(entity.getProductId());
     if (product != null) {
-      Long original_quantity = product.getQuantity();
-      Long updated_quantity = original_quantity - item.getQuantity();
-      productRepo.updateProductInventory(product.getId(), updated_quantity);
+      Long originalQuantity = product.getQuantity();
+      Long updatedQuantity = originalQuantity - entity.getQuantity();
+      productRepo.updateProductInventory(product.getId(), updatedQuantity);
     }
   }
 }

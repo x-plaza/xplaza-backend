@@ -12,15 +12,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.xplaza.backend.common.util.DateConverter;
-import com.xplaza.backend.dto.ProductDiscountRequestDTO;
-import com.xplaza.backend.dto.ProductDiscountResponseDTO;
-import com.xplaza.backend.entity.ProductDiscountEntity;
+import com.xplaza.backend.http.dto.ProductDiscountRequestDTO;
+import com.xplaza.backend.http.dto.ProductDiscountResponseDTO;
+import com.xplaza.backend.jpa.repository.ProductDiscountListRepository;
+import com.xplaza.backend.jpa.repository.ProductDiscountRepository;
+import com.xplaza.backend.jpa.repository.ProductRepository;
 import com.xplaza.backend.mapper.ProductDiscountMapper;
 import com.xplaza.backend.model.Product;
 import com.xplaza.backend.model.ProductDiscount;
-import com.xplaza.backend.repository.ProductDiscountListRepository;
-import com.xplaza.backend.repository.ProductDiscountRepository;
-import com.xplaza.backend.repository.ProductRepository;
+import com.xplaza.backend.service.entity.ProductDiscountEntity;
 
 @Service
 public class ProductDiscountService extends DateConverter {

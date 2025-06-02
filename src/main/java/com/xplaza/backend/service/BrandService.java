@@ -9,19 +9,26 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.xplaza.backend.model.Brand;
-import com.xplaza.backend.repository.BrandRepository;
+import com.xplaza.backend.jpa.dao.BrandDao;
+import com.xplaza.backend.jpa.repository.BrandRepository;
+import com.xplaza.backend.mapper.BrandMapper;
+import com.xplaza.backend.service.entity.Brand;
 
 @Service
 public class BrandService {
   @Autowired
   private BrandRepository brandRepo;
 
-  public void addBrand(Brand brand) {
+  @Autowired
+  private BrandMapper brandMapper;
+
+  public void addBrand(Brand entity) {
+    BrandDao brand = brandMapper.toDao(entity);
     brandRepo.save(brand);
   }
 
-  public void updateBrand(Brand brand) {
+  public void updateBrand(Brand entity) {
+    BrandDao brand = brandMapper.toDao(entity);
     brandRepo.save(brand);
   }
 
@@ -34,14 +41,16 @@ public class BrandService {
   }
 
   public List<Brand> listBrands() {
-    return brandRepo.findAll();
+    return brandRepo.findAll().stream().map(brandMapper::toEntityFromDAO).toList();
   }
 
   public Brand listBrand(Long id) {
-    return brandRepo.findBrandById(id);
+    Brand dao = brandRepo.findBrandById(id);
+    return brandMapper.toEntityFromDAO(dao);
   }
 
-  public boolean isExist(Brand brand) {
+  public boolean isExist(Brand entity) {
+    BrandDao brand = brandMapper.toDao(entity);
     return brandRepo.existsByName(brand.getName());
   }
 }

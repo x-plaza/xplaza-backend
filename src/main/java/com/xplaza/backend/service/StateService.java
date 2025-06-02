@@ -5,17 +5,13 @@
 package com.xplaza.backend.service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.xplaza.backend.dao.StateDAO;
-import com.xplaza.backend.dto.StateRequestDTO;
-import com.xplaza.backend.dto.StateResponseDTO;
-import com.xplaza.backend.entity.StateEntity;
+import com.xplaza.backend.jpa.repository.StateEntityRepository;
 import com.xplaza.backend.mapper.StateMapper;
-import com.xplaza.backend.repository.StateEntityRepository;
+import com.xplaza.backend.service.entity.StateEntity;
 
 @Service
 public class StateService {
@@ -25,13 +21,11 @@ public class StateService {
   @Autowired
   private StateMapper stateMapper;
 
-  public void addState(StateRequestDTO dto) {
-    StateEntity entity = stateMapper.toEntity(dto);
+  public void addState(StateEntity entity) {
     stateEntityRepository.save(entity);
   }
 
-  public void updateState(StateRequestDTO dto) {
-    StateEntity entity = stateMapper.toEntity(dto);
+  public void updateState(StateEntity entity) {
     stateEntityRepository.save(entity);
   }
 
@@ -39,16 +33,11 @@ public class StateService {
     stateEntityRepository.deleteById(id);
   }
 
-  public StateResponseDTO listState(Long id) {
-    StateEntity entity = stateEntityRepository.findById(id).orElse(null);
-    StateDAO dao = stateMapper.toDAO(entity);
-    return stateMapper.toResponseDTO(dao);
+  public StateEntity listState(Long id) {
+    return stateEntityRepository.findById(id).orElse(null);
   }
 
-  public List<StateResponseDTO> listStates() {
-    return stateEntityRepository.findAll().stream()
-        .map(stateMapper::toDAO)
-        .map(stateMapper::toResponseDTO)
-        .collect(Collectors.toList());
+  public List<StateEntity> listStates() {
+    return stateEntityRepository.findAll();
   }
 }

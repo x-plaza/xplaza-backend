@@ -10,8 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.xplaza.backend.jpa.repository.CurrencyRepository;
 import com.xplaza.backend.model.Currency;
-import com.xplaza.backend.repository.CurrencyRepository;
 
 @Service
 public class CurrencyService {

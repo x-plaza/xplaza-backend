@@ -53,4 +53,12 @@ public class ConfirmationToken {
     calendar.add(Calendar.MINUTE, 30);
     this.valid_till = calendar.getTime();
   }
+
+  public String getConfirmationCode() {
+    return confirmation_token;
+  }
+
+  public Date getValidTill() {
+    return valid_till;
+  }
 }

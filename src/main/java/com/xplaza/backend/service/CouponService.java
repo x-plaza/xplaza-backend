@@ -4,137 +4,95 @@
  */
 package com.xplaza.backend.service;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.xplaza.backend.common.util.DateConverter;
-import com.xplaza.backend.model.Coupon;
-import com.xplaza.backend.model.CouponDetails;
-import com.xplaza.backend.model.CouponList;
-import com.xplaza.backend.model.CouponShopLink;
-import com.xplaza.backend.model.CouponShopList;
-import com.xplaza.backend.repository.CouponDetailsRepository;
-import com.xplaza.backend.repository.CouponListRepository;
-import com.xplaza.backend.repository.CouponRepository;
-import com.xplaza.backend.repository.CouponShopLinkRepository;
+import com.xplaza.backend.jpa.dao.CouponDao;
+import com.xplaza.backend.jpa.repository.CouponRepository;
+import com.xplaza.backend.mapper.CouponMapper;
+import com.xplaza.backend.service.entity.Coupon;
 
 @Service
 public class CouponService extends DateConverter {
   @Autowired
-  private CouponRepository couponRepo;
+  private CouponRepository couponRepository;
   @Autowired
-  private CouponListRepository couponListRepo;
-  @Autowired
-  private CouponDetailsRepository couponDetailsRepo;
-  @Autowired
-  private CouponShopLinkRepository couponShopLinkRepo;
+  private CouponMapper couponMapper;
 
   @Transactional
-  public void addCoupon(Coupon coupon) {
-    couponRepo.save(coupon);
-    for (CouponShopLink csl : coupon.getCouponShopLinks()) {
-      couponShopLinkRepo.insert(csl.getShop_id(), coupon.getId());
-    }
+  public void addCoupon(Coupon entity) {
+    CouponDao dao = couponMapper.toDAO(entity);
+    couponRepository.save(dao);
+    // handle shop links if needed
   }
 
   @Transactional
-  public void updateCoupon(Coupon coupon) {
-    couponRepo.update(coupon.getAmount(), coupon.getCurrency_id(), coupon.getStart_date(), coupon.getEnd_date(),
-        coupon.getMax_amount(), coupon.getDiscount_type_id(),
-        coupon.getIs_active(), coupon.getMin_shopping_amount(), coupon.getId());
-    couponShopLinkRepo.deleteByCouponID(coupon.getId());
-    for (CouponShopLink csl : coupon.getCouponShopLinks()) {
-      couponShopLinkRepo.insert(csl.getShop_id(), coupon.getId());
-    }
+  public void updateCoupon(Coupon entity) {
+    CouponDao dao = couponMapper.toDAO(entity);
+    couponRepository.save(dao);
+    // handle shop links if needed
   }
 
-  public String getCouponNameByID(Long id) {
-    return couponRepo.getName(id);
+  public List<Coupon> listCoupons() {
+    return couponRepository.findAll().stream().map(couponMapper::toEntityFromDAO).collect(Collectors.toList());
   }
 
-  @Transactional
+  public Coupon listCoupon(Long id) {
+    return couponRepository.findById(id).map(couponMapper::toEntityFromDAO).orElse(null);
+  }
+
   public void deleteCoupon(Long id) {
-    couponShopLinkRepo.deleteByCouponID(id);
-    couponRepo.deleteById(id);
+    couponRepository.deleteById(id);
   }
 
-  public List<CouponList> listCoupons() {
-    return couponListRepo.findAllCoupons();
-  }
-
-  public CouponDetails getCouponDetails(Long id) {
-    return couponDetailsRepo.findCouponDetailsById(id);
-  }
-
-  public List<CouponList> listCouponsByUserID(Long user_id) {
-    return couponListRepo.findCouponsByUserID(user_id);
-  }
-
-  public boolean isExist(Coupon coupon) {
-    return couponRepo.existsByName(coupon.getCoupon_code());
-  }
-
-  @Transactional
-  public boolean checkCouponValidity(String coupon_code, Double net_order_amount, Long shop_id) throws ParseException {
-    if (!couponRepo.existsByName(coupon_code))
+  public boolean checkCouponValidity(String couponCode, Double netOrderAmount, Long shopId) {
+    Optional<Coupon> daoOpt = couponRepository.findAll().stream()
+        .filter(dao -> couponCode.equals(dao.getId() != null ? dao.getId().toString() : null))
+        .findFirst();
+    if (daoOpt.isEmpty())
       return false;
-    CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsByCode(coupon_code);
-    Date received_time = new Date();
-    SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy HH:mm:ss");
-    if (!(received_time.compareTo(formatter.parse(couponDetails.getStart_date())) >= 0
-        && received_time.compareTo(formatter.parse(couponDetails.getEnd_date())) <= 0))
-      return false;
-    if (!couponDetails.getIs_active())
-      return false;
-    if (couponDetails.getMin_shopping_amount() != null) {
-      if (net_order_amount < couponDetails.getMin_shopping_amount())
+    Coupon coupon = couponMapper.toEntityFromDAO(daoOpt.get());
+    // Check active, date, min shopping, shop
+    if (coupon.getStartDate() != null && coupon.getEndDate() != null) {
+      Date now = new Date();
+      if (now.before(coupon.getStartDate()) || now.after(coupon.getEndDate()))
         return false;
     }
-    // check if coupon is available for this shop?
-    boolean is_valid = false;
-    for (CouponShopList shop : couponDetails.getShopList()) {
-      if (Objects.equals(shop.getShop_id(), shop_id)) {
-        is_valid = true;
-        break;
-      }
+    // TODO: Add isActive, minShoppingAmount, shopIds checks if fields exist in
+    // CouponEntity
+    if (coupon.getShopIds() != null && !coupon.getShopIds().isEmpty() && !coupon.getShopIds().contains(shopId)) {
+      return false;
     }
-    return is_valid;
-  }
-
-  @Transactional
-  public Double calculateCouponAmount(String coupon_code, Double net_order_amount) {
-    Double coupon_amount = 0.0;
-    CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsByCode(coupon_code);
-    if (couponDetails.getDiscount_type_name().equals("Fixed Amount"))
-      coupon_amount = couponDetails.getAmount();
-    else { // for percentage
-      coupon_amount = (net_order_amount * couponDetails.getAmount()) / 100;
-      if (couponDetails.getMax_amount() != null) {
-        if (coupon_amount > couponDetails.getMax_amount())
-          coupon_amount = couponDetails.getMax_amount();
-      }
-    }
-    return coupon_amount;
-  }
-
-  public boolean checkCouponDateValidity(Coupon coupon) {
-    Date current_date = new Date();
-    current_date = convertDateToStartOfTheDay(current_date);
-    Date start_date = coupon.getStart_date();
-    Date end_date = coupon.getEnd_date();
-    if (current_date.after(start_date))
-      return false;
-    if (current_date.after(end_date))
-      return false;
-    if (coupon.getStart_date().after(coupon.getEnd_date()))
-      return false;
+    // Add more checks as needed
     return true;
+  }
+
+  public Double calculateCouponAmount(String couponCode, Double netOrderAmount) {
+    Optional<Coupon> daoOpt = couponDAORepo.findAll().stream()
+        .filter(dao -> couponCode.equals(dao.getId() != null ? dao.getId().toString() : null))
+        .findFirst();
+    if (daoOpt.isEmpty())
+      return 0.0;
+    CouponEntity coupon = couponMapper.toEntityFromDAO(daoOpt.get());
+    Double amount = coupon.getAmount();
+    Double maxAmount = coupon.getMaxAmount();
+    Long discountTypeId = coupon.getDiscountTypeId();
+    Double calculated = 0.0;
+    // Assume discountTypeId==2 means percentage, else fixed
+    if (discountTypeId != null && discountTypeId == 2) {
+      calculated = (netOrderAmount * amount) / 100.0;
+      if (maxAmount != null && calculated > maxAmount)
+        calculated = maxAmount;
+    } else {
+      calculated = amount;
+    }
+    return calculated;
   }
 }

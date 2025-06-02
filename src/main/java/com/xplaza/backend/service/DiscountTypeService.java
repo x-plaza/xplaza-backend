@@ -10,8 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.xplaza.backend.jpa.repository.DiscountTypeRepository;
 import com.xplaza.backend.model.DiscountType;
-import com.xplaza.backend.repository.DiscountTypeRepository;
 
 @Service
 public class DiscountTypeService {
