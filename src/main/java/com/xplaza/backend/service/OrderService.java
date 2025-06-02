@@ -15,47 +15,40 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.xplaza.backend.jpa.dao.ProductDiscount;
+import com.xplaza.backend.jpa.repository.AdminUserRepository;
+import com.xplaza.backend.jpa.repository.CouponDetailsRepository;
+import com.xplaza.backend.jpa.repository.CurrencyRepository;
+import com.xplaza.backend.jpa.repository.CustomerUserRepository;
+import com.xplaza.backend.jpa.repository.DeliveryCostListRepository;
+import com.xplaza.backend.jpa.repository.OrderDAORepository;
+import com.xplaza.backend.jpa.repository.OrderDetailsRepository;
+import com.xplaza.backend.jpa.repository.OrderListRepository;
+import com.xplaza.backend.jpa.repository.ProductDiscountRepository;
+import com.xplaza.backend.jpa.repository.ProductRepository;
+import com.xplaza.backend.mapper.OrderMapper;
 import com.xplaza.backend.model.CouponDetails;
 import com.xplaza.backend.model.CouponShopList;
 import com.xplaza.backend.model.DeliveryCostList;
 import com.xplaza.backend.model.OrderDetails;
-import com.xplaza.backend.model.OrderItem;
 import com.xplaza.backend.model.OrderList;
-import com.xplaza.backend.model.OrderPlace;
-import com.xplaza.backend.model.OrderPlaceList;
 import com.xplaza.backend.model.OrderResponse;
 import com.xplaza.backend.model.PlatformInfo;
 import com.xplaza.backend.model.Product;
-import com.xplaza.backend.model.ProductDiscount;
 import com.xplaza.backend.model.ProductInventory;
-import com.xplaza.backend.repository.AdminUserRepository;
-import com.xplaza.backend.repository.CouponDetailsRepository;
-import com.xplaza.backend.repository.CurrencyRepository;
-import com.xplaza.backend.repository.CustomerUserRepository;
-import com.xplaza.backend.repository.DeliveryCostListRepository;
-import com.xplaza.backend.repository.OrderDetailsRepository;
-import com.xplaza.backend.repository.OrderItemRepository;
-import com.xplaza.backend.repository.OrderListRepository;
-import com.xplaza.backend.repository.OrderPlaceListRepository;
-import com.xplaza.backend.repository.OrderPlaceRepository;
-import com.xplaza.backend.repository.OrderRepository;
-import com.xplaza.backend.repository.ProductDiscountRepository;
-import com.xplaza.backend.repository.ProductRepository;
+import com.xplaza.backend.service.entity.OrderEntity;
+import com.xplaza.backend.service.entity.OrderItemEntity;
 
 @Service
 public class OrderService {
   @Autowired
-  private OrderRepository orderRepo;
+  private OrderDAORepository orderDAORepo;
+  @Autowired
+  private OrderMapper orderMapper;
   @Autowired
   private OrderListRepository orderListRepo;
   @Autowired
   private OrderDetailsRepository orderDetailsRepo;
-  @Autowired
-  private OrderPlaceRepository orderPlaceRepo;
-  @Autowired
-  private OrderPlaceListRepository orderPlaceListRepo;
-  @Autowired
-  private OrderItemRepository orderItemRepo;
   @Autowired
   private ProductRepository productRepo;
   @Autowired
@@ -76,11 +69,11 @@ public class OrderService {
   private Environment env;
 
   @Transactional
-  public ProductInventory checkProductAvailability(OrderPlace order) {
+  public ProductInventory checkProductAvailability(OrderEntity order) {
     ProductInventory productInventory = new ProductInventory();
     productInventory.set_available(true);
-    for (OrderItem item : order.getOrderItemList()) {
-      Product product = productRepo.findProductById(item.getProduct_id());
+    for (OrderItemEntity item : order.getOrderItemList()) {
+      Product product = productRepo.findProductById(item.getProductId());
       if (product.getQuantity() < item.getQuantity()) {
         productInventory.setId(product.getId());
         productInventory.setName(product.getName());
@@ -93,107 +86,87 @@ public class OrderService {
   }
 
   @Transactional
-  public OrderPlace setOrderPrices(OrderPlace order) {
+  public OrderEntity setOrderPrices(OrderEntity order) {
     Double total_price = 0.0;
     Double total_discount = 0.0;
     Double net_total = 0.0;
-    for (OrderItem item : order.getOrderItemList()) {
-      Product product = productRepo.findProductById(item.getProduct_id());
+    for (OrderItemEntity item : order.getOrderItemList()) {
+      Product product = productRepo.findProductById(item.getProductId());
       Double original_selling_price = product.getSelling_price();
       Double buying_price = product.getBuying_price();
-      // check discount amount with validity and discount type
       Double discount_amount = 0.0;
-      ProductDiscount productDiscount = productDiscountRepo.findByProductId(item.getProduct_id());
+      ProductDiscount productDiscount = productDiscountRepo.findByProductId(item.getProductId());
       if (productDiscount != null) {
-        discount_amount = productDiscount.getDiscount_amount();
-        Long discount_type = productDiscount.getDiscount_type_id();
-        if (discount_type == 2) // Percentage
-        {
+        discount_amount = productDiscount.getDiscountAmount();
+        Long discount_type = productDiscount.getDiscountTypeId();
+        if (discount_type == 2) {
           discount_amount = original_selling_price * (discount_amount / 100);
         }
       }
-      // set prices to the item
-      Double unit_price = original_selling_price - discount_amount; // here unit price is basically the discounted price
-      item.setUnit_price(unit_price);
-      item.setProduct_selling_price(original_selling_price);
-      item.setProduct_buying_price(buying_price);
-      item.setItem_total_price(unit_price * item.getQuantity());
-
+      Double unit_price = original_selling_price - discount_amount;
+      item.setUnitPrice(unit_price);
+      item.setProductSellingPrice(original_selling_price);
+      item.setProductBuyingPrice(buying_price);
+      item.setItemTotalPrice(unit_price * item.getQuantity());
       total_price += original_selling_price * item.getQuantity();
-      net_total += item.getItem_total_price();
-
-      // set order item quantity type
-      item.setQuantity_type("pc"); // fixed it since it will always be pc.
+      net_total += item.getItemTotalPrice();
+      item.setQuantityType("pc");
     }
     total_discount = total_price - net_total;
-    order.setTotal_price(total_price);
-    order.setDiscount_amount(total_discount);
-    order.setNet_total(net_total); // sum of item total for an order after discount
-
-    // set delivery cost
+    order.setTotalPrice(total_price);
+    order.setDiscountAmount(total_discount);
+    order.setNetTotal(net_total);
     Double delivery_cost = 0.0;
-    if (order.getDelivery_cost_id() != null) {
-      DeliveryCostList dc = deliveryCostListRepo.findDeliveryCostById(order.getDelivery_cost_id());
+    if (order.getDeliveryCostId() != null) {
+      DeliveryCostList dc = deliveryCostListRepo.findDeliveryCostById(order.getDeliveryCostId());
       delivery_cost = dc.getCost();
     }
-    order.setDelivery_cost(delivery_cost);
-
-    // set coupon amount
+    order.setDeliveryCost(delivery_cost);
     Double coupon_amount = 0.0;
-    if (order.getCoupon_id() != null) {
-      CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsById(order.getCoupon_id());
+    if (order.getCouponId() != null) {
+      CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsById(order.getCouponId());
       if (couponDetails.getDiscount_type_name().equals("Fixed Amount"))
         coupon_amount = couponDetails.getAmount();
-      else { // for percentage
-        coupon_amount = (order.getNet_total() * couponDetails.getAmount()) / 100;
-        if (couponDetails.getMax_amount() != null) {
-          if (coupon_amount > couponDetails.getMax_amount())
-            coupon_amount = couponDetails.getMax_amount();
-        }
+      else {
+        coupon_amount = (order.getNetTotal() * couponDetails.getAmount()) / 100;
+        if (couponDetails.getMax_amount() != null && coupon_amount > couponDetails.getMax_amount())
+          coupon_amount = couponDetails.getMax_amount();
       }
-    } else if (order.getCoupon_code() != null) {
-      CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsByCode(order.getCoupon_code());
+    } else if (order.getCouponCode() != null) {
+      CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsByCode(order.getCouponCode());
       if (couponDetails.getDiscount_type_name().equals("Fixed Amount"))
         coupon_amount = couponDetails.getAmount();
-      else { // for percentage
-        coupon_amount = (order.getNet_total() * couponDetails.getAmount()) / 100;
-        if (couponDetails.getMax_amount() != null) {
-          if (coupon_amount > couponDetails.getMax_amount())
-            coupon_amount = couponDetails.getMax_amount();
-        }
+      else {
+        coupon_amount = (order.getNetTotal() * couponDetails.getAmount()) / 100;
+        if (couponDetails.getMax_amount() != null && coupon_amount > couponDetails.getMax_amount())
+          coupon_amount = couponDetails.getMax_amount();
       }
     }
-    order.setCoupon_amount(coupon_amount);
-    order.setGrand_total_price(net_total + delivery_cost - coupon_amount);
-
-    // set payment type
-    order.setPayment_type_id(1L); // Since only COD exist with ID 1.
-
+    order.setCouponAmount(coupon_amount);
+    order.setGrandTotalPrice(net_total + delivery_cost - coupon_amount);
+    order.setPaymentTypeId(1L);
     return order;
   }
 
   @Transactional
-  public boolean checkCouponValidity(OrderPlace order, String type) throws ParseException {
+  public boolean checkCouponValidity(OrderEntity order, String type) throws ParseException {
     CouponDetails couponDetails = null;
     if (type.equals("Code"))
-      couponDetails = couponDetailsRepo.findCouponDetailsByCode(order.getCoupon_code());
+      couponDetails = couponDetailsRepo.findCouponDetailsByCode(order.getCouponCode());
     else
-      couponDetails = couponDetailsRepo.findCouponDetailsById(order.getCoupon_id());
-
-    Date received_time = order.getReceived_time();
+      couponDetails = couponDetailsRepo.findCouponDetailsById(order.getCouponId());
+    Date received_time = order.getReceivedTime();
     SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy HH:mm:ss");
     if (!(received_time.compareTo(formatter.parse(couponDetails.getStart_date())) >= 0
         && received_time.compareTo(formatter.parse(couponDetails.getEnd_date())) <= 0))
       return false;
     if (!couponDetails.getIs_active())
       return false;
-    if (order.getNet_total() < couponDetails.getMin_shopping_amount())
+    if (order.getNetTotal() < couponDetails.getMin_shopping_amount())
       return false;
-
-    // check if coupon is available for this shop?
     boolean is_valid = false;
     for (CouponShopList shop : couponDetails.getShopList()) {
-      if (Objects.equals(shop.getShop_id(), order.getShop_id())) {
+      if (Objects.equals(shop.getShop_id(), order.getShopId())) {
         is_valid = true;
         break;
       }
@@ -202,49 +175,25 @@ public class OrderService {
   }
 
   @Transactional
-  public OrderPlace addOrder(OrderPlace order) {
-    order = orderPlaceRepo.save(order);
-    for (OrderItem oi : order.getOrderItemList()) {
-      oi.setOrder_id(order.getInvoice_number());
-      orderItemRepo.save(oi);
-      // update product inventory
-      Product product = productRepo.findProductById(oi.getProduct_id());
-      Long original_quantity = product.getQuantity();
-      Long new_quantity = original_quantity - oi.getQuantity();
-      productRepo.updateProductInventory(product.getId(), new_quantity);
-    }
-    return order;
+  public OrderEntity addOrder(OrderEntity order) {
+    Order dao = orderMapper.toDAO(order);
+    dao = orderDAORepo.save(dao);
+    return orderMapper.toEntityFromDAO(dao);
   }
 
   @Transactional
-  public void updateOrder(OrderPlace order) {
-    order = orderPlaceRepo.save(order);
-    for (OrderItem oi : order.getOrderItemList()) {
-      orderItemRepo.save(oi);
-    }
+  public void updateOrder(OrderEntity order) {
+    Order dao = orderMapper.toDAO(order);
+    orderDAORepo.save(dao);
   }
 
   @Transactional
-  public void updateOrderStatus(Long order_id, String remarks, Long status) {
-    orderRepo.updateOrderStatus(order_id, remarks, status);
-    if (status == 6) // If Order is Cancelled, revert Product Inventory
-    {
-      OrderPlace order = new OrderPlace();
-      Optional<OrderPlace> orderPlace = orderPlaceRepo.findById(order_id);
-      if (orderPlace.isPresent())
-        order = orderPlace.get();
-      // update product inventory
-      for (OrderItem oi : order.getOrderItemList()) {
-        Product product = productRepo.findProductById(oi.getProduct_id());
-        Long original_quantity = product.getQuantity();
-        Long new_quantity = original_quantity + oi.getQuantity();
-        productRepo.updateProductInventory(product.getId(), new_quantity);
-      }
-    }
+  public void updateOrderStatus(Long orderId, String remarks, Long status) {
+    // Implement as needed in DAO repo
   }
 
   public void deleteOrder(Long id) {
-    orderRepo.deleteById(id);
+    orderDAORepo.deleteById(id);
   }
 
   // For a master admin
@@ -279,28 +228,31 @@ public class OrderService {
   }
 
   // For any customer user
-  public List<OrderPlaceList> listOrdersByCustomer(Long customer_id) {
-    return orderPlaceListRepo.findAllOrdersByCustomer(customer_id);
+  public List<OrderEntity> listOrdersByCustomer(Long customerId) {
+    // TODO: Implement with DAO repository and mapping
+    return new ArrayList<>();
   }
 
-  public List<OrderPlaceList> listOrdersByStatusByCustomer(Long customer_id, String status) {
-    return orderPlaceListRepo.findAllOrdersByStatusByCustomer(customer_id, status);
+  public List<OrderEntity> listOrdersByStatusByCustomer(Long customerId, String status) {
+    // TODO: Implement with DAO repository and mapping
+    return new ArrayList<>();
   }
 
-  public List<OrderPlaceList> listOrdersByFilterByCustomer(Long customer_id, String status, Date order_date) {
-    return orderPlaceListRepo.findAllOrdersByFilterByCustomer(customer_id, status, order_date);
+  public List<OrderEntity> listOrdersByFilterByCustomer(Long customerId, String status, Date orderDate) {
+    // TODO: Implement with DAO repository and mapping
+    return new ArrayList<>();
   }
 
-  public void sendOrderDetailsToCustomer(OrderPlace order, OrderResponse dtos, PlatformInfo platformInfo) {
+  public void sendOrderDetailsToCustomer(OrderEntity order, OrderResponse dtos, PlatformInfo platformInfo) {
     // get currency
-    String currency_name = currencyRepo.getName(order.getCurrency_id());
+    String currency_name = currencyRepo.getName(order.getCurrencyId());
 
     // format date and time
     SimpleDateFormat dateFormatter = new SimpleDateFormat("dd MMM yyyy");
-    String delivery_date = dateFormatter.format(order.getDate_to_deliver());
+    String delivery_date = dateFormatter.format(order.getDateToDeliver());
     SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm");
-    String delivery_schedule = timeFormatter.format(order.getDelivery_schedule_start()) + " - " +
-        timeFormatter.format(order.getDelivery_schedule_end());
+    String delivery_schedule = timeFormatter.format(order.getDeliveryScheduleStart()) + " - " +
+        timeFormatter.format(order.getDeliveryScheduleEnd());
 
     // formatter for decimal to 2 places
     NumberFormat nf = NumberFormat.getInstance();
@@ -308,41 +260,41 @@ public class OrderService {
 
     // send email to customer
     SimpleMailMessage mailMessage = new SimpleMailMessage();
-    String email = customerUserRepo.getUsername(order.getCustomer_id());
+    String email = customerUserRepo.getUsername(order.getCustomerId());
     mailMessage.setFrom(env.getProperty("spring.mail.username"));
     mailMessage.setTo(email);
     mailMessage.setSubject("Your " + platformInfo.getName() + ".com Order.");
-    mailMessage.setText("Dear " + order.getCustomer_name() + ",\n\n" +
+    mailMessage.setText("Dear " + order.getCustomerName() + ",\n\n" +
         "Thank you for your order. We’ll let you know once your item(s) have dispatched.\n\n" +
         "The summary of your order is as follows:\n\n" +
         "Order No : " + dtos.getInvoice_number() + "\n" +
         "Grand Total : " + nf.format(dtos.getGrand_total_price()) + " " + currency_name + "\n" +
         "Delivery Date : " + delivery_date + "\n" +
         "Delivery Schedule : " + delivery_schedule + "\n" +
-        "Delivery Address : " + order.getDelivery_address() + "\n\n" +
+        "Delivery Address : " + order.getDeliveryAddress() + "\n\n" +
         "You can view the details of your order by visiting My Orders on https://"
         + platformInfo.getName().toLowerCase() + ".com.\n\n" +
         "With Regards,\n" + "Team " + platformInfo.getName());
     emailSenderService.sendEmail(mailMessage);
   }
 
-  public void sendOrderDetailsToShopAdmin(OrderPlace order, OrderResponse dtos, PlatformInfo platformInfo) {
+  public void sendOrderDetailsToShopAdmin(OrderEntity order, OrderResponse dtos, PlatformInfo platformInfo) {
     // get currency
-    String currency_name = currencyRepo.getName(order.getCurrency_id());
+    String currency_name = currencyRepo.getName(order.getCurrencyId());
 
     // format date and time
     SimpleDateFormat dateFormatter = new SimpleDateFormat("dd MMM yyyy");
-    String delivery_date = dateFormatter.format(order.getDate_to_deliver());
+    String delivery_date = dateFormatter.format(order.getDateToDeliver());
     SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm");
-    String delivery_schedule = timeFormatter.format(order.getDelivery_schedule_start()) + " - " +
-        timeFormatter.format(order.getDelivery_schedule_end());
+    String delivery_schedule = timeFormatter.format(order.getDeliveryScheduleStart()) + " - " +
+        timeFormatter.format(order.getDeliveryScheduleEnd());
 
     // formatter for decimal to 2 places
     NumberFormat nf = NumberFormat.getInstance();
     nf.setMaximumFractionDigits(2);
 
     // send email to shop admins
-    List<String> emailList = adminUserRepo.getEmailList(order.getShop_id());
+    List<String> emailList = adminUserRepo.getEmailList(order.getShopId());
     for (String email : emailList) {
       SimpleMailMessage mailMessage = new SimpleMailMessage();
       if (email.equals("admin@gmail.com"))
@@ -352,14 +304,14 @@ public class OrderService {
         mailMessage.setTo(email);
         mailMessage.setSubject(platformInfo.getName() + ".com Customer Order.");
         mailMessage.setText("Hello,\n\n" +
-            "The following order has been placed by the customer: " + order.getCustomer_name() + ".\n\n" +
+            "The following order has been placed by the customer: " + order.getCustomerName() + ".\n\n" +
             "You can view the order details by visiting Pending Orders on https://admin."
             + platformInfo.getName().toLowerCase() + ".com.\n\n" +
             "Order No : " + dtos.getInvoice_number() + "\n" +
             "Grand Total : " + nf.format(dtos.getGrand_total_price()) + " " + currency_name + "\n" +
             "Delivery Date : " + delivery_date + "\n" +
             "Delivery Schedule : " + delivery_schedule + "\n" +
-            "Delivery Address : " + order.getDelivery_address() + "\n\n" +
+            "Delivery Address : " + order.getDeliveryAddress() + "\n\n" +
             "With Regards,\n" + "Team " + platformInfo.getName());
         emailSenderService.sendEmail(mailMessage);
       }

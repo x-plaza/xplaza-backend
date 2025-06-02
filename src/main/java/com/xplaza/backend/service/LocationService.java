@@ -9,10 +9,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.xplaza.backend.jpa.repository.LocationListRepository;
+import com.xplaza.backend.jpa.repository.LocationRepository;
 import com.xplaza.backend.model.Location;
 import com.xplaza.backend.model.LocationList;
-import com.xplaza.backend.repository.LocationListRepository;
-import com.xplaza.backend.repository.LocationRepository;
 
 @Service
 public class LocationService {

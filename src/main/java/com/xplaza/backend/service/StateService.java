@@ -9,35 +9,35 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.xplaza.backend.model.State;
-import com.xplaza.backend.repository.StateRepository;
+import com.xplaza.backend.jpa.repository.StateEntityRepository;
+import com.xplaza.backend.mapper.StateMapper;
+import com.xplaza.backend.service.entity.StateEntity;
 
 @Service
 public class StateService {
   @Autowired
-  private StateRepository stateRepo;
+  private StateEntityRepository stateEntityRepository;
 
-  public void addState(State city) {
-    stateRepo.save(city);
+  @Autowired
+  private StateMapper stateMapper;
+
+  public void addState(StateEntity entity) {
+    stateEntityRepository.save(entity);
   }
 
-  public void updateState(State city) {
-    stateRepo.save(city);
-  }
-
-  public String getStateNameByID(Long id) {
-    return stateRepo.getName(id);
+  public void updateState(StateEntity entity) {
+    stateEntityRepository.save(entity);
   }
 
   public void deleteState(Long id) {
-    stateRepo.deleteById(id);
+    stateEntityRepository.deleteById(id);
   }
 
-  public List<State> listStates() {
-    return stateRepo.findAll();
+  public StateEntity listState(Long id) {
+    return stateEntityRepository.findById(id).orElse(null);
   }
 
-  public State listState(Long id) {
-    return stateRepo.findStateById(id);
+  public List<StateEntity> listStates() {
+    return stateEntityRepository.findAll();
   }
 }

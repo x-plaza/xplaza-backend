@@ -9,35 +9,35 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.xplaza.backend.model.Country;
-import com.xplaza.backend.repository.CountryRepository;
+import com.xplaza.backend.jpa.repository.CountryRepository;
+import com.xplaza.backend.mapper.CountryMapper;
+import com.xplaza.backend.service.entity.Country;
 
 @Service
 public class CountryService {
   @Autowired
-  private CountryRepository countryRepo;
+  private CountryRepository countryRepository;
 
-  public void addCountry(Country country) {
-    countryRepo.save(country);
+  @Autowired
+  private CountryMapper countryMapper;
+
+  public void addCountry(Country entity) {
+    countryRepository.save(countryMapper.toDao(entity));
   }
 
-  public void updateCountry(Country country) {
-    countryRepo.save(country);
-  }
-
-  public String getCountryNameByID(Long id) {
-    return countryRepo.getName(id);
+  public void updateCountry(Country entity) {
+    countryRepository.save(countryMapper.toDao(entity));
   }
 
   public void deleteCountry(Long id) {
-    countryRepo.deleteById(id);
-  }
-
-  public List<Country> listCountries() {
-    return countryRepo.findAll();
+    countryRepository.deleteById(id);
   }
 
   public Country listCountry(Long id) {
-    return countryRepo.findCountryById(id);
+    return countryRepository.findById(id).map(countryMapper::toEntity).orElse(null);
+  }
+
+  public List<Country> listCountries() {
+    return countryRepository.findAll().stream().map(countryMapper::toEntity).toList();
   }
 }

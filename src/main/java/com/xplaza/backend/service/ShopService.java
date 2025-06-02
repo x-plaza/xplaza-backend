@@ -5,64 +5,43 @@
 package com.xplaza.backend.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.xplaza.backend.model.AdminUserList;
-import com.xplaza.backend.model.Shop;
-import com.xplaza.backend.model.ShopList;
-import com.xplaza.backend.repository.AdminUserListRepository;
-import com.xplaza.backend.repository.AdminUserShopLinkRepository;
-import com.xplaza.backend.repository.ShopListRepository;
-import com.xplaza.backend.repository.ShopRepository;
+import com.xplaza.backend.jpa.dao.Shop;
+import com.xplaza.backend.jpa.repository.ShopRepository;
+import com.xplaza.backend.mapper.ShopMapper;
+import com.xplaza.backend.service.entity.ShopEntity;
 
 @Service
 public class ShopService {
   @Autowired
   private ShopRepository shopRepo;
   @Autowired
-  private ShopListRepository shopListRepo;
-  @Autowired
-  private AdminUserListRepository adminUserListRepo;
-  @Autowired
-  private AdminUserShopLinkRepository adminUserShopLinkRepo;
+  private ShopMapper shopMapper;
 
-  @Transactional
-  public void addShop(Shop shop) {
-    Shop updatedShop = shopRepo.save(shop);
-    List<AdminUserList> adminUserList = adminUserListRepo.findAllAdminUsersByRoleName("Master Admin");
-    for (AdminUserList adminUser : adminUserList) {
-      adminUserShopLinkRepo.insert(adminUser.getId(), updatedShop.getId());
-    }
+  public void addShop(ShopEntity shopEntity) {
+    Shop dao = shopMapper.toDAO(shopEntity);
+    shopRepo.save(dao);
   }
 
-  public void updateShop(Shop shop) {
-    shopRepo.save(shop);
-  }
-
-  public List<ShopList> listShops() {
-    return shopListRepo.findAllShopList();
-  }
-
-  public String getShopNameByID(Long id) {
-    return shopRepo.getName(id);
+  public void updateShop(ShopEntity shopEntity) {
+    Shop dao = shopMapper.toDAO(shopEntity);
+    shopRepo.save(dao);
   }
 
   public void deleteShop(Long id) {
     shopRepo.deleteById(id);
   }
 
-  public ShopList listShop(Long id) {
-    return shopListRepo.findShopListById(id);
+  public List<ShopEntity> listShops() {
+    return shopRepo.findAll().stream().map(shopMapper::toEntityFromDAO).collect(Collectors.toList());
   }
 
-  public List<ShopList> listShopsByUserID(Long user_id) {
-    return shopListRepo.findAllShopListByUserID(user_id);
-  }
-
-  public List<ShopList> listShopByLocation(Long id) {
-    return shopListRepo.findShopListByLocationId(id);
+  public ShopEntity listShop(Long id) {
+    Shop dao = shopRepo.findById(id).orElse(null);
+    return shopMapper.toEntityFromDAO(dao);
   }
 }

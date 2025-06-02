@@ -10,10 +10,13 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.xplaza.backend.jpa.repository.CustomerRepository;
+import com.xplaza.backend.jpa.repository.CustomerUserDAORepository;
+import com.xplaza.backend.jpa.repository.CustomerUserRepository;
+import com.xplaza.backend.mapper.CustomerUserMapper;
 import com.xplaza.backend.model.Customer;
 import com.xplaza.backend.model.CustomerDetails;
-import com.xplaza.backend.repository.CustomerRepository;
-import com.xplaza.backend.repository.CustomerUserRepository;
+import com.xplaza.backend.service.entity.User;
 
 @Service
 public class CustomerUserService {
@@ -21,6 +24,20 @@ public class CustomerUserService {
   private CustomerUserRepository customerUserRepo;
   @Autowired
   private CustomerRepository customerRepo;
+  @Autowired
+  private CustomerUserDAORepository customerUserDAORepo;
+  @Autowired
+  private CustomerUserMapper customerUserMapper;
+
+  public CustomerUserEntity getCustomerEntity(Long id) {
+    User dao = customerUserDAORepo.findById(id).orElse(null);
+    return customerUserMapper.toEntityFromDAO(dao);
+  }
+
+  public void updateCustomer(CustomerUserEntity entity) {
+    User dao = customerUserMapper.toDAO(entity);
+    customerUserDAORepo.save(dao);
+  }
 
   public void updateCustomer(Customer customer) {
     customerRepo.save(customer);

@@ -10,8 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.xplaza.backend.jpa.repository.ProductVariationTypeRepository;
 import com.xplaza.backend.model.ProductVariationType;
-import com.xplaza.backend.repository.ProductVariationTypeRepository;
 
 @Service
 public class ProductVariationTypeService {
