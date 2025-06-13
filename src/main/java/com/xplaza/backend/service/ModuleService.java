@@ -5,29 +5,37 @@
 package com.xplaza.backend.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.xplaza.backend.model.Module;
-import com.xplaza.backend.repository.ModuleRepository;
+import com.xplaza.backend.jpa.dao.ModuleDao;
+import com.xplaza.backend.jpa.repository.ModuleRepository;
+import com.xplaza.backend.mapper.ModuleMapper;
+import com.xplaza.backend.service.entity.Module;
 
 @Service
 public class ModuleService {
   @Autowired
   private ModuleRepository moduleRepo;
+  @Autowired
+  private ModuleMapper moduleMapper;
 
   public void addModule(Module module) {
-    moduleRepo.save(module);
+    ModuleDao dao = moduleMapper.toDao(module);
+    moduleRepo.save(dao);
   }
 
   public void updateModule(Module module) {
-    moduleRepo.save(module);
+    ModuleDao dao = moduleMapper.toDao(module);
+    moduleRepo.save(dao);
   }
 
   public List<Module> listModules() {
-    return moduleRepo.findAll(Sort.by(Sort.Direction.ASC, "name"));
+    return moduleRepo.findAll(Sort.by(Sort.Direction.ASC, "name"))
+        .stream().map(moduleMapper::toEntityFromDao).collect(Collectors.toList());
   }
 
   public String getModuleNameByID(Long id) {
@@ -39,6 +47,7 @@ public class ModuleService {
   }
 
   public Module listModule(Long id) {
-    return moduleRepo.findModuleById(id);
+    ModuleDao dao = moduleRepo.findModuleById(id);
+    return moduleMapper.toEntityFromDao(dao);
   }
 }

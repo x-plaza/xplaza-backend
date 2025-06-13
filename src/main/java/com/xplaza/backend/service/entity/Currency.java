@@ -1,0 +1,20 @@
+/*
+ * Copyright (c) 2025 Xplaza or Xplaza affiliate company. All rights reserved.
+ * Author: Mahiuddin Al Kamal <mahiuddinalkamal>
+ */
+package com.xplaza.backend.service.entity;
+
+import java.util.List;
+
+import lombok.*;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Currency {
+  private Long currencyId;
+  private String currencyName;
+  private String currencySign;
+  private List<Product> products;
+}

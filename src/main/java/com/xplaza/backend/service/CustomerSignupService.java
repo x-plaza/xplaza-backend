@@ -9,9 +9,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 
+import com.xplaza.backend.jpa.repository.CustomerSignupRepository;
 import com.xplaza.backend.model.CustomerDetails;
 import com.xplaza.backend.model.PlatformInfo;
-import com.xplaza.backend.repository.CustomerSignupRepository;
 
 @Service
 public class CustomerSignupService {
