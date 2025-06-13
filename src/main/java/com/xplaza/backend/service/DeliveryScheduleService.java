@@ -10,39 +10,38 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.xplaza.backend.jpa.dao.DeliverySchedule;
-import com.xplaza.backend.jpa.repository.DeliveryScheduleDAORepository;
+import com.xplaza.backend.jpa.dao.DeliveryScheduleDao;
+import com.xplaza.backend.jpa.repository.DeliveryScheduleRepository;
 import com.xplaza.backend.mapper.DeliveryScheduleMapper;
-import com.xplaza.backend.service.entity.DeliveryScheduleEntity;
+import com.xplaza.backend.service.entity.DeliverySchedule;
 
 @Service
 public class DeliveryScheduleService {
-
   @Autowired
-  private DeliveryScheduleDAORepository deliveryScheduleDAORepo;
+  private DeliveryScheduleRepository deliveryScheduleRepo;
   @Autowired
   private DeliveryScheduleMapper deliveryScheduleMapper;
 
-  public void addSchedule(DeliveryScheduleEntity entity) {
-    DeliverySchedule dao = deliveryScheduleMapper.toDAO(entity);
-    deliveryScheduleDAORepo.save(dao);
+  public void addSchedule(DeliverySchedule entity) {
+    DeliveryScheduleDao dao = deliveryScheduleMapper.toDao(entity);
+    deliveryScheduleRepo.save(dao);
   }
 
-  public void updateSchedule(DeliveryScheduleEntity entity) {
-    DeliverySchedule dao = deliveryScheduleMapper.toDAO(entity);
-    deliveryScheduleDAORepo.save(dao);
+  public void updateSchedule(DeliverySchedule entity) {
+    DeliveryScheduleDao dao = deliveryScheduleMapper.toDao(entity);
+    deliveryScheduleRepo.save(dao);
   }
 
-  public List<DeliveryScheduleEntity> listDeliverySchedules() {
-    return deliveryScheduleDAORepo.findAll().stream().map(deliveryScheduleMapper::toEntityFromDAO)
+  public List<DeliverySchedule> listDeliverySchedules() {
+    return deliveryScheduleRepo.findAll().stream().map(deliveryScheduleMapper::toEntityFromDao)
         .collect(Collectors.toList());
   }
 
-  public DeliveryScheduleEntity listDeliverySchedule(Long id) {
-    return deliveryScheduleDAORepo.findById(id).map(deliveryScheduleMapper::toEntityFromDAO).orElse(null);
+  public DeliverySchedule listDeliverySchedule(Long id) {
+    return deliveryScheduleRepo.findById(id).map(deliveryScheduleMapper::toEntityFromDao).orElse(null);
   }
 
   public void deleteSchedule(Long id) {
-    deliveryScheduleDAORepo.deleteById(id);
+    deliveryScheduleRepo.deleteById(id);
   }
 }

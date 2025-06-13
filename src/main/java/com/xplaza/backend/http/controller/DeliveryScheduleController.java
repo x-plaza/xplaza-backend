@@ -4,6 +4,8 @@
  */
 package com.xplaza.backend.http.controller;
 
+import static org.json.XMLTokener.entity;
+
 import java.util.Date;
 
 import jakarta.validation.Valid;
@@ -16,10 +18,11 @@ import org.springframework.web.bind.annotation.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xplaza.backend.common.util.ApiResponse;
-import com.xplaza.backend.http.dto.DeliveryScheduleRequestDTO;
+import com.xplaza.backend.http.dto.request.DeliveryScheduleRequest;
+import com.xplaza.backend.http.dto.response.DeliveryScheduleResponse;
 import com.xplaza.backend.mapper.DeliveryScheduleMapper;
 import com.xplaza.backend.service.DeliveryScheduleService;
-import com.xplaza.backend.service.entity.DeliveryScheduleEntity;
+import com.xplaza.backend.service.entity.DeliverySchedule;
 
 @RestController
 @RequestMapping("/api/v1/delivery-schedules")
@@ -37,7 +40,7 @@ public class DeliveryScheduleController extends BaseController {
   public ResponseEntity<String> getDeliverySchedules() throws JsonProcessingException {
     start = new Date();
     var entities = deliveryScheduleService.listDeliverySchedules();
-    var dtos = entities.stream().map(deliveryScheduleMapper::toResponseDTO).toList();
+    var dtos = entities.stream().map(deliveryScheduleMapper::toResponse).toList();
     end = new Date();
     responseTime = end.getTime() - start.getTime();
     ObjectMapper mapper = new ObjectMapper();
@@ -54,8 +57,8 @@ public class DeliveryScheduleController extends BaseController {
   @GetMapping("/{id}")
   public ResponseEntity<String> getDeliverySchedule(@PathVariable @Valid Long id) throws JsonProcessingException {
     start = new Date();
-    var entity = deliveryScheduleService.listDeliverySchedule(id);
-    var dto = deliveryScheduleMapper.toResponseDTO(entity);
+    DeliverySchedule entity = deliveryScheduleService.listDeliverySchedule(id);
+    DeliveryScheduleResponse dto = deliveryScheduleMapper.toResponse(entity);
     end = new Date();
     responseTime = end.getTime() - start.getTime();
     ObjectMapper mapper = new ObjectMapper();
@@ -71,10 +74,10 @@ public class DeliveryScheduleController extends BaseController {
 
   @PostMapping
   public ResponseEntity<ApiResponse> addSchedule(
-      @RequestBody @Valid DeliveryScheduleRequestDTO deliveryScheduleRequestDTO) {
+      @RequestBody @Valid DeliveryScheduleRequest deliveryScheduleRequest) {
     start = new Date();
-    DeliveryScheduleEntity entity = deliveryScheduleMapper.toEntity(deliveryScheduleRequestDTO);
-    deliveryScheduleService.addSchedule(entity);
+    DeliverySchedule deliverySchedule = deliveryScheduleMapper.toEntity(deliveryScheduleRequest);
+    deliveryScheduleService.addSchedule(deliverySchedule);
     end = new Date();
     responseTime = end.getTime() - start.getTime();
     return new ResponseEntity<>(new ApiResponse(responseTime, "Add Delivery Schedule", HttpStatus.CREATED.value(),
@@ -83,9 +86,9 @@ public class DeliveryScheduleController extends BaseController {
 
   @PutMapping
   public ResponseEntity<ApiResponse> updateSchedule(
-      @RequestBody @Valid DeliveryScheduleRequestDTO deliveryScheduleRequestDTO) {
+      @RequestBody @Valid DeliveryScheduleRequest deliveryScheduleRequest) {
     start = new Date();
-    DeliveryScheduleEntity entity = deliveryScheduleMapper.toEntity(deliveryScheduleRequestDTO);
+    DeliverySchedule entity = deliveryScheduleMapper.toEntity(deliveryScheduleRequest);
     deliveryScheduleService.updateSchedule(entity);
     end = new Date();
     responseTime = end.getTime() - start.getTime();

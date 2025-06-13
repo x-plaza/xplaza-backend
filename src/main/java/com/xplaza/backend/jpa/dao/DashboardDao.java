@@ -4,59 +4,38 @@
  */
 package com.xplaza.backend.jpa.dao;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import java.util.List;
+
+import jakarta.persistence.*;
+
+import lombok.*;
 
 import org.hibernate.annotations.Immutable;
 
-@Entity
-@Immutable
 @Table(name = "dashboard")
+@Immutable
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class DashboardDao {
   @Id
-  @Column(name = "shop_id")
-  private Long shopId;
+  private Long dashboardId;
 
-  @Column(name = "total_expense")
-  private Double totalExpense;
+  @OneToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "shop_id")
+  ShopDao shop;
 
-  @Column(name = "total_income")
-  private Double totalIncome;
+  @OneToOne(mappedBy = "shop")
+  RevenueDao revenue;
 
-  @Column(name = "total_revenue")
-  private Double totalRevenue;
+  @OneToMany(mappedBy = "shop", fetch = FetchType.LAZY)
+  List<TopCustomerDao> topCustomers;
 
-  public Long getShopId() {
-    return shopId;
-  }
+  @OneToMany(mappedBy = "shop", fetch = FetchType.LAZY)
+  List<TopProductDao> topProducts;
 
-  public void setShopId(Long shopId) {
-    this.shopId = shopId;
-  }
-
-  public Double getTotalExpense() {
-    return totalExpense;
-  }
-
-  public void setTotalExpense(Double totalExpense) {
-    this.totalExpense = totalExpense;
-  }
-
-  public Double getTotalIncome() {
-    return totalIncome;
-  }
-
-  public void setTotalIncome(Double totalIncome) {
-    this.totalIncome = totalIncome;
-  }
-
-  public Double getTotalRevenue() {
-    return totalRevenue;
-  }
-
-  public void setTotalRevenue(Double totalRevenue) {
-    this.totalRevenue = totalRevenue;
-  }
+  @OneToMany(mappedBy = "shop", fetch = FetchType.LAZY)
+  List<ProductToStockDao> productToStocks;
 }

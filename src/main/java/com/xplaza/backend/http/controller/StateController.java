@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xplaza.backend.common.util.ApiResponse;
-import com.xplaza.backend.http.dto.StateRequestDTO;
-import com.xplaza.backend.http.dto.StateResponseDTO;
+import com.xplaza.backend.http.dto.request.StateRequest;
+import com.xplaza.backend.http.dto.response.StateResponse;
 import com.xplaza.backend.mapper.StateMapper;
 import com.xplaza.backend.service.StateService;
-import com.xplaza.backend.service.entity.StateEntity;
+import com.xplaza.backend.service.entity.State;
 
 @RestController
 @RequestMapping("/api/v1/states")
@@ -33,8 +33,8 @@ public class StateController extends BaseController {
   @GetMapping
   public ResponseEntity<ApiResponse> getStates() throws Exception {
     long start = System.currentTimeMillis();
-    List<StateEntity> states = stateService.listStates();
-    List<StateResponseDTO> dtos = states.stream().map(stateMapper::toResponseDTO).toList();
+    List<State> states = stateService.listStates();
+    List<StateResponse> dtos = states.stream().map(stateMapper::toResponse).toList();
     long end = System.currentTimeMillis();
     long responseTime = end - start;
     String data = new ObjectMapper().writeValueAsString(dtos);
@@ -45,8 +45,8 @@ public class StateController extends BaseController {
   @GetMapping("/{id}")
   public ResponseEntity<ApiResponse> getState(@PathVariable @Valid Long id) throws Exception {
     long start = System.currentTimeMillis();
-    StateEntity state = stateService.listState(id);
-    StateResponseDTO dto = stateMapper.toResponseDTO(state);
+    State state = stateService.listState(id);
+    StateResponse dto = stateMapper.toResponse(state);
     long end = System.currentTimeMillis();
     long responseTime = end - start;
     String data = new ObjectMapper().writeValueAsString(dto);
@@ -55,8 +55,8 @@ public class StateController extends BaseController {
   }
 
   @PostMapping
-  public ResponseEntity<ApiResponse> addState(@RequestBody @Valid StateRequestDTO stateRequestDTO) {
-    StateEntity state = stateMapper.toEntity(stateRequestDTO);
+  public ResponseEntity<ApiResponse> addState(@RequestBody @Valid StateRequest stateRequest) {
+    State state = stateMapper.toEntity(stateRequest);
     stateService.addState(state);
     ApiResponse response = new ApiResponse(0, "Add State", HttpStatus.CREATED.value(), "Success",
         "State has been created.", null);
@@ -64,8 +64,8 @@ public class StateController extends BaseController {
   }
 
   @PutMapping
-  public ResponseEntity<ApiResponse> updateState(@RequestBody @Valid StateRequestDTO stateRequestDTO) {
-    StateEntity state = stateMapper.toEntity(stateRequestDTO);
+  public ResponseEntity<ApiResponse> updateState(@RequestBody @Valid StateRequest stateRequest) {
+    State state = stateMapper.toEntity(stateRequest);
     stateService.updateState(state);
     ApiResponse response = new ApiResponse(0, "Update State", HttpStatus.OK.value(), "Success",
         "State has been updated.", null);

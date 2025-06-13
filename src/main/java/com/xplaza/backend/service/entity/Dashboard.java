@@ -12,10 +12,9 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Dashboard {
-  private Long shopId;
+  private Shop shop;
   private Revenue revenue;
   private List<TopCustomer> topCustomers;
   private List<TopProduct> topProducts;
   private List<ProductToStock> productToStocks;
-  // add other fields as needed
 }

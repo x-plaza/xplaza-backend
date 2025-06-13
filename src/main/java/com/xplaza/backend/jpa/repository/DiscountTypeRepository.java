@@ -6,7 +6,7 @@ package com.xplaza.backend.jpa.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.xplaza.backend.model.DiscountType;
+import com.xplaza.backend.jpa.dao.DiscountTypeDao;
 
-public interface DiscountTypeRepository extends JpaRepository<DiscountType, Long> {
+public interface DiscountTypeRepository extends JpaRepository<DiscountTypeDao, Long> {
 }

@@ -9,9 +9,9 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.xplaza.backend.model.PlatformInfo;
+import com.xplaza.backend.jpa.dao.PlatformInfoDao;
 
-public interface PlatformInfoRepository extends JpaRepository<PlatformInfo, Long> {
+public interface PlatformInfoRepository extends JpaRepository<PlatformInfoDao, Long> {
   @Modifying
   @Transactional
   @Query(value = "update platform_info set additional_info=?1, cell_no=?2, banner_image=?3, banner_image_path=?4", nativeQuery = true)

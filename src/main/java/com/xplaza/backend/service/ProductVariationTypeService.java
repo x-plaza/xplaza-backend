@@ -7,38 +7,58 @@ package com.xplaza.backend.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.xplaza.backend.jpa.dao.ProductVariationTypeDao;
 import com.xplaza.backend.jpa.repository.ProductVariationTypeRepository;
-import com.xplaza.backend.model.ProductVariationType;
+import com.xplaza.backend.mapper.ProductVariationTypeMapper;
+import com.xplaza.backend.service.entity.ProductVariationType;
 
 @Service
+@Transactional
 public class ProductVariationTypeService {
+
   @Autowired
-  private ProductVariationTypeRepository prodVarTypeRepo;
+  private ProductVariationTypeRepository productVariationTypeRepository;
 
-  public void addProductVarType(ProductVariationType productVariationType) {
-    prodVarTypeRepo.save(productVariationType);
+  @Autowired
+  private ProductVariationTypeMapper productVariationTypeMapper;
+
+  public ProductVariationType addProductVariationType(ProductVariationType productVariationType) {
+    ProductVariationTypeDao productVariationTypeDao = productVariationTypeMapper.toDao(productVariationType);
+    ProductVariationTypeDao savedProductVariationTypeDao = productVariationTypeRepository.save(productVariationTypeDao);
+    return productVariationTypeMapper.toEntityFromDao(savedProductVariationTypeDao);
   }
 
-  public void updateProductVarType(ProductVariationType productVariationType) {
-    prodVarTypeRepo.save(productVariationType);
+  public ProductVariationType updateProductVariationType(ProductVariationType productVariationType) {
+    ProductVariationTypeDao existingProductVariationTypeDao = productVariationTypeRepository
+        .findById(productVariationType.getProductVarTypeId())
+        .orElseThrow(() -> new RuntimeException(
+            "Product variation type not found with id: " + productVariationType.getProductVarTypeId()));
+
+    ProductVariationTypeDao productVariationTypeDao = productVariationTypeMapper.toDao(productVariationType);
+    productVariationTypeDao.setProductVariationTypeId(existingProductVariationTypeDao.getProductVariationTypeId());
+
+    ProductVariationTypeDao updatedProductVariationTypeDao = productVariationTypeRepository
+        .save(productVariationTypeDao);
+    return productVariationTypeMapper.toEntityFromDao(updatedProductVariationTypeDao);
   }
 
-  public List<ProductVariationType> listProductVarTypes() {
-    return prodVarTypeRepo.findAll(Sort.by(Sort.Direction.ASC, "name"));
+  public void deleteProductVariationType(Long id) {
+    productVariationTypeRepository.deleteById(id);
   }
 
-  public String getProductVarTypeNameByID(Long id) {
-    return prodVarTypeRepo.getName(id);
+  public List<ProductVariationType> listProductVariationTypes() {
+    List<ProductVariationTypeDao> productVariationTypeDaos = productVariationTypeRepository.findAll();
+    return productVariationTypeDaos.stream()
+        .map(productVariationTypeMapper::toEntityFromDao)
+        .toList();
   }
 
-  public void deleteProductVarType(Long id) {
-    prodVarTypeRepo.deleteById(id);
-  }
-
-  public ProductVariationType listProductVarType(Long id) {
-    return prodVarTypeRepo.findProdVarTypeById(id);
+  public ProductVariationType listProductVariationType(Long id) {
+    ProductVariationTypeDao productVariationTypeDao = productVariationTypeRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Product variation type not found with id: " + id));
+    return productVariationTypeMapper.toEntityFromDao(productVariationTypeDao);
   }
 }

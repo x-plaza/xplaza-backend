@@ -16,8 +16,9 @@ import org.springframework.web.bind.annotation.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xplaza.backend.common.util.ApiResponse;
-import com.xplaza.backend.model.PlatformInfo;
+import com.xplaza.backend.http.dto.response.PlatformInfoResponse;
 import com.xplaza.backend.service.PlatformInfoService;
+import com.xplaza.backend.service.entity.PlatformInfo;
 
 @RestController
 @RequestMapping("/api/v1/platform-infos")
@@ -31,7 +32,8 @@ public class PlatformInfoController extends BaseController {
   @GetMapping
   public ResponseEntity<String> getPlatformInfo() throws JsonProcessingException {
     start = new Date();
-    PlatformInfo dtos = platformInfoService.listPlatform();
+    PlatformInfo platformInfo = platformInfoService.listPlatform();
+    PlatformInfoResponse dto = new PlatformInfoResponse();
     end = new Date();
     responseTime = end.getTime() - start.getTime();
     ObjectMapper mapper = new ObjectMapper();
@@ -43,6 +45,16 @@ public class PlatformInfoController extends BaseController {
         "  \"msg\": \"\",\n" +
         "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
     return new ResponseEntity<>(response, HttpStatus.OK);
+  }
+
+  @PostMapping
+  public ResponseEntity<ApiResponse> addPlatformInfo(@RequestBody @Valid PlatformInfo platformInfo) {
+    start = new Date();
+    platformInfoService.addPlatformInfo(platformInfo);
+    end = new Date();
+    responseTime = end.getTime() - start.getTime();
+    return new ResponseEntity<>(new ApiResponse(responseTime, "Update Platform Info", HttpStatus.OK.value(),
+        "Success", "Platform Info has been updated.", null), HttpStatus.OK);
   }
 
   @PutMapping

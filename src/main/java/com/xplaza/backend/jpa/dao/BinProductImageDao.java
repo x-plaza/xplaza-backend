@@ -8,12 +8,12 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-@Entity
 @Table(name = "bin_product_images")
-@Data
+@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class BinProductImageDao {
 
   @Id

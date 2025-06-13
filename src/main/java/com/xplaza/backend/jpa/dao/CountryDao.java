@@ -10,25 +10,29 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-@Entity
 @Table(name = "countries")
-@Data
+@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class CountryDao {
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long countryId;
+  Long countryId;
 
-  private String iso;
-  private String countryName;
-  private String nicename;
-  private String iso3;
-  private Short numcode;
-  private Integer phonecode;
+  String iso;
+
+  String countryName;
+
+  String nicename;
+
+  String iso3;
+
+  Short numcode;
+
+  Integer phonecode;
 
   @OneToMany(mappedBy = "country", fetch = FetchType.LAZY)
-  private List<StateDao> states = new ArrayList<>();
+  List<StateDao> states;
 }

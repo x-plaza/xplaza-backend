@@ -19,12 +19,12 @@ import org.springframework.web.bind.annotation.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xplaza.backend.common.util.ApiResponse;
-import com.xplaza.backend.model.ConfirmationToken;
-import com.xplaza.backend.model.CustomerLogin;
 import com.xplaza.backend.service.ConfirmationTokenService;
 import com.xplaza.backend.service.CustomerLoginService;
 import com.xplaza.backend.service.CustomerUserService;
 import com.xplaza.backend.service.SecurityService;
+import com.xplaza.backend.service.entity.ConfirmationToken;
+import com.xplaza.backend.service.entity.Customer;
 
 @RestController
 @RequestMapping("/api/v1/customer-login")
@@ -49,7 +49,7 @@ public class CustomerLoginController extends BaseController {
       @RequestParam("password") @Valid String password) throws IOException {
     start = new Date();
     Boolean isValidUser = customerLoginService.isVaidUser(username.toLowerCase(), password);
-    CustomerLogin dtos = new CustomerLogin();
+    Customer dtos = new Customer();
     if (isValidUser) {
       dtos = customerLoginService.getCustomerLoginDetails(username.toLowerCase());
       dtos.setAuthentication(true);
@@ -74,7 +74,7 @@ public class CustomerLoginController extends BaseController {
   @PostMapping("/send-otp")
   public ResponseEntity<ApiResponse> sendOTP(@RequestParam("username") @Valid String username) {
     start = new Date();
-    CustomerLogin customer = customerLoginService.getCustomerLoginDetails(username.toLowerCase());
+    Customer customer = customerLoginService.getCustomerLoginDetails(username.toLowerCase());
     if (customer == null) {
       end = new Date();
       responseTime = end.getTime() - start.getTime();

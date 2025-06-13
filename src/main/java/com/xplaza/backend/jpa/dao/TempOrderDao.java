@@ -10,53 +10,57 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-@Entity
 @Table(name = "temp_orders")
-@Data
+@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class TempOrderDao {
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long tempOrderId;
+  Long tempOrderId;
+
+  Double totalPrice;
+
+  Double discountAmount;
+
+  Double grandTotalPrice;
+
+  String deliveryAddress;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "fk_customer_id")
-  private CustomerDao customer;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "fk_status_id")
-  private StatusCatalogueDao status;
+  CustomerDao customer;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "fk_shop_id")
-  private ShopDao shop;
+  ShopDao shop;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "fk_delivery_schedule_id")
-  private DeliveryScheduleDao deliverySchedule;
+  DeliveryScheduleDao deliverySchedule;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "fk_delivery_cost_id")
-  private DeliveryCostDao deliveryCost;
+  DeliveryCostDao deliveryCost;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "fk_payment_type_id")
-  private PaymentTypeDao paymentType;
+  PaymentTypeDao paymentType;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "fk_status_id")
+  StatusCatalogueDao status;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "fk_delivery_id")
-  private DeliveryDao delivery;
+  DeliveryDao delivery;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "fk_coupon_id")
-  private CouponDao coupon;
-
-  private Double totalAmount;
-  private Date createdAt;
+  CouponDao coupon;
 
   @OneToMany(mappedBy = "tempOrder", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  private List<TempOrderItemDao> tempOrderItems = new ArrayList<>();
+  List<TempOrderItemDao> tempOrderItems;
 }

@@ -9,21 +9,22 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class OrderItem {
-  private Long id;
-  private Long productId;
+  private Long orderItemId;
   private Long orderId;
-  private Long quantity;
+  private Long productId;
   private Double productSellingPrice;
   private Double productBuyingPrice;
   private String itemName;
   private String itemVarTypeName;
   private Long itemVarTypeValue;
   private String itemCategory;
+  private Long quantity;
   private String quantityType;
   private Double unitPrice;
   private Double itemTotalPrice;
   private String itemImage;
   private Long currencyId;
-  // add other fields as needed
+  private OrderPlace orderPlace;
 }

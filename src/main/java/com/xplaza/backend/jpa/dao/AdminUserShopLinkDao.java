@@ -8,23 +8,21 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-@Entity
 @Table(name = "admin_user_shop_link")
-@Data
+@IdClass(AdminUserShopLinkIdDao.class)
+@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class AdminUserShopLinkDao {
+  @Id
+  @ManyToOne
+  @JoinColumn(name = "admin_user_id")
+  AdminUserDao adminUser;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "admin_user_id")
-  private AdminUserDao adminUser;
-
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne
   @JoinColumn(name = "shop_id")
-  private ShopDao shop;
+  ShopDao shop;
 }

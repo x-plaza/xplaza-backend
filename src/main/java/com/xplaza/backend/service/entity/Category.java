@@ -4,15 +4,18 @@
  */
 package com.xplaza.backend.service.entity;
 
+import java.util.List;
+
 import lombok.*;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Category {
-  private Long id;
-  private String name;
-  private String description;
-  private Long parentCategoryId;
+  private Long categoryId;
+  private String categoryName;
+  private String categoryDescription;
+  private Category parentCategory;
+  private List<Product> products;
 }

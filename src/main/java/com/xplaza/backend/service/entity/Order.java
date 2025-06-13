@@ -13,31 +13,32 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Order {
   private Long invoiceNumber;
-  private Long shopId;
-  private String shopName;
-  private Long customerId;
-  private String customerName;
-  private String mobileNo;
+  private Double totalPrice;
+  private Double discountAmount;
+  private Double netTotal;
+  private Double grandTotalPrice;
   private String deliveryAddress;
-  private String additionalInfo;
-  private String remarks;
-  private Time deliveryScheduleStart;
-  private Time deliveryScheduleEnd;
+  private Long customerId;
+  private Long shopId;
+  private Long deliveryCostId;
+  private Long paymentTypeId;
+  private Long statusId;
+  private Long couponId;
   private Date receivedTime;
   private Date dateToDeliver;
-  private Long statusId;
   private Long currencyId;
-  private Double totalPrice;
-  private Double netTotal;
-  private Double discountAmount;
-  private Long couponId;
+  private String additionalInfo;
+  private String remarks;
+  private String customerName;
+  private String shopName;
+  private Time deliveryScheduleStart;
+  private Time deliveryScheduleEnd;
+  private Double deliveryCost;
   private String couponCode;
   private Double couponAmount;
-  private Long deliveryCostId;
-  private Double deliveryCost;
-  private Double grandTotalPrice;
-  private Long paymentTypeId;
+  private String mobileNo;
   private List<OrderItem> orderItemList;
 }

@@ -7,9 +7,9 @@ package com.xplaza.backend.jpa.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import com.xplaza.backend.jpa.dao.Category;
+import com.xplaza.backend.jpa.dao.CategoryDao;
 
-public interface CategoryRepository extends JpaRepository<Category, Long> {
+public interface CategoryRepository extends JpaRepository<CategoryDao, Long> {
   @Query(value = "select category_name from categories where category_id = ?1", nativeQuery = true)
   String getName(Long id);
 

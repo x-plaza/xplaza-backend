@@ -13,13 +13,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.xplaza.backend.http.dto.OrderDetailsRequestDTO;
-import com.xplaza.backend.http.dto.OrderDetailsResponseDTO;
+import com.xplaza.backend.http.dto.request.OrderRequest;
+import com.xplaza.backend.http.dto.response.OrderResponse;
 import com.xplaza.backend.mapper.OrderDetailsMapper;
 import com.xplaza.backend.service.OrderService;
 import com.xplaza.backend.service.PlatformInfoService;
 import com.xplaza.backend.service.RoleService;
-import com.xplaza.backend.service.entity.OrderDetailsEntity;
+import com.xplaza.backend.service.entity.OrderDetails;
 
 @RestController
 @RequestMapping("/api/v1/orders")
@@ -40,22 +40,22 @@ public class OrderController extends BaseController {
   private Long responseTime;
 
   @GetMapping("/{id}")
-  public ResponseEntity<OrderDetailsResponseDTO> getOrder(@PathVariable @Valid Long id) {
-    OrderDetailsEntity entity = orderService.getOrderDetailsEntity(id);
-    OrderDetailsResponseDTO dto = orderDetailsMapper.toResponseDTO(entity);
+  public ResponseEntity<OrderResponse> getOrder(@PathVariable @Valid Long id) {
+    OrderDetails entity = orderService.getOrderDetails(id);
+    OrderResponse dto = orderDetailsMapper.toResponseDTO(entity);
     return ResponseEntity.ok(dto);
   }
 
   @PostMapping
-  public ResponseEntity<Void> addOrder(@RequestBody @Valid OrderDetailsRequestDTO requestDTO) {
-    OrderDetailsEntity entity = orderDetailsMapper.toEntity(requestDTO);
-    orderService.addOrder(entity);
+  public ResponseEntity<Void> addOrder(@RequestBody @Valid OrderRequest request) {
+    OrderDetails entity = orderDetailsMapper.toEntity(request);
+    orderService.createOrder(entity);
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
   @PutMapping
-  public ResponseEntity<Void> updateOrder(@RequestBody @Valid OrderDetailsRequestDTO requestDTO) {
-    OrderDetailsEntity entity = orderDetailsMapper.toEntity(requestDTO);
+  public ResponseEntity<Void> updateOrder(@RequestBody @Valid OrderRequest request) {
+    OrderDetails entity = orderDetailsMapper.toEntity(request);
     orderService.updateOrder(entity);
     return ResponseEntity.ok().build();
   }

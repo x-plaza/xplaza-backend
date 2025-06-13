@@ -9,9 +9,12 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class DeliveryCost {
-  private Long id;
-  private String name;
-  private Double cost;
-  // add other fields as needed
+  private Long deliveryCostId;
+  private String deliveryCostName;
+  Double deliveryCost;
+  Double delivery_slab_start_range;
+
+  Double delivery_slab_end_range;
 }

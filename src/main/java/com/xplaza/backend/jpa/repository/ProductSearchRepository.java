@@ -9,7 +9,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import com.xplaza.backend.model.ProductSearch;
+import com.xplaza.backend.service.entity.ProductSearch;
 
 public interface ProductSearchRepository extends JpaRepository<ProductSearch, Long> {
   @Query(value = "select p.product_id, p.product_name from products p \n" +

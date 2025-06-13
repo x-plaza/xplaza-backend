@@ -19,19 +19,18 @@ import org.springframework.web.bind.annotation.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xplaza.backend.common.util.ApiResponse;
-import com.xplaza.backend.model.AdminLogin;
-import com.xplaza.backend.model.AdminUser;
-import com.xplaza.backend.model.ConfirmationToken;
+import com.xplaza.backend.service.AdminUserLoginService;
 import com.xplaza.backend.service.AdminUserService;
 import com.xplaza.backend.service.ConfirmationTokenService;
-import com.xplaza.backend.service.LoginService;
 import com.xplaza.backend.service.SecurityService;
+import com.xplaza.backend.service.entity.ConfirmationToken;
+import com.xplaza.backend.service.entity.Login;
 
 @RestController
 @RequestMapping("/api/v1/login")
 public class LoginController extends BaseController {
   @Autowired
-  private LoginService loginService;
+  private AdminUserLoginService adminUserLoginService;
 
   @Autowired
   private AdminUserService adminUserService;
@@ -49,13 +48,13 @@ public class LoginController extends BaseController {
   public ResponseEntity<String> loginAdminUser(@RequestParam("username") @Valid String username,
       @RequestParam("password") @Valid String password) throws IOException {
     start = new Date();
-    AdminLogin dtos = loginService.getAdminUserDetails(username.toLowerCase());
+    Login dtos = adminUserLoginService.getAdminUserDetails(username.toLowerCase());
     if (dtos != null) {
       Boolean isValidUser;
       if (username.equalsIgnoreCase("admin@gmail.com"))
-        isValidUser = loginService.isVaidMasterAdmin(username.toLowerCase(), password);
+        isValidUser = adminUserLoginService.isVaidMasterAdmin(username.toLowerCase(), password);
       else
-        isValidUser = loginService.isVaidUser(username.toLowerCase(), password);
+        isValidUser = adminUserLoginService.isVaidUser(username.toLowerCase(), password);
 
       if (isValidUser) {
         dtos.setAuthentication(true);

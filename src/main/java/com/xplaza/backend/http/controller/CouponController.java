@@ -4,7 +4,6 @@
  */
 package com.xplaza.backend.http.controller;
 
-import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
@@ -18,11 +17,11 @@ import org.springframework.web.bind.annotation.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xplaza.backend.common.util.ApiResponse;
-import com.xplaza.backend.http.dto.CouponRequestDTO;
-import com.xplaza.backend.http.dto.CouponResponseDTO;
+import com.xplaza.backend.http.dto.request.CouponRequest;
+import com.xplaza.backend.http.dto.response.CouponResponse;
 import com.xplaza.backend.mapper.CouponMapper;
 import com.xplaza.backend.service.CouponService;
-import com.xplaza.backend.service.entity.CouponEntity;
+import com.xplaza.backend.service.entity.Coupon;
 
 @RestController
 @RequestMapping("/api/v1/coupons")
@@ -37,11 +36,11 @@ public class CouponController extends BaseController {
   private Long responseTime;
 
   @GetMapping
-  public ResponseEntity<String> getCoupons(@RequestParam(value = "user_id", required = true) @Valid Long user_id)
+  public ResponseEntity<String> getCoupons(@RequestParam(value = "user_id") @Valid Long user_id)
       throws JsonProcessingException {
     start = new Date();
-    List<CouponEntity> entities = couponService.listCoupons();
-    List<CouponResponseDTO> dtos = entities.stream().map(couponMapper::toResponseDTO).toList();
+    List<Coupon> entities = couponService.listCoupons();
+    List<CouponResponse> dtos = entities.stream().map(couponMapper::toResponse).toList();
     end = new Date();
     responseTime = end.getTime() - start.getTime();
     ObjectMapper mapper = new ObjectMapper();
@@ -58,8 +57,8 @@ public class CouponController extends BaseController {
   @GetMapping("/{id}")
   public ResponseEntity<String> getCouponDetails(@PathVariable @Valid Long id) throws JsonProcessingException {
     start = new Date();
-    CouponEntity entity = couponService.listCoupon(id);
-    CouponResponseDTO dto = couponMapper.toResponseDTO(entity);
+    Coupon entity = couponService.listCoupon(id);
+    CouponResponse dto = couponMapper.toResponse(entity);
     end = new Date();
     responseTime = end.getTime() - start.getTime();
     ObjectMapper mapper = new ObjectMapper();
@@ -75,9 +74,9 @@ public class CouponController extends BaseController {
 
   @PostMapping("/validate-coupon")
   public ResponseEntity<ApiResponse> validateCoupon(
-      @RequestParam(value = "coupon_code", required = true) @Valid String coupon_code,
-      @RequestParam(value = "net_order_amount", required = true) @Valid Double net_order_amount,
-      @RequestParam(value = "shop_id", required = true) @Valid Long shop_id) throws ParseException {
+      @RequestParam(value = "coupon_code") @Valid String coupon_code,
+      @RequestParam(value = "net_order_amount") @Valid Double net_order_amount,
+      @RequestParam(value = "shop_id") @Valid Long shop_id) {
     start = new Date();
     if (!couponService.checkCouponValidity(coupon_code, net_order_amount, shop_id)) {
       end = new Date();
@@ -93,9 +92,9 @@ public class CouponController extends BaseController {
   }
 
   @PostMapping
-  public ResponseEntity<ApiResponse> addCoupon(@RequestBody @Valid CouponRequestDTO couponRequestDTO) {
+  public ResponseEntity<ApiResponse> addCoupon(@RequestBody @Valid CouponRequest couponRequest) {
     start = new Date();
-    CouponEntity entity = couponMapper.toEntity(couponRequestDTO);
+    Coupon entity = couponMapper.toEntity(couponRequest);
     couponService.addCoupon(entity);
     end = new Date();
     responseTime = end.getTime() - start.getTime();
@@ -104,9 +103,9 @@ public class CouponController extends BaseController {
   }
 
   @PutMapping
-  public ResponseEntity<ApiResponse> updateCoupon(@RequestBody @Valid CouponRequestDTO couponRequestDTO) {
+  public ResponseEntity<ApiResponse> updateCoupon(@RequestBody @Valid CouponRequest couponRequest) {
     start = new Date();
-    CouponEntity entity = couponMapper.toEntity(couponRequestDTO);
+    Coupon entity = couponMapper.toEntity(couponRequest);
     couponService.updateCoupon(entity);
     end = new Date();
     responseTime = end.getTime() - start.getTime();

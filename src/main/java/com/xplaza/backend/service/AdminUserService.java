@@ -13,12 +13,14 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.xplaza.backend.jpa.dao.AdminUserDao;
 import com.xplaza.backend.jpa.repository.AdminUserRepository;
 import com.xplaza.backend.mapper.AdminUserMapper;
-import com.xplaza.backend.model.PlatformInfo;
 import com.xplaza.backend.service.entity.AdminUser;
+import com.xplaza.backend.service.entity.PlatformInfo;
 
 @Service
+@Transactional
 public class AdminUserService {
   @Autowired
   private AdminUserRepository adminUserRepository;
@@ -31,38 +33,35 @@ public class AdminUserService {
   @Autowired
   private Environment env;
 
-  @Transactional
   public void addAdminUser(AdminUser entity) {
-    AdminUser dao = adminUserMapper.toDao(entity);
+    AdminUserDao dao = adminUserMapper.toDao(entity);
     adminUserRepository.save(dao);
   }
 
-  @Transactional
   public void updateAdminUser(AdminUser entity) {
-    AdminUser dao = adminUserMapper.toDao(entity);
+    AdminUserDao dao = adminUserMapper.toDao(entity);
     adminUserRepository.save(dao);
     // handle shop links if needed
   }
 
   public List<AdminUser> listAdminUsers() {
-    return adminUserRepository.findAll().stream().map(adminUserMapper::toEntity).collect(Collectors.toList());
+    return adminUserRepository.findAll().stream().map(adminUserMapper::toEntityFromDao).collect(Collectors.toList());
   }
 
   public AdminUser listAdminUser(Long id) {
-    return adminUserRepository.findById(id).map(adminUserMapper::toEntity).orElse(null);
+    return adminUserRepository.findById(id).map(adminUserMapper::toEntityFromDao).orElse(null);
   }
 
   public AdminUser listAdminUser(String username) {
-    // TODO: Implement lookup by username using DAO repository
-    return null;
+    AdminUserDao dao = adminUserRepository.findUserByUsername(username);
+    return dao != null ? adminUserMapper.toEntityFromDao(dao) : null;
   }
 
-  @Transactional
   public void deleteAdminUser(Long id) {
     adminUserRepository.deleteById(id);
   }
 
-  public void sendLoginDetails(String email, String temp_password) {
+  public void sendLoginDetails(String email, String tempPassword) {
     // Get platform info
     PlatformInfo platformInfo = platformInfoService.listPlatform();
     // Send email
@@ -74,17 +73,16 @@ public class AdminUserService {
         + " Admin account has been created successfully.\n\n" +
         "Please use the following login details to login to the admin panel and please change the password immediately.\n\n"
         +
-        "Email : " + email + "\n" + "Password : " + temp_password + "\n\n" +
+        "Email : " + email + "\n" + "Password : " + tempPassword + "\n\n" +
         "With Regards,\n" + "Team " + platformInfo.getName());
     emailSenderService.sendEmail(mailMessage);
   }
 
   public void changeAdminUserPassword(String password, String salt, String username) {
-    // TODO: Implement password change logic using DAO repository
+    adminUserRepository.changePassword(password, salt, username);
   }
 
   public String getAdminUserNameByID(Long id) {
-    // TODO: Implement username fetch by ID using DAO repository
-    return null;
+    return adminUserRepository.getName(id);
   }
 }

@@ -10,21 +10,21 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-@Entity
 @Table(name = "discount_types")
-@Data
+@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class DiscountTypeDao {
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long discountTypeId;
+  Long discountTypeId;
 
-  private String discountTypeName;
-  private String discountTypeDescription;
+  String discountTypeName;
+
+  String discountTypeDescription;
 
   @OneToMany(mappedBy = "discountType", fetch = FetchType.LAZY)
-  private List<ProductDiscountDao> productDiscounts = new ArrayList<>();
+  List<ProductDiscountDao> productDiscounts;
 }

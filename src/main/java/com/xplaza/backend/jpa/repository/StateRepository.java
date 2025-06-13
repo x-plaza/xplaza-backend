@@ -4,15 +4,17 @@
  */
 package com.xplaza.backend.jpa.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import com.xplaza.backend.jpa.dao.State;
+import com.xplaza.backend.jpa.dao.StateDao;
 
-public interface StateRepository extends JpaRepository<State, Long> {
-  @Query(value = "select state_name from states where state_id = ?1", nativeQuery = true)
-  String getName(Long id);
-
+public interface StateRepository extends JpaRepository<StateDao, Long> {
   @Query(value = "select * from states where state_id = ?1", nativeQuery = true)
-  State findStateById(Long id);
+  StateDao findStateById(Long id);
+
+  @Query(value = "SELECT * FROM states WHERE country_id = ?1", nativeQuery = true)
+  List<StateDao> findByCountryId(Long countryId);
 }

@@ -10,93 +10,87 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 
 import com.xplaza.backend.jpa.repository.ConfirmationTokenRepository;
-import com.xplaza.backend.model.ConfirmationToken;
-import com.xplaza.backend.model.PlatformInfo;
+import com.xplaza.backend.mapper.ConfirmationTokenMapper;
+import com.xplaza.backend.service.entity.ConfirmationToken;
+import com.xplaza.backend.service.entity.PlatformInfo;
 
 @Service
 public class ConfirmationTokenService {
   @Autowired
   private ConfirmationTokenRepository confirmationTokenRepo;
-
   @Autowired
   private EmailSenderService emailSenderService;
-
   @Autowired
   private PlatformInfoService platformInfoService;
-
+  @Autowired
+  private ConfirmationTokenMapper confirmationTokenMapper;
   @Autowired
   private Environment env;
 
-  public ConfirmationToken getConfirmationToken(String confirmation_token) {
-    return confirmationTokenRepo.findByConfirmationToken(confirmation_token);
+  public ConfirmationToken getConfirmationToken(String confirmationToken) {
+    return confirmationTokenMapper.toEntityFromDao(confirmationTokenRepo.findByConfirmationToken(confirmationToken));
+  }
+
+  // Helper method to create and save a ConfirmationToken
+  private ConfirmationToken createAndSaveToken(String email, String type) {
+    ConfirmationToken confirmationToken = new ConfirmationToken(email, type);
+    confirmationTokenRepo.save(confirmationTokenMapper.toDao(confirmationToken));
+    return confirmationToken;
+  }
+
+  // Helper method to send an email
+  private void sendEmail(String to, String subject, String text) {
+    SimpleMailMessage mailMessage = new SimpleMailMessage();
+    mailMessage.setFrom(env.getProperty("spring.mail.username"));
+    mailMessage.setTo(to);
+    mailMessage.setSubject(subject);
+    mailMessage.setText(text);
+    emailSenderService.sendEmail(mailMessage);
+  }
+
+  // Helper method to get platform info
+  private PlatformInfo getPlatformInfo() {
+    return platformInfoService.listPlatform();
   }
 
   public void sendConfirmationToken(String email) {
-    // Send authentication token in the user email
-    ConfirmationToken confirmationToken = new ConfirmationToken(email, "Code");
-    confirmationTokenRepo.save(confirmationToken);
-    // Get platform info
-    PlatformInfo platformInfo = platformInfoService.listPlatform();
-    // Send email
-    SimpleMailMessage mailMessage = new SimpleMailMessage();
-    mailMessage.setFrom(env.getProperty("spring.mail.username"));
-    mailMessage.setTo(email);
-    mailMessage.setSubject("Complete " + platformInfo.getName() + ".com Sign Up!");
-    mailMessage.setText("To confirm your " + platformInfo.getName() + ".com Admin account, " +
-        "please use the following Code:\n\n" + confirmationToken.getConfirmation_token() + "\n\n" +
-        "With Regards,\n" + "Team " + platformInfo.getName());
-    emailSenderService.sendEmail(mailMessage);
+    ConfirmationToken confirmationToken = createAndSaveToken(email, "Code");
+    PlatformInfo platformInfo = getPlatformInfo();
+    String subject = "Complete " + platformInfo.getName() + ".com Sign Up!";
+    String text = "To confirm your " + platformInfo.getName() + ".com Admin account, " +
+        "please use the following Code:\n\n" + confirmationToken.getConfirmationToken() + "\n\n" +
+        "With Regards,\n" + "Team " + platformInfo.getName();
+    sendEmail(email, subject, text);
   }
 
   public void sendOTP(String email) {
-    // Send OTP in the user email
-    ConfirmationToken confirmationToken = new ConfirmationToken(email, "OTP");
-    confirmationTokenRepo.save(confirmationToken);
-    // Get platform info
-    PlatformInfo platformInfo = platformInfoService.listPlatform();
-    // Send email
-    SimpleMailMessage mailMessage = new SimpleMailMessage();
-    mailMessage.setFrom(env.getProperty("spring.mail.username"));
-    mailMessage.setTo(email);
-    mailMessage.setSubject("One Time Password!");
-    mailMessage.setText("To reset your " + platformInfo.getName() + ".com Admin account password, " +
-        "please use the following OTP:\n\n" + confirmationToken.getConfirmation_token() + "\n\n" +
-        "With Regards,\n" + "Team " + platformInfo.getName());
-    emailSenderService.sendEmail(mailMessage);
+    ConfirmationToken confirmationToken = createAndSaveToken(email, "OTP");
+    PlatformInfo platformInfo = getPlatformInfo();
+    String subject = "One Time Password!";
+    String text = "To reset your " + platformInfo.getName() + ".com Admin account password, " +
+        "please use the following OTP:\n\n" + confirmationToken.getConfirmationToken() + "\n\n" +
+        "With Regards,\n" + "Team " + platformInfo.getName();
+    sendEmail(email, subject, text);
   }
 
   public void sendConfirmationTokenToCustomer(String email) {
-    // Send authentication token in the user email
-    ConfirmationToken confirmationToken = new ConfirmationToken(email, "Code");
-    confirmationTokenRepo.save(confirmationToken);
-    // Get platform info
-    PlatformInfo platformInfo = platformInfoService.listPlatform();
-    // Send email
-    SimpleMailMessage mailMessage = new SimpleMailMessage();
-    mailMessage.setFrom(env.getProperty("spring.mail.username"));
-    mailMessage.setTo(email);
-    mailMessage.setSubject("Complete " + platformInfo.getName() + ".com Sign Up!");
-    mailMessage.setText("To confirm your email, please use the following Code:\n\n"
-        + confirmationToken.getConfirmation_token() + "\n\n" +
-        "With Regards,\n" + "Team " + platformInfo.getName());
-    emailSenderService.sendEmail(mailMessage);
+    ConfirmationToken confirmationToken = createAndSaveToken(email, "Code");
+    PlatformInfo platformInfo = getPlatformInfo();
+    String subject = "Complete " + platformInfo.getName() + ".com Sign Up!";
+    String text = "To confirm your email, please use the following Code:\n\n"
+        + confirmationToken.getConfirmationToken() + "\n\n" +
+        "With Regards,\n" + "Team " + platformInfo.getName();
+    sendEmail(email, subject, text);
   }
 
   public void sendOTPToCustomer(String email) {
-    // Send OTP in the user email
-    ConfirmationToken confirmationToken = new ConfirmationToken(email, "OTP");
-    confirmationTokenRepo.save(confirmationToken);
-    // Get platform info
-    PlatformInfo platformInfo = platformInfoService.listPlatform();
-    // Send email
-    SimpleMailMessage mailMessage = new SimpleMailMessage();
-    mailMessage.setFrom(env.getProperty("spring.mail.username"));
-    mailMessage.setTo(email);
-    mailMessage.setSubject("One Time Password!");
-    mailMessage.setText("To reset your " + platformInfo.getName() + ".com account password, " +
+    ConfirmationToken confirmationToken = createAndSaveToken(email, "OTP");
+    PlatformInfo platformInfo = getPlatformInfo();
+    String subject = "One Time Password!";
+    String text = "To reset your " + platformInfo.getName() + ".com account password, " +
         "please use the following OTP:\n\n"
-        + confirmationToken.getConfirmation_token() + "\n\n" +
-        "With Regards,\n" + "Team " + platformInfo.getName());
-    emailSenderService.sendEmail(mailMessage);
+        + confirmationToken.getConfirmationToken() + "\n\n" +
+        "With Regards,\n" + "Team " + platformInfo.getName();
+    sendEmail(email, subject, text);
   }
 }

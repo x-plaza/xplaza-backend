@@ -9,6 +9,10 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Revenue {
-  // Add fields as needed
+  private Double totalExpense;
+  private Double totalIncome;
+  private Double totalRevenue;
+  private Shop shop;
 }

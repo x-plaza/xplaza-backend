@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.xplaza.backend.jpa.dao.CategoryDao;
 import com.xplaza.backend.jpa.repository.CategoryRepository;
@@ -23,26 +24,43 @@ public class CategoryService {
   @Autowired
   private CategoryMapper categoryMapper;
 
-  public void addCategory(Category category) {
-    CategoryDao dao = categoryMapper.toDao(category);
-    categoryRepo.save(dao);
+  @Transactional
+  public Category addCategory(Category category) {
+    CategoryDao categoryDao = categoryMapper.toDao(category);
+    CategoryDao savedCategoryDao = categoryRepo.save(categoryDao);
+    return categoryMapper.toEntityFromDao(savedCategoryDao);
   }
 
-  public void updateCategory(Category category) {
-    CategoryDao dao = categoryMapper.toDao(category);
-    categoryRepo.save(dao);
+  @Transactional
+  public Category updateCategory(Long id, Category category) {
+    CategoryDao existingCategoryDao = categoryRepo.findById(id)
+        .orElseThrow(() -> new RuntimeException("Category not found with id: " + id));
+
+    category.setCategoryId(id);
+    CategoryDao categoryDao = categoryMapper.toDao(category);
+    CategoryDao updatedCategoryDao = categoryRepo.save(categoryDao);
+    return categoryMapper.toEntityFromDao(updatedCategoryDao);
   }
 
+  @Transactional
   public void deleteCategory(Long id) {
     categoryRepo.deleteById(id);
   }
 
   public List<Category> listCategories() {
-    return categoryRepo.findAll().stream().map(categoryMapper::toEntityFromDAO).collect(Collectors.toList());
+    List<CategoryDao> categoryDaos = categoryRepo.findAll();
+    return categoryDaos.stream()
+        .map(categoryMapper::toEntityFromDao)
+        .collect(Collectors.toList());
   }
 
   public Category listCategory(Long id) {
-    CategoryDao dao = categoryRepo.findById(id).orElse(null);
-    return categoryMapper.toEntityFromDAO(dao);
+    CategoryDao categoryDao = categoryRepo.findById(id)
+        .orElseThrow(() -> new RuntimeException("Category not found with id: " + id));
+    return categoryMapper.toEntityFromDao(categoryDao);
+  }
+
+  public String getCategoryNameByID(Long id) {
+    return categoryRepo.getName(id);
   }
 }

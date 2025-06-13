@@ -10,12 +10,12 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-@Entity
 @Table(name = "bin_orders")
-@Data
+@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class BinOrderDao {
 
   @Id

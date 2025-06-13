@@ -7,38 +7,57 @@ package com.xplaza.backend.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.xplaza.backend.jpa.dao.CurrencyDao;
 import com.xplaza.backend.jpa.repository.CurrencyRepository;
-import com.xplaza.backend.model.Currency;
+import com.xplaza.backend.mapper.CurrencyMapper;
+import com.xplaza.backend.service.entity.Currency;
 
 @Service
 public class CurrencyService {
-  @Autowired
-  private CurrencyRepository currencyRepo;
 
-  public void addCurrency(Currency currency) {
-    currencyRepo.save(currency);
+  @Autowired
+  private CurrencyRepository currencyRepository;
+
+  @Autowired
+  private CurrencyMapper currencyMapper;
+
+  @Transactional
+  public Currency addCurrency(Currency currency) {
+    CurrencyDao currencyDao = currencyMapper.toDao(currency);
+    CurrencyDao savedCurrencyDao = currencyRepository.save(currencyDao);
+    return currencyMapper.toEntityFromDao(savedCurrencyDao);
   }
 
-  public void updateCurrency(Currency currency) {
-    currencyRepo.save(currency);
+  @Transactional
+  public Currency updateCurrency(Long id, Currency currency) {
+    CurrencyDao existingCurrencyDao = currencyRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Currency not found with id: " + id));
+
+    CurrencyDao currencyDao = currencyMapper.toDao(currency);
+    currencyDao.setCurrencyId(existingCurrencyDao.getCurrencyId());
+
+    CurrencyDao updatedCurrencyDao = currencyRepository.save(currencyDao);
+    return currencyMapper.toEntityFromDao(updatedCurrencyDao);
+  }
+
+  @Transactional
+  public void deleteCurrency(Long id) {
+    currencyRepository.deleteById(id);
   }
 
   public List<Currency> listCurrencies() {
-    return currencyRepo.findAll(Sort.by(Sort.Direction.ASC, "name"));
-  }
-
-  public String getCurrencyNameByID(Long id) {
-    return currencyRepo.getName(id);
-  }
-
-  public void deleteCurrency(Long id) {
-    currencyRepo.deleteById(id);
+    List<CurrencyDao> currencyDaos = currencyRepository.findAll();
+    return currencyDaos.stream()
+        .map(currencyMapper::toEntityFromDao)
+        .toList();
   }
 
   public Currency listCurrency(Long id) {
-    return currencyRepo.findCurrencyById(id);
+    CurrencyDao currencyDao = currencyRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Currency not found with id: " + id));
+    return currencyMapper.toEntityFromDao(currencyDao);
   }
 }

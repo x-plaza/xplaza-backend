@@ -5,14 +5,15 @@
 package com.xplaza.backend.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.xplaza.backend.jpa.repository.LocationListRepository;
+import com.xplaza.backend.jpa.dao.LocationDao;
 import com.xplaza.backend.jpa.repository.LocationRepository;
-import com.xplaza.backend.model.Location;
-import com.xplaza.backend.model.LocationList;
+import com.xplaza.backend.service.entity.Location;
 
 @Service
 public class LocationService {
@@ -20,29 +21,62 @@ public class LocationService {
   private LocationRepository locationRepo;
 
   @Autowired
-  private LocationListRepository locationListRepo;
+  private LocationMapper locationMapper;
 
-  public void addLocation(Location location) {
-    locationRepo.save(location);
+  @Transactional
+  public Location addLocation(Location location) {
+    LocationDao locationDao = locationMapper.toDao(location);
+    LocationDao savedLocationDao = locationRepo.save(locationDao);
+    return locationMapper.toEntityFromDao(savedLocationDao);
   }
 
-  public void updateLocation(Location location) {
-    locationRepo.save(location);
+  @Transactional
+  public Location updateLocation(Long id, Location location) {
+    LocationDao existingLocationDao = locationRepo.findById(id)
+        .orElseThrow(() -> new RuntimeException("Location not found with id: " + id));
+
+    location.setLocationId(id);
+    LocationDao locationDao = locationMapper.toDao(location);
+    LocationDao updatedLocationDao = locationRepo.save(locationDao);
+    return locationMapper.toEntityFromDao(updatedLocationDao);
   }
 
-  public List<LocationList> listLocations() {
-    return locationListRepo.findAllItem();
-  }
-
-  public LocationList listLocation(Long id) {
-    return locationListRepo.findLocationListById(id);
-  }
-
-  public String getLocationNameByID(Long id) {
-    return locationRepo.getName(id);
-  }
-
+  @Transactional
   public void deleteLocation(Long id) {
     locationRepo.deleteById(id);
+  }
+
+  public List<Location> listLocations() {
+    List<LocationDao> locationDaos = locationRepo.findAll();
+    return locationDaos.stream()
+        .map(locationMapper::toEntityFromDao)
+        .collect(Collectors.toList());
+  }
+
+  public Location listLocation(Long id) {
+    LocationDao locationDao = locationRepo.findById(id)
+        .orElseThrow(() -> new RuntimeException("Location not found with id: " + id));
+    return locationMapper.toEntityFromDao(locationDao);
+  }
+
+  public List<Location> listLocationsByCity(Long cityId) {
+    List<LocationDao> locationDaos = locationRepo.findByCityId(cityId);
+    return locationDaos.stream()
+        .map(locationMapper::toEntityFromDao)
+        .collect(Collectors.toList());
+  }
+
+  public List<Location> listLocationsByState(Long stateId) {
+    List<LocationDao> locationDaos = locationRepo.findByStateId(stateId);
+    return locationDaos.stream()
+        .map(locationMapper::toEntityFromDao)
+        .collect(Collectors.toList());
+  }
+
+  public List<Location> listLocationsByCountry(Long countryId) {
+    List<LocationDao> locationDaos = locationRepo.findByCountryId(countryId);
+    return locationDaos.stream()
+        .map(locationMapper::toEntityFromDao)
+        .collect(Collectors.toList());
   }
 }

@@ -4,13 +4,17 @@
  */
 package com.xplaza.backend.service.entity;
 
+import java.util.List;
+
 import lombok.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Module {
-  private Long id;
-  private String name;
-  // add other fields as needed
+  private Long moduleId;
+  private String moduleName;
+  private String moduleDescription;
+  private List<Role> roles;
 }

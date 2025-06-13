@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xplaza.backend.common.util.ApiResponse;
-import com.xplaza.backend.http.dto.ModuleRequestDTO;
-import com.xplaza.backend.http.dto.ModuleResponseDTO;
+import com.xplaza.backend.http.dto.request.ModuleRequest;
+import com.xplaza.backend.http.dto.response.ModuleResponse;
 import com.xplaza.backend.mapper.ModuleMapper;
 import com.xplaza.backend.service.ModuleService;
-import com.xplaza.backend.service.entity.ModuleEntity;
+import com.xplaza.backend.service.entity.Module;
 
 @RestController
 @RequestMapping("/api/v1/modules")
@@ -34,8 +34,8 @@ public class ModuleController extends BaseController {
   @GetMapping
   public ResponseEntity<ApiResponse> getModules() throws JsonProcessingException {
     long start = System.currentTimeMillis();
-    List<ModuleEntity> modules = moduleService.listModules();
-    List<ModuleResponseDTO> dtos = modules.stream().map(moduleMapper::toResponseDTO).toList();
+    List<Module> modules = moduleService.listModules();
+    List<ModuleResponse> dtos = modules.stream().map(moduleMapper::toResponse).toList();
     long end = System.currentTimeMillis();
     long responseTime = end - start;
     String data = new ObjectMapper().writeValueAsString(dtos);
@@ -46,8 +46,8 @@ public class ModuleController extends BaseController {
   @GetMapping("/{id}")
   public ResponseEntity<ApiResponse> getModule(@PathVariable @Valid Long id) throws JsonProcessingException {
     long start = System.currentTimeMillis();
-    ModuleEntity module = moduleService.listModule(id);
-    ModuleResponseDTO dto = moduleMapper.toResponseDTO(module);
+    Module module = moduleService.listModule(id);
+    ModuleResponse dto = moduleMapper.toResponse(module);
     long end = System.currentTimeMillis();
     long responseTime = end - start;
     String data = new ObjectMapper().writeValueAsString(dto);
@@ -56,8 +56,8 @@ public class ModuleController extends BaseController {
   }
 
   @PostMapping
-  public ResponseEntity<ApiResponse> addModule(@RequestBody @Valid ModuleRequestDTO moduleRequestDTO) {
-    ModuleEntity module = moduleMapper.toEntity(moduleRequestDTO);
+  public ResponseEntity<ApiResponse> addModule(@RequestBody @Valid ModuleRequest moduleRequest) {
+    Module module = moduleMapper.toEntity(moduleRequest);
     moduleService.addModule(module);
     ApiResponse response = new ApiResponse(0, "Add Module", HttpStatus.CREATED.value(), "Success",
         "Module has been created.", null);
@@ -65,8 +65,8 @@ public class ModuleController extends BaseController {
   }
 
   @PutMapping
-  public ResponseEntity<ApiResponse> updateModule(@RequestBody @Valid ModuleRequestDTO moduleRequestDTO) {
-    ModuleEntity module = moduleMapper.toEntity(moduleRequestDTO);
+  public ResponseEntity<ApiResponse> updateModule(@RequestBody @Valid ModuleRequest moduleRequest) {
+    Module module = moduleMapper.toEntity(moduleRequest);
     moduleService.updateModule(module);
     ApiResponse response = new ApiResponse(0, "Update Module", HttpStatus.OK.value(), "Success",
         "Module has been updated.", null);

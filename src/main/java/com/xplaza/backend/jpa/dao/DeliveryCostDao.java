@@ -10,21 +10,24 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-@Entity
 @Table(name = "delivery_costs")
-@Data
+@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class DeliveryCostDao {
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long deliveryCostId;
+  Long deliveryCostId;
+
+  Double delivery_slab_start_range;
+
+  Double delivery_slab_end_range;
+
+  Double deliveryCost;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "fk_currency_id")
-  private Currency currency;
-
-  private Double cost;
+  CurrencyDao currency;
 }

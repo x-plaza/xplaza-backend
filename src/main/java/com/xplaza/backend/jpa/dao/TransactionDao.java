@@ -10,34 +10,32 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-@Entity
 @Table(name = "transactions")
-@Data
+@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class TransactionDao {
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long transactionId;
+  Long transactionId;
+
+  Double transactionAmount;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "fk_currency_id")
-  private Currency currency;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "fk_payment_type_id")
-  private PaymentTypeDao paymentType;
+  CurrencyDao currency;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "fk_order_id")
-  private OrderDao order;
+  OrderDao order;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "fk_payment_type_id")
+  PaymentTypeDao paymentType;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "fk_status_id")
-  private StatusCatalogueDao status;
-
-  private Double amount;
-  private Date transactionDate;
+  StatusCatalogueDao status;
 }

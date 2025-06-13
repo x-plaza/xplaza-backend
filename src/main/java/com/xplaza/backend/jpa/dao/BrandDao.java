@@ -10,21 +10,18 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-@Entity
 @Table(name = "brands")
-@Data
+@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class BrandDao {
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long brandId;
+  Long brandId;
 
-  private String brandName;
-  private String brandDescription;
+  String brandName;
 
-  @OneToMany(mappedBy = "brand", fetch = FetchType.LAZY)
-  private List<ProductDao> products = new ArrayList<>();
+  String brandDescription;
 }

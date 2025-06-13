@@ -15,5 +15,4 @@ public class AdminUserResponse {
   private String email;
   private Long roleId;
   private List<Long> shopIds;
-  // add other fields as needed
 }

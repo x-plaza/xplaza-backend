@@ -4,17 +4,17 @@
  */
 package com.xplaza.backend.service.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.util.List;
 
-@Getter
-@Setter
+import lombok.*;
+
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Brand {
-  private Long id;
-  private String name;
-  private String description;
+  private Long brandId;
+  private String brandName;
+  private String brandDescription;
+  private List<Product> products;
 }

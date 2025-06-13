@@ -10,25 +10,24 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-@Entity
 @Table(name = "shopping_temp_carts")
-@Data
+@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class ShoppingTempCartDao {
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long shoppingTempCartId;
+  Long shoppingTempCartId;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "fk_product_id")
-  private ProductDao product;
+  ProductDao product;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "fk_customer_id")
-  private CustomerDao customer;
+  CustomerDao customer;
 
-  private Integer quantity;
+  Integer itemQuantity;
 }

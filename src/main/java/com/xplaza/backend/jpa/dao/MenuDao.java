@@ -10,21 +10,21 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-@Entity
 @Table(name = "menus")
-@Data
+@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class MenuDao {
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long menuId;
+  Long menuId;
 
-  private String menuName;
-  private String menuDescription;
+  String menuName;
+
+  String menuDescription;
 
   @OneToMany(mappedBy = "menu", fetch = FetchType.LAZY)
-  private List<MenuModuleLinkDao> menuModuleLinks = new ArrayList<>();
+  List<MenuModuleLinkDao> menuModuleLinks;
 }

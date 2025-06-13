@@ -11,9 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.xplaza.backend.jpa.dao.ModuleDao;
 import com.xplaza.backend.jpa.repository.ModuleRepository;
 import com.xplaza.backend.mapper.ModuleMapper;
-import com.xplaza.backend.service.entity.ModuleEntity;
+import com.xplaza.backend.service.entity.Module;
 
 @Service
 public class ModuleService {
@@ -22,19 +23,19 @@ public class ModuleService {
   @Autowired
   private ModuleMapper moduleMapper;
 
-  public void addModule(ModuleEntity moduleEntity) {
-    ModuleDAO dao = moduleMapper.toDAO(moduleEntity);
+  public void addModule(Module module) {
+    ModuleDao dao = moduleMapper.toDao(module);
     moduleRepo.save(dao);
   }
 
-  public void updateModule(ModuleEntity moduleEntity) {
-    ModuleDAO dao = moduleMapper.toDAO(moduleEntity);
+  public void updateModule(Module module) {
+    ModuleDao dao = moduleMapper.toDao(module);
     moduleRepo.save(dao);
   }
 
-  public List<ModuleEntity> listModules() {
+  public List<Module> listModules() {
     return moduleRepo.findAll(Sort.by(Sort.Direction.ASC, "name"))
-        .stream().map(moduleMapper::toEntityFromDAO).collect(Collectors.toList());
+        .stream().map(moduleMapper::toEntityFromDao).collect(Collectors.toList());
   }
 
   public String getModuleNameByID(Long id) {
@@ -45,8 +46,8 @@ public class ModuleService {
     moduleRepo.deleteById(id);
   }
 
-  public ModuleEntity listModule(Long id) {
-    ModuleDAO dao = moduleRepo.findModuleById(id);
-    return moduleMapper.toEntityFromDAO(dao);
+  public Module listModule(Long id) {
+    ModuleDao dao = moduleRepo.findModuleById(id);
+    return moduleMapper.toEntityFromDao(dao);
   }
 }

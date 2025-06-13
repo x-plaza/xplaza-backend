@@ -8,23 +8,26 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-@Entity
 @Table(name = "users")
-@Data
+@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class UserDao {
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long userId;
+  Long userId;
 
-  private String userName;
-  private String password;
-  private String salt;
-  private String fullName;
-  private String email;
-  private String mobileNo;
-  private String confirmationCode;
+  @OneToOne
+  @JoinColumn(name = "fk_customer_id")
+  CustomerDao customer;
+
+  String userName;
+
+  String userEmail;
+
+  String password;
+
+  String salt;
 }

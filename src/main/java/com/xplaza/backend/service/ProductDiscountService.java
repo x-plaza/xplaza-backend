@@ -10,90 +10,89 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.xplaza.backend.common.util.DateConverter;
-import com.xplaza.backend.http.dto.ProductDiscountRequestDTO;
-import com.xplaza.backend.http.dto.ProductDiscountResponseDTO;
+import com.xplaza.backend.jpa.dao.ProductDao;
+import com.xplaza.backend.jpa.dao.ProductDiscountDao;
 import com.xplaza.backend.jpa.repository.ProductDiscountListRepository;
 import com.xplaza.backend.jpa.repository.ProductDiscountRepository;
 import com.xplaza.backend.jpa.repository.ProductRepository;
 import com.xplaza.backend.mapper.ProductDiscountMapper;
-import com.xplaza.backend.model.Product;
-import com.xplaza.backend.model.ProductDiscount;
-import com.xplaza.backend.service.entity.ProductDiscountEntity;
+import com.xplaza.backend.service.entity.ProductDiscount;
+import com.xplaza.backend.service.entity.ProductDiscountList;
 
 @Service
+@Transactional
 public class ProductDiscountService extends DateConverter {
   @Autowired
-  private ProductDiscountRepository productDiscountRepo;
+  private ProductDiscountRepository productDiscountRepository;
   @Autowired
   private ProductDiscountListRepository productDiscountListRepo;
   @Autowired
   private ProductRepository productRepo;
   @Autowired
   private ProductDiscountMapper productDiscountMapper;
+  @Autowired
+  private ProductDiscountListMapper productDiscountListMapper;
 
-  public boolean checkDiscountValidity(ProductDiscountRequestDTO dto) {
-    Product product = productRepo.findProductById(dto.getProductId());
-    Double original_selling_price = product.getSelling_price();
-    if (dto.getDiscountAmount() > original_selling_price)
+  public boolean checkDiscountValidity(ProductDiscount entity) {
+    ProductDao product = productRepo.findProductById(entity.getProduct().getProductId());
+    Double originalSellingPrice = product.getProductSellingPrice();
+    if (entity.getDiscountAmount() > originalSellingPrice)
       return false;
     return true;
   }
 
-  public void addProductDiscount(ProductDiscountRequestDTO dto) {
-    ProductDiscountEntity entity = productDiscountMapper.toEntity(dto);
-    ProductDiscount productDiscount = new ProductDiscount();
-    productDiscount.setProduct_id(entity.getProductId());
-    productDiscount.setDiscount_type_id(entity.getDiscountTypeId());
-    productDiscount.setDiscount_amount(entity.getDiscountAmount());
-    productDiscount.setCurrency_id(entity.getCurrencyId());
-    productDiscount.setStart_date(entity.getStartDate());
-    productDiscount.setEnd_date(entity.getEndDate());
-    productDiscountRepo.save(productDiscount);
+  public ProductDiscount addProductDiscount(ProductDiscount productDiscount) {
+    ProductDiscountDao productDiscountDao = productDiscountMapper.toDao(productDiscount);
+    ProductDiscountDao savedProductDiscountDao = productDiscountRepository.save(productDiscountDao);
+    return productDiscountMapper.toEntityFromDao(savedProductDiscountDao);
   }
 
-  public void updateProductDiscount(ProductDiscountRequestDTO dto) {
-    ProductDiscountEntity entity = productDiscountMapper.toEntity(dto);
-    ProductDiscount productDiscount = new ProductDiscount();
-    productDiscount.setProduct_id(entity.getProductId());
-    productDiscount.setDiscount_type_id(entity.getDiscountTypeId());
-    productDiscount.setDiscount_amount(entity.getDiscountAmount());
-    productDiscount.setCurrency_id(entity.getCurrencyId());
-    productDiscount.setStart_date(entity.getStartDate());
-    productDiscount.setEnd_date(entity.getEndDate());
-    productDiscountRepo.save(productDiscount);
-  }
+  public ProductDiscount updateProductDiscount(Long id, ProductDiscount productDiscount) {
+    ProductDiscountDao existingProductDiscountDao = productDiscountRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Product discount not found with id: " + id));
 
-  public String getProductNameByID(Long id) {
-    return productDiscountRepo.getName(id);
+    ProductDiscountDao productDiscountDao = productDiscountMapper.toDao(productDiscount);
+    productDiscountDao.setProductDiscountId(existingProductDiscountDao.getProductDiscountId());
+
+    ProductDiscountDao updatedProductDiscountDao = productDiscountRepository.save(productDiscountDao);
+    return productDiscountMapper.toEntityFromDao(updatedProductDiscountDao);
   }
 
   public void deleteProductDiscount(Long id) {
-    productDiscountRepo.deleteById(id);
+    productDiscountRepository.deleteById(id);
   }
 
-  public List<ProductDiscountResponseDTO> listProductDiscounts() {
-    return productDiscountListRepo.findAllProductDiscounts().stream()
-        .map(productDiscountMapper::toResponseDTO)
+  public List<ProductDiscount> listProductDiscounts() {
+    List<ProductDiscountDao> productDiscountDaos = productDiscountRepository.findAll();
+    return productDiscountDaos.stream()
+        .map(productDiscountMapper::toEntityFromDao)
+        .toList();
+  }
+
+  public ProductDiscount listProductDiscount(Long id) {
+    ProductDiscountDao productDiscountDao = productDiscountRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Product discount not found with id: " + id));
+    return productDiscountMapper.toEntityFromDao(productDiscountDao);
+  }
+
+  public String getProductNameByID(Long id) {
+    return productDiscountRepository.getName(id);
+  }
+
+  public List<ProductDiscountList> listProductDiscountsByProduct(Long productId) {
+    return productDiscountListRepo.findByProductId(productId).stream()
+        .map(productDiscountListMapper::toEntity)
         .collect(Collectors.toList());
   }
 
-  public ProductDiscountResponseDTO listProductDiscount(Long id) {
-    return productDiscountMapper.toResponseDTO(productDiscountListRepo.findProductDiscountById(id));
-  }
-
-  public List<ProductDiscountResponseDTO> listProductDiscountsByUserID(Long user_id) {
-    return productDiscountListRepo.findAllProductDiscountByUserID(user_id).stream()
-        .map(productDiscountMapper::toResponseDTO)
-        .collect(Collectors.toList());
-  }
-
-  public boolean checkDiscountDateValidity(ProductDiscountRequestDTO dto) {
+  public boolean checkDiscountDateValidity(ProductDiscount entity) {
     Date current_date = new Date();
     current_date = convertDateToStartOfTheDay(current_date);
-    Date start_date = dto.getStartDate();
-    Date end_date = dto.getEndDate();
+    Date start_date = entity.getValidFrom();
+    Date end_date = entity.getValidTo();
     if (current_date.after(start_date))
       return false;
     if (current_date.after(end_date))
@@ -101,5 +100,10 @@ public class ProductDiscountService extends DateConverter {
     if (start_date.after(end_date))
       return false;
     return true;
+  }
+
+  public ProductDiscount getProductDiscountByProduct(Long productId) {
+    ProductDiscountDao productDiscountDao = productDiscountRepository.findByProductId(productId);
+    return productDiscountMapper.toEntityFromDao(productDiscountDao);
   }
 }

@@ -4,14 +4,17 @@
  */
 package com.xplaza.backend.service.entity;
 
+import java.util.List;
+
 import lombok.*;
-import lombok.Data;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class State {
-  private Long id;
-  private String name;
-  // add other fields as needed
+  private Long stateId;
+  private String stateName;
+  private Country country;
+  private List<City> cities;
 }

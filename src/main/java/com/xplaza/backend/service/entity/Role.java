@@ -9,8 +9,10 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Role {
-  private Long id;
-  private String name;
-  // add other fields as needed
+  private Long roleId;
+  private String roleName;
+  private String roleDescription;
+  private Long moduleId;
 }

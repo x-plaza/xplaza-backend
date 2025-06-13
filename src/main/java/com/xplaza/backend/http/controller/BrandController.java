@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xplaza.backend.common.util.ApiResponse;
-import com.xplaza.backend.http.dto.BrandRequestDTO;
-import com.xplaza.backend.http.dto.BrandResponseDTO;
+import com.xplaza.backend.http.dto.request.BrandRequest;
+import com.xplaza.backend.http.dto.response.BrandResponse;
 import com.xplaza.backend.mapper.BrandMapper;
 import com.xplaza.backend.service.BrandService;
-import com.xplaza.backend.service.entity.BrandEntity;
+import com.xplaza.backend.service.entity.Brand;
 
 @RestController
 @RequestMapping("/api/v1/brands")
@@ -33,8 +33,8 @@ public class BrandController extends BaseController {
   @GetMapping
   public ResponseEntity<ApiResponse> getBrands() throws Exception {
     long start = System.currentTimeMillis();
-    List<BrandEntity> brands = brandService.listBrands();
-    List<BrandResponseDTO> dtos = brands.stream().map(brandMapper::toResponseDTO).toList();
+    List<Brand> brands = brandService.listBrands();
+    List<BrandResponse> dtos = brands.stream().map(brandMapper::toResponse).toList();
     long end = System.currentTimeMillis();
     long responseTime = end - start;
     String data = new ObjectMapper().writeValueAsString(dtos);
@@ -45,8 +45,8 @@ public class BrandController extends BaseController {
   @GetMapping("/{id}")
   public ResponseEntity<ApiResponse> getBrand(@PathVariable @Valid Long id) throws Exception {
     long start = System.currentTimeMillis();
-    BrandEntity brand = brandService.listBrand(id);
-    BrandResponseDTO dto = brandMapper.toResponseDTO(brand);
+    Brand brand = brandService.listBrand(id);
+    BrandResponse dto = brandMapper.toResponse(brand);
     long end = System.currentTimeMillis();
     long responseTime = end - start;
     String data = new ObjectMapper().writeValueAsString(dto);
@@ -55,8 +55,8 @@ public class BrandController extends BaseController {
   }
 
   @PostMapping
-  public ResponseEntity<ApiResponse> addBrand(@RequestBody @Valid BrandRequestDTO brandRequestDTO) {
-    BrandEntity brand = brandMapper.toEntity(brandRequestDTO);
+  public ResponseEntity<ApiResponse> addBrand(@RequestBody @Valid BrandRequest brandRequest) {
+    Brand brand = brandMapper.toEntity(brandRequest);
     brandService.addBrand(brand);
     ApiResponse response = new ApiResponse(0, "Add Brand", HttpStatus.CREATED.value(), "Success",
         "Brand has been created.", null);
@@ -64,8 +64,8 @@ public class BrandController extends BaseController {
   }
 
   @PutMapping
-  public ResponseEntity<ApiResponse> updateBrand(@RequestBody @Valid BrandRequestDTO brandRequestDTO) {
-    BrandEntity brand = brandMapper.toEntity(brandRequestDTO);
+  public ResponseEntity<ApiResponse> updateBrand(@RequestBody @Valid BrandRequest brandRequest) {
+    Brand brand = brandMapper.toEntity(brandRequest);
     brandService.updateBrand(brand);
     ApiResponse response = new ApiResponse(0, "Update Brand", HttpStatus.OK.value(), "Success",
         "Brand has been updated.", null);

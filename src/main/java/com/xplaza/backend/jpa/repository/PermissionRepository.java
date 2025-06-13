@@ -6,7 +6,7 @@ package com.xplaza.backend.jpa.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.xplaza.backend.model.Permission;
+import com.xplaza.backend.jpa.dao.PermissionDao;
 
-public interface PermissionRepository extends JpaRepository<Permission, Long> {
+public interface PermissionRepository extends JpaRepository<PermissionDao, Long> {
 }

@@ -10,30 +10,32 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-@Entity
 @Table(name = "temp_order_items")
-@Data
+@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class TempOrderItemDao {
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long tempOrderItemId;
+  Long tempOrderItemId;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "fk_temp_order_id")
-  private TempOrderDao tempOrder;
+  TempOrderDao tempOrder;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "fk_product_id")
-  private ProductDao product;
+  ProductDao product;
+
+  String orderItemName;
+
+  Double orderItemPrice;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "fk_currency_id")
-  private CurrencyDao currency;
+  CurrencyDao currency;
 
-  private Integer quantity;
-  private Double price;
+  Integer quantity;
 }

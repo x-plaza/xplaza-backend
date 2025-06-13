@@ -10,25 +10,22 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-@Entity
 @Table(name = "roles")
-@Data
+@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class RoleDao {
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long roleId;
+  Long roleId;
 
-  private String roleName;
-  private String roleDescription;
+  String roleName;
+
+  String roleDescription;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "fk_module_id")
-  private Module module;
-
-  @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
-  private List<AdminUserDao> adminUsers = new ArrayList<>();
+  ModuleDao module;
 }

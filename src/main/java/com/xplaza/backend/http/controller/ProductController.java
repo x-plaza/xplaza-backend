@@ -19,14 +19,13 @@ import org.springframework.web.bind.annotation.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xplaza.backend.common.util.ApiResponse;
-import com.xplaza.backend.http.dto.ProductListResponseDTO;
-import com.xplaza.backend.http.dto.ProductRequestDTO;
+import com.xplaza.backend.http.dto.request.ProductRequest;
+import com.xplaza.backend.http.dto.response.ProductListResponse;
 import com.xplaza.backend.mapper.ProductListMapper;
 import com.xplaza.backend.mapper.ProductMapper;
 import com.xplaza.backend.service.ProductService;
 import com.xplaza.backend.service.RoleService;
-import com.xplaza.backend.service.entity.ProductEntity;
-import com.xplaza.backend.service.entity.ProductListEntity;
+import com.xplaza.backend.service.entity.Product;
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -50,7 +49,7 @@ public class ProductController extends BaseController {
   public ResponseEntity<String> getProducts(@RequestParam(value = "user_id") @Valid Long user_id)
       throws JsonProcessingException, ParseException {
     start = new Date();
-    List<ProductListEntity> entities;
+    List<Product> entities;
     String role_name = roleService.getRoleNameByUserID(user_id);
     if (role_name == null)
       entities = null;
@@ -58,8 +57,8 @@ public class ProductController extends BaseController {
       entities = productService.listProducts();
     else
       entities = productService.listProductsByUserID(user_id);
-    List<ProductListResponseDTO> dtos = entities == null ? null
-        : entities.stream().map(productListMapper::toResponseDTO).toList();
+    List<ProductListResponse> dtos = entities == null ? null
+        : entities.stream().map(productListMapper::toResponse).toList();
     end = new Date();
     responseTime = end.getTime() - start.getTime();
     ObjectMapper mapper = new ObjectMapper();
@@ -77,8 +76,8 @@ public class ProductController extends BaseController {
   public ResponseEntity<String> getProduct(@PathVariable @Valid Long id)
       throws JsonProcessingException, ParseException {
     start = new Date();
-    ProductListEntity entity = productService.listProduct(id);
-    ProductListResponseDTO dto = productListMapper.toResponseDTO(entity);
+    ProductList entity = productService.listProduct(id);
+    ProductListResponse dto = productListMapper.toResponse(entity);
     end = new Date();
     responseTime = end.getTime() - start.getTime();
     ObjectMapper mapper = new ObjectMapper();
@@ -97,8 +96,8 @@ public class ProductController extends BaseController {
       @RequestParam(value = "shop_id") @Valid Long shop_id)
       throws JsonProcessingException, ParseException {
     start = new Date();
-    List<ProductListEntity> entities = productService.listProductsByShopIDByAdmin(shop_id);
-    List<ProductListResponseDTO> dtos = entities.stream().map(productListMapper::toResponseDTO).toList();
+    List<ProductList> entities = productService.listProductsByShopIDByAdmin(shop_id);
+    List<ProductListResponse> dtos = entities.stream().map(productListMapper::toResponse).toList();
     end = new Date();
     responseTime = end.getTime() - start.getTime();
     ObjectMapper mapper = new ObjectMapper();
@@ -116,8 +115,8 @@ public class ProductController extends BaseController {
   public ResponseEntity<String> getProductsByShop(@RequestParam(value = "shop_id") @Valid Long shop_id)
       throws JsonProcessingException, ParseException {
     start = new Date();
-    List<ProductListEntity> entities = productService.listProductsByShopID(shop_id);
-    List<ProductListResponseDTO> dtos = entities.stream().map(productListMapper::toResponseDTO).toList();
+    List<ProductList> entities = productService.listProductsByShopID(shop_id);
+    List<ProductListResponse> dtos = entities.stream().map(productListMapper::toResponse).toList();
     end = new Date();
     responseTime = end.getTime() - start.getTime();
     ObjectMapper mapper = new ObjectMapper();
@@ -136,8 +135,8 @@ public class ProductController extends BaseController {
       @RequestParam(value = "shop_id") @Valid Long shop_id)
       throws JsonProcessingException, ParseException {
     start = new Date();
-    List<ProductListEntity> entities = productService.listProductsByTrending(shop_id);
-    List<ProductListResponseDTO> dtos = entities.stream().map(productListMapper::toResponseDTO).toList();
+    List<ProductList> entities = productService.listProductsByTrending(shop_id);
+    List<ProductListResponse> dtos = entities.stream().map(productListMapper::toResponse).toList();
     end = new Date();
     responseTime = end.getTime() - start.getTime();
     ObjectMapper mapper = new ObjectMapper();
@@ -157,8 +156,8 @@ public class ProductController extends BaseController {
       @RequestParam(value = "category_id") @Valid Long category_id)
       throws JsonProcessingException, ParseException {
     start = new Date();
-    List<ProductListEntity> entities = productService.listProductsByCategory(shop_id, category_id);
-    List<ProductListResponseDTO> dtos = entities.stream().map(productListMapper::toResponseDTO).toList();
+    List<ProductList> entities = productService.listProductsByCategory(shop_id, category_id);
+    List<ProductListResponse> dtos = entities.stream().map(productListMapper::toResponse).toList();
     end = new Date();
     responseTime = end.getTime() - start.getTime();
     ObjectMapper mapper = new ObjectMapper();
@@ -180,8 +179,8 @@ public class ProductController extends BaseController {
     start = new Date();
     // This endpoint is not yet refactored to use DTO/entity separation, so return
     // empty or refactor as needed
-    List<ProductListEntity> entities = List.of(); // TODO: Implement if needed
-    List<ProductListResponseDTO> dtos = entities.stream().map(productListMapper::toResponseDTO).toList();
+    List<ProductList> entities = List.of(); // TODO: Implement if needed
+    List<ProductListResponse> dtos = entities.stream().map(productListMapper::toResponse).toList();
     end = new Date();
     responseTime = end.getTime() - start.getTime();
     ObjectMapper mapper = new ObjectMapper();
@@ -196,10 +195,10 @@ public class ProductController extends BaseController {
   }
 
   @PostMapping
-  public ResponseEntity<ApiResponse> addProduct(@RequestBody @Valid ProductRequestDTO productRequestDTO)
+  public ResponseEntity<ApiResponse> addProduct(@RequestBody @Valid ProductRequest productRequest)
       throws JSONException {
     start = new Date();
-    ProductEntity entity = productMapper.toEntity(productRequestDTO);
+    Product entity = productMapper.toEntity(productRequest);
     productService.addProduct(entity);
     end = new Date();
     responseTime = end.getTime() - start.getTime();
@@ -208,9 +207,9 @@ public class ProductController extends BaseController {
   }
 
   @PutMapping
-  public ResponseEntity<ApiResponse> updateProduct(@RequestBody @Valid ProductRequestDTO productRequestDTO) {
+  public ResponseEntity<ApiResponse> updateProduct(@RequestBody @Valid ProductRequest productRequest) {
     start = new Date();
-    ProductEntity entity = productMapper.toEntity(productRequestDTO);
+    Product entity = productMapper.toEntity(productRequest);
     productService.updateProduct(entity);
     end = new Date();
     responseTime = end.getTime() - start.getTime();

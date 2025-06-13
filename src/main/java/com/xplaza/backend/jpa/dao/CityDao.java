@@ -10,24 +10,19 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-@Entity
 @Table(name = "cities")
-@Data
+@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class CityDao {
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long cityId;
+  Long cityId;
 
-  private String cityName;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "fk_state_id")
-  private StateDao state;
+  String cityName;
 
   @OneToMany(mappedBy = "city", fetch = FetchType.LAZY)
-  private List<LocationDao> locations = new ArrayList<>();
+  List<LocationDao> locations;
 }

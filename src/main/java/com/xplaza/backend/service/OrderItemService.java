@@ -11,14 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.xplaza.backend.jpa.dao.*;
 import com.xplaza.backend.jpa.dao.OrderItem;
-import com.xplaza.backend.jpa.dao.ProductDiscount;
-import com.xplaza.backend.jpa.repository.CouponDetailsRepository;
-import com.xplaza.backend.jpa.repository.DeliveryCostRepository;
-import com.xplaza.backend.jpa.repository.OrderItemRepository;
-import com.xplaza.backend.jpa.repository.OrderRepository;
-import com.xplaza.backend.jpa.repository.ProductDiscountRepository;
-import com.xplaza.backend.jpa.repository.ProductRepository;
+import com.xplaza.backend.jpa.repository.*;
 import com.xplaza.backend.mapper.OrderItemMapper;
 import com.xplaza.backend.model.CouponDetails;
 import com.xplaza.backend.model.DeliveryCost;
@@ -37,24 +32,24 @@ public class OrderItemService {
   @Autowired
   private DeliveryCostRepository deliveryCostRepo;
   @Autowired
-  private CouponDetailsRepository couponDetailsRepo;
-  @Autowired
   private ProductDiscountRepository productDiscountRepo;
   @Autowired
   private OrderItemMapper orderItemMapper;
+  @Autowired
+  private CouponRepository couponRepo;
 
   @Transactional
-  public void addOrderItem(OrderItemEntity orderItemEntity) {
-    OrderItem dao = orderItemMapper.toDAO(orderItemEntity);
-    Order order = orderRepo.findOrderById(dao.getOrderId());
-    Product product = productRepo.findProductById(dao.getProductId());
+  public void addOrderItem(OrderItem orderItem) {
+    OrderItemDao dao = orderItemMapper.toDao(orderItem);
+    OrderDao order = orderRepo.findOrderById(dao.getOrder().getOrderId());
+    ProductDao product = productRepo.findProductById(dao.getPr());
     Double originalSellingPrice = product.getSelling_price();
     Double buyingPrice = product.getBuying_price();
     dao.setProductSellingPrice(originalSellingPrice);
     dao.setProductBuyingPrice(buyingPrice);
 
     Double discountAmount = 0.0;
-    ProductDiscount productDiscount = productDiscountRepo.findByProductId(dao.getProductId());
+    ProductDiscountDao productDiscount = productDiscountRepo.findByProductId(dao.getProductId());
     if (productDiscount != null) {
       discountAmount = productDiscount.getDiscountAmount();
       Long discountType = productDiscount.getDiscountTypeId();
@@ -83,14 +78,14 @@ public class OrderItemService {
 
     Double couponAmount = order.getCoupon_amount();
     if (order.getCoupon_id() != null) {
-      CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsById(order.getCoupon_id());
-      if (Objects.equals(couponDetails.getDiscount_type_name(), "Percentage")) {
+      CouponDao couponDetails = couponRepo.findCouponDetailsById(order.getCoupon_id());
+      if (Objects.equals(couponDetails.getDiscountType().getDiscountTypeName(), "Percentage")) {
         couponAmount = (order.getNet_total() * couponDetails.getAmount()) / 100;
         if (couponAmount > couponDetails.getMax_amount())
           couponAmount = couponDetails.getMax_amount();
       }
     } else if (order.getCoupon_code() != null) {
-      CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsByCode(order.getCoupon_code());
+      CouponDetails couponDetails = couponRepo.findCouponDetailsByCode(order.getCoupon_code());
       if (Objects.equals(couponDetails.getDiscount_type_name(), "Percentage")) {
         couponAmount = (order.getNet_total() * couponDetails.getAmount()) / 100;
         if (couponAmount > couponDetails.getMax_amount())
@@ -155,14 +150,14 @@ public class OrderItemService {
 
     Double couponAmount = order.getCoupon_amount();
     if (order.getCoupon_id() != null) {
-      CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsById(order.getCoupon_id());
+      CouponDetails couponDetails = couponRepo.findCouponDetailsById(order.getCoupon_id());
       if (Objects.equals(couponDetails.getDiscount_type_name(), "Percentage")) {
         couponAmount = (order.getNet_total() * couponDetails.getAmount()) / 100;
         if (couponAmount > couponDetails.getMax_amount())
           couponAmount = couponDetails.getMax_amount();
       }
     } else if (order.getCoupon_code() != null) {
-      CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsByCode(order.getCoupon_code());
+      CouponDetails couponDetails = couponRepo.findCouponDetailsByCode(order.getCoupon_code());
       if (Objects.equals(couponDetails.getDiscount_type_name(), "Percentage")) {
         couponAmount = (order.getNet_total() * couponDetails.getAmount()) / 100;
         if (couponAmount > couponDetails.getMax_amount())
@@ -218,14 +213,14 @@ public class OrderItemService {
 
     Double couponAmount = order.getCoupon_amount();
     if (order.getCoupon_id() != null) {
-      CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsById(order.getCoupon_id());
+      CouponDao couponDetails = couponRepo.findCouponDetailsById(order.getCoupon_id());
       if (Objects.equals(couponDetails.getDiscount_type_name(), "Percentage")) {
         couponAmount = (order.getNet_total() * couponDetails.getAmount()) / 100;
         if (couponAmount > couponDetails.getMax_amount())
           couponAmount = couponDetails.getMax_amount();
       }
     } else if (order.getCoupon_code() != null) {
-      CouponDetails couponDetails = couponDetailsRepo.findCouponDetailsByCode(order.getCoupon_code());
+      CouponDao couponDetails = couponRepo.findCouponDetailsByCode(order.getCoupon_code());
       if (Objects.equals(couponDetails.getDiscount_type_name(), "Percentage")) {
         couponAmount = (order.getNet_total() * couponDetails.getAmount()) / 100;
         if (couponAmount > couponDetails.getMax_amount())
@@ -244,7 +239,7 @@ public class OrderItemService {
     entity.setQuantity(newQuantity);
     entity.setQuantityType("pc");
 
-    orderItemRepo.save(orderItemMapper.toDAO(entity));
+    orderItemRepo.save(orderItemMapper.toDao(entity));
     orderRepo.save(order);
 
     Product product = productRepo.findProductById(entity.getProductId());

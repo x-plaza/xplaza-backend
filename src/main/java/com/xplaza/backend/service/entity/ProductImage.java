@@ -4,15 +4,21 @@
  */
 package com.xplaza.backend.service.entity;
 
+import java.util.Date;
+
 import lombok.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ProductImage {
-  private Long id;
-  private String name;
-  private String path;
-  private Long productId;
-  // add other fields as needed
+  private Long productImageId;
+  private Product product;
+  private String productImageName;
+  private String productImagePath;
+  private Integer createdBy;
+  private Date createdAt;
+  private Integer lastUpdatedBy;
+  private Date lastUpdatedAt;
 }

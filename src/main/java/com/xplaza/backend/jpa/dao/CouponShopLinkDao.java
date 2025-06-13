@@ -8,23 +8,25 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-@Entity
 @Table(name = "coupon_shop_link")
-@Data
+@IdClass(CouponShopLinkIdDao.class)
+@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class CouponShopLinkDao {
+  @Id
+  Long shopId;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  Long couponId;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "shop_id")
-  private ShopDao shop;
+  ShopDao shop;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "coupon_id")
-  private CouponDao coupon;
+  CouponDao coupon;
 }

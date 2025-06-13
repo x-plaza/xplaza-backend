@@ -4,10 +4,17 @@
  */
 package com.xplaza.backend.http.dto.request;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class BrandRequest {
-  private String name;
-  // add other fields as needed
+  private Long brandId;
+  private String brandName;
+  private String brandDescription;
 }

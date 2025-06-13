@@ -10,18 +10,14 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-@Entity
 @Table(name = "shippings")
-@Data
+@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class ShippingDao {
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long shippingId;
-
-  private String shippingStatus;
-  private Date shippingDate;
 }

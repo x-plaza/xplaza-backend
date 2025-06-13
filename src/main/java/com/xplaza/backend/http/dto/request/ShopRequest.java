@@ -4,13 +4,18 @@
  */
 package com.xplaza.backend.http.dto.request;
 
-import lombok.Data;
+import lombok.*;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ShopRequest {
-  private String name;
-  private String owner;
-  private String address;
-  private String description;
+  private Long shopId;
+  private String shopName;
+  private String shopDescription;
+  private String shopAddress;
   private Long locationId;
+  private String locationName;
+  private String shopOwner;
 }

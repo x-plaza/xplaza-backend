@@ -7,9 +7,9 @@ package com.xplaza.backend.jpa.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import com.xplaza.backend.jpa.dao.ProductDiscount;
+import com.xplaza.backend.jpa.dao.ProductDiscountDao;
 
-public interface ProductDiscountRepository extends JpaRepository<ProductDiscount, Long> {
+public interface ProductDiscountRepository extends JpaRepository<ProductDiscountDao, Long> {
   @Query(value = "select concat(p.product_name,' (', p.product_var_type_value,' ', pvt.var_type_name, ')') as product_name \n"
       +
       "from product_discounts pd \n" +
@@ -27,5 +27,5 @@ public interface ProductDiscountRepository extends JpaRepository<ProductDiscount
   Double findProductDiscountByProductId(Long product_id);
 
   @Query(value = "select pd.* from product_discounts pd where fk_product_id = ?1 and now() between pd.discount_start_date and pd.discount_end_date", nativeQuery = true)
-  ProductDiscount findByProductId(Long product_id);
+  ProductDiscountDao findByProductId(Long product_id);
 }

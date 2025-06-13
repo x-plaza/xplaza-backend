@@ -10,25 +10,22 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-@Entity
 @Table(name = "categories")
-@Data
+@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class CategoryDao {
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long categoryId;
+  Long categoryId;
 
-  private String categoryName;
-  private String categoryDescription;
+  String categoryName;
+
+  String categoryDescription;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "parent_category")
-  private CategoryDao parentCategory;
-
-  @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
-  private List<ProductDao> products = new ArrayList<>();
+  CategoryDao parentCategory;
 }

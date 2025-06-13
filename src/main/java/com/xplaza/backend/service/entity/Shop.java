@@ -4,19 +4,20 @@
  */
 package com.xplaza.backend.service.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.List;
+
+import lombok.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Shop {
-  private Long id;
-  private String name;
-  private String description;
-  private String address;
-  private Long locationId;
-  private String owner;
-  // add other fields as needed
+  private Long shopId;
+  private String shopName;
+  private String shopDescription;
+  private String shopAddress;
+  private Location location;
+  private String shopOwner;
+  private List<Product> products;
 }

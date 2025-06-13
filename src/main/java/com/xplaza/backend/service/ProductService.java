@@ -5,87 +5,82 @@
 package com.xplaza.backend.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.xplaza.backend.jpa.dao.Product;
-import com.xplaza.backend.jpa.repository.ProductDAORepository;
-import com.xplaza.backend.jpa.repository.ProductListDAORepository;
-import com.xplaza.backend.mapper.ProductListMapper;
+import com.xplaza.backend.jpa.dao.ProductDao;
+import com.xplaza.backend.jpa.repository.ProductRepository;
 import com.xplaza.backend.mapper.ProductMapper;
-import com.xplaza.backend.service.entity.ProductEntity;
-import com.xplaza.backend.service.entity.ProductListEntity;
+import com.xplaza.backend.service.entity.Product;
 
 @Service
+@Transactional
 public class ProductService {
   @Autowired
-  private ProductDAORepository productDAORepo;
-  @Autowired
-  private ProductListDAORepository productListDAORepo;
+  private ProductRepository productRepo;
   @Autowired
   private ProductMapper productMapper;
-  @Autowired
-  private ProductListMapper productListMapper;
 
-  @Transactional
-  public void addProduct(ProductEntity productEntity) {
-    Product dao = productMapper.toDAO(productEntity);
-    productDAORepo.save(dao);
-    // handle images if needed
+  public Product addProduct(Product product) {
+    ProductDao productDao = productMapper.toDao(product);
+    ProductDao savedProductDao = productRepo.save(productDao);
+    return productMapper.toEntityFromDao(savedProductDao);
   }
 
-  @Transactional
-  public void updateProduct(ProductEntity productEntity) {
-    Product dao = productMapper.toDAO(productEntity);
-    productDAORepo.save(dao);
-    // handle images if needed
+  public Product updateProduct(Product product) {
+    productRepo.findById(product.getProductId())
+        .orElseThrow(() -> new RuntimeException("Product not found with id: " + product.getProductId()));
+    ProductDao productDao = productMapper.toDao(product);
+    ProductDao updatedProductDao = productRepo.save(productDao);
+    return productMapper.toEntityFromDao(updatedProductDao);
   }
 
-  @Transactional
   public void deleteProduct(Long id) {
-    productDAORepo.deleteById(id);
-    // handle images if needed
+    productRepo.deleteById(id);
+  }
+
+  public List<Product> listProducts() {
+    List<ProductDao> productDaos = productRepo.findAll();
+    return productDaos.stream()
+        .map(productMapper::toEntityFromDao)
+        .collect(Collectors.toList());
+  }
+
+  public Product listProduct(Long id) {
+    ProductDao productDao = productRepo.findById(id)
+        .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+    return productMapper.toEntityFromDao(productDao);
+  }
+
+  public List<Product> listProductsByShop(Long shopId) {
+    List<ProductDao> productDaos = productRepo.findByShopId(shopId);
+    return productDaos.stream()
+        .map(productMapper::toEntityFromDao)
+        .collect(Collectors.toList());
+  }
+
+  public List<Product> listProductsByCategory(Long categoryId) {
+    List<ProductDao> productDaos = productRepo.findByCategoryId(categoryId);
+    return productDaos.stream()
+        .map(productMapper::toEntityFromDao)
+        .collect(Collectors.toList());
+  }
+
+  public List<Product> listProductsByBrand(Long brandId) {
+    List<ProductDao> productDaos = productRepo.findByBrandId(brandId);
+    return productDaos.stream()
+        .map(productMapper::toEntityFromDao)
+        .collect(Collectors.toList());
   }
 
   public String getProductNameByID(Long id) {
-    // Implement if needed in DAO repo
-    return null;
+    return productRepo.getName(id);
   }
 
-  public List<ProductListEntity> listProducts() {
-    List<ProductListDAO> daos = productListDAORepo.findAll();
-    return daos.stream().map(productListMapper::toEntity).toList();
-  }
-
-  public List<ProductListEntity> listProductsByUserID(Long userId) {
-    List<ProductListDAO> daos = productListDAORepo.findAll(); // replace with correct query
-    return daos.stream().map(productListMapper::toEntity).toList();
-  }
-
-  public ProductListEntity listProduct(Long id) {
-    ProductListDAO dao = productListDAORepo.findById(id).orElse(null);
-    return productListMapper.toEntity(dao);
-  }
-
-  public List<ProductListEntity> listProductsByShopIDByAdmin(Long shopId) {
-    List<ProductListDAO> daos = productListDAORepo.findAll(); // replace with correct query
-    return daos.stream().map(productListMapper::toEntity).toList();
-  }
-
-  public List<ProductListEntity> listProductsByShopID(Long shopId) {
-    List<ProductListDAO> daos = productListDAORepo.findAll(); // replace with correct query
-    return daos.stream().map(productListMapper::toEntity).toList();
-  }
-
-  public List<ProductListEntity> listProductsByCategory(Long shopId, Long categoryId) {
-    List<ProductListDAO> daos = productListDAORepo.findAll(); // replace with correct query
-    return daos.stream().map(productListMapper::toEntity).toList();
-  }
-
-  public List<ProductListEntity> listProductsByTrending(Long shopId) {
-    List<ProductListDAO> daos = productListDAORepo.findAll(); // replace with correct query
-    return daos.stream().map(productListMapper::toEntity).toList();
+  public void updateProductInventory(Long id, int quantity) {
+    productRepo.updateInventory(id, quantity);
   }
 }

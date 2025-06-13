@@ -10,18 +10,14 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-@Entity
 @Table(name = "cancellations")
-@Data
+@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class CancellationDao {
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long cancellationId;
-
-  private String cancellationReason;
-  private Date cancellationDate;
+  Long cancellationId;
 }

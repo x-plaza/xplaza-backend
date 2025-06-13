@@ -10,28 +10,31 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-@Entity
 @Table(name = "admin_users")
-@Data
+@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class AdminUserDao {
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long adminUserId;
+  Long adminUserId;
 
-  private String userName;
-  private String password;
-  private String salt;
-  private String fullName;
-  private String confirmationCode;
+  String userName;
+
+  String password;
+
+  String salt;
+
+  String fullName;
+
+  String confirmationCode;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "fk_role_id")
-  private RoleDao role;
+  RoleDao role;
 
   @OneToMany(mappedBy = "adminUser", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-  private List<AdminUserShopLinkDao> shopLinks = new ArrayList<>();
+  List<AdminUserShopLinkDao> shopLinks;
 }

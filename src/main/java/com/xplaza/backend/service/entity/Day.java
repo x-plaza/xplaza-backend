@@ -4,13 +4,16 @@
  */
 package com.xplaza.backend.service.entity;
 
+import java.util.List;
+
 import lombok.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Day {
-  private Long id;
-  private String name;
-  // add other fields as needed
+  private Long dayId;
+  private String dayName;
+  private List<DeliverySchedule> deliverySchedules;
 }

@@ -12,14 +12,17 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Coupon {
-  private Long id;
+  private Long couponId;
+  private String couponCode;
   private Double amount;
+  private Double maxAmount;
   private Long currencyId;
+  private Long discountTypeId;
   private Date startDate;
   private Date endDate;
-  private Double maxAmount;
-  private Long discountTypeId;
-  private List<Long> shopIds;
-  // add other fields as needed
+  private Boolean isActive;
+  private Double minShoppingAmount;
+  private List<CouponShopLink> couponShopLinks;
 }

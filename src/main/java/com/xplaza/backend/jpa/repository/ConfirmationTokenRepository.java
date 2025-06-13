@@ -9,11 +9,11 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.xplaza.backend.model.ConfirmationToken;
+import com.xplaza.backend.jpa.dao.ConfirmationTokenDao;
 
-public interface ConfirmationTokenRepository extends JpaRepository<ConfirmationToken, Long> {
+public interface ConfirmationTokenRepository extends JpaRepository<ConfirmationTokenDao, Long> {
   @Query(value = "select * from confirmation_tokens where confirmation_token = ?1", nativeQuery = true)
-  ConfirmationToken findByConfirmationToken(String confirmation_token);
+  ConfirmationTokenDao findByConfirmationToken(String confirmation_token);
 
   @Modifying
   @Transactional

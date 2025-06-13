@@ -4,59 +4,28 @@
  */
 package com.xplaza.backend.jpa.dao;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
+import lombok.*;
 
 import org.hibernate.annotations.Immutable;
 
-@Entity
-@Immutable
 @Table(name = "revenue")
-public class RevenueDao {
+@Immutable
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public final class RevenueDao {
   @Id
-  @Column(name = "shop_id")
-  private Long shopId;
+  @OneToOne
+  @JoinColumn(name = "shop_id")
+  ShopDao shop;
 
-  @Column(name = "total_expense")
-  private Double totalExpense;
+  Double totalExpense;
 
-  @Column(name = "total_income")
-  private Double totalIncome;
+  Double totalIncome;
 
-  @Column(name = "total_revenue")
-  private Double totalRevenue;
-
-  public Long getShopId() {
-    return shopId;
-  }
-
-  public void setShopId(Long shopId) {
-    this.shopId = shopId;
-  }
-
-  public Double getTotalExpense() {
-    return totalExpense;
-  }
-
-  public void setTotalExpense(Double totalExpense) {
-    this.totalExpense = totalExpense;
-  }
-
-  public Double getTotalIncome() {
-    return totalIncome;
-  }
-
-  public void setTotalIncome(Double totalIncome) {
-    this.totalIncome = totalIncome;
-  }
-
-  public Double getTotalRevenue() {
-    return totalRevenue;
-  }
-
-  public void setTotalRevenue(Double totalRevenue) {
-    this.totalRevenue = totalRevenue;
-  }
+  Double totalRevenue;
 }

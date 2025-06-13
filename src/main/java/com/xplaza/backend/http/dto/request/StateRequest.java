@@ -4,10 +4,18 @@
  */
 package com.xplaza.backend.http.dto.request;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class StateRequest {
-  private String name;
-  // add other fields as needed
+  private Long stateId;
+  private String stateName;
+  private Long countryId;
+  private String countryName;
 }

@@ -17,11 +17,11 @@ import org.springframework.web.bind.annotation.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xplaza.backend.common.util.ApiResponse;
-import com.xplaza.backend.http.dto.RoleRequestDTO;
-import com.xplaza.backend.http.dto.RoleResponseDTO;
+import com.xplaza.backend.http.dto.request.RoleRequest;
+import com.xplaza.backend.http.dto.response.RoleResponse;
 import com.xplaza.backend.mapper.RoleMapper;
 import com.xplaza.backend.service.RoleService;
-import com.xplaza.backend.service.entity.RoleEntity;
+import com.xplaza.backend.service.entity.Role;
 
 @RestController
 @RequestMapping("/api/v1/roles")
@@ -37,9 +37,9 @@ public class RoleController extends BaseController {
   @GetMapping
   public ResponseEntity<String> getRoles() throws JsonProcessingException {
     start = new Date();
-    List<RoleEntity> entities = roleService.listRoles();
-    List<RoleResponseDTO> dtos = entities.stream().map(roleMapper::toResponseDTO).toList();
-    dtos.removeIf(r -> r.getName().equals("Master Admin"));
+    List<Role> roles = roleService.listRoles();
+    roles.removeIf(r -> r.getRoleName().equals("Master Admin"));
+    List<RoleResponse> dtos = roles.stream().map(roleMapper::toResponse).toList();
     end = new Date();
     responseTime = end.getTime() - start.getTime();
     ObjectMapper mapper = new ObjectMapper();
@@ -56,8 +56,8 @@ public class RoleController extends BaseController {
   @GetMapping("/{id}")
   public ResponseEntity<String> getRole(@PathVariable @Valid Long id) throws JsonProcessingException {
     start = new Date();
-    RoleEntity entity = roleService.listRole(id);
-    RoleResponseDTO dto = roleMapper.toResponseDTO(entity);
+    Role entity = roleService.listRole(id);
+    RoleResponse dto = roleMapper.toResponse(entity);
     end = new Date();
     responseTime = end.getTime() - start.getTime();
     ObjectMapper mapper = new ObjectMapper();
@@ -72,9 +72,9 @@ public class RoleController extends BaseController {
   }
 
   @PostMapping
-  public ResponseEntity<ApiResponse> addRole(@RequestBody @Valid RoleRequestDTO roleRequestDTO) {
+  public ResponseEntity<ApiResponse> addRole(@RequestBody @Valid RoleRequest roleRequest) {
     start = new Date();
-    RoleEntity entity = roleMapper.toEntity(roleRequestDTO);
+    Role entity = roleMapper.toEntity(roleRequest);
     roleService.addRole(entity);
     end = new Date();
     responseTime = end.getTime() - start.getTime();
@@ -83,9 +83,9 @@ public class RoleController extends BaseController {
   }
 
   @PutMapping
-  public ResponseEntity<ApiResponse> updateRole(@RequestBody @Valid RoleRequestDTO roleRequestDTO) {
+  public ResponseEntity<ApiResponse> updateRole(@RequestBody @Valid RoleRequest roleRequestDTO) {
     start = new Date();
-    RoleEntity entity = roleMapper.toEntity(roleRequestDTO);
+    Role entity = roleMapper.toEntity(roleRequestDTO);
     roleService.updateRole(entity);
     end = new Date();
     responseTime = end.getTime() - start.getTime();

@@ -10,28 +10,29 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-@Entity
 @Table(name = "shops")
-@Data
+@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class ShopDao {
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long shopId;
+  Long shopId;
 
-  private String shopName;
-  private String shopDescription;
-  private String shopAddress;
+  String shopName;
+
+  String shopDescription;
+
+  String shopAddress;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "fk_location_id")
-  private LocationDao location;
+  LocationDao location;
 
-  private String shopOwner;
+  String shopOwner;
 
   @OneToMany(mappedBy = "shop", fetch = FetchType.LAZY)
-  private List<ProductDao> products = new ArrayList<>();
+  List<ProductDao> products;
 }

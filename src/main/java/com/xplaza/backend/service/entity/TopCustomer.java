@@ -9,6 +9,11 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class TopCustomer {
-  // Add fields as needed
+  private Long id;
+  private Long customerId;
+  private String customerName;
+  private Double totalOrderAmount;
+  private Shop shop;
 }

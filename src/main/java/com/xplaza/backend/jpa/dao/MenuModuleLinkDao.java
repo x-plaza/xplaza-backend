@@ -8,23 +8,22 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-@Entity
 @Table(name = "menu_module_link")
-@Data
+@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class MenuModuleLinkDao {
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  Long id;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "menu_id")
-  private MenuDao menu;
+  MenuDao menu;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "module_id")
-  private ModuleDao module;
+  ModuleDao module;
 }

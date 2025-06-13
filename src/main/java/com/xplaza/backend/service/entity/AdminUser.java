@@ -11,11 +11,14 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class AdminUser {
-  private Long id;
+  private Long adminUserId;
   private String fullName;
-  private String email;
+  private String userName;
+  private String password;
+  private String salt;
   private Long roleId;
-  private List<Long> shopIds;
-  // add other fields as needed
+  private String confirmationCode;
+  private List<AdminUserShopLink> adminUserShopLinks;
 }

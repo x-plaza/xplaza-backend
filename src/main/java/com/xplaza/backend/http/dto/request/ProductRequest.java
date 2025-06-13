@@ -4,17 +4,23 @@
  */
 package com.xplaza.backend.http.dto.request;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ProductRequest {
-  private String name;
-  private String description;
-  private Long brandId;
+  private Long productId;
+  private String productName;
+  private String productDescription;
+  private Double productPrice;
+  private Integer quantity;
+  private Boolean isTrending;
+  private Long shopId;
   private Long categoryId;
-  private Long productVarTypeId;
-  private Double productVarTypeValue;
-  private Double buyingPrice;
-  private Double sellingPrice;
-  // add other fields as needed
+  private Long brandId;
 }

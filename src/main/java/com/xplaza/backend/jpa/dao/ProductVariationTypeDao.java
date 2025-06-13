@@ -10,21 +10,21 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-@Entity
+import org.hibernate.annotations.Immutable;
+
 @Table(name = "product_variation_types")
-@Data
+@Immutable
+@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class ProductVariationTypeDao {
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long productVarTypeId;
+  Long productVarTypeId;
 
-  private String varTypeName;
-  private String varTypeDescription;
+  String varTypeName;
 
-  @OneToMany(mappedBy = "productVariationType", fetch = FetchType.LAZY)
-  private List<ProductDao> products = new ArrayList<>();
+  String varTypeDescription;
 }

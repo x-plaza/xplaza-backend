@@ -5,31 +5,30 @@
 package com.xplaza.backend.service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.xplaza.backend.jpa.dao.DeliveryCost;
-import com.xplaza.backend.jpa.repository.DeliveryCostDAORepository;
+import com.xplaza.backend.jpa.dao.DeliveryCostDao;
+import com.xplaza.backend.jpa.repository.DeliveryCostRepository;
 import com.xplaza.backend.mapper.DeliveryCostMapper;
-import com.xplaza.backend.service.entity.DeliveryCostEntity;
+import com.xplaza.backend.service.entity.DeliveryCost;
 
 @Service
 public class DeliveryCostService {
   @Autowired
-  private DeliveryCostDAORepository deliveryCostDAORepo;
+  private DeliveryCostRepository deliveryCostRepo;
   @Autowired
   private DeliveryCostMapper deliveryCostMapper;
 
-  public void addDeliveryCost(DeliveryCostEntity entity) {
-    DeliveryCost dao = deliveryCostMapper.toDAO(entity);
-    deliveryCostDAORepo.save(dao);
+  public void addDeliveryCost(DeliveryCost entity) {
+    DeliveryCostDao dao = deliveryCostMapper.toDao(entity);
+    deliveryCostRepo.save(dao);
   }
 
-  public void updateDeliveryCost(DeliveryCostEntity entity) {
-    DeliveryCost dao = deliveryCostMapper.toDAO(entity);
-    deliveryCostDAORepo.save(dao);
+  public void updateDeliveryCost(DeliveryCost entity) {
+    DeliveryCostDao dao = deliveryCostMapper.toDao(entity);
+    deliveryCostRepo.save(dao);
   }
 
   public String getDeliverySlabRangeNameByID(Long id) {
@@ -38,14 +37,14 @@ public class DeliveryCostService {
   }
 
   public void deleteDeliveryCost(Long id) {
-    deliveryCostDAORepo.deleteById(id);
+    deliveryCostRepo.deleteById(id);
   }
 
-  public List<DeliveryCostEntity> listDeliveryCosts() {
-    return deliveryCostDAORepo.findAll().stream().map(deliveryCostMapper::toEntityFromDAO).collect(Collectors.toList());
+  public List<DeliveryCost> listDeliveryCosts() {
+    return deliveryCostRepo.findAll().stream().map(deliveryCostMapper::toEntityFromDao).toList();
   }
 
-  public DeliveryCostEntity listDeliveryCost(Long id) {
-    return deliveryCostDAORepo.findById(id).map(deliveryCostMapper::toEntityFromDAO).orElse(null);
+  public DeliveryCost listDeliveryCost(Long id) {
+    return deliveryCostRepo.findById(id).map(deliveryCostMapper::toEntityFromDao).orElse(null);
   }
 }

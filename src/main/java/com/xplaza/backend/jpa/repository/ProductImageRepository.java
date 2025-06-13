@@ -11,9 +11,9 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.xplaza.backend.model.ProductImage;
+import com.xplaza.backend.jpa.dao.ProductImageDao;
 
-public interface ProductImageRepository extends JpaRepository<ProductImage, Long> {
+public interface ProductImageRepository extends JpaRepository<ProductImageDao, Long> {
   /*
    * @Query(value =
    * "select product_image_name from product_images where product_image_id = ?1",
@@ -21,7 +21,7 @@ public interface ProductImageRepository extends JpaRepository<ProductImage, Long
    */
 
   @Query(value = "select * from product_images where fk_product_id = ?1", nativeQuery = true)
-  List<ProductImage> findImageByProductId(Long id);
+  List<ProductImageDao> findByProductId(Long id);
 
   @Modifying
   @Transactional

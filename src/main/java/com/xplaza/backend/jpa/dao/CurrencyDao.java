@@ -10,21 +10,18 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-@Entity
 @Table(name = "currencies")
-@Data
+@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class CurrencyDao {
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long currencyId;
+  Long currencyId;
 
-  private String currencyName;
-  private String currencySign;
+  String currencyName;
 
-  @OneToMany(mappedBy = "currency", fetch = FetchType.LAZY)
-  private List<ProductDao> products = new ArrayList<>();
+  String currencySign;
 }

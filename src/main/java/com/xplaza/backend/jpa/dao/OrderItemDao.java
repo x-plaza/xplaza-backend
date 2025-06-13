@@ -10,14 +10,13 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-@Entity
 @Table(name = "order_items")
-@Data
+@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class OrderItemDao {
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long orderItemId;

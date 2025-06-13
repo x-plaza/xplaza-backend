@@ -10,32 +10,46 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-@Entity
 @Table(name = "customers")
-@Data
+@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class CustomerDao {
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long customerId;
+  Long customerId;
 
-  private String firstName;
-  private String lastName;
-  private String houseNo;
-  private String streetName;
-  private Integer postcode;
-  private String area;
-  private String city;
-  private String country;
-  private String mobileNo;
-  private String email;
-  private Date dateOfBirth;
-  private String password;
-  private String salt;
-  private String otp;
-  private Date createdAt;
-  private Date updatedAt;
+  String firstName;
+
+  String lastName;
+
+  String houseNo;
+
+  String streetName;
+
+  Integer postcode;
+
+  String area;
+
+  String city;
+
+  String country;
+
+  String mobileNo;
+
+  String email;
+
+  Date dateOfBirth;
+
+  String password;
+
+  String salt;
+
+  String otp;
+
+  Date createdAt;
+
+  Date updatedAt;
 }

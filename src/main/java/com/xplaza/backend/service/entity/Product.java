@@ -4,20 +4,32 @@
  */
 package com.xplaza.backend.service.entity;
 
+import java.util.Date;
+import java.util.List;
+
 import lombok.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Product {
-  private Long id;
-  private String name;
-  private String description;
-  private Long brandId;
-  private Long categoryId;
-  private Long productVarTypeId;
-  private Double productVarTypeValue;
-  private Double buyingPrice;
-  private Double sellingPrice;
-  // add other fields as needed
+  private Long productId;
+  private String productName;
+  private String productDescription;
+  private Brand brand;
+  private Category category;
+  private ProductVariationType productVariationType;
+  private Integer productVarTypeValue;
+  private Double productBuyingPrice;
+  private Double productSellingPrice;
+  private Double productDiscountedPrice;
+  private Currency currency;
+  private Shop shop;
+  private Integer quantity;
+  private Integer createdBy;
+  private Date createdAt;
+  private Integer lastUpdatedBy;
+  private Date lastUpdatedAt;
+  private List<ProductImage> images;
 }

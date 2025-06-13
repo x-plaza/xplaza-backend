@@ -16,39 +16,36 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.xplaza.backend.http.dto.CustomerUserRequestDTO;
-import com.xplaza.backend.http.dto.CustomerUserResponseDTO;
-import com.xplaza.backend.mapper.CustomerUserMapper;
+import com.xplaza.backend.http.dto.request.CustomerUserRequest;
+import com.xplaza.backend.http.dto.response.CustomerUserResponse;
+import com.xplaza.backend.mapper.CustomerMapper;
 import com.xplaza.backend.service.CustomerLoginService;
 import com.xplaza.backend.service.CustomerUserService;
 import com.xplaza.backend.service.SecurityService;
-import com.xplaza.backend.service.entity.CustomerUserEntity;
+import com.xplaza.backend.service.entity.Customer;
 
 @RestController
 @RequestMapping("/api/v1/customers")
 public class CustomerUserController extends BaseController {
   @Autowired
   private CustomerUserService customerUserService;
-
   @Autowired
   private CustomerLoginService customerLoginService;
-
   @Autowired
   private SecurityService securityService;
-
   @Autowired
-  private CustomerUserMapper customerUserMapper;
+  private CustomerMapper customerMapper;
 
   @GetMapping("/{id}")
-  public ResponseEntity<CustomerUserResponseDTO> getCustomer(@PathVariable @Valid Long id) {
-    CustomerUserEntity entity = customerUserService.getCustomerEntity(id);
-    CustomerUserResponseDTO dto = customerUserMapper.toResponseDTO(entity);
+  public ResponseEntity<CustomerUserResponse> getCustomer(@PathVariable @Valid Long id) {
+    Customer entity = customerUserService.getCustomer(id);
+    CustomerUserResponse dto = customerMapper.toResponse(entity);
     return ResponseEntity.ok(dto);
   }
 
   @PutMapping
-  public ResponseEntity<Void> updateCustomer(@RequestBody @Valid CustomerUserRequestDTO requestDTO) {
-    CustomerUserEntity entity = customerUserMapper.toEntity(requestDTO);
+  public ResponseEntity<Void> updateCustomer(@RequestBody @Valid CustomerUserRequest request) {
+    Customer entity = customerMapper.toEntity(request);
     customerUserService.updateCustomer(entity);
     return ResponseEntity.ok().build();
   }
@@ -73,8 +70,8 @@ public class CustomerUserController extends BaseController {
     } catch (NoSuchAlgorithmException ex) {
       Logger.getLogger("Salt error").log(Level.SEVERE, null, ex);
     }
-    byte[] biteDigestPsw = securityService.getSaltedHashSHA512(newPassword, byteSalt);
-    String strDigestPsw = securityService.toHex(biteDigestPsw);
+    byte[] byteDigestPsw = securityService.getSaltedHashSHA512(newPassword, byteSalt);
+    String strDigestPsw = securityService.toHex(byteDigestPsw);
     String strSalt = securityService.toHex(byteSalt);
     customerUserService.changeCustomerPassword(strDigestPsw, strSalt, username.toLowerCase());
     return ResponseEntity.ok().build();

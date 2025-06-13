@@ -10,28 +10,30 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-@Entity
 @Table(name = "coupons")
-@Data
+@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class CouponDao {
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long couponId;
+  Long couponId;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "fk_currency_id")
-  private Currency currency;
+  CurrencyDao currency;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "fk_discount_type_id")
-  private DiscountTypeDao discountType;
+  DiscountTypeDao discountType;
 
-  private String couponCode;
-  private Double discountValue;
-  private Date validFrom;
-  private Date validTo;
+  String couponCode;
+
+  Double discountValue;
+
+  Date validFrom;
+
+  Date validTo;
 }

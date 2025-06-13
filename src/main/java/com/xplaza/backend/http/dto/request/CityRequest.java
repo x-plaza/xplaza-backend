@@ -4,10 +4,17 @@
  */
 package com.xplaza.backend.http.dto.request;
 
-import lombok.Data;
+import lombok.*;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class CityRequest {
-  private String name;
-  // add other fields as needed
+  private Long cityId;
+  private String cityName;
+  private Long stateId;
+  private String stateName;
+  private Long countryId;
+  private String countryName;
 }

@@ -10,37 +10,39 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.xplaza.backend.jpa.repository.RoleDAORepository;
+import com.xplaza.backend.jpa.dao.RoleDao;
+import com.xplaza.backend.jpa.repository.RoleRepository;
 import com.xplaza.backend.mapper.RoleMapper;
-import com.xplaza.backend.service.entity.RoleEntity;
+import com.xplaza.backend.service.entity.Role;
 
 @Service
 public class RoleService {
   @Autowired
-  private RoleDAORepository roleDAORepo;
+  private RoleRepository roleRepo;
   @Autowired
   private RoleMapper roleMapper;
 
-  public void addRole(RoleEntity entity) {
-    RoleDAO dao = roleMapper.toDAO(entity);
-    roleDAORepo.save(dao);
+  public void addRole(Role entity) {
+    RoleDao dao = roleMapper.toDao(entity);
+    roleRepo.save(dao);
   }
 
-  public void updateRole(RoleEntity entity) {
-    RoleDAO dao = roleMapper.toDAO(entity);
-    roleDAORepo.save(dao);
+  public void updateRole(Role entity) {
+    RoleDao dao = roleMapper.toDao(entity);
+    roleRepo.save(dao);
   }
 
-  public List<RoleEntity> listRoles() {
-    return roleDAORepo.findAll().stream().map(roleMapper::toEntityFromDAO).collect(Collectors.toList());
+  public List<Role> listRoles() {
+    return roleRepo.findAll().stream().map(roleMapper::toEntityFromDao).collect(Collectors.toList());
   }
 
   public void deleteRole(Long id) {
-    roleDAORepo.deleteById(id);
+    roleRepo.deleteById(id);
   }
 
-  public RoleEntity listRole(Long id) {
-    return roleDAORepo.findById(id).map(roleMapper::toEntityFromDAO).orElse(null);
+  public Role listRole(Long id) {
+    return roleRepo.findById(id)
+        .map(roleMapper::toEntityFromDao).orElse(null);
   }
 
   public String getRoleNameByID(Long id) {

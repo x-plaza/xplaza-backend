@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.xplaza.backend.common.util.JwtUtil;
-import com.xplaza.backend.model.AuthenticationRequest;
-import com.xplaza.backend.model.AuthenticationResponse;
+import com.xplaza.backend.http.dto.request.AuthenticationRequest;
+import com.xplaza.backend.http.dto.response.AuthenticationResponse;
 import com.xplaza.backend.service.AuthUserDetailsService;
 
 @RestController
@@ -22,7 +22,6 @@ import com.xplaza.backend.service.AuthUserDetailsService;
 public class AuthController extends BaseController {
   @Autowired
   private JwtUtil jwtTokenUtil;
-
   @Autowired
   private AuthUserDetailsService authUserDetailsService;
 

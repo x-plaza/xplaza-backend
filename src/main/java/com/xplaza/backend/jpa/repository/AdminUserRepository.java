@@ -23,15 +23,15 @@ public interface AdminUserRepository extends JpaRepository<AdminUserDao, Long> {
   @Modifying
   @Transactional
   @Query(value = "update admin_users set fk_role_id=?1, full_name=?2 where admin_user_id=?3", nativeQuery = true)
-  void update(Long role_id, String full_name, Long admin_user_id);
+  void update(Long roleId, String fullName, Long adminUserId);
 
   @Modifying
   @Transactional
   @Query(value = "update admin_users set password=?1, salt=?2 where user_name=?3", nativeQuery = true)
-  void changePassword(String new_password, String salt, String user_name);
+  void changePassword(String newPassword, String salt, String userName);
 
   @Query(value = "select user_name from admin_users au " +
       "left join admin_user_shop_link ausl on au.admin_user_id = ausl.admin_user_id " +
       "where ausl.shop_id = ?1", nativeQuery = true)
-  List<String> getEmailList(Long id);
+  List<String> getEmailListByShopId(Long shopId);
 }

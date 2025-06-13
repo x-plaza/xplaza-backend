@@ -11,11 +11,11 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class DeliveryScheduleDetails {
-  private Long id;
+  private Long deliveryScheduleId;
   private Time deliveryScheduleStart;
   private Time deliveryScheduleEnd;
-  private Long dayId;
-  private String dayName;
-  // add other fields as needed
+  private Day deliveryScheduleDay;
+  private Long deliveryScheduleListId;
 }

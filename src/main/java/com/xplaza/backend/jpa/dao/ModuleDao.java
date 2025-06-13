@@ -10,21 +10,21 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-@Entity
 @Table(name = "modules")
-@Data
+@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class ModuleDao {
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long moduleId;
+  Long moduleId;
 
-  private String moduleName;
-  private String moduleDescription;
+  String moduleName;
+
+  String moduleDescription;
 
   @OneToMany(mappedBy = "module", fetch = FetchType.LAZY)
-  private List<RoleDao> roles = new ArrayList<>();
+  List<RoleDao> roles;
 }

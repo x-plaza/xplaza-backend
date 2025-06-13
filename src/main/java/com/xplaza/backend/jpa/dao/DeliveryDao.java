@@ -10,22 +10,22 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-@Entity
 @Table(name = "deliveries")
-@Data
+@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class DeliveryDao {
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long deliveryId;
+  Long deliveryId;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "fk_order_id")
-  private OrderDao order;
+  OrderDao order;
 
-  private String deliveryStatus;
-  private Date deliveryDate;
+  String deliveryStatus;
+
+  Date deliveryDate;
 }

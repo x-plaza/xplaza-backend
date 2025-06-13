@@ -19,13 +19,12 @@ import org.springframework.web.bind.annotation.*;
 import com.telesign.MessagingClient;
 import com.telesign.Util;
 import com.xplaza.backend.common.util.ApiResponse;
-import com.xplaza.backend.model.ConfirmationToken;
-import com.xplaza.backend.model.CustomerDetails;
-import com.xplaza.backend.model.CustomerLogin;
 import com.xplaza.backend.service.ConfirmationTokenService;
 import com.xplaza.backend.service.CustomerLoginService;
 import com.xplaza.backend.service.CustomerSignupService;
 import com.xplaza.backend.service.SecurityService;
+import com.xplaza.backend.service.entity.ConfirmationToken;
+import com.xplaza.backend.service.entity.Customer;
 
 @RestController
 @RequestMapping("/api/v1/customer-signup")
@@ -62,13 +61,13 @@ public class CustomerSignupController extends BaseController {
           "Failed", "Confirmation code does not match!", null), HttpStatus.FORBIDDEN);
     }
     Date today = new Date();
-    if (today.after(token.getValid_till())) {
+    if (today.after(token.getValidTill())) {
       end = new Date();
       responseTime = end.getTime() - start.getTime();
       return new ResponseEntity<>(new ApiResponse(responseTime, "Signup Customer", HttpStatus.FORBIDDEN.value(),
           "Failed", "Confirmation code expired! Please get a new code!", null), HttpStatus.FORBIDDEN);
     }
-    CustomerLogin customerLogin = customerLoginService
+    Customer customerLogin = customerLoginService
         .getCustomerLoginDetails(customerDetails.getEmail().toLowerCase());
     if (customerLogin != null) {
       end = new Date();

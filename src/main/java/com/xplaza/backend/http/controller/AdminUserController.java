@@ -21,16 +21,16 @@ import org.springframework.web.bind.annotation.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xplaza.backend.common.util.ApiResponse;
-import com.xplaza.backend.http.dto.AdminUserRequest;
-import com.xplaza.backend.http.dto.AdminUserResponse;
+import com.xplaza.backend.http.dto.request.AdminUserRequest;
+import com.xplaza.backend.http.dto.response.AdminUserResponse;
 import com.xplaza.backend.mapper.AdminUserMapper;
-import com.xplaza.backend.model.ConfirmationToken;
+import com.xplaza.backend.service.AdminUserLoginService;
 import com.xplaza.backend.service.AdminUserService;
 import com.xplaza.backend.service.ConfirmationTokenService;
-import com.xplaza.backend.service.LoginService;
 import com.xplaza.backend.service.RoleService;
 import com.xplaza.backend.service.SecurityService;
 import com.xplaza.backend.service.entity.AdminUser;
+import com.xplaza.backend.service.entity.ConfirmationToken;
 
 @RestController
 @RequestMapping("/api/v1/admin-users")
@@ -45,7 +45,7 @@ public class AdminUserController extends BaseController {
   private RoleService roleService;
 
   @Autowired
-  private LoginService loginService;
+  private AdminUserLoginService adminUserLoginService;
 
   @Autowired
   private ConfirmationTokenService confirmationTokenService;
@@ -57,21 +57,21 @@ public class AdminUserController extends BaseController {
   private Long responseTime;
 
   @GetMapping
-  public ResponseEntity<String> getAdminUsers(@RequestParam(value = "user_id") @Valid Long user_id)
+  public ResponseEntity<String> getAdminUsers(@RequestParam(value = "user_id") @Valid Long userId)
       throws JsonProcessingException {
     start = new Date();
     ObjectMapper mapper = new ObjectMapper();
     String data;
-    String role_name = roleService.getRoleNameByUserID(user_id);
+    String role_name = roleService.getRoleNameByUserID(userId);
     if (role_name == null)
       data = null;
     else if (role_name.equals("Master Admin")) {
       List<AdminUser> adminUsers = adminUserService.listAdminUsers();
-      List<AdminUserResponse> adminUserResponses = adminUsers.stream().map(adminUserMapper::toResponseDTO).toList();
+      List<AdminUserResponse> adminUserResponses = adminUsers.stream().map(adminUserMapper::toResponse).toList();
       data = mapper.writeValueAsString(adminUserResponses);
     } else {
-      AdminUser adminUser = adminUserService.listAdminUser(user_id);
-      AdminUserResponse adminUserResponse = adminUserMapper.toResponseDTO(adminUser);
+      AdminUser adminUser = adminUserService.listAdminUser(userId);
+      AdminUserResponse adminUserResponse = adminUserMapper.toResponse(adminUser);
       data = mapper.writeValueAsString(adminUserResponse);
     }
     end = new Date();
@@ -91,7 +91,7 @@ public class AdminUserController extends BaseController {
   public ResponseEntity<String> getAdminUser(@PathVariable @Valid Long id) throws JsonProcessingException {
     start = new Date();
     AdminUser adminUser = adminUserService.listAdminUser(id);
-    AdminUserResponse adminUserResponse = adminUserMapper.toResponseDTO(adminUser);
+    AdminUserResponse adminUserResponse = adminUserMapper.toResponse(adminUser);
     end = new Date();
     responseTime = end.getTime() - start.getTime();
     ObjectMapper mapper = new ObjectMapper();
@@ -163,7 +163,7 @@ public class AdminUserController extends BaseController {
       @RequestParam("oldPassword") @Valid String oldPassword,
       @RequestParam("newPassword") @Valid String newPassword) throws IOException {
     start = new Date();
-    boolean isValidUser = loginService.isVaidUser(username.toLowerCase(), oldPassword);
+    boolean isValidUser = adminUserLoginService.isValidAdminUser(username.toLowerCase(), oldPassword);
     if (!isValidUser) {
       return new ResponseEntity<>(new ApiResponse(responseTime, "Change Admin User Password",
           HttpStatus.FORBIDDEN.value(), "Failure", "Old Password does not match.", null), HttpStatus.FORBIDDEN);

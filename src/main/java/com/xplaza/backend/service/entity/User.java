@@ -9,9 +9,14 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class User {
-  private Long id;
-  private String username;
+  private Long userId;
+  private String userName;
+  private String password;
+  private String salt;
+  private String fullName;
   private String email;
-  // add other fields as needed
+  private String mobileNo;
+  private String confirmationCode;
 }

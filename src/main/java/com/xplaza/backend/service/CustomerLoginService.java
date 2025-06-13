@@ -10,9 +10,9 @@ import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.xplaza.backend.jpa.repository.CustomerLoginRepository;
-import com.xplaza.backend.model.CustomerDetails;
-import com.xplaza.backend.model.CustomerLogin;
+import com.xplaza.backend.jpa.repository.CustomerRepository;
+import com.xplaza.backend.mapper.CustomerMapper;
+import com.xplaza.backend.service.entity.Customer;
 
 @Service
 public class CustomerLoginService {
@@ -21,10 +21,12 @@ public class CustomerLoginService {
   @Autowired
   private SecurityService securityService;
   @Autowired
-  private CustomerLoginRepository customerLoginRepo;
+  private CustomerRepository customerRepo;
+  @Autowired
+  private CustomerMapper customerMapper;
 
   public Boolean isVaidUser(String username, String password) throws IOException {
-    CustomerDetails customer = customerUserService.listCustomer(username);
+    Customer customer = customerUserService.listCustomer(username);
     if (customer == null)
       return false;
     String strOrgSalt = customer.getSalt();
@@ -35,7 +37,7 @@ public class CustomerLoginService {
     return result;
   }
 
-  public CustomerLogin getCustomerLoginDetails(String username) {
-    return customerLoginRepo.findCustomerByUsername(username);
+  public Customer getCustomerLoginDetails(String username) {
+    return customerMapper.toEntityFromDao(customerRepo.findCustomerByUsername(username));
   }
 }

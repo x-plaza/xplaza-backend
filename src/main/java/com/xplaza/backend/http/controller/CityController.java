@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xplaza.backend.common.util.ApiResponse;
-import com.xplaza.backend.http.dto.CityRequestDTO;
-import com.xplaza.backend.http.dto.CityResponseDTO;
+import com.xplaza.backend.http.dto.request.CityRequest;
+import com.xplaza.backend.http.dto.response.CityResponse;
 import com.xplaza.backend.mapper.CityMapper;
 import com.xplaza.backend.service.CityService;
-import com.xplaza.backend.service.entity.CityEntity;
+import com.xplaza.backend.service.entity.City;
 
 @RestController
 @RequestMapping("/api/v1/cities")
@@ -33,11 +33,11 @@ public class CityController extends BaseController {
   @GetMapping
   public ResponseEntity<ApiResponse> getCities() throws Exception {
     long start = System.currentTimeMillis();
-    List<CityEntity> cities = cityService.listCities();
-    List<CityResponseDTO> dtos = cities.stream().map(cityMapper::toResponseDTO).toList();
+    List<City> cities = cityService.listCities();
+    List<CityResponse> responses = cities.stream().map(cityMapper::toResponse).toList();
     long end = System.currentTimeMillis();
     long responseTime = end - start;
-    String data = new ObjectMapper().writeValueAsString(dtos);
+    String data = new ObjectMapper().writeValueAsString(responses);
     ApiResponse response = new ApiResponse(responseTime, "City List", HttpStatus.OK.value(), "Success", "", data);
     return ResponseEntity.ok(response);
   }
@@ -45,18 +45,18 @@ public class CityController extends BaseController {
   @GetMapping("/{id}")
   public ResponseEntity<ApiResponse> getCity(@PathVariable @Valid Long id) throws Exception {
     long start = System.currentTimeMillis();
-    CityEntity city = cityService.listCity(id);
-    CityResponseDTO dto = cityMapper.toResponseDTO(city);
+    City city = cityService.listCity(id);
+    CityResponse response = cityMapper.toResponse(city);
     long end = System.currentTimeMillis();
     long responseTime = end - start;
-    String data = new ObjectMapper().writeValueAsString(dto);
-    ApiResponse response = new ApiResponse(responseTime, "City By ID", HttpStatus.OK.value(), "Success", "", data);
-    return ResponseEntity.ok(response);
+    String data = new ObjectMapper().writeValueAsString(response);
+    ApiResponse apiResponse = new ApiResponse(responseTime, "City By ID", HttpStatus.OK.value(), "Success", "", data);
+    return ResponseEntity.ok(apiResponse);
   }
 
   @PostMapping
-  public ResponseEntity<ApiResponse> addCity(@RequestBody @Valid CityRequestDTO cityRequestDTO) {
-    CityEntity city = cityMapper.toEntity(cityRequestDTO);
+  public ResponseEntity<ApiResponse> addCity(@RequestBody @Valid CityRequest request) {
+    City city = cityMapper.toEntity(request);
     cityService.addCity(city);
     ApiResponse response = new ApiResponse(0, "Add City", HttpStatus.CREATED.value(), "Success",
         "City has been created.", null);
@@ -64,8 +64,8 @@ public class CityController extends BaseController {
   }
 
   @PutMapping
-  public ResponseEntity<ApiResponse> updateCity(@RequestBody @Valid CityRequestDTO cityRequestDTO) {
-    CityEntity city = cityMapper.toEntity(cityRequestDTO);
+  public ResponseEntity<ApiResponse> updateCity(@RequestBody @Valid CityRequest cityRequest) {
+    City city = cityMapper.toEntity(cityRequest);
     cityService.updateCity(city);
     ApiResponse response = new ApiResponse(0, "Update City", HttpStatus.OK.value(), "Success", "City has been updated.",
         null);

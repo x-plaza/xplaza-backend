@@ -11,12 +11,13 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ProductDiscount {
-  private Long id;
-  private Long productId;
-  private Long discountTypeId;
+  private Long productDiscountId;
+  private DiscountType discountType;
+  private Product product;
+  private Currency currency;
   private Double discountAmount;
-  private Long currencyId;
-  private Date startDate;
-  private Date endDate;
+  private Date validFrom;
+  private Date validTo;
 }

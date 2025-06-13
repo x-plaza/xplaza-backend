@@ -10,26 +10,30 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-@Entity
 @Table(name = "product_images")
-@Data
+@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class ProductImageDao {
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long productImagesId;
+  Long productImagesId;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "fk_product_id")
-  private ProductDao product;
+  ProductDao product;
 
-  private String productImageName;
-  private String productImagePath;
-  private Integer createdBy;
-  private Date createdAt;
-  private Integer lastUpdatedBy;
-  private Date lastUpdatedAt;
+  String productImageName;
+
+  String productImagePath;
+
+  Integer createdBy;
+
+  Date createdAt;
+
+  Integer lastUpdatedBy;
+
+  Date lastUpdatedAt;
 }

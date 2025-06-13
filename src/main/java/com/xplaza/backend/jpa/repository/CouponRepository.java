@@ -5,6 +5,7 @@
 package com.xplaza.backend.jpa.repository;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -28,4 +29,19 @@ public interface CouponRepository extends JpaRepository<CouponDao, Long> {
 
   @Query(value = "select coalesce ((select true from coupons c where c.coupon_code = ?1), false)", nativeQuery = true)
   boolean existsByName(String coupon_code);
+
+  @Query(value = "select cou.* " +
+      "from coupons cou " +
+      "left join coupon_shop_link csl on cou.coupon_id = csl.coupon_id " +
+      "left join admin_user_shop_link ausl on ausl.shop_id = csl.shop_id " +
+      "where ausl.admin_user_id = ?1 or ausl.admin_user_id is null", nativeQuery = true)
+  List<CouponDao> findCouponsByUserID(Long user_id);
+
+  @Query(value = "select cou.* " +
+      "from coupons cou where cou.coupon_id = ?1", nativeQuery = true)
+  CouponDao findCouponDetailsById(Long id);
+
+  @Query(value = "select cou.* " +
+      "from coupons cou where cou.coupon_code = ?1", nativeQuery = true)
+  CouponDao findCouponDetailsByCode(String couponCode);
 }

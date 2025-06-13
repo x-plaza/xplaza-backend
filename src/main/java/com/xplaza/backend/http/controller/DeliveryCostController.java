@@ -18,11 +18,11 @@ import org.springframework.web.bind.annotation.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xplaza.backend.common.util.ApiResponse;
-import com.xplaza.backend.http.dto.DeliveryCostRequestDTO;
-import com.xplaza.backend.http.dto.DeliveryCostResponseDTO;
+import com.xplaza.backend.http.dto.request.DeliveryCostRequest;
+import com.xplaza.backend.http.dto.response.DeliveryCostResponse;
 import com.xplaza.backend.mapper.DeliveryCostMapper;
 import com.xplaza.backend.service.DeliveryCostService;
-import com.xplaza.backend.service.entity.DeliveryCostEntity;
+import com.xplaza.backend.service.entity.DeliveryCost;
 
 @RestController
 @RequestMapping("/api/v1/delivery-costs")
@@ -38,8 +38,8 @@ public class DeliveryCostController extends BaseController {
   @GetMapping
   public ResponseEntity<String> getDeliveryCosts() throws JsonProcessingException, JSONException {
     start = new Date();
-    List<DeliveryCostEntity> entities = deliveryCostService.listDeliveryCosts();
-    List<DeliveryCostResponseDTO> dtos = entities.stream().map(deliveryCostMapper::toResponseDTO).toList();
+    List<DeliveryCost> entities = deliveryCostService.listDeliveryCosts();
+    List<DeliveryCostResponse> dtos = entities.stream().map(deliveryCostMapper::toResponse).toList();
     end = new Date();
     responseTime = end.getTime() - start.getTime();
     ObjectMapper mapper = new ObjectMapper();
@@ -56,8 +56,8 @@ public class DeliveryCostController extends BaseController {
   @GetMapping("/{id}")
   public ResponseEntity<String> getDeliveryCost(@PathVariable @Valid Long id) throws JsonProcessingException {
     start = new Date();
-    DeliveryCostEntity entity = deliveryCostService.listDeliveryCost(id);
-    DeliveryCostResponseDTO dto = deliveryCostMapper.toResponseDTO(entity);
+    DeliveryCost entity = deliveryCostService.listDeliveryCost(id);
+    DeliveryCostResponse dto = deliveryCostMapper.toResponse(entity);
     end = new Date();
     responseTime = end.getTime() - start.getTime();
     ObjectMapper mapper = new ObjectMapper();
@@ -73,9 +73,9 @@ public class DeliveryCostController extends BaseController {
 
   @PostMapping
   public ResponseEntity<ApiResponse> addDeliveryCost(
-      @RequestBody @Valid DeliveryCostRequestDTO deliveryCostRequestDTO) {
+      @RequestBody @Valid DeliveryCostRequest deliveryCostRequest) {
     start = new Date();
-    DeliveryCostEntity entity = deliveryCostMapper.toEntity(deliveryCostRequestDTO);
+    DeliveryCost entity = deliveryCostMapper.toEntity(deliveryCostRequest);
     deliveryCostService.addDeliveryCost(entity);
     end = new Date();
     responseTime = end.getTime() - start.getTime();
@@ -85,9 +85,9 @@ public class DeliveryCostController extends BaseController {
 
   @PutMapping
   public ResponseEntity<ApiResponse> updateDeliveryCost(
-      @RequestBody @Valid DeliveryCostRequestDTO deliveryCostRequestDTO) {
+      @RequestBody @Valid DeliveryCostRequest deliveryCostRequest) {
     start = new Date();
-    DeliveryCostEntity entity = deliveryCostMapper.toEntity(deliveryCostRequestDTO);
+    DeliveryCost entity = deliveryCostMapper.toEntity(deliveryCostRequest);
     deliveryCostService.updateDeliveryCost(entity);
     end = new Date();
     responseTime = end.getTime() - start.getTime();
