@@ -8,35 +8,68 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.xplaza.backend.model.ProductImage;
-import com.xplaza.backend.repository.ProductImageRepository;
+import com.xplaza.backend.jpa.dao.ProductImageDao;
+import com.xplaza.backend.jpa.repository.ProductImageRepository;
+import com.xplaza.backend.mapper.ProductImageMapper;
+import com.xplaza.backend.service.entity.ProductImage;
 
 @Service
 public class ProductImageService {
+
+  private final ProductImageRepository productImageRepo;
+  private final ProductImageMapper productImageMapper;
+
   @Autowired
-  private ProductImageRepository productImgRepo;
+  public ProductImageService(ProductImageRepository productImageRepo, ProductImageMapper productImageMapper) {
+    this.productImageRepo = productImageRepo;
+    this.productImageMapper = productImageMapper;
+  }
 
-  /*
-   * public void addProductImage(ProductImage productImage) {
-   * productImgRepo.save(productImage); }
-   * 
-   * public void updateProductImage(ProductImage productImage) {
-   * productImgRepo.save(productImage); }
-   * 
-   * public List<ProductImage> listProductImages() { return
-   * productImgRepo.findAll(Sort.by(Sort.Direction.ASC, "name")); }
-   * 
-   * public String getProductImageNameByID(Long id) { return
-   * productImgRepo.getName(id); }
-   * 
-   * public void deleteProductImage(Long id) { productImgRepo.deleteById(id); }
-   * 
-   * public void deleteImagesByProductId(Long id) {
-   * productImgRepo.deleteImagesByProductId(id); }
-   */
+  @Transactional
+  public ProductImage addProductImage(ProductImage productImage) {
+    ProductImageDao productImageDao = productImageMapper.toDao(productImage);
+    ProductImageDao savedProductImageDao = productImageRepo.save(productImageDao);
+    return productImageMapper.toEntityFromDao(savedProductImageDao);
+  }
 
-  public List<ProductImage> listProductImage(Long id) {
-    return productImgRepo.findImageByProductId(id);
+  @Transactional
+  public ProductImage updateProductImage(Long id, ProductImage productImage) {
+    ProductImageDao existingProductImageDao = productImageRepo.findById(id)
+        .orElseThrow(() -> new RuntimeException("Product image not found with id: " + id));
+
+    ProductImageDao productImageDao = productImageMapper.toDao(productImage);
+    productImageDao.setProductImagesId(existingProductImageDao.getProductImagesId());
+    productImageDao.setCreatedBy(existingProductImageDao.getCreatedBy());
+    productImageDao.setCreatedAt(existingProductImageDao.getCreatedAt());
+
+    ProductImageDao updatedProductImageDao = productImageRepo.save(productImageDao);
+    return productImageMapper.toEntityFromDao(updatedProductImageDao);
+  }
+
+  @Transactional
+  public void deleteProductImage(Long id) {
+    productImageRepo.deleteById(id);
+  }
+
+  public List<ProductImage> listProductImages() {
+    List<ProductImageDao> productImageDaos = productImageRepo.findAll();
+    return productImageDaos.stream()
+        .map(productImageMapper::toEntityFromDao)
+        .toList();
+  }
+
+  public ProductImage listProductImage(Long id) {
+    ProductImageDao productImageDao = productImageRepo.findById(id)
+        .orElseThrow(() -> new RuntimeException("Product image not found with id: " + id));
+    return productImageMapper.toEntityFromDao(productImageDao);
+  }
+
+  public List<ProductImage> listProductImagesByProduct(Long productId) {
+    List<ProductImageDao> productImageDaos = productImageRepo.findByProductId(productId);
+    return productImageDaos.stream()
+        .map(productImageMapper::toEntityFromDao)
+        .toList();
   }
 }

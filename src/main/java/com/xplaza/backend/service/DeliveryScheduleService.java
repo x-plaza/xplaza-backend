@@ -5,42 +5,45 @@
 package com.xplaza.backend.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.xplaza.backend.model.DeliverySchedule;
-import com.xplaza.backend.model.DeliveryScheduleDetails;
-import com.xplaza.backend.model.DeliveryScheduleList;
-import com.xplaza.backend.repository.DeliveryScheduleDetailsRepository;
-import com.xplaza.backend.repository.DeliveryScheduleListRepository;
-import com.xplaza.backend.repository.DeliveryScheduleRepository;
+import com.xplaza.backend.jpa.dao.DeliveryScheduleDao;
+import com.xplaza.backend.jpa.repository.DeliveryScheduleRepository;
+import com.xplaza.backend.mapper.DeliveryScheduleMapper;
+import com.xplaza.backend.service.entity.DeliverySchedule;
 
 @Service
 public class DeliveryScheduleService {
+  private final DeliveryScheduleRepository deliveryScheduleRepo;
+  private final DeliveryScheduleMapper deliveryScheduleMapper;
 
   @Autowired
-  private DeliveryScheduleRepository deliveryScheduleRepo;
-  @Autowired
-  private DeliveryScheduleDetailsRepository deliveryScheduleDetailsRepo;
-
-  @Autowired
-  private DeliveryScheduleListRepository deliveryScheduleListRepo;
-
-  public void addSchedule(DeliverySchedule deliverySchedule) {
-    deliveryScheduleRepo.save(deliverySchedule);
+  public DeliveryScheduleService(DeliveryScheduleRepository deliveryScheduleRepo,
+      DeliveryScheduleMapper deliveryScheduleMapper) {
+    this.deliveryScheduleRepo = deliveryScheduleRepo;
+    this.deliveryScheduleMapper = deliveryScheduleMapper;
   }
 
-  public void updateSchedule(DeliverySchedule deliverySchedule) {
-    deliveryScheduleRepo.save(deliverySchedule);
+  public void addSchedule(DeliverySchedule entity) {
+    DeliveryScheduleDao dao = deliveryScheduleMapper.toDao(entity);
+    deliveryScheduleRepo.save(dao);
   }
 
-  public List<DeliveryScheduleList> listDeliverySchedules() {
-    return deliveryScheduleListRepo.findAllItem();
+  public void updateSchedule(DeliverySchedule entity) {
+    DeliveryScheduleDao dao = deliveryScheduleMapper.toDao(entity);
+    deliveryScheduleRepo.save(dao);
   }
 
-  public DeliveryScheduleDetails listDeliveryScheduleDetails(Long id) {
-    return deliveryScheduleDetailsRepo.findDeliveryScheduleDetailsById(id);
+  public List<DeliverySchedule> listDeliverySchedules() {
+    return deliveryScheduleRepo.findAll().stream().map(deliveryScheduleMapper::toEntityFromDao)
+        .collect(Collectors.toList());
+  }
+
+  public DeliverySchedule listDeliverySchedule(Long id) {
+    return deliveryScheduleRepo.findById(id).map(deliveryScheduleMapper::toEntityFromDao).orElse(null);
   }
 
   public void deleteSchedule(Long id) {

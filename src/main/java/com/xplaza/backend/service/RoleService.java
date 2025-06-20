@@ -5,44 +5,61 @@
 package com.xplaza.backend.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.xplaza.backend.model.Role;
-import com.xplaza.backend.repository.RoleRepository;
+import com.xplaza.backend.jpa.dao.RoleDao;
+import com.xplaza.backend.jpa.repository.RoleRepository;
+import com.xplaza.backend.mapper.RoleMapper;
+import com.xplaza.backend.service.entity.Role;
 
 @Service
 public class RoleService {
-  @Autowired
-  private RoleRepository roleRepo;
+  private final RoleRepository roleRepo;
+  private final RoleMapper roleMapper;
 
-  public void addRole(Role role) {
-    roleRepo.save(role);
+  @Autowired
+  public RoleService(RoleRepository roleRepo, RoleMapper roleMapper) {
+    this.roleRepo = roleRepo;
+    this.roleMapper = roleMapper;
   }
 
-  public void updateRole(Role role) {
-    roleRepo.save(role);
+  @Transactional
+  public void addRole(Role entity) {
+    RoleDao dao = roleMapper.toDao(entity);
+    roleRepo.save(dao);
+  }
+
+  @Transactional
+  public void updateRole(Role entity) {
+    RoleDao dao = roleMapper.toDao(entity);
+    roleRepo.save(dao);
   }
 
   public List<Role> listRoles() {
-    return roleRepo.findAll(Sort.by(Sort.Direction.ASC, "name"));
+    return roleRepo.findAll().stream().map(roleMapper::toEntityFromDao).collect(Collectors.toList());
   }
 
-  public String getRoleNameByID(Long id) {
-    return roleRepo.getName(id);
-  }
-
+  @Transactional
   public void deleteRole(Long id) {
     roleRepo.deleteById(id);
   }
 
   public Role listRole(Long id) {
-    return roleRepo.findRoleById(id);
+    return roleRepo.findById(id)
+        .map(roleMapper::toEntityFromDao).orElse(null);
+  }
+
+  public String getRoleNameByID(Long id) {
+    // Implement if needed in DAO repo
+    return null;
   }
 
   public String getRoleNameByUserID(Long id) {
-    return roleRepo.getRoleNameByUserID(id);
+    // Implement if needed in DAO repo
+    return null;
   }
 }
