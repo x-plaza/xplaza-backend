@@ -4,7 +4,6 @@
  */
 package com.xplaza.backend.http.controller;
 
-import java.util.Date;
 import java.util.List;
 
 import jakarta.validation.Valid;
@@ -28,100 +27,96 @@ import com.xplaza.backend.service.entity.Coupon;
 public class CouponController extends BaseController {
   private final CouponService couponService;
   private final CouponMapper couponMapper;
+  private final ObjectMapper objectMapper;
 
   @Autowired
-  public CouponController(CouponService couponService, CouponMapper couponMapper) {
+  public CouponController(CouponService couponService, CouponMapper couponMapper, ObjectMapper objectMapper) {
     this.couponService = couponService;
     this.couponMapper = couponMapper;
+    this.objectMapper = objectMapper;
   }
 
-  private Date start, end;
-  private Long responseTime;
-
   @GetMapping
-  public ResponseEntity<String> getCoupons(@RequestParam(value = "user_id") @Valid Long user_id)
+  public ResponseEntity<ApiResponse> getCoupons(@RequestParam(value = "user_id") @Valid Long userId)
       throws JsonProcessingException {
-    start = new Date();
+    long startTime = System.currentTimeMillis();
     List<Coupon> entities = couponService.listCoupons();
     List<CouponResponse> dtos = entities.stream().map(couponMapper::toResponse).toList();
-    end = new Date();
-    responseTime = end.getTime() - start.getTime();
-    ObjectMapper mapper = new ObjectMapper();
-    String response = "{\n" +
-        "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Coupon List\",\n" +
-        "  \"status\": 200,\n" +
-        "  \"response\": \"Success\",\n" +
-        "  \"msg\": \"\",\n" +
-        "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
-    return new ResponseEntity<>(response, HttpStatus.OK);
+    long responseTime = System.currentTimeMillis() - startTime;
+
+    return ResponseEntity.ok(new ApiResponse(
+        responseTime,
+        "Coupon List",
+        HttpStatus.OK.value(),
+        "Success",
+        "",
+        objectMapper.writeValueAsString(dtos)));
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<String> getCouponDetails(@PathVariable @Valid Long id) throws JsonProcessingException {
-    start = new Date();
+  public ResponseEntity<ApiResponse> getCouponDetails(@PathVariable @Valid Long id) throws JsonProcessingException {
+    long startTime = System.currentTimeMillis();
     Coupon entity = couponService.listCoupon(id);
     CouponResponse dto = couponMapper.toResponse(entity);
-    end = new Date();
-    responseTime = end.getTime() - start.getTime();
-    ObjectMapper mapper = new ObjectMapper();
-    String response = "{\n" +
-        "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Coupon By ID\",\n" +
-        "  \"status\": 200,\n" +
-        "  \"response\": \"Success\",\n" +
-        "  \"msg\": \"\",\n" +
-        "  \"data\":" + mapper.writeValueAsString(dto) + "\n}";
-    return new ResponseEntity<>(response, HttpStatus.OK);
+    long responseTime = System.currentTimeMillis() - startTime;
+
+    return ResponseEntity.ok(new ApiResponse(
+        responseTime,
+        "Coupon By ID",
+        HttpStatus.OK.value(),
+        "Success",
+        "",
+        objectMapper.writeValueAsString(dto)));
   }
 
   @PostMapping("/validate-coupon")
   public ResponseEntity<ApiResponse> validateCoupon(
-      @RequestParam(value = "coupon_code") @Valid String coupon_code,
-      @RequestParam(value = "net_order_amount") @Valid Double net_order_amount,
-      @RequestParam(value = "shop_id") @Valid Long shop_id) {
-    start = new Date();
-    if (!couponService.checkCouponValidity(coupon_code, net_order_amount, shop_id)) {
-      end = new Date();
-      responseTime = end.getTime() - start.getTime();
+      @RequestParam(value = "coupon_code") @Valid String couponCode,
+      @RequestParam(value = "net_order_amount") @Valid Double netOrderAmount,
+      @RequestParam(value = "shop_id") @Valid Long shopId) {
+    long startTime = System.currentTimeMillis();
+
+    if (!couponService.checkCouponValidity(couponCode, netOrderAmount, shopId)) {
+      long responseTime = System.currentTimeMillis() - startTime;
       return new ResponseEntity<>(new ApiResponse(responseTime, "Validate Coupon", HttpStatus.FORBIDDEN.value(),
           "Error", "Coupon is not valid!", null), HttpStatus.FORBIDDEN);
     }
-    Double coupon_amount = couponService.calculateCouponAmount(coupon_code, net_order_amount);
-    end = new Date();
-    responseTime = end.getTime() - start.getTime();
+
+    Double couponAmount = couponService.calculateCouponAmount(couponCode, netOrderAmount);
+    long responseTime = System.currentTimeMillis() - startTime;
+
     return new ResponseEntity<>(new ApiResponse(responseTime, "Validate Coupon", HttpStatus.OK.value(), "Success",
-        "Coupon is valid.", coupon_amount.toString()), HttpStatus.OK);
+        "Coupon is valid.", couponAmount.toString()), HttpStatus.OK);
   }
 
   @PostMapping
   public ResponseEntity<ApiResponse> addCoupon(@RequestBody @Valid CouponRequest couponRequest) {
-    start = new Date();
+    long startTime = System.currentTimeMillis();
     Coupon entity = couponMapper.toEntity(couponRequest);
     couponService.addCoupon(entity);
-    end = new Date();
-    responseTime = end.getTime() - start.getTime();
+    long responseTime = System.currentTimeMillis() - startTime;
+
     return new ResponseEntity<>(new ApiResponse(responseTime, "Add Coupon", HttpStatus.CREATED.value(),
         "Success", "Coupon has been created.", null), HttpStatus.CREATED);
   }
 
   @PutMapping
   public ResponseEntity<ApiResponse> updateCoupon(@RequestBody @Valid CouponRequest couponRequest) {
-    start = new Date();
+    long startTime = System.currentTimeMillis();
     Coupon entity = couponMapper.toEntity(couponRequest);
     couponService.updateCoupon(entity);
-    end = new Date();
-    responseTime = end.getTime() - start.getTime();
+    long responseTime = System.currentTimeMillis() - startTime;
+
     return new ResponseEntity<>(new ApiResponse(responseTime, "Update Coupon", HttpStatus.OK.value(),
         "Success", "Coupon has been updated.", null), HttpStatus.OK);
   }
 
   @DeleteMapping("/{id}")
   public ResponseEntity<ApiResponse> deleteCoupon(@PathVariable @Valid Long id) {
-    start = new Date();
+    long startTime = System.currentTimeMillis();
     couponService.deleteCoupon(id);
-    end = new Date();
-    responseTime = end.getTime() - start.getTime();
+    long responseTime = System.currentTimeMillis() - startTime;
+
     return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Coupon", HttpStatus.OK.value(),
         "Success", "Coupon has been deleted.", null), HttpStatus.OK);
   }

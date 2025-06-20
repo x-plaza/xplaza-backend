@@ -6,7 +6,6 @@ package com.xplaza.backend.http.controller;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,9 +61,6 @@ public class AdminUserController extends BaseController {
     this.adminUserMapper = adminUserMapper;
     this.objectMapper = objectMapper;
   }
-
-  private Date start, end;
-  private Long responseTime;
 
   @GetMapping
   @Operation(summary = "Get all admin users", description = "Retrieves a list of all admin users in the system", responses = {
@@ -254,11 +250,12 @@ public class AdminUserController extends BaseController {
   }
 
   // Keep existing methods for backward compatibility
+  @GetMapping("/legacy")
   public ResponseEntity<?> getAdminUsers(@RequestParam(value = "user_id") @Valid Long userId) {
-    String role_name = roleService.getRoleNameByUserID(userId);
-    if (role_name == null) {
+    String roleName = roleService.getRoleNameByUserID(userId);
+    if (roleName == null) {
       return ResponseEntity.ok().body(List.of());
-    } else if (role_name.equals("Master Admin")) {
+    } else if (roleName.equals("Master Admin")) {
       List<AdminUser> adminUsers = adminUserService.listAdminUsers();
       List<AdminUserResponse> adminUserResponses = adminUsers.stream().map(adminUserMapper::toResponse).toList();
       return ResponseEntity.ok(adminUserResponses);
@@ -269,25 +266,25 @@ public class AdminUserController extends BaseController {
     }
   }
 
+  @GetMapping("/legacy/{id}")
   public ResponseEntity<AdminUserResponse> getAdminUser(@PathVariable @Valid Long id) {
     AdminUser adminUser = adminUserService.listAdminUser(id);
     AdminUserResponse adminUserResponse = adminUserMapper.toResponse(adminUser);
     return ResponseEntity.ok(adminUserResponse);
   }
 
+  @PostMapping("/legacy")
   public ResponseEntity<ApiResponse> addAdminUser(@RequestBody @Valid AdminUserRequest adminUserRequest) {
-    start = new Date();
+    long startTime = System.currentTimeMillis();
     try {
       AdminUser adminUser = adminUserMapper.toEntity(adminUserRequest);
       adminUserService.addAdminUser(adminUser);
-      end = new Date();
-      responseTime = end.getTime() - start.getTime();
+      long responseTime = System.currentTimeMillis() - startTime;
       ApiResponse response = new ApiResponse(responseTime, "success", 200, "Admin user added successfully",
           "Admin user added successfully", null);
       return ResponseEntity.ok(response);
     } catch (Exception e) {
-      end = new Date();
-      responseTime = end.getTime() - start.getTime();
+      long responseTime = System.currentTimeMillis() - startTime;
       logger.error("Error adding admin user", e);
       ApiResponse response = new ApiResponse(responseTime, "error", 500, "Failed to add admin user",
           "Failed to add admin user: " + e.getMessage(), null);
@@ -299,25 +296,30 @@ public class AdminUserController extends BaseController {
   public ResponseEntity<ApiResponse> changeAdminUserPassword(@RequestParam("username") @Valid String username,
       @RequestParam("oldPassword") @Valid String oldPassword,
       @RequestParam("newPassword") @Valid String newPassword) throws IOException {
-    start = new Date();
+    long startTime = System.currentTimeMillis();
     boolean isValidUser = adminUserLoginService.isValidAdminUser(username.toLowerCase(), oldPassword);
     if (!isValidUser) {
+      long responseTime = System.currentTimeMillis() - startTime;
       return new ResponseEntity<>(new ApiResponse(responseTime, "Change Admin User Password",
           HttpStatus.FORBIDDEN.value(), "Failure", "Old Password does not match.", null), HttpStatus.FORBIDDEN);
     }
-    byte[] byteSalt = null;
+
     try {
-      byteSalt = securityService.getSalt();
+      byte[] byteSalt = securityService.getSalt();
+      byte[] biteDigestPsw = securityService.getSaltedHashSHA512(newPassword, byteSalt);
+      String strDigestPsw = securityService.toHex(biteDigestPsw);
+      String strSalt = securityService.toHex(byteSalt);
+      adminUserService.changeAdminUserPassword(strDigestPsw, strSalt, username.toLowerCase());
+
+      long responseTime = System.currentTimeMillis() - startTime;
+      return new ResponseEntity<>(new ApiResponse(responseTime, "Change Admin User Password",
+          HttpStatus.OK.value(), "Success", "Password has been updated successfully.", null), HttpStatus.OK);
     } catch (NoSuchAlgorithmException ex) {
       logger.error("Salt generation error", ex);
+      long responseTime = System.currentTimeMillis() - startTime;
+      return new ResponseEntity<>(new ApiResponse(responseTime, "Change Admin User Password",
+          HttpStatus.INTERNAL_SERVER_ERROR.value(), "Error", "Failed to update password: " + ex.getMessage(), null),
+          HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    byte[] biteDigestPsw = securityService.getSaltedHashSHA512(newPassword, byteSalt);
-    String strDigestPsw = securityService.toHex(biteDigestPsw);
-    String strSalt = securityService.toHex(byteSalt);
-    adminUserService.changeAdminUserPassword(strDigestPsw, strSalt, username.toLowerCase());
-    end = new Date();
-    responseTime = end.getTime() - start.getTime();
-    return new ResponseEntity<>(new ApiResponse(responseTime, "Change Admin User Password",
-        HttpStatus.OK.value(), "Success", "Password has been updated successfully.", null), HttpStatus.OK);
   }
 }

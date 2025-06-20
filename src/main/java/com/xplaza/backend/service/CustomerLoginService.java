@@ -4,7 +4,6 @@
  */
 package com.xplaza.backend.service;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +29,7 @@ public class CustomerLoginService {
     this.customerMapper = customerMapper;
   }
 
-  public Boolean isVaidUser(String username, String password) throws IOException {
+  public boolean isValidCustomerUser(String username, String password) {
     Customer customer = customerUserService.listCustomer(username);
     if (customer == null)
       return false;
@@ -38,8 +37,7 @@ public class CustomerLoginService {
     byte[] byteSalt = securityService.fromHex(strOrgSalt);
     byte[] loginPassword = securityService.getSaltedHashSHA512(password, byteSalt);
     byte[] storedPassword = securityService.fromHex(customer.getPassword());
-    boolean result = Arrays.equals(loginPassword, storedPassword);
-    return result;
+    return Arrays.equals(loginPassword, storedPassword);
   }
 
   public Customer getCustomerLoginDetails(String username) {
