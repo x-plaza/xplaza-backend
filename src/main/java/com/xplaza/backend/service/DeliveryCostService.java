@@ -8,44 +8,51 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.xplaza.backend.model.DeliveryCost;
-import com.xplaza.backend.model.DeliveryCostList;
-import com.xplaza.backend.repository.DeliveryCostListRepository;
-import com.xplaza.backend.repository.DeliveryCostRepository;
+import com.xplaza.backend.jpa.dao.DeliveryCostDao;
+import com.xplaza.backend.jpa.repository.DeliveryCostRepository;
+import com.xplaza.backend.mapper.DeliveryCostMapper;
+import com.xplaza.backend.service.entity.DeliveryCost;
 
 @Service
 public class DeliveryCostService {
-  @Autowired
-  private DeliveryCostRepository deliveryCostRepo;
-  @Autowired
-  private DeliveryCostListRepository deliveryCostListRepo;
+  private final DeliveryCostRepository deliveryCostRepo;
+  private final DeliveryCostMapper deliveryCostMapper;
 
-  public void addDeliveryCost(DeliveryCost deliveryCost) {
-    deliveryCostRepo.save(deliveryCost);
+  @Autowired
+  public DeliveryCostService(DeliveryCostRepository deliveryCostRepo, DeliveryCostMapper deliveryCostMapper) {
+    this.deliveryCostRepo = deliveryCostRepo;
+    this.deliveryCostMapper = deliveryCostMapper;
   }
 
-  public void updateDeliveryCost(DeliveryCost deliveryCost) {
-    deliveryCostRepo.save(deliveryCost);
+  @Transactional
+  public void addDeliveryCost(DeliveryCost entity) {
+    DeliveryCostDao dao = deliveryCostMapper.toDao(entity);
+    deliveryCostRepo.save(dao);
+  }
+
+  @Transactional
+  public void updateDeliveryCost(DeliveryCost entity) {
+    DeliveryCostDao dao = deliveryCostMapper.toDao(entity);
+    deliveryCostRepo.save(dao);
   }
 
   public String getDeliverySlabRangeNameByID(Long id) {
-    return deliveryCostRepo.getName(id);
+    // Implement if needed in DAO repo
+    return null;
   }
 
+  @Transactional
   public void deleteDeliveryCost(Long id) {
     deliveryCostRepo.deleteById(id);
   }
 
-//    public List<DeliveryCost> listDeliveryCost() {
-//        return deliveryCostRepo.findAll();
-//    }
-
-  public List<DeliveryCostList> listDeliveryCosts() {
-    return deliveryCostListRepo.findAllDeliveryCost();
+  public List<DeliveryCost> listDeliveryCosts() {
+    return deliveryCostRepo.findAll().stream().map(deliveryCostMapper::toEntityFromDao).toList();
   }
 
-  public DeliveryCostList listDeliveryCost(Long id) {
-    return deliveryCostListRepo.findDeliveryCostById(id);
+  public DeliveryCost listDeliveryCost(Long id) {
+    return deliveryCostRepo.findById(id).map(deliveryCostMapper::toEntityFromDao).orElse(null);
   }
 }

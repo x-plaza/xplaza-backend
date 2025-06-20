@@ -4,23 +4,46 @@
  */
 package com.xplaza.backend.service;
 
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.xplaza.backend.model.PlatformInfo;
-import com.xplaza.backend.repository.PlatformInfoRepository;
+import com.xplaza.backend.jpa.repository.PlatformInfoRepository;
+import com.xplaza.backend.mapper.PlatformInfoMapper;
+import com.xplaza.backend.service.entity.PlatformInfo;
 
 @Service
 public class PlatformInfoService {
+  private final PlatformInfoRepository platformInfoRepo;
   @Autowired
-  private PlatformInfoRepository platformInfoRepo;
+  private PlatformInfoMapper platformInfoMapper;
 
-  public PlatformInfo listPlatform() {
-    return platformInfoRepo.findAll().get(0); // for single row
+  @Autowired
+  public PlatformInfoService(PlatformInfoRepository platformInfoRepo) {
+    this.platformInfoRepo = platformInfoRepo;
   }
 
+  public PlatformInfo listPlatform() {
+    return platformInfoMapper.toEntityFromDao(platformInfoRepo.findAll().getFirst());
+  }
+
+  @Transactional
   public void updatePlatformInfo(PlatformInfo platformInfo) {
-    platformInfoRepo.update(platformInfo.getAdditional_info(), platformInfo.getCell_no(),
-        platformInfo.getBanner_image(), platformInfo.getBanner_image_path());
+    var existingPlatformInfo = platformInfoRepo.findById(platformInfo.getId())
+        .orElseThrow(() -> new IllegalArgumentException("Platform info not found"));
+    existingPlatformInfo.setName(platformInfo.getName());
+    existingPlatformInfo.setInvoice(platformInfo.getInvoicePrefix());
+    existingPlatformInfo.setAdditionalInfo(platformInfo.getAdditionalInfo());
+    existingPlatformInfo.setCellNo(platformInfo.getCellNo());
+    existingPlatformInfo.setBannerImage(platformInfo.getBannerImage());
+    existingPlatformInfo.setBannerImagePath(platformInfo.getBannerImagePath());
+    platformInfoRepo.save(existingPlatformInfo);
+  }
+
+  @Transactional
+  public void addPlatformInfo(@Valid PlatformInfo platformInfo) {
+    platformInfoRepo.save(platformInfoMapper.toDao(platformInfo));
   }
 }

@@ -5,48 +5,57 @@
 package com.xplaza.backend.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.xplaza.backend.model.Customer;
-import com.xplaza.backend.model.CustomerDetails;
-import com.xplaza.backend.repository.CustomerRepository;
-import com.xplaza.backend.repository.CustomerUserRepository;
+import com.xplaza.backend.jpa.dao.CustomerDao;
+import com.xplaza.backend.jpa.repository.CustomerRepository;
+import com.xplaza.backend.jpa.repository.CustomerUserRepository;
+import com.xplaza.backend.mapper.CustomerMapper;
+import com.xplaza.backend.service.entity.Customer;
 
 @Service
 public class CustomerUserService {
-  @Autowired
-  private CustomerUserRepository customerUserRepo;
-  @Autowired
-  private CustomerRepository customerRepo;
+  private final CustomerUserRepository customerUserRepo;
+  private final CustomerRepository customerRepo;
+  private final CustomerMapper customerMapper;
 
-  public void updateCustomer(Customer customer) {
-    customerRepo.save(customer);
+  @Autowired
+  public CustomerUserService(CustomerUserRepository customerUserRepo, CustomerRepository customerRepo,
+      CustomerMapper customerMapper) {
+    this.customerUserRepo = customerUserRepo;
+    this.customerRepo = customerRepo;
+    this.customerMapper = customerMapper;
   }
 
-  public String getCustomerNameByID(Long id) {
-    return customerUserRepo.getUsername(id);
+  @Transactional
+  public void updateCustomer(Customer entity) {
+    CustomerDao dao = customerMapper.toDao(entity);
+    customerRepo.save(dao);
   }
 
+  @Transactional
   public void deleteCustomer(Long id) {
     customerUserRepo.deleteById(id);
   }
 
-  public List<CustomerDetails> listCustomers() {
-    return customerUserRepo.findAll();
+  public List<Customer> listCustomers() {
+    return customerUserRepo.findAll().stream().map(customerMapper::toEntityFromDao).toList();
   }
 
-  public CustomerDetails listCustomer(String username) {
-    return customerUserRepo.findCustomerByUsername(username);
+  public Customer listCustomer(String username) {
+    return customerMapper.toEntityFromDao(customerUserRepo.findCustomerByUsername(username));
   }
 
+  @Transactional
   public void changeCustomerPassword(String new_password, String salt, String user_name) {
     customerUserRepo.changePassword(new_password, salt, user_name);
   }
 
-  public Optional<Customer> getCustomer(Long id) {
-    return customerRepo.findById(id);
+  public Customer getCustomer(Long id) {
+    return customerMapper.toEntityFromDao(customerRepo.findById(id).orElseThrow(
+        () -> new RuntimeException("Customer not found with id: " + id)));
   }
 }

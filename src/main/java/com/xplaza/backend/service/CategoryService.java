@@ -5,51 +5,67 @@
 package com.xplaza.backend.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.xplaza.backend.model.Category;
-import com.xplaza.backend.model.CategoryList;
-import com.xplaza.backend.repository.CategoryListRepository;
-import com.xplaza.backend.repository.CategoryRepository;
+import com.xplaza.backend.exception.ResourceNotFoundException;
+import com.xplaza.backend.jpa.dao.CategoryDao;
+import com.xplaza.backend.jpa.repository.CategoryRepository;
+import com.xplaza.backend.mapper.CategoryMapper;
+import com.xplaza.backend.service.entity.Category;
 
 @Service
 public class CategoryService {
+  private final CategoryRepository categoryRepo;
+  private final CategoryMapper categoryMapper;
+
   @Autowired
-  private CategoryRepository categoryRepo;
-  @Autowired
-  private CategoryListRepository categoryListRepo;
-
-  public void addCategory(Category category) {
-    categoryRepo.save(category);
+  public CategoryService(CategoryRepository categoryRepo, CategoryMapper categoryMapper) {
+    this.categoryRepo = categoryRepo;
+    this.categoryMapper = categoryMapper;
   }
 
-  public void updateCategory(Category category) {
-    categoryRepo.save(category);
+  @Transactional
+  public Category addCategory(Category category) {
+    CategoryDao categoryDao = categoryMapper.toDao(category);
+    CategoryDao savedCategoryDao = categoryRepo.save(categoryDao);
+    return categoryMapper.toEntityFromDao(savedCategoryDao);
   }
 
-  public String getCategoryNameByID(Long id) {
-    return categoryRepo.getName(id);
+  @Transactional
+  public Category updateCategory(Long id, Category category) {
+    // Check if category exists
+    categoryRepo.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
+
+    category.setCategoryId(id);
+    CategoryDao categoryDao = categoryMapper.toDao(category);
+    CategoryDao updatedCategoryDao = categoryRepo.save(categoryDao);
+    return categoryMapper.toEntityFromDao(updatedCategoryDao);
   }
 
+  @Transactional
   public void deleteCategory(Long id) {
     categoryRepo.deleteById(id);
   }
 
-  public List<CategoryList> listCategories() {
-    return categoryListRepo.findAllCategories();
+  public List<Category> listCategories() {
+    List<CategoryDao> categoryDaos = categoryRepo.findAll();
+    return categoryDaos.stream()
+        .map(categoryMapper::toEntityFromDao)
+        .collect(Collectors.toList());
   }
 
-  public CategoryList listCategory(Long id) {
-    return categoryListRepo.findCategoryById(id);
+  public Category listCategory(Long id) {
+    CategoryDao categoryDao = categoryRepo.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
+    return categoryMapper.toEntityFromDao(categoryDao);
   }
 
-  public boolean isExist(Category category) {
-    return categoryRepo.existsByName(category.getName());
-  }
-
-  public boolean hasChildCategory(Long id) {
-    return categoryRepo.hasChildCategory(id);
+  public String getCategoryNameByID(Long id) {
+    return categoryRepo.getName(id);
   }
 }

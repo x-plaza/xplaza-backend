@@ -5,43 +5,71 @@
 package com.xplaza.backend.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.xplaza.backend.model.Brand;
-import com.xplaza.backend.repository.BrandRepository;
+import com.xplaza.backend.jpa.dao.BrandDao;
+import com.xplaza.backend.jpa.repository.BrandRepository;
+import com.xplaza.backend.mapper.BrandMapper;
+import com.xplaza.backend.service.entity.Brand;
 
 @Service
 public class BrandService {
-  @Autowired
-  private BrandRepository brandRepo;
+  private final BrandRepository brandRepo;
+  private final BrandMapper brandMapper;
 
-  public void addBrand(Brand brand) {
-    brandRepo.save(brand);
+  @Autowired
+  public BrandService(BrandRepository brandRepo, BrandMapper brandMapper) {
+    this.brandRepo = brandRepo;
+    this.brandMapper = brandMapper;
   }
 
-  public void updateBrand(Brand brand) {
-    brandRepo.save(brand);
+  @Transactional
+  public Brand addBrand(Brand brand) {
+    BrandDao brandDao = brandMapper.toDao(brand);
+    BrandDao savedBrandDao = brandRepo.save(brandDao);
+    return brandMapper.toEntityFromDao(savedBrandDao);
+  }
+
+  @Transactional
+  public Brand updateBrand(Brand brand) {
+    BrandDao existingBrandDao = brandRepo.findById(brand.getBrandId())
+        .orElseThrow(() -> new RuntimeException("Brand not found with id: " + brand.getBrandId()));
+
+    // Update fields from the provided brand entity
+    existingBrandDao.setBrandName(brand.getBrandName());
+    existingBrandDao.setBrandDescription(brand.getBrandDescription());
+    BrandDao updatedBrandDao = brandRepo.save(existingBrandDao);
+    return brandMapper.toEntityFromDao(updatedBrandDao);
+  }
+
+  @Transactional
+  public void deleteBrand(Long id) {
+    brandRepo.deleteById(id);
+  }
+
+  public List<Brand> listBrands() {
+    List<BrandDao> brandDaos = brandRepo.findAll();
+    return brandDaos.stream()
+        .map(brandMapper::toEntityFromDao)
+        .collect(Collectors.toList());
+  }
+
+  public Brand listBrand(Long id) {
+    BrandDao brandDao = brandRepo.findById(id)
+        .orElseThrow(() -> new RuntimeException("Brand not found with id: " + id));
+    return brandMapper.toEntityFromDao(brandDao);
   }
 
   public String getBrandNameByID(Long id) {
     return brandRepo.getName(id);
   }
 
-  public void deleteBrand(Long id) {
-    brandRepo.deleteById(id);
-  }
-
-  public List<Brand> listBrands() {
-    return brandRepo.findAll();
-  }
-
-  public Brand listBrand(Long id) {
-    return brandRepo.findBrandById(id);
-  }
-
-  public boolean isExist(Brand brand) {
-    return brandRepo.existsByName(brand.getName());
+  public boolean isExist(Brand entity) {
+    BrandDao brand = brandMapper.toDao(entity);
+    return brandRepo.existsByName(brand.getBrandName());
   }
 }

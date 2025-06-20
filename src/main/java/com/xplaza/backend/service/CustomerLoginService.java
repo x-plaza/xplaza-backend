@@ -10,21 +10,28 @@ import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.xplaza.backend.model.CustomerDetails;
-import com.xplaza.backend.model.CustomerLogin;
-import com.xplaza.backend.repository.CustomerLoginRepository;
+import com.xplaza.backend.jpa.repository.CustomerRepository;
+import com.xplaza.backend.mapper.CustomerMapper;
+import com.xplaza.backend.service.entity.Customer;
 
 @Service
 public class CustomerLoginService {
+  private final CustomerUserService customerUserService;
+  private final SecurityService securityService;
+  private final CustomerRepository customerRepo;
+  private final CustomerMapper customerMapper;
+
   @Autowired
-  private CustomerUserService customerUserService;
-  @Autowired
-  private SecurityService securityService;
-  @Autowired
-  private CustomerLoginRepository customerLoginRepo;
+  public CustomerLoginService(CustomerUserService customerUserService, SecurityService securityService,
+      CustomerRepository customerRepo, CustomerMapper customerMapper) {
+    this.customerUserService = customerUserService;
+    this.securityService = securityService;
+    this.customerRepo = customerRepo;
+    this.customerMapper = customerMapper;
+  }
 
   public Boolean isVaidUser(String username, String password) throws IOException {
-    CustomerDetails customer = customerUserService.listCustomer(username);
+    Customer customer = customerUserService.listCustomer(username);
     if (customer == null)
       return false;
     String strOrgSalt = customer.getSalt();
@@ -35,7 +42,7 @@ public class CustomerLoginService {
     return result;
   }
 
-  public CustomerLogin getCustomerLoginDetails(String username) {
-    return customerLoginRepo.findCustomerByUsername(username);
+  public Customer getCustomerLoginDetails(String username) {
+    return customerMapper.toEntityFromDao(customerRepo.findCustomerByUsername(username));
   }
 }

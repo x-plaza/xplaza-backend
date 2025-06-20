@@ -5,64 +5,89 @@
 package com.xplaza.backend.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.xplaza.backend.model.AdminUserList;
-import com.xplaza.backend.model.Shop;
-import com.xplaza.backend.model.ShopList;
-import com.xplaza.backend.repository.AdminUserListRepository;
-import com.xplaza.backend.repository.AdminUserShopLinkRepository;
-import com.xplaza.backend.repository.ShopListRepository;
-import com.xplaza.backend.repository.ShopRepository;
+import com.xplaza.backend.common.util.ValidationUtil;
+import com.xplaza.backend.exception.ResourceNotFoundException;
+import com.xplaza.backend.jpa.dao.ShopDao;
+import com.xplaza.backend.jpa.repository.ShopRepository;
+import com.xplaza.backend.mapper.ShopMapper;
+import com.xplaza.backend.service.entity.Shop;
 
 @Service
 public class ShopService {
+  private final ShopRepository shopRepo;
+  private final ShopMapper shopMapper;
+
   @Autowired
-  private ShopRepository shopRepo;
-  @Autowired
-  private ShopListRepository shopListRepo;
-  @Autowired
-  private AdminUserListRepository adminUserListRepo;
-  @Autowired
-  private AdminUserShopLinkRepository adminUserShopLinkRepo;
+  public ShopService(ShopRepository shopRepo, ShopMapper shopMapper) {
+    this.shopRepo = shopRepo;
+    this.shopMapper = shopMapper;
+  }
 
   @Transactional
-  public void addShop(Shop shop) {
-    Shop updatedShop = shopRepo.save(shop);
-    List<AdminUserList> adminUserList = adminUserListRepo.findAllAdminUsersByRoleName("Master Admin");
-    for (AdminUserList adminUser : adminUserList) {
-      adminUserShopLinkRepo.insert(adminUser.getId(), updatedShop.getId());
-    }
+  public Shop addShop(Shop shop) {
+    // Validate input
+    ValidationUtil.validateNotNull(shop, "Shop");
+    ValidationUtil.validateNotEmpty(shop.getShopName(), "Shop name");
+    ValidationUtil.validateNotEmpty(shop.getShopAddress(), "Shop address");
+    ValidationUtil.validateNotEmpty(shop.getShopOwner(), "Shop owner");
+    ShopDao shopDao = shopMapper.toDao(shop);
+    ShopDao savedShopDao = shopRepo.save(shopDao);
+    return shopMapper.toEntityFromDao(savedShopDao);
   }
 
-  public void updateShop(Shop shop) {
-    shopRepo.save(shop);
+  @Transactional
+  public Shop updateShop(Long id, Shop shop) {
+    // Validate input
+    ValidationUtil.validateId(id, "Shop ID");
+    ValidationUtil.validateNotNull(shop, "Shop");
+    ValidationUtil.validateNotEmpty(shop.getShopName(), "Shop name");
+    ValidationUtil.validateNotEmpty(shop.getShopAddress(), "Shop address");
+    ValidationUtil.validateNotEmpty(shop.getShopOwner(), "Shop owner");
+    // Check if shop exists
+    shopRepo.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Shop not found with id: " + id));
+    shop.setShopId(id);
+    ShopDao shopDao = shopMapper.toDao(shop);
+    ShopDao updatedShopDao = shopRepo.save(shopDao);
+    return shopMapper.toEntityFromDao(updatedShopDao);
   }
 
-  public List<ShopList> listShops() {
-    return shopListRepo.findAllShopList();
-  }
-
-  public String getShopNameByID(Long id) {
-    return shopRepo.getName(id);
-  }
-
+  @Transactional
   public void deleteShop(Long id) {
+    ValidationUtil.validateId(id, "Shop ID");
     shopRepo.deleteById(id);
   }
 
-  public ShopList listShop(Long id) {
-    return shopListRepo.findShopListById(id);
+  public List<Shop> listShops() {
+    List<ShopDao> shopDaos = shopRepo.findAll();
+    return shopDaos.stream()
+        .map(shopMapper::toEntityFromDao)
+        .collect(Collectors.toList());
   }
 
-  public List<ShopList> listShopsByUserID(Long user_id) {
-    return shopListRepo.findAllShopListByUserID(user_id);
+  public Shop listShop(Long id) {
+    ShopDao shopDao = shopRepo.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Shop not found with id: " + id));
+    return shopMapper.toEntityFromDao(shopDao);
   }
 
-  public List<ShopList> listShopByLocation(Long id) {
-    return shopListRepo.findShopListByLocationId(id);
+  public List<Shop> listShopsByLocation(Long locationId) {
+    List<ShopDao> shopDaos = shopRepo.findByLocationId(locationId);
+    return shopDaos.stream()
+        .map(shopMapper::toEntityFromDao)
+        .collect(Collectors.toList());
+  }
+
+  public List<Shop> listShopsByOwner(Long ownerId) {
+    List<ShopDao> shopDaos = shopRepo.findByShopOwner(ownerId);
+    return shopDaos.stream()
+        .map(shopMapper::toEntityFromDao)
+        .collect(Collectors.toList());
   }
 }

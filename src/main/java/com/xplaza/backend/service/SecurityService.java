@@ -9,13 +9,15 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class SecurityService {
+  private static final Logger logger = LoggerFactory.getLogger(SecurityService.class);
+
   public byte[] getSalt() throws NoSuchAlgorithmException {
     SecureRandom secureRandom = SecureRandom.getInstance("SHA1PRNG");
     byte[] salt = new byte[16];
@@ -31,7 +33,7 @@ public class SecurityService {
       md.reset();
       return byteData;
     } catch (NoSuchAlgorithmException ex) {
-      Logger.getLogger("SHA-512").log(Level.SEVERE, "SHA-512 is not a valid algorithm name", ex);
+      logger.error("SHA-512 is not a valid algorithm name", ex);
       return null;
     }
   }
