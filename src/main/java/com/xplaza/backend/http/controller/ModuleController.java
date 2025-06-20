@@ -25,11 +25,14 @@ import com.xplaza.backend.service.entity.Module;
 @RestController
 @RequestMapping("/api/v1/modules")
 public class ModuleController extends BaseController {
-  @Autowired
-  private ModuleService moduleService;
+  private final ModuleService moduleService;
+  private final ModuleMapper moduleMapper;
 
   @Autowired
-  private ModuleMapper moduleMapper;
+  public ModuleController(ModuleService moduleService, ModuleMapper moduleMapper) {
+    this.moduleService = moduleService;
+    this.moduleMapper = moduleMapper;
+  }
 
   @GetMapping
   public ResponseEntity<ApiResponse> getModules() throws JsonProcessingException {

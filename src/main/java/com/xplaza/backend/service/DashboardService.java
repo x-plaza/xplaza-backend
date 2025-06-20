@@ -10,14 +10,19 @@ import java.util.Calendar;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.xplaza.backend.jpa.dao.RevenueDao;
 import com.xplaza.backend.jpa.repository.DashboardRepository;
 
 @Service
 public class DashboardService {
-  @Autowired
-  private DashboardRepository dashboardRepo;
+  private final DashboardRepository dashboardRepo;
 
-  public Dashboard getDashboardDetails(Long shop_id) {
+  @Autowired
+  public DashboardService(DashboardRepository dashboardRepo) {
+    this.dashboardRepo = dashboardRepo;
+  }
+
+  public RevenueDao getDashboardDetails(Long shop_id) {
     return dashboardRepo.findAllDetailsByShopId(shop_id);
   }
 

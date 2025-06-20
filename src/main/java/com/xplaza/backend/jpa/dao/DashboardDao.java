@@ -4,8 +4,6 @@
  */
 package com.xplaza.backend.jpa.dao;
 
-import java.util.List;
-
 import jakarta.persistence.*;
 
 import lombok.*;
@@ -26,16 +24,4 @@ public class DashboardDao {
   @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "shop_id")
   ShopDao shop;
-
-  @OneToOne(mappedBy = "shop")
-  RevenueDao revenue;
-
-  @OneToMany(mappedBy = "shop", fetch = FetchType.LAZY)
-  List<TopCustomerDao> topCustomers;
-
-  @OneToMany(mappedBy = "shop", fetch = FetchType.LAZY)
-  List<TopProductDao> topProducts;
-
-  @OneToMany(mappedBy = "shop", fetch = FetchType.LAZY)
-  List<ProductToStockDao> productToStocks;
 }

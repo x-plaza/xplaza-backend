@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.xplaza.backend.jpa.repository.PlatformInfoRepository;
 import com.xplaza.backend.mapper.PlatformInfoMapper;
@@ -15,15 +16,20 @@ import com.xplaza.backend.service.entity.PlatformInfo;
 
 @Service
 public class PlatformInfoService {
-  @Autowired
-  private PlatformInfoRepository platformInfoRepo;
+  private final PlatformInfoRepository platformInfoRepo;
   @Autowired
   private PlatformInfoMapper platformInfoMapper;
+
+  @Autowired
+  public PlatformInfoService(PlatformInfoRepository platformInfoRepo) {
+    this.platformInfoRepo = platformInfoRepo;
+  }
 
   public PlatformInfo listPlatform() {
     return platformInfoMapper.toEntityFromDao(platformInfoRepo.findAll().getFirst());
   }
 
+  @Transactional
   public void updatePlatformInfo(PlatformInfo platformInfo) {
     var existingPlatformInfo = platformInfoRepo.findById(platformInfo.getId())
         .orElseThrow(() -> new IllegalArgumentException("Platform info not found"));
@@ -36,6 +42,7 @@ public class PlatformInfoService {
     platformInfoRepo.save(existingPlatformInfo);
   }
 
+  @Transactional
   public void addPlatformInfo(@Valid PlatformInfo platformInfo) {
     platformInfoRepo.save(platformInfoMapper.toDao(platformInfo));
   }

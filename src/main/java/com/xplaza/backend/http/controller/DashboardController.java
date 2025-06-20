@@ -4,7 +4,6 @@
  */
 package com.xplaza.backend.http.controller;
 
-import java.io.IOException;
 import java.util.Date;
 
 import jakarta.validation.Valid;
@@ -14,73 +13,59 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.xplaza.backend.jpa.dao.Dashboard;
+import com.xplaza.backend.common.util.ApiResponse;
+import com.xplaza.backend.jpa.dao.RevenueDao;
 import com.xplaza.backend.service.DashboardService;
 
 @RestController
 @RequestMapping("/api/v1/dashboard")
 public class DashboardController extends BaseController {
+  private final DashboardService dashboardService;
+
   @Autowired
-  private DashboardService dashboardService;
+  public DashboardController(DashboardService dashboardService) {
+    this.dashboardService = dashboardService;
+  }
 
   private Date start, end;
   private Long responseTime;
 
   @PostMapping
-  public ResponseEntity<String> dashboardDetails(@RequestParam(value = "shop_id") @Valid Long shop_id)
-      throws IOException {
+  public ResponseEntity<ApiResponse> dashboardDetails(@RequestParam(value = "shop_id") @Valid Long shop_id)
+      throws JsonProcessingException {
     start = new Date();
-    Dashboard dtos = dashboardService.getDashboardDetails(shop_id);
+    RevenueDao dto = dashboardService.getDashboardDetails(shop_id);
     end = new Date();
     responseTime = end.getTime() - start.getTime();
-    ObjectMapper mapper = new ObjectMapper();
-    String response = "{\n" +
-        "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Dashboard Details\",\n" +
-        "  \"status\": 200,\n" +
-        "  \"response\": \"Success\",\n" +
-        "  \"msg\": \"\",\n" +
-        "  \"data\":" +
-        mapper.writeValueAsString(dtos) + "\n}";
-    return new ResponseEntity<>(response, HttpStatus.OK);
+    String data = new ObjectMapper().writeValueAsString(dto);
+    ApiResponse response = new ApiResponse(responseTime, "Dashboard Details", HttpStatus.OK.value(), "Success", "",
+        data);
+    return ResponseEntity.ok(response);
   }
 
   @PostMapping("/monthly-profits")
-  public ResponseEntity<String> getMonthlyProfit(@RequestParam(value = "shop_id") @Valid Long shop_id,
-      @RequestParam(value = "month") @Valid int month) throws IOException {
+  public ResponseEntity<ApiResponse> getMonthlyProfit(@RequestParam(value = "shop_id") @Valid Long shop_id,
+      @RequestParam(value = "month") @Valid int month) throws JsonProcessingException {
     start = new Date();
-    Double dtos = dashboardService.getMonthlyProfit(shop_id, month);
+    Double dto = dashboardService.getMonthlyProfit(shop_id, month);
     end = new Date();
     responseTime = end.getTime() - start.getTime();
-    ObjectMapper mapper = new ObjectMapper();
-    String response = "{\n" +
-        "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Monthly Profit\",\n" +
-        "  \"status\": 200,\n" +
-        "  \"response\": \"Success\",\n" +
-        "  \"msg\": \"\",\n" +
-        "  \"data\":" +
-        mapper.writeValueAsString(dtos) + "\n}";
-    return new ResponseEntity<>(response, HttpStatus.OK);
+    String data = new ObjectMapper().writeValueAsString(dto);
+    ApiResponse response = new ApiResponse(responseTime, "Monthly Profit", HttpStatus.OK.value(), "Success", "", data);
+    return ResponseEntity.ok(response);
   }
 
   @PostMapping("/monthly-sales")
-  public ResponseEntity<String> getMonthlySales(@RequestParam(value = "shop_id") @Valid Long shop_id,
-      @RequestParam(value = "month") @Valid int month) throws IOException {
+  public ResponseEntity<ApiResponse> getMonthlySales(@RequestParam(value = "shop_id") @Valid Long shop_id,
+      @RequestParam(value = "month") @Valid int month) throws JsonProcessingException {
     start = new Date();
-    Double dtos = dashboardService.getMonthlySales(shop_id, month);
+    Double dto = dashboardService.getMonthlySales(shop_id, month);
     end = new Date();
     responseTime = end.getTime() - start.getTime();
-    ObjectMapper mapper = new ObjectMapper();
-    String response = "{\n" +
-        "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Monthly Sales\",\n" +
-        "  \"status\": 200,\n" +
-        "  \"response\": \"Success\",\n" +
-        "  \"msg\": \"\",\n" +
-        "  \"data\":" +
-        mapper.writeValueAsString(dtos) + "\n}";
-    return new ResponseEntity<>(response, HttpStatus.OK);
+    String data = new ObjectMapper().writeValueAsString(dto);
+    ApiResponse response = new ApiResponse(responseTime, "Monthly Sales", HttpStatus.OK.value(), "Success", "", data);
+    return ResponseEntity.ok(response);
   }
 }

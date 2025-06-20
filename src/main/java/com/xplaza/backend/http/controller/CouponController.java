@@ -26,11 +26,14 @@ import com.xplaza.backend.service.entity.Coupon;
 @RestController
 @RequestMapping("/api/v1/coupons")
 public class CouponController extends BaseController {
-  @Autowired
-  private CouponService couponService;
+  private final CouponService couponService;
+  private final CouponMapper couponMapper;
 
   @Autowired
-  private CouponMapper couponMapper;
+  public CouponController(CouponService couponService, CouponMapper couponMapper) {
+    this.couponService = couponService;
+    this.couponMapper = couponMapper;
+  }
 
   private Date start, end;
   private Long responseTime;

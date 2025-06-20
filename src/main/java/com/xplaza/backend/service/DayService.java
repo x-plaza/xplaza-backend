@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.xplaza.backend.jpa.dao.DayDao;
 import com.xplaza.backend.jpa.repository.DayRepository;
@@ -17,16 +18,22 @@ import com.xplaza.backend.service.entity.Day;
 
 @Service
 public class DayService {
-  @Autowired
-  private DayRepository dayRepo;
-  @Autowired
-  private DayMapper dayMapper;
+  private final DayRepository dayRepo;
+  private final DayMapper dayMapper;
 
+  @Autowired
+  public DayService(DayRepository dayRepo, DayMapper dayMapper) {
+    this.dayRepo = dayRepo;
+    this.dayMapper = dayMapper;
+  }
+
+  @Transactional
   public void addDay(Day entity) {
     DayDao dao = dayMapper.toDao(entity);
     dayRepo.save(dao);
   }
 
+  @Transactional
   public void updateDay(Day entity) {
     DayDao dao = dayMapper.toDao(entity);
     dayRepo.save(dao);
@@ -39,6 +46,7 @@ public class DayService {
         .orElse(null);
   }
 
+  @Transactional
   public void deleteDay(Long id) {
     dayRepo.deleteById(id);
   }

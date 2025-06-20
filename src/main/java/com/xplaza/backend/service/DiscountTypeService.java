@@ -18,45 +18,48 @@ import com.xplaza.backend.service.entity.DiscountType;
 @Service
 public class DiscountTypeService {
 
-  @Autowired
-  private DiscountTypeRepository discountTypeRepository;
+  private final DiscountTypeRepository discountTypeRepo;
+  private final DiscountTypeMapper discountTypeMapper;
 
   @Autowired
-  private DiscountTypeMapper discountTypeMapper;
+  public DiscountTypeService(DiscountTypeRepository discountTypeRepo, DiscountTypeMapper discountTypeMapper) {
+    this.discountTypeRepo = discountTypeRepo;
+    this.discountTypeMapper = discountTypeMapper;
+  }
 
   @Transactional
   public DiscountType addDiscountType(DiscountType discountType) {
     DiscountTypeDao discountTypeDao = discountTypeMapper.toDao(discountType);
-    DiscountTypeDao savedDiscountTypeDao = discountTypeRepository.save(discountTypeDao);
+    DiscountTypeDao savedDiscountTypeDao = discountTypeRepo.save(discountTypeDao);
     return discountTypeMapper.toEntityFromDao(savedDiscountTypeDao);
   }
 
   @Transactional
   public DiscountType updateDiscountType(Long id, DiscountType discountType) {
-    DiscountTypeDao existingDiscountTypeDao = discountTypeRepository.findById(id)
+    DiscountTypeDao existingDiscountTypeDao = discountTypeRepo.findById(id)
         .orElseThrow(() -> new RuntimeException("Discount type not found with id: " + id));
 
     DiscountTypeDao discountTypeDao = discountTypeMapper.toDao(discountType);
     discountTypeDao.setDiscountTypeId(existingDiscountTypeDao.getDiscountTypeId());
 
-    DiscountTypeDao updatedDiscountTypeDao = discountTypeRepository.save(discountTypeDao);
+    DiscountTypeDao updatedDiscountTypeDao = discountTypeRepo.save(discountTypeDao);
     return discountTypeMapper.toEntityFromDao(updatedDiscountTypeDao);
   }
 
   @Transactional
   public void deleteDiscountType(Long id) {
-    discountTypeRepository.deleteById(id);
+    discountTypeRepo.deleteById(id);
   }
 
   public List<DiscountType> listDiscountTypes() {
-    List<DiscountTypeDao> discountTypeDaos = discountTypeRepository.findAll();
+    List<DiscountTypeDao> discountTypeDaos = discountTypeRepo.findAll();
     return discountTypeDaos.stream()
         .map(discountTypeMapper::toEntityFromDao)
         .toList();
   }
 
   public DiscountType listDiscountType(Long id) {
-    DiscountTypeDao discountTypeDao = discountTypeRepository.findById(id)
+    DiscountTypeDao discountTypeDao = discountTypeRepo.findById(id)
         .orElseThrow(() -> new RuntimeException("Discount type not found with id: " + id));
     return discountTypeMapper.toEntityFromDao(discountTypeDao);
   }

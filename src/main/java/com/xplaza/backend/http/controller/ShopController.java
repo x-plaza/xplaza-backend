@@ -14,26 +14,28 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xplaza.backend.common.util.ApiResponse;
+import com.xplaza.backend.http.dto.request.ShopRequest;
+import com.xplaza.backend.http.dto.response.ShopResponse;
 import com.xplaza.backend.mapper.ShopMapper;
-import com.xplaza.backend.model.ShopList;
 import com.xplaza.backend.service.RoleService;
 import com.xplaza.backend.service.ShopService;
-import com.xplaza.backend.service.entity.ShopEntity;
+import com.xplaza.backend.service.entity.Shop;
 
 @RestController
 @RequestMapping("/api/v1/shops")
 public class ShopController extends BaseController {
-  @Autowired
-  private ShopService shopService;
+  private final ShopService shopService;
+  private final RoleService roleService;
+  private final ShopMapper shopMapper;
 
   @Autowired
-  private RoleService roleService;
-
-  @Autowired
-  private ShopMapper shopMapper;
+  public ShopController(ShopService shopService, RoleService roleService, ShopMapper shopMapper) {
+    this.shopService = shopService;
+    this.roleService = roleService;
+    this.shopMapper = shopMapper;
+  }
 
   private Date start, end;
   private Long responseTime;
@@ -41,8 +43,8 @@ public class ShopController extends BaseController {
   @GetMapping
   public ResponseEntity<ApiResponse> getShops() throws Exception {
     long start = System.currentTimeMillis();
-    List<ShopEntity> shops = shopService.listShops();
-    List<ShopResponseDTO> dtos = shops.stream().map(shopMapper::toResponseDTO).toList();
+    List<Shop> shops = shopService.listShops();
+    List<ShopResponse> dtos = shops.stream().map(shopMapper::toResponse).toList();
     long end = System.currentTimeMillis();
     long responseTime = end - start;
     String data = new ObjectMapper().writeValueAsString(dtos);
@@ -53,8 +55,8 @@ public class ShopController extends BaseController {
   @GetMapping("/{id}")
   public ResponseEntity<ApiResponse> getShop(@PathVariable @Valid Long id) throws Exception {
     long start = System.currentTimeMillis();
-    ShopEntity shop = shopService.listShop(id);
-    ShopResponseDTO dto = shopMapper.toResponseDTO(shop);
+    Shop shop = shopService.listShop(id);
+    ShopResponse dto = shopMapper.toResponse(shop);
     long end = System.currentTimeMillis();
     long responseTime = end - start;
     String data = new ObjectMapper().writeValueAsString(dto);
@@ -62,36 +64,19 @@ public class ShopController extends BaseController {
     return ResponseEntity.ok(response);
   }
 
-  @GetMapping("/by-location/{id}")
-  public ResponseEntity<String> getShopsByLocation(@PathVariable @Valid Long id) throws JsonProcessingException {
-    start = new Date();
-    List<ShopList> dtos = shopService.listShopByLocation(id);
-    end = new Date();
-    responseTime = end.getTime() - start.getTime();
-    ObjectMapper mapper = new ObjectMapper();
-    String response = "{\n" +
-        "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Shop List By Location\",\n" +
-        "  \"status\": 200,\n" +
-        "  \"response\": \"Success\",\n" +
-        "  \"msg\": \"\",\n" +
-        "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
-    return new ResponseEntity<>(response, HttpStatus.OK);
-  }
-
   @PostMapping
-  public ResponseEntity<ApiResponse> addShop(@RequestBody @Valid ShopRequestDTO shopRequestDTO) {
-    ShopEntity shop = shopMapper.toEntity(shopRequestDTO);
+  public ResponseEntity<ApiResponse> addShop(@RequestBody @Valid ShopRequest shopRequest) {
+    Shop shop = shopMapper.toEntity(shopRequest);
     shopService.addShop(shop);
     ApiResponse response = new ApiResponse(0, "Add Shop", HttpStatus.CREATED.value(), "Success",
         "Shop has been created.", null);
     return new ResponseEntity<>(response, HttpStatus.CREATED);
   }
 
-  @PutMapping
-  public ResponseEntity<ApiResponse> updateShop(@RequestBody @Valid ShopRequestDTO shopRequestDTO) {
-    ShopEntity shop = shopMapper.toEntity(shopRequestDTO);
-    shopService.updateShop(shop);
+  @PutMapping("/{id}")
+  public ResponseEntity<ApiResponse> updateShop(@PathVariable Long id, @RequestBody @Valid ShopRequest shopRequest) {
+    Shop shop = shopMapper.toEntity(shopRequest);
+    shopService.updateShop(id, shop);
     ApiResponse response = new ApiResponse(0, "Update Shop", HttpStatus.OK.value(), "Success",
         "Shop has been updated.", null);
     return ResponseEntity.ok(response);

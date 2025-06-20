@@ -9,9 +9,9 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.xplaza.backend.model.CustomerDetails;
+import com.xplaza.backend.jpa.dao.CustomerDao;
 
-public interface CustomerSignupRepository extends JpaRepository<CustomerDetails, Long> {
+public interface CustomerSignupRepository extends JpaRepository<CustomerDao, Long> {
 
   @Modifying
   @Transactional

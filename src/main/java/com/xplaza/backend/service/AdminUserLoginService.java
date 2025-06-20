@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.xplaza.backend.jpa.repository.LoginRepository;
-import com.xplaza.backend.mapper.AdminUserMapper;
 import com.xplaza.backend.mapper.LoginMapper;
 import com.xplaza.backend.service.entity.AdminUser;
 import com.xplaza.backend.service.entity.Login;
@@ -19,16 +18,19 @@ import com.xplaza.backend.service.entity.Login;
 @Service
 @Transactional
 public class AdminUserLoginService {
+  private final AdminUserService adminUserService;
+  private final SecurityService securityService;
+  private final LoginRepository loginRepo;
+  private final LoginMapper loginMapper;
+
   @Autowired
-  private AdminUserService adminUserService;
-  @Autowired
-  private SecurityService securityService;
-  @Autowired
-  private LoginRepository loginRepo;
-  @Autowired
-  private AdminUserMapper adminUserMapper;
-  @Autowired
-  private LoginMapper loginMapper;
+  public AdminUserLoginService(AdminUserService adminUserService, SecurityService securityService,
+      LoginRepository loginRepo, LoginMapper loginMapper) {
+    this.adminUserService = adminUserService;
+    this.securityService = securityService;
+    this.loginRepo = loginRepo;
+    this.loginMapper = loginMapper;
+  }
 
   public boolean isValidAdminUser(String username, String password) {
     AdminUser adminUser = adminUserService.listAdminUser(username);

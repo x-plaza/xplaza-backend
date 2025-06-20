@@ -16,35 +16,39 @@ import com.xplaza.backend.mapper.ProductVariationTypeMapper;
 import com.xplaza.backend.service.entity.ProductVariationType;
 
 @Service
-@Transactional
 public class ProductVariationTypeService {
 
-  @Autowired
-  private ProductVariationTypeRepository productVariationTypeRepository;
+  private final ProductVariationTypeRepository productVariationTypeRepository;
+  private final ProductVariationTypeMapper productVariationTypeMapper;
 
   @Autowired
-  private ProductVariationTypeMapper productVariationTypeMapper;
+  public ProductVariationTypeService(ProductVariationTypeRepository productVariationTypeRepository,
+      ProductVariationTypeMapper productVariationTypeMapper) {
+    this.productVariationTypeRepository = productVariationTypeRepository;
+    this.productVariationTypeMapper = productVariationTypeMapper;
+  }
 
+  @Transactional
   public ProductVariationType addProductVariationType(ProductVariationType productVariationType) {
     ProductVariationTypeDao productVariationTypeDao = productVariationTypeMapper.toDao(productVariationType);
     ProductVariationTypeDao savedProductVariationTypeDao = productVariationTypeRepository.save(productVariationTypeDao);
     return productVariationTypeMapper.toEntityFromDao(savedProductVariationTypeDao);
   }
 
+  @Transactional
   public ProductVariationType updateProductVariationType(ProductVariationType productVariationType) {
     ProductVariationTypeDao existingProductVariationTypeDao = productVariationTypeRepository
         .findById(productVariationType.getProductVarTypeId())
         .orElseThrow(() -> new RuntimeException(
             "Product variation type not found with id: " + productVariationType.getProductVarTypeId()));
-
     ProductVariationTypeDao productVariationTypeDao = productVariationTypeMapper.toDao(productVariationType);
-    productVariationTypeDao.setProductVariationTypeId(existingProductVariationTypeDao.getProductVariationTypeId());
-
+    productVariationTypeDao.setProductVarTypeId(existingProductVariationTypeDao.getProductVarTypeId());
     ProductVariationTypeDao updatedProductVariationTypeDao = productVariationTypeRepository
         .save(productVariationTypeDao);
     return productVariationTypeMapper.toEntityFromDao(updatedProductVariationTypeDao);
   }
 
+  @Transactional
   public void deleteProductVariationType(Long id) {
     productVariationTypeRepository.deleteById(id);
   }

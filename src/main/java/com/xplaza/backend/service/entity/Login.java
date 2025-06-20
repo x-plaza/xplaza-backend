@@ -6,8 +6,6 @@ package com.xplaza.backend.service.entity;
 
 import java.util.List;
 
-import jakarta.persistence.*;
-
 import lombok.*;
 
 @Data

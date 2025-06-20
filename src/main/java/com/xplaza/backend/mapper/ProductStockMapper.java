@@ -9,35 +9,24 @@ import org.mapstruct.Mapping;
 
 import com.xplaza.backend.http.dto.request.ProductStockRequest;
 import com.xplaza.backend.http.dto.response.ProductStockResponse;
-import com.xplaza.backend.service.entity.ProductStock;
+import com.xplaza.backend.jpa.dao.ProductToStockDao;
+import com.xplaza.backend.service.entity.ProductToStock;
 
 @Mapper(componentModel = "spring")
 public interface ProductStockMapper {
-  @Mapping(target = "id", source = "id")
-  @Mapping(target = "productId", source = "productId")
-  @Mapping(target = "productName", source = "productName")
-  @Mapping(target = "quantity", source = "quantity")
-  @Mapping(target = "shopId", source = "shopId")
-  ProductStock toEntity(ProductStockRequest request);
+  @Mapping(target = "remainingUnit", source = "quantity")
+  @Mapping(target = "shop.shopId", source = "shopId")
+  ProductToStock toEntity(ProductStockRequest request);
 
-  @Mapping(target = "id", source = "id")
-  @Mapping(target = "productId", source = "productId")
-  @Mapping(target = "productName", source = "productName")
-  @Mapping(target = "quantity", source = "quantity")
-  @Mapping(target = "shopId", source = "shopId")
-  ProductStockResponse toResponse(ProductStock entity);
+  @Mapping(target = "quantity", source = "remainingUnit")
+  @Mapping(target = "shopId", source = "shop.shopId")
+  ProductStockResponse toResponse(ProductToStock entity);
 
-  @Mapping(target = "id", source = "id")
-  @Mapping(target = "productId", source = "productId")
-  @Mapping(target = "productName", source = "productName")
-  @Mapping(target = "quantity", source = "quantity")
-  @Mapping(target = "shopId", source = "shopId")
-  ProductStockDao toDao(ProductStock entity);
+  @Mapping(target = "remainingUnit", source = "remainingUnit")
+  @Mapping(target = "shop", source = "shop")
+  ProductToStockDao toDao(ProductToStock entity);
 
-  @Mapping(target = "id", source = "id")
-  @Mapping(target = "productId", source = "productId")
-  @Mapping(target = "productName", source = "productName")
-  @Mapping(target = "quantity", source = "quantity")
-  @Mapping(target = "shopId", source = "shopId")
-  ProductStock toEntityFromDao(ProductStockDao dao);
+  @Mapping(target = "remainingUnit", source = "remainingUnit")
+  @Mapping(target = "shop", source = "shop")
+  ProductToStock toEntityFromDao(ProductToStockDao dao);
 }

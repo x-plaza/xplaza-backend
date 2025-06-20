@@ -24,32 +24,39 @@ import com.xplaza.backend.mapper.OrderMapper;
 import com.xplaza.backend.service.entity.*;
 
 @Service
-@Transactional
 public class OrderService {
+  private final OrderRepository orderRepo;
+  private final OrderMapper orderMapper;
+  private final ProductRepository productRepo;
+  private final ProductDiscountRepository productDiscountRepo;
+  private final CouponRepository couponRepo;
+  private final DeliveryCostRepository deliveryCostRepo;
+  private final EmailSenderService emailSenderService;
+  private final CustomerUserRepository customerUserRepo;
+  private final AdminUserRepository adminUserRepo;
+  private final CurrencyRepository currencyRepo;
+  private final Environment env;
+  private final CouponMapper couponMapper;
+
   @Autowired
-  private OrderRepository orderRepo;
-  @Autowired
-  private OrderMapper orderMapper;
-  @Autowired
-  private ProductRepository productRepo;
-  @Autowired
-  private ProductDiscountRepository productDiscountRepo;
-  @Autowired
-  private CouponRepository couponRepo;
-  @Autowired
-  private DeliveryCostRepository deliveryCostRepo;
-  @Autowired
-  private EmailSenderService emailSenderService;
-  @Autowired
-  private CustomerUserRepository customerUserRepo;
-  @Autowired
-  private AdminUserRepository adminUserRepo;
-  @Autowired
-  private CurrencyRepository currencyRepo;
-  @Autowired
-  private Environment env;
-  @Autowired
-  private CouponMapper couponMapper;
+  public OrderService(OrderRepository orderRepo, OrderMapper orderMapper, ProductRepository productRepo,
+      ProductDiscountRepository productDiscountRepo, CouponRepository couponRepo,
+      DeliveryCostRepository deliveryCostRepo, EmailSenderService emailSenderService,
+      CustomerUserRepository customerUserRepo, AdminUserRepository adminUserRepo, CurrencyRepository currencyRepo,
+      Environment env, CouponMapper couponMapper) {
+    this.orderRepo = orderRepo;
+    this.orderMapper = orderMapper;
+    this.productRepo = productRepo;
+    this.productDiscountRepo = productDiscountRepo;
+    this.couponRepo = couponRepo;
+    this.deliveryCostRepo = deliveryCostRepo;
+    this.emailSenderService = emailSenderService;
+    this.customerUserRepo = customerUserRepo;
+    this.adminUserRepo = adminUserRepo;
+    this.currencyRepo = currencyRepo;
+    this.env = env;
+    this.couponMapper = couponMapper;
+  }
 
   public ProductInventory validateProductAvailability(Order order) {
     ProductInventory productInventory = new ProductInventory();
@@ -196,21 +203,25 @@ public class OrderService {
         .anyMatch(shopLink -> Objects.equals(shopLink.getShop().getShopId(), order.getShopId()));
   }
 
+  @Transactional
   public Order createOrder(Order order) {
     OrderDao dao = orderMapper.toDao(order);
     dao = orderRepo.save(dao);
     return orderMapper.toEntityFromDao(dao);
   }
 
+  @Transactional
   public void updateOrder(Order order) {
     OrderDao dao = orderMapper.toDao(order);
     orderRepo.save(dao);
   }
 
+  @Transactional
   public void updateOrderStatus(Long orderId, String remarks, Long status) {
     orderRepo.updateOrderStatus(orderId, remarks, status);
   }
 
+  @Transactional
   public void deleteOrder(Long id) {
     orderRepo.deleteById(id);
   }
@@ -242,7 +253,6 @@ public class OrderService {
   public void sendOrderConfirmationToCustomer(OrderDetails order, PlatformInfo platformInfo) {
     String currencyName = currencyRepo.getName(order.getCurrencyId());
     SimpleDateFormat dateFormatter = new SimpleDateFormat("dd MMM yyyy");
-    SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm");
 
     String deliveryDate = dateFormatter.format(order.getDateToDeliver());
     String deliverySchedule = order.getAllottedTime();
@@ -316,5 +326,11 @@ public class OrderService {
         "Delivery Address: " + order.getDeliveryAddress() + "\n\n" +
         "With Regards,\n" +
         "Team " + platformInfo.getName();
+  }
+
+  public Order getOrderById(Long id) {
+    return orderRepo.findById(id)
+        .map(orderMapper::toEntityFromDao)
+        .orElseThrow(() -> new RuntimeException("Order not found with id: " + id));
   }
 }

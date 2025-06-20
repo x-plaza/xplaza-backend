@@ -17,9 +17,10 @@ import org.springframework.web.bind.annotation.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xplaza.backend.common.util.ApiResponse;
-import com.xplaza.backend.model.Location;
-import com.xplaza.backend.model.LocationList;
+import com.xplaza.backend.http.dto.response.LocationResponse;
+import com.xplaza.backend.mapper.LocationMapper;
 import com.xplaza.backend.service.LocationService;
+import com.xplaza.backend.service.entity.Location;
 
 @RestController
 @RequestMapping("/api/v1/locations")
@@ -27,13 +28,17 @@ public class LocationController extends BaseController {
   @Autowired
   private LocationService locationService;
 
+  @Autowired
+  private LocationMapper locationMapper;
+
   private Date start, end;
   private Long responseTime;
 
   @GetMapping
   public ResponseEntity<String> getLocations() throws JsonProcessingException {
     start = new Date();
-    List<LocationList> dtos = locationService.listLocations();
+    List<Location> entities = locationService.listLocations();
+    List<LocationResponse> dtos = entities.stream().map(locationMapper::toResponse).toList();
     end = new Date();
     responseTime = end.getTime() - start.getTime();
     ObjectMapper mapper = new ObjectMapper();
@@ -50,7 +55,8 @@ public class LocationController extends BaseController {
   @GetMapping("/{id}")
   public ResponseEntity<String> getLocation(@PathVariable @Valid Long id) throws JsonProcessingException {
     start = new Date();
-    LocationList dtos = locationService.listLocation(id);
+    Location entity = locationService.listLocation(id);
+    LocationResponse dto = locationMapper.toResponse(entity);
     end = new Date();
     responseTime = end.getTime() - start.getTime();
     ObjectMapper mapper = new ObjectMapper();
@@ -60,7 +66,7 @@ public class LocationController extends BaseController {
         "  \"status\": 200,\n" +
         "  \"response\": \"Success\",\n" +
         "  \"msg\": \"\",\n" +
-        "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
+        "  \"data\":" + mapper.writeValueAsString(dto) + "\n}";
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
@@ -74,10 +80,10 @@ public class LocationController extends BaseController {
         "Success", "Location has been created.", null), HttpStatus.CREATED);
   }
 
-  @PutMapping
-  public ResponseEntity<ApiResponse> updateLocation(@RequestBody @Valid Location location) {
+  @PutMapping("/{id}")
+  public ResponseEntity<ApiResponse> updateLocation(@PathVariable Long id, @RequestBody @Valid Location location) {
     start = new Date();
-    locationService.updateLocation(location);
+    locationService.updateLocation(id, location);
     end = new Date();
     responseTime = end.getTime() - start.getTime();
     return new ResponseEntity<>(new ApiResponse(responseTime, "Update Location", HttpStatus.OK.value(),
@@ -86,12 +92,11 @@ public class LocationController extends BaseController {
 
   @DeleteMapping("/{id}")
   public ResponseEntity<ApiResponse> deleteLocation(@PathVariable @Valid Long id) {
-    String location_name = locationService.getLocationNameByID(id);
     start = new Date();
     locationService.deleteLocation(id);
     end = new Date();
     responseTime = end.getTime() - start.getTime();
     return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Location", HttpStatus.OK.value(),
-        "Success", location_name + " has been deleted.", null), HttpStatus.OK);
+        "Success", "Location has been deleted.", null), HttpStatus.OK);
   }
 }

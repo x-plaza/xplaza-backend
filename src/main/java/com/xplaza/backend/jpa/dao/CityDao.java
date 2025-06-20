@@ -23,6 +23,10 @@ public class CityDao {
 
   String cityName;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "fk_state_id")
+  StateDao state;
+
   @OneToMany(mappedBy = "city", fetch = FetchType.LAZY)
   List<LocationDao> locations;
 }

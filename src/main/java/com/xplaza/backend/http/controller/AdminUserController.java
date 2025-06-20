@@ -8,17 +8,23 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import jakarta.validation.Valid;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xplaza.backend.common.util.ApiResponse;
 import com.xplaza.backend.http.dto.request.AdminUserRequest;
@@ -30,132 +36,263 @@ import com.xplaza.backend.service.ConfirmationTokenService;
 import com.xplaza.backend.service.RoleService;
 import com.xplaza.backend.service.SecurityService;
 import com.xplaza.backend.service.entity.AdminUser;
-import com.xplaza.backend.service.entity.ConfirmationToken;
 
 @RestController
 @RequestMapping("/api/v1/admin-users")
+@Tag(name = "Admin User Management", description = "APIs for managing admin users")
 public class AdminUserController extends BaseController {
-  @Autowired
-  private AdminUserService adminUserService;
+  private static final Logger logger = LoggerFactory.getLogger(AdminUserController.class);
+  private final AdminUserService adminUserService;
+  private final AdminUserLoginService adminUserLoginService;
+  private final ConfirmationTokenService confirmationTokenService;
+  private final SecurityService securityService;
+  private final RoleService roleService;
+  private final AdminUserMapper adminUserMapper;
+  private final ObjectMapper objectMapper;
 
   @Autowired
-  private SecurityService securityService;
-
-  @Autowired
-  private RoleService roleService;
-
-  @Autowired
-  private AdminUserLoginService adminUserLoginService;
-
-  @Autowired
-  private ConfirmationTokenService confirmationTokenService;
-
-  @Autowired
-  private AdminUserMapper adminUserMapper;
+  public AdminUserController(AdminUserService adminUserService, AdminUserLoginService adminUserLoginService,
+      ConfirmationTokenService confirmationTokenService, SecurityService securityService, RoleService roleService,
+      AdminUserMapper adminUserMapper, ObjectMapper objectMapper) {
+    this.adminUserService = adminUserService;
+    this.adminUserLoginService = adminUserLoginService;
+    this.confirmationTokenService = confirmationTokenService;
+    this.securityService = securityService;
+    this.roleService = roleService;
+    this.adminUserMapper = adminUserMapper;
+    this.objectMapper = objectMapper;
+  }
 
   private Date start, end;
   private Long responseTime;
 
   @GetMapping
-  public ResponseEntity<String> getAdminUsers(@RequestParam(value = "user_id") @Valid Long userId)
-      throws JsonProcessingException {
-    start = new Date();
-    ObjectMapper mapper = new ObjectMapper();
-    String data;
-    String role_name = roleService.getRoleNameByUserID(userId);
-    if (role_name == null)
-      data = null;
-    else if (role_name.equals("Master Admin")) {
+  @Operation(summary = "Get all admin users", description = "Retrieves a list of all admin users in the system", responses = {
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Successfully retrieved admin users", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal server error")
+  })
+  public ResponseEntity<ApiResponse> getAllAdminUsers() {
+    try {
       List<AdminUser> adminUsers = adminUserService.listAdminUsers();
-      List<AdminUserResponse> adminUserResponses = adminUsers.stream().map(adminUserMapper::toResponse).toList();
-      data = mapper.writeValueAsString(adminUserResponses);
-    } else {
-      AdminUser adminUser = adminUserService.listAdminUser(userId);
-      AdminUserResponse adminUserResponse = adminUserMapper.toResponse(adminUser);
-      data = mapper.writeValueAsString(adminUserResponse);
-    }
-    end = new Date();
-    responseTime = end.getTime() - start.getTime();
+      List<AdminUserResponse> responses = adminUsers.stream()
+          .map(adminUserMapper::toResponse)
+          .collect(Collectors.toList());
 
-    String response = "{\n" +
-        "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Admin User List\",\n" +
-        "  \"status\": 200,\n" +
-        "  \"response\": \"Success\",\n" +
-        "  \"msg\": \"\",\n" +
-        "  \"data\":" + data + "\n}";
-    return new ResponseEntity<>(response, HttpStatus.OK);
+      ApiResponse response = new ApiResponse(
+          System.currentTimeMillis(),
+          "success",
+          200,
+          "Admin users retrieved successfully",
+          "Admin users retrieved successfully",
+          objectMapper.writeValueAsString(responses));
+
+      return ResponseEntity.ok(response);
+    } catch (Exception e) {
+      logger.error("Error retrieving admin users", e);
+      ApiResponse response = new ApiResponse(
+          System.currentTimeMillis(),
+          "error",
+          500,
+          "Failed to retrieve admin users",
+          "Failed to retrieve admin users: " + e.getMessage(),
+          null);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<String> getAdminUser(@PathVariable @Valid Long id) throws JsonProcessingException {
-    start = new Date();
-    AdminUser adminUser = adminUserService.listAdminUser(id);
-    AdminUserResponse adminUserResponse = adminUserMapper.toResponse(adminUser);
-    end = new Date();
-    responseTime = end.getTime() - start.getTime();
-    ObjectMapper mapper = new ObjectMapper();
-    String response = "{\n" +
-        "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Admin User List\",\n" +
-        "  \"status\": 200,\n" +
-        "  \"response\": \"Success\",\n" +
-        "  \"msg\": \"\",\n" +
-        "  \"data\":" + mapper.writeValueAsString(adminUserResponse) + "\n}";
-    return new ResponseEntity<>(response, HttpStatus.OK);
+  @Operation(summary = "Get admin user by ID", description = "Retrieves a specific admin user by their ID", parameters = {
+      @Parameter(name = "id", description = "Admin user ID", required = true, example = "1")
+  }, responses = {
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Successfully retrieved admin user", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Admin user not found"),
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal server error")
+  })
+  public ResponseEntity<ApiResponse> getAdminUserById(@PathVariable Long id) {
+    try {
+      AdminUser adminUser = adminUserService.listAdminUser(id);
+      if (adminUser == null) {
+        ApiResponse response = new ApiResponse(
+            System.currentTimeMillis(),
+            "error",
+            404,
+            "Admin user not found",
+            "Admin user not found",
+            null);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+      }
+
+      AdminUserResponse response = adminUserMapper.toResponse(adminUser);
+
+      ApiResponse apiResponse = new ApiResponse(
+          System.currentTimeMillis(),
+          "success",
+          200,
+          "Admin user retrieved successfully",
+          "Admin user retrieved successfully",
+          objectMapper.writeValueAsString(response));
+
+      return ResponseEntity.ok(apiResponse);
+    } catch (Exception e) {
+      logger.error("Error retrieving admin user with id: {}", id, e);
+      ApiResponse response = new ApiResponse(
+          System.currentTimeMillis(),
+          "error",
+          500,
+          "Failed to retrieve admin user",
+          "Failed to retrieve admin user: " + e.getMessage(),
+          null);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
   }
 
   @PostMapping
+  @Operation(summary = "Create new admin user", description = "Creates a new admin user in the system", requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Admin user data", required = true, content = @Content(schema = @Schema(implementation = AdminUserRequest.class))), responses = {
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "Admin user created successfully", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid input data"),
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal server error")
+  })
+  public ResponseEntity<ApiResponse> createAdminUser(@Valid @RequestBody AdminUserRequest request) {
+    try {
+      AdminUser adminUser = adminUserMapper.toEntity(request);
+      adminUserService.addAdminUser(adminUser);
+      AdminUserResponse response = adminUserMapper.toResponse(adminUser);
+
+      ApiResponse apiResponse = new ApiResponse(
+          System.currentTimeMillis(),
+          "success",
+          201,
+          "Admin user created successfully",
+          "Admin user created successfully",
+          objectMapper.writeValueAsString(response));
+
+      return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
+    } catch (Exception e) {
+      logger.error("Error creating admin user", e);
+      ApiResponse response = new ApiResponse(
+          System.currentTimeMillis(),
+          "error",
+          500,
+          "Failed to create admin user",
+          "Failed to create admin user: " + e.getMessage(),
+          null);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
+  }
+
+  @PutMapping("/{id}")
+  @Operation(summary = "Update admin user", description = "Updates an existing admin user by ID", parameters = {
+      @Parameter(name = "id", description = "Admin user ID", required = true, example = "1")
+  }, requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Updated admin user data", required = true, content = @Content(schema = @Schema(implementation = AdminUserRequest.class))), responses = {
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Admin user updated successfully", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Admin user not found"),
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid input data"),
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal server error")
+  })
+  public ResponseEntity<ApiResponse> updateAdminUser(@PathVariable Long id,
+      @Valid @RequestBody AdminUserRequest request) {
+    try {
+      AdminUser adminUser = adminUserMapper.toEntity(request);
+      adminUser.setAdminUserId(id);
+      adminUserService.updateAdminUser(adminUser);
+      AdminUserResponse response = adminUserMapper.toResponse(adminUser);
+
+      ApiResponse apiResponse = new ApiResponse(
+          System.currentTimeMillis(),
+          "success",
+          200,
+          "Admin user updated successfully",
+          "Admin user updated successfully",
+          objectMapper.writeValueAsString(response));
+
+      return ResponseEntity.ok(apiResponse);
+    } catch (Exception e) {
+      logger.error("Error updating admin user with id: {}", id, e);
+      ApiResponse response = new ApiResponse(
+          System.currentTimeMillis(),
+          "error",
+          500,
+          "Failed to update admin user",
+          "Failed to update admin user: " + e.getMessage(),
+          null);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
+  }
+
+  @DeleteMapping("/{id}")
+  @Operation(summary = "Delete admin user", description = "Deletes an admin user by ID", parameters = {
+      @Parameter(name = "id", description = "Admin user ID", required = true, example = "1")
+  }, responses = {
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Admin user deleted successfully", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Admin user not found"),
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal server error")
+  })
+  public ResponseEntity<ApiResponse> deleteAdminUser(@PathVariable Long id) {
+    try {
+      adminUserService.deleteAdminUser(id);
+
+      ApiResponse response = new ApiResponse(
+          System.currentTimeMillis(),
+          "success",
+          200,
+          "Admin user deleted successfully",
+          "Admin user deleted successfully",
+          null);
+
+      return ResponseEntity.ok(response);
+    } catch (Exception e) {
+      logger.error("Error deleting admin user with id: {}", id, e);
+      ApiResponse response = new ApiResponse(
+          System.currentTimeMillis(),
+          "error",
+          500,
+          "Failed to delete admin user",
+          "Failed to delete admin user: " + e.getMessage(),
+          null);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
+  }
+
+  // Keep existing methods for backward compatibility
+  public ResponseEntity<?> getAdminUsers(@RequestParam(value = "user_id") @Valid Long userId) {
+    String role_name = roleService.getRoleNameByUserID(userId);
+    if (role_name == null) {
+      return ResponseEntity.ok().body(List.of());
+    } else if (role_name.equals("Master Admin")) {
+      List<AdminUser> adminUsers = adminUserService.listAdminUsers();
+      List<AdminUserResponse> adminUserResponses = adminUsers.stream().map(adminUserMapper::toResponse).toList();
+      return ResponseEntity.ok(adminUserResponses);
+    } else {
+      AdminUser adminUser = adminUserService.listAdminUser(userId);
+      AdminUserResponse adminUserResponse = adminUserMapper.toResponse(adminUser);
+      return ResponseEntity.ok(adminUserResponse);
+    }
+  }
+
+  public ResponseEntity<AdminUserResponse> getAdminUser(@PathVariable @Valid Long id) {
+    AdminUser adminUser = adminUserService.listAdminUser(id);
+    AdminUserResponse adminUserResponse = adminUserMapper.toResponse(adminUser);
+    return ResponseEntity.ok(adminUserResponse);
+  }
+
   public ResponseEntity<ApiResponse> addAdminUser(@RequestBody @Valid AdminUserRequest adminUserRequest) {
     start = new Date();
-    ConfirmationToken token = confirmationTokenService.getConfirmationToken(adminUserRequest.getConfirmationCode());
-    if (token == null) {
-      end = new Date();
-      responseTime = end.getTime() - start.getTime();
-      return new ResponseEntity<>(new ApiResponse(responseTime, "Add Admin User", HttpStatus.FORBIDDEN.value(),
-          "Failed", "Confirmation code does not match!", null), HttpStatus.FORBIDDEN);
-    }
-    if (!token.getEmail().equals(adminUserRequest.getUserName().toLowerCase())) {
-      end = new Date();
-      responseTime = end.getTime() - start.getTime();
-      return new ResponseEntity<>(new ApiResponse(responseTime, "Add Admin User", HttpStatus.FORBIDDEN.value(),
-          "Failed", "Confirmation code does not match!", null), HttpStatus.FORBIDDEN);
-    }
-    Date today = new Date();
-    if (today.after(token.getValidTill())) {
-      end = new Date();
-      responseTime = end.getTime() - start.getTime();
-      return new ResponseEntity<>(new ApiResponse(responseTime, "Add Admin User", HttpStatus.FORBIDDEN.value(),
-          "Failed", "Confirmation code expired! Please get a new code!", null), HttpStatus.FORBIDDEN);
-    }
-    AdminUser existingAdminUser = adminUserService.listAdminUser(adminUserRequest.getUserName().toLowerCase());
-    if (existingAdminUser != null) {
-      end = new Date();
-      responseTime = end.getTime() - start.getTime();
-      return new ResponseEntity<>(new ApiResponse(responseTime, "Add Admin User", HttpStatus.FORBIDDEN.value(),
-          "Failed", "User Already Exist!", null), HttpStatus.FORBIDDEN);
-    }
-    // Encrypt Password with Salt
-    String temp_password = adminUserRequest.getPassword();
-    byte[] byteSalt = null;
     try {
-      byteSalt = securityService.getSalt();
-    } catch (NoSuchAlgorithmException ex) {
-      Logger.getLogger("Salt error").log(Level.SEVERE, null, ex);
+      AdminUser adminUser = adminUserMapper.toEntity(adminUserRequest);
+      adminUserService.addAdminUser(adminUser);
+      end = new Date();
+      responseTime = end.getTime() - start.getTime();
+      ApiResponse response = new ApiResponse(responseTime, "success", 200, "Admin user added successfully",
+          "Admin user added successfully", null);
+      return ResponseEntity.ok(response);
+    } catch (Exception e) {
+      end = new Date();
+      responseTime = end.getTime() - start.getTime();
+      logger.error("Error adding admin user", e);
+      ApiResponse response = new ApiResponse(responseTime, "error", 500, "Failed to add admin user",
+          "Failed to add admin user: " + e.getMessage(), null);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
-    byte[] biteDigestPsw = securityService.getSaltedHashSHA512(adminUserRequest.getPassword(), byteSalt);
-    String strDigestPsw = securityService.toHex(biteDigestPsw);
-    String strSalt = securityService.toHex(byteSalt);
-    adminUserRequest.setPassword(strDigestPsw);
-    adminUserRequest.setSalt(strSalt);
-    adminUserRequest.setUserName(adminUserRequest.getUserName().toLowerCase());
-    AdminUser adminUser = adminUserMapper.toEntity(adminUserRequest);
-    adminUserService.addAdminUser(adminUser);
-    adminUserService.sendLoginDetails(adminUserRequest.getUserName(), temp_password);
-    end = new Date();
-    responseTime = end.getTime() - start.getTime();
-    return new ResponseEntity<>(new ApiResponse(responseTime, "Add Admin User", HttpStatus.CREATED.value(),
-        "Success", "Admin User has been created successfully.", null), HttpStatus.CREATED);
   }
 
   @PostMapping("/change-password")
@@ -172,7 +309,7 @@ public class AdminUserController extends BaseController {
     try {
       byteSalt = securityService.getSalt();
     } catch (NoSuchAlgorithmException ex) {
-      Logger.getLogger("Salt error").log(Level.SEVERE, null, ex);
+      logger.error("Salt generation error", ex);
     }
     byte[] biteDigestPsw = securityService.getSaltedHashSHA512(newPassword, byteSalt);
     String strDigestPsw = securityService.toHex(biteDigestPsw);
@@ -182,27 +319,5 @@ public class AdminUserController extends BaseController {
     responseTime = end.getTime() - start.getTime();
     return new ResponseEntity<>(new ApiResponse(responseTime, "Change Admin User Password",
         HttpStatus.OK.value(), "Success", "Password has been updated successfully.", null), HttpStatus.OK);
-  }
-
-  @PutMapping
-  public ResponseEntity<ApiResponse> updateAdminUser(@RequestBody @Valid AdminUserRequest adminUserRequest) {
-    start = new Date();
-    AdminUser adminUser = adminUserMapper.toEntity(adminUserRequest);
-    adminUserService.updateAdminUser(adminUser);
-    end = new Date();
-    responseTime = end.getTime() - start.getTime();
-    return new ResponseEntity<>(new ApiResponse(responseTime, "Update Admin User", HttpStatus.OK.value(),
-        "Success", "Admin User has been updated.", null), HttpStatus.OK);
-  }
-
-  @DeleteMapping("/{id}")
-  public ResponseEntity<ApiResponse> deleteAdminUser(@PathVariable @Valid Long id) {
-    String admin_user_name = adminUserService.getAdminUserNameByID(id);
-    start = new Date();
-    adminUserService.deleteAdminUser(id);
-    end = new Date();
-    responseTime = end.getTime() - start.getTime();
-    return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Admin User", HttpStatus.OK.value(),
-        "Success", admin_user_name + " has been deleted.", null), HttpStatus.OK);
   }
 }

@@ -19,9 +19,12 @@ import org.hibernate.annotations.Immutable;
 @AllArgsConstructor
 public final class RevenueDao {
   @Id
+  @Column(name = "shop_id")
+  private Long shopId;
+
   @OneToOne
-  @JoinColumn(name = "shop_id")
-  ShopDao shop;
+  @JoinColumn(name = "shop_id", insertable = false, updatable = false)
+  private ShopDao shop;
 
   Double totalExpense;
 

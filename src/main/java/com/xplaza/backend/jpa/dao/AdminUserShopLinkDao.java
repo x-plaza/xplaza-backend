@@ -17,12 +17,29 @@ import lombok.*;
 @AllArgsConstructor
 public class AdminUserShopLinkDao {
   @Id
-  @ManyToOne
-  @JoinColumn(name = "admin_user_id")
-  AdminUserDao adminUser;
+  @Column(name = "admin_user_id")
+  private Long adminUserId;
 
   @Id
+  @Column(name = "shop_id")
+  private Long shopId;
+
   @ManyToOne
-  @JoinColumn(name = "shop_id")
+  @JoinColumn(name = "admin_user_id", insertable = false, updatable = false)
+  AdminUserDao adminUser;
+
+  @ManyToOne
+  @JoinColumn(name = "shop_id", insertable = false, updatable = false)
   ShopDao shop;
+
+  // Add transient getters for @IdClass compatibility
+  @Transient
+  public Long getAdminUserId() {
+    return adminUser != null ? adminUser.getAdminUserId() : null;
+  }
+
+  @Transient
+  public Long getShopId() {
+    return shop != null ? shop.getShopId() : null;
+  }
 }

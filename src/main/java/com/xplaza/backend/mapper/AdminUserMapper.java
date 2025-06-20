@@ -85,8 +85,10 @@ public interface AdminUserMapper {
       return null;
     return links.stream()
         .map(link -> new AdminUserShopLinkDao(
-            null, // adminUser will be set by JPA
-            ShopDao.builder().shopId(link.getShop().getShopId()).build()))
+            null, // adminUserId
+            link.getShop().getShopId(), // shopId
+            null, // adminUser
+            createShopDaoWithId(link.getShop().getShopId())))
         .collect(Collectors.toList());
   }
 
@@ -101,5 +103,11 @@ public interface AdminUserMapper {
                 .build())
             .build())
         .collect(Collectors.toList());
+  }
+
+  default ShopDao createShopDaoWithId(Long shopId) {
+    ShopDao shopDao = new ShopDao();
+    shopDao.setShopId(shopId);
+    return shopDao;
   }
 }

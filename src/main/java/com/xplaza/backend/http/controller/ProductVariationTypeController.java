@@ -14,58 +14,40 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xplaza.backend.common.util.ApiResponse;
-import com.xplaza.backend.model.ProductVariationType;
+import com.xplaza.backend.http.dto.response.ProductVariationTypeResponse;
+import com.xplaza.backend.mapper.ProductVariationTypeMapper;
 import com.xplaza.backend.service.ProductVariationTypeService;
+import com.xplaza.backend.service.entity.ProductVariationType;
 
 @RestController
 @RequestMapping("/api/v1/product-variation-types")
 public class ProductVariationTypeController extends BaseController {
   @Autowired
   private ProductVariationTypeService prodVarTypeService;
+  @Autowired
+  private ProductVariationTypeMapper productVariationTypeMapper;
   private Date start, end;
   private Long responseTime;
 
   @GetMapping
-  public ResponseEntity<String> getProductVarTypes() throws JsonProcessingException {
-    start = new Date();
-    List<ProductVariationType> dtos = prodVarTypeService.listProductVarTypes();
-    end = new Date();
-    responseTime = end.getTime() - start.getTime();
-    ObjectMapper mapper = new ObjectMapper();
-    String response = "{\n" +
-        "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Product Variation Type List\",\n" +
-        "  \"status\": 200,\n" +
-        "  \"response\": \"Success\",\n" +
-        "  \"msg\": \"\",\n" +
-        "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
-    return new ResponseEntity<>(response, HttpStatus.OK);
+  public ResponseEntity<List<ProductVariationTypeResponse>> getProductVarTypes() {
+    List<ProductVariationType> entities = prodVarTypeService.listProductVariationTypes();
+    List<ProductVariationTypeResponse> dtos = entities.stream().map(productVariationTypeMapper::toResponse).toList();
+    return ResponseEntity.ok(dtos);
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<String> getProductVarType(@PathVariable @Valid Long id) throws JsonProcessingException {
-    start = new Date();
-    ProductVariationType dtos = prodVarTypeService.listProductVarType(id);
-    end = new Date();
-    responseTime = end.getTime() - start.getTime();
-    ObjectMapper mapper = new ObjectMapper();
-    String response = "{\n" +
-        "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Product Variation Type By ID\",\n" +
-        "  \"status\": 200,\n" +
-        "  \"response\": \"Success\",\n" +
-        "  \"msg\": \"\",\n" +
-        "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
-    return new ResponseEntity<>(response, HttpStatus.OK);
+  public ResponseEntity<ProductVariationTypeResponse> getProductVarType(@PathVariable @Valid Long id) {
+    ProductVariationType entity = prodVarTypeService.listProductVariationType(id);
+    ProductVariationTypeResponse dto = productVariationTypeMapper.toResponse(entity);
+    return ResponseEntity.ok(dto);
   }
 
   @PostMapping
   public ResponseEntity<ApiResponse> addProductVarType(@RequestBody @Valid ProductVariationType productVariationType) {
     start = new Date();
-    prodVarTypeService.addProductVarType(productVariationType);
+    prodVarTypeService.addProductVariationType(productVariationType);
     end = new Date();
     responseTime = end.getTime() - start.getTime();
     return new ResponseEntity<>(new ApiResponse(responseTime, "Add Product Variation Type", HttpStatus.CREATED.value(),
@@ -76,7 +58,7 @@ public class ProductVariationTypeController extends BaseController {
   public ResponseEntity<ApiResponse> updateProductVarType(
       @RequestBody @Valid ProductVariationType productVariationType) {
     start = new Date();
-    prodVarTypeService.updateProductVarType(productVariationType);
+    prodVarTypeService.updateProductVariationType(productVariationType);
     end = new Date();
     responseTime = end.getTime() - start.getTime();
     return new ResponseEntity<>(new ApiResponse(responseTime, "Update Product Variation Type", HttpStatus.OK.value(),
@@ -85,12 +67,11 @@ public class ProductVariationTypeController extends BaseController {
 
   @DeleteMapping("/{id}")
   public ResponseEntity<ApiResponse> deleteProductVarType(@PathVariable @Valid Long id) {
-    String prod_var_type_name = prodVarTypeService.getProductVarTypeNameByID(id);
     start = new Date();
-    prodVarTypeService.deleteProductVarType(id);
+    prodVarTypeService.deleteProductVariationType(id);
     end = new Date();
     responseTime = end.getTime() - start.getTime();
     return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Product Variation Type", HttpStatus.OK.value(),
-        "Success", prod_var_type_name + " has been deleted.", null), HttpStatus.OK);
+        "Success", "Product Variation Type has been deleted.", null), HttpStatus.OK);
   }
 }

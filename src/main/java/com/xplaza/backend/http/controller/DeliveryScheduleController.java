@@ -27,49 +27,43 @@ import com.xplaza.backend.service.entity.DeliverySchedule;
 @RestController
 @RequestMapping("/api/v1/delivery-schedules")
 public class DeliveryScheduleController extends BaseController {
-  @Autowired
-  private DeliveryScheduleService deliveryScheduleService;
+  private final DeliveryScheduleService deliveryScheduleService;
+  private final DeliveryScheduleMapper deliveryScheduleMapper;
 
   @Autowired
-  private DeliveryScheduleMapper deliveryScheduleMapper;
+  public DeliveryScheduleController(DeliveryScheduleService deliveryScheduleService,
+      DeliveryScheduleMapper deliveryScheduleMapper) {
+    this.deliveryScheduleService = deliveryScheduleService;
+    this.deliveryScheduleMapper = deliveryScheduleMapper;
+  }
 
   private Date start, end;
   private Long responseTime;
 
   @GetMapping
-  public ResponseEntity<String> getDeliverySchedules() throws JsonProcessingException {
+  public ResponseEntity<ApiResponse> getDeliverySchedules() throws JsonProcessingException {
     start = new Date();
     var entities = deliveryScheduleService.listDeliverySchedules();
     var dtos = entities.stream().map(deliveryScheduleMapper::toResponse).toList();
     end = new Date();
     responseTime = end.getTime() - start.getTime();
-    ObjectMapper mapper = new ObjectMapper();
-    String response = "{\n" +
-        "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Delivery Schedule List\",\n" +
-        "  \"status\": 200,\n" +
-        "  \"response\": \"Success\",\n" +
-        "  \"msg\": \"\",\n" +
-        "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
-    return new ResponseEntity<>(response, HttpStatus.OK);
+    String data = new ObjectMapper().writeValueAsString(dtos);
+    ApiResponse response = new ApiResponse(responseTime, "Delivery Schedule List", HttpStatus.OK.value(), "Success", "",
+        data);
+    return ResponseEntity.ok(response);
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<String> getDeliverySchedule(@PathVariable @Valid Long id) throws JsonProcessingException {
+  public ResponseEntity<ApiResponse> getDeliverySchedule(@PathVariable @Valid Long id) throws JsonProcessingException {
     start = new Date();
     DeliverySchedule entity = deliveryScheduleService.listDeliverySchedule(id);
     DeliveryScheduleResponse dto = deliveryScheduleMapper.toResponse(entity);
     end = new Date();
     responseTime = end.getTime() - start.getTime();
-    ObjectMapper mapper = new ObjectMapper();
-    String response = "{\n" +
-        "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Delivery Schedule By ID\",\n" +
-        "  \"status\": 200,\n" +
-        "  \"response\": \"Success\",\n" +
-        "  \"msg\": \"\",\n" +
-        "  \"data\":" + mapper.writeValueAsString(dto) + "\n}";
-    return new ResponseEntity<>(response, HttpStatus.OK);
+    String data = new ObjectMapper().writeValueAsString(dto);
+    ApiResponse response = new ApiResponse(responseTime, "Delivery Schedule By ID", HttpStatus.OK.value(), "Success",
+        "", data);
+    return ResponseEntity.ok(response);
   }
 
   @PostMapping

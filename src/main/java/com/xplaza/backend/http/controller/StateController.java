@@ -24,11 +24,14 @@ import com.xplaza.backend.service.entity.State;
 @RestController
 @RequestMapping("/api/v1/states")
 public class StateController extends BaseController {
-  @Autowired
-  private StateService stateService;
+  private final StateService stateService;
+  private final StateMapper stateMapper;
 
   @Autowired
-  private StateMapper stateMapper;
+  public StateController(StateService stateService, StateMapper stateMapper) {
+    this.stateService = stateService;
+    this.stateMapper = stateMapper;
+  }
 
   @GetMapping
   public ResponseEntity<ApiResponse> getStates() throws Exception {

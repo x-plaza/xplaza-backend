@@ -45,16 +45,16 @@ public class CustomerSignupController extends BaseController {
   private Long responseTime;
 
   @PostMapping
-  public ResponseEntity<ApiResponse> signupCustomer(@RequestBody @Valid CustomerDetails customerDetails) {
+  public ResponseEntity<ApiResponse> signupCustomer(@RequestBody @Valid Customer customer) {
     start = new Date();
-    ConfirmationToken token = confirmationTokenService.getConfirmationToken(customerDetails.getOtp());
+    ConfirmationToken token = confirmationTokenService.getConfirmationToken(customer.getOtp());
     if (token == null) {
       end = new Date();
       responseTime = end.getTime() - start.getTime();
       return new ResponseEntity<>(new ApiResponse(responseTime, "Signup Customer", HttpStatus.FORBIDDEN.value(),
           "Failed", "Confirmation code does not match!", null), HttpStatus.FORBIDDEN);
     }
-    if (!token.getEmail().equals(customerDetails.getEmail().toLowerCase())) {
+    if (!token.getEmail().equals(customer.getEmail().toLowerCase())) {
       end = new Date();
       responseTime = end.getTime() - start.getTime();
       return new ResponseEntity<>(new ApiResponse(responseTime, "Signup Customer", HttpStatus.FORBIDDEN.value(),
@@ -68,7 +68,7 @@ public class CustomerSignupController extends BaseController {
           "Failed", "Confirmation code expired! Please get a new code!", null), HttpStatus.FORBIDDEN);
     }
     Customer customerLogin = customerLoginService
-        .getCustomerLoginDetails(customerDetails.getEmail().toLowerCase());
+        .getCustomerLoginDetails(customer.getEmail().toLowerCase());
     if (customerLogin != null) {
       end = new Date();
       responseTime = end.getTime() - start.getTime();
@@ -76,21 +76,21 @@ public class CustomerSignupController extends BaseController {
           "Failed", "User Already Exist!", null), HttpStatus.FORBIDDEN);
     }
     // Encrypt Password with Salt
-    String temp_password = customerDetails.getPassword();
+    String temp_password = customer.getPassword();
     byte[] byteSalt = null;
     try {
       byteSalt = securityService.getSalt();
     } catch (NoSuchAlgorithmException ex) {
       Logger.getLogger("Salt error").log(Level.SEVERE, null, ex);
     }
-    byte[] biteDigestPsw = securityService.getSaltedHashSHA512(customerDetails.getPassword(), byteSalt);
+    byte[] biteDigestPsw = securityService.getSaltedHashSHA512(customer.getPassword(), byteSalt);
     String strDigestPsw = securityService.toHex(biteDigestPsw);
     String strSalt = securityService.toHex(byteSalt);
-    customerDetails.setPassword(strDigestPsw);
-    customerDetails.setSalt(strSalt);
-    customerDetails.setEmail(customerDetails.getEmail().toLowerCase());
-    customerSignupService.signupCustomer(customerDetails);
-    customerSignupService.sendLoginDetails(customerDetails.getEmail(), temp_password);
+    customer.setPassword(strDigestPsw);
+    customer.setSalt(strSalt);
+    customer.setEmail(customer.getEmail().toLowerCase());
+    customerSignupService.signupCustomer(customer);
+    customerSignupService.sendLoginDetails(customer.getEmail(), temp_password);
     end = new Date();
     responseTime = end.getTime() - start.getTime();
     return new ResponseEntity<>(new ApiResponse(responseTime, "Signup Customer", HttpStatus.CREATED.value(), "Success",

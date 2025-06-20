@@ -20,14 +20,22 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.xplaza.backend.model.DiscountType;
+import com.xplaza.backend.http.dto.response.DiscountTypeResponse;
+import com.xplaza.backend.mapper.DiscountTypeMapper;
 import com.xplaza.backend.service.DiscountTypeService;
+import com.xplaza.backend.service.entity.DiscountType;
 
 @RestController
 @RequestMapping("/api/v1/discount-types")
 public class DiscountTypeController {
+  private final DiscountTypeService discountTypeService;
+  private final DiscountTypeMapper discountTypeMapper;
+
   @Autowired
-  private DiscountTypeService discountTypeService;
+  public DiscountTypeController(DiscountTypeService discountTypeService, DiscountTypeMapper discountTypeMapper) {
+    this.discountTypeService = discountTypeService;
+    this.discountTypeMapper = discountTypeMapper;
+  }
 
   @ModelAttribute
   public void setResponseHeader(HttpServletResponse response) {
@@ -41,7 +49,8 @@ public class DiscountTypeController {
   @GetMapping
   public ResponseEntity<String> getDiscountTypes() throws JsonProcessingException, JSONException {
     Date start = new Date();
-    List<DiscountType> dtos = discountTypeService.listDiscountTypes();
+    List<DiscountType> entities = discountTypeService.listDiscountTypes();
+    List<DiscountTypeResponse> dtos = entities.stream().map(discountTypeMapper::toResponse).toList();
     Date end = new Date();
     long responseTime = end.getTime() - start.getTime();
     ObjectMapper mapper = new ObjectMapper();

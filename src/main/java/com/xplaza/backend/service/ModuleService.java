@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.xplaza.backend.jpa.dao.ModuleDao;
 import com.xplaza.backend.jpa.repository.ModuleRepository;
@@ -18,16 +19,22 @@ import com.xplaza.backend.service.entity.Module;
 
 @Service
 public class ModuleService {
-  @Autowired
-  private ModuleRepository moduleRepo;
-  @Autowired
-  private ModuleMapper moduleMapper;
+  private final ModuleRepository moduleRepo;
+  private final ModuleMapper moduleMapper;
 
+  @Autowired
+  public ModuleService(ModuleRepository moduleRepo, ModuleMapper moduleMapper) {
+    this.moduleRepo = moduleRepo;
+    this.moduleMapper = moduleMapper;
+  }
+
+  @Transactional
   public void addModule(Module module) {
     ModuleDao dao = moduleMapper.toDao(module);
     moduleRepo.save(dao);
   }
 
+  @Transactional
   public void updateModule(Module module) {
     ModuleDao dao = moduleMapper.toDao(module);
     moduleRepo.save(dao);
@@ -42,6 +49,7 @@ public class ModuleService {
     return moduleRepo.getName(id);
   }
 
+  @Transactional
   public void deleteModule(Long id) {
     moduleRepo.deleteById(id);
   }

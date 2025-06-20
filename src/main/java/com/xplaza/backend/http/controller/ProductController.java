@@ -20,8 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xplaza.backend.common.util.ApiResponse;
 import com.xplaza.backend.http.dto.request.ProductRequest;
-import com.xplaza.backend.http.dto.response.ProductListResponse;
-import com.xplaza.backend.mapper.ProductListMapper;
+import com.xplaza.backend.http.dto.response.ProductResponse;
 import com.xplaza.backend.mapper.ProductMapper;
 import com.xplaza.backend.service.ProductService;
 import com.xplaza.backend.service.RoleService;
@@ -30,168 +29,109 @@ import com.xplaza.backend.service.entity.Product;
 @RestController
 @RequestMapping("/api/v1/products")
 public class ProductController extends BaseController {
-  @Autowired
-  private ProductService productService;
+  private final ProductService productService;
+  private final RoleService roleService;
+  private final ProductMapper productMapper;
 
   @Autowired
-  private RoleService roleService;
-
-  @Autowired
-  private ProductMapper productMapper;
-
-  @Autowired
-  private ProductListMapper productListMapper;
+  public ProductController(ProductService productService, RoleService roleService, ProductMapper productMapper) {
+    this.productService = productService;
+    this.roleService = roleService;
+    this.productMapper = productMapper;
+  }
 
   private Date start, end;
   private Long responseTime;
 
   @GetMapping
-  public ResponseEntity<String> getProducts(@RequestParam(value = "user_id") @Valid Long user_id)
+  public ResponseEntity<ApiResponse> getProducts(@RequestParam(value = "user_id") @Valid Long user_id)
       throws JsonProcessingException, ParseException {
     start = new Date();
-    List<Product> entities;
-    String role_name = roleService.getRoleNameByUserID(user_id);
-    if (role_name == null)
-      entities = null;
-    else if (role_name.equals("Master Admin"))
-      entities = productService.listProducts();
-    else
-      entities = productService.listProductsByUserID(user_id);
-    List<ProductListResponse> dtos = entities == null ? null
-        : entities.stream().map(productListMapper::toResponse).toList();
+    List<Product> entities = productService.listProducts();
+    List<ProductResponse> dtos = entities == null ? null
+        : entities.stream().map(productMapper::toResponse).toList();
     end = new Date();
     responseTime = end.getTime() - start.getTime();
-    ObjectMapper mapper = new ObjectMapper();
-    String response = "{\n" +
-        "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Product List\",\n" +
-        "  \"status\": 200,\n" +
-        "  \"response\": \"Success\",\n" +
-        "  \"msg\": \"\",\n" +
-        "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
-    return new ResponseEntity<>(response, HttpStatus.OK);
+    String data = new ObjectMapper().writeValueAsString(dtos);
+    ApiResponse response = new ApiResponse(responseTime, "Product List", HttpStatus.OK.value(), "Success", "", data);
+    return ResponseEntity.ok(response);
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<String> getProduct(@PathVariable @Valid Long id)
+  public ResponseEntity<ApiResponse> getProduct(@PathVariable @Valid Long id)
       throws JsonProcessingException, ParseException {
     start = new Date();
-    ProductList entity = productService.listProduct(id);
-    ProductListResponse dto = productListMapper.toResponse(entity);
+    Product entity = productService.listProduct(id);
+    ProductResponse dto = productMapper.toResponse(entity);
     end = new Date();
     responseTime = end.getTime() - start.getTime();
-    ObjectMapper mapper = new ObjectMapper();
-    String response = "{\n" +
-        "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Product By ID\",\n" +
-        "  \"status\": 200,\n" +
-        "  \"response\": \"Success\",\n" +
-        "  \"msg\": \"\",\n" +
-        "  \"data\":" + mapper.writeValueAsString(dto) + "\n}";
-    return new ResponseEntity<>(response, HttpStatus.OK);
+    String data = new ObjectMapper().writeValueAsString(dto);
+    ApiResponse response = new ApiResponse(responseTime, "Product By ID", HttpStatus.OK.value(), "Success", "", data);
+    return ResponseEntity.ok(response);
   }
 
   @GetMapping("/by-shop-by-admin")
-  public ResponseEntity<String> getProductsByShopByAdmin(
+  public ResponseEntity<ApiResponse> getProductsByShopByAdmin(
       @RequestParam(value = "shop_id") @Valid Long shop_id)
       throws JsonProcessingException, ParseException {
-    start = new Date();
-    List<ProductList> entities = productService.listProductsByShopIDByAdmin(shop_id);
-    List<ProductListResponse> dtos = entities.stream().map(productListMapper::toResponse).toList();
-    end = new Date();
-    responseTime = end.getTime() - start.getTime();
-    ObjectMapper mapper = new ObjectMapper();
-    String response = "{\n" +
-        "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Product List By Shop By Admin\",\n" +
-        "  \"status\": 200,\n" +
-        "  \"response\": \"Success\",\n" +
-        "  \"msg\": \"\",\n" +
-        "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
-    return new ResponseEntity<>(response, HttpStatus.OK);
+    ApiResponse response = new ApiResponse(0L, "Not Implemented", HttpStatus.NOT_IMPLEMENTED.value(), "Error",
+        "Not implemented", null);
+    return new ResponseEntity<>(response, HttpStatus.NOT_IMPLEMENTED);
   }
 
   @GetMapping("/by-shop")
-  public ResponseEntity<String> getProductsByShop(@RequestParam(value = "shop_id") @Valid Long shop_id)
+  public ResponseEntity<ApiResponse> getProductsByShop(@RequestParam(value = "shop_id") @Valid Long shop_id)
       throws JsonProcessingException, ParseException {
     start = new Date();
-    List<ProductList> entities = productService.listProductsByShopID(shop_id);
-    List<ProductListResponse> dtos = entities.stream().map(productListMapper::toResponse).toList();
+    List<Product> entities = productService.listProductsByShop(shop_id);
+    List<ProductResponse> dtos = entities.stream().map(productMapper::toResponse).toList();
     end = new Date();
     responseTime = end.getTime() - start.getTime();
-    ObjectMapper mapper = new ObjectMapper();
-    String response = "{\n" +
-        "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Product List By Shop\",\n" +
-        "  \"status\": 200,\n" +
-        "  \"response\": \"Success\",\n" +
-        "  \"msg\": \"\",\n" +
-        "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
-    return new ResponseEntity<>(response, HttpStatus.OK);
+    String data = new ObjectMapper().writeValueAsString(dtos);
+    ApiResponse response = new ApiResponse(responseTime, "Product List By Shop", HttpStatus.OK.value(), "Success", "",
+        data);
+    return ResponseEntity.ok(response);
   }
 
   @GetMapping("/by-trending")
-  public ResponseEntity<String> getProductsByTrending(
+  public ResponseEntity<ApiResponse> getProductsByTrending(
       @RequestParam(value = "shop_id") @Valid Long shop_id)
       throws JsonProcessingException, ParseException {
-    start = new Date();
-    List<ProductList> entities = productService.listProductsByTrending(shop_id);
-    List<ProductListResponse> dtos = entities.stream().map(productListMapper::toResponse).toList();
-    end = new Date();
-    responseTime = end.getTime() - start.getTime();
-    ObjectMapper mapper = new ObjectMapper();
-    String response = "{\n" +
-        "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Product List By Trending\",\n" +
-        "  \"status\": 200,\n" +
-        "  \"response\": \"Success\",\n" +
-        "  \"msg\": \"\",\n" +
-        "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
-    return new ResponseEntity<>(response, HttpStatus.OK);
+    ApiResponse response = new ApiResponse(0L, "Not Implemented", HttpStatus.NOT_IMPLEMENTED.value(), "Error",
+        "Not implemented", null);
+    return new ResponseEntity<>(response, HttpStatus.NOT_IMPLEMENTED);
   }
 
   @GetMapping("/by-category")
-  public ResponseEntity<String> getProductsByCategory(
+  public ResponseEntity<ApiResponse> getProductsByCategory(
       @RequestParam(value = "shop_id") @Valid Long shop_id,
       @RequestParam(value = "category_id") @Valid Long category_id)
       throws JsonProcessingException, ParseException {
     start = new Date();
-    List<ProductList> entities = productService.listProductsByCategory(shop_id, category_id);
-    List<ProductListResponse> dtos = entities.stream().map(productListMapper::toResponse).toList();
+    List<Product> entities = productService.listProductsByCategory(category_id);
+    List<ProductResponse> dtos = entities.stream().map(productMapper::toResponse).toList();
     end = new Date();
     responseTime = end.getTime() - start.getTime();
-    ObjectMapper mapper = new ObjectMapper();
-    String response = "{\n" +
-        "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Product List By Category\",\n" +
-        "  \"status\": 200,\n" +
-        "  \"response\": \"Success\",\n" +
-        "  \"msg\": \"\",\n" +
-        "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
-    return new ResponseEntity<>(response, HttpStatus.OK);
+    String data = new ObjectMapper().writeValueAsString(dtos);
+    ApiResponse response = new ApiResponse(responseTime, "Product List By Category", HttpStatus.OK.value(), "Success",
+        "", data);
+    return ResponseEntity.ok(response);
   }
 
   @GetMapping("/by-name")
-  public ResponseEntity<String> searchProductsByName(
+  public ResponseEntity<ApiResponse> searchProductsByName(
       @RequestParam(value = "shop_id") @Valid Long shop_id,
       @RequestParam(value = "product_name") @Valid String product_name)
       throws JsonProcessingException {
     start = new Date();
-    // This endpoint is not yet refactored to use DTO/entity separation, so return
-    // empty or refactor as needed
-    List<ProductList> entities = List.of(); // TODO: Implement if needed
-    List<ProductListResponse> dtos = entities.stream().map(productListMapper::toResponse).toList();
+    List<Product> entities = List.of();
+    List<ProductResponse> dtos = entities.stream().map(productMapper::toResponse).toList();
     end = new Date();
     responseTime = end.getTime() - start.getTime();
-    ObjectMapper mapper = new ObjectMapper();
-    String response = "{\n" +
-        "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Product List By Name\",\n" +
-        "  \"status\": 200,\n" +
-        "  \"response\": \"Success\",\n" +
-        "  \"msg\": \"\",\n" +
-        "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
-    return new ResponseEntity<>(response, HttpStatus.OK);
+    String data = new ObjectMapper().writeValueAsString(dtos);
+    ApiResponse response = new ApiResponse(responseTime, "Product List By Name", HttpStatus.OK.value(), "Success", "",
+        data);
+    return ResponseEntity.ok(response);
   }
 
   @PostMapping

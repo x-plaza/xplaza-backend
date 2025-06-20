@@ -11,17 +11,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.xplaza.backend.exception.ResourceNotFoundException;
 import com.xplaza.backend.jpa.dao.LocationDao;
 import com.xplaza.backend.jpa.repository.LocationRepository;
+import com.xplaza.backend.mapper.LocationMapper;
 import com.xplaza.backend.service.entity.Location;
 
 @Service
 public class LocationService {
-  @Autowired
-  private LocationRepository locationRepo;
+  private final LocationRepository locationRepo;
+  private final LocationMapper locationMapper;
 
   @Autowired
-  private LocationMapper locationMapper;
+  public LocationService(LocationRepository locationRepo, LocationMapper locationMapper) {
+    this.locationRepo = locationRepo;
+    this.locationMapper = locationMapper;
+  }
 
   @Transactional
   public Location addLocation(Location location) {
@@ -32,8 +37,9 @@ public class LocationService {
 
   @Transactional
   public Location updateLocation(Long id, Location location) {
-    LocationDao existingLocationDao = locationRepo.findById(id)
-        .orElseThrow(() -> new RuntimeException("Location not found with id: " + id));
+    // Check if location exists
+    locationRepo.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Location not found with id: " + id));
 
     location.setLocationId(id);
     LocationDao locationDao = locationMapper.toDao(location);
@@ -55,7 +61,7 @@ public class LocationService {
 
   public Location listLocation(Long id) {
     LocationDao locationDao = locationRepo.findById(id)
-        .orElseThrow(() -> new RuntimeException("Location not found with id: " + id));
+        .orElseThrow(() -> new ResourceNotFoundException("Location not found with id: " + id));
     return locationMapper.toEntityFromDao(locationDao);
   }
 

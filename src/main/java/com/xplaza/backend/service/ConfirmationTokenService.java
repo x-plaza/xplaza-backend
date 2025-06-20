@@ -16,8 +16,7 @@ import com.xplaza.backend.service.entity.PlatformInfo;
 
 @Service
 public class ConfirmationTokenService {
-  @Autowired
-  private ConfirmationTokenRepository confirmationTokenRepo;
+  private final ConfirmationTokenRepository confirmationTokenRepo;
   @Autowired
   private EmailSenderService emailSenderService;
   @Autowired
@@ -26,6 +25,11 @@ public class ConfirmationTokenService {
   private ConfirmationTokenMapper confirmationTokenMapper;
   @Autowired
   private Environment env;
+
+  @Autowired
+  public ConfirmationTokenService(ConfirmationTokenRepository confirmationTokenRepo) {
+    this.confirmationTokenRepo = confirmationTokenRepo;
+  }
 
   public ConfirmationToken getConfirmationToken(String confirmationToken) {
     return confirmationTokenMapper.toEntityFromDao(confirmationTokenRepo.findByConfirmationToken(confirmationToken));

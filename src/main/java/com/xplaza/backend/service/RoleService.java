@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.xplaza.backend.jpa.dao.RoleDao;
 import com.xplaza.backend.jpa.repository.RoleRepository;
@@ -17,16 +18,22 @@ import com.xplaza.backend.service.entity.Role;
 
 @Service
 public class RoleService {
-  @Autowired
-  private RoleRepository roleRepo;
-  @Autowired
-  private RoleMapper roleMapper;
+  private final RoleRepository roleRepo;
+  private final RoleMapper roleMapper;
 
+  @Autowired
+  public RoleService(RoleRepository roleRepo, RoleMapper roleMapper) {
+    this.roleRepo = roleRepo;
+    this.roleMapper = roleMapper;
+  }
+
+  @Transactional
   public void addRole(Role entity) {
     RoleDao dao = roleMapper.toDao(entity);
     roleRepo.save(dao);
   }
 
+  @Transactional
   public void updateRole(Role entity) {
     RoleDao dao = roleMapper.toDao(entity);
     roleRepo.save(dao);
@@ -36,6 +43,7 @@ public class RoleService {
     return roleRepo.findAll().stream().map(roleMapper::toEntityFromDao).collect(Collectors.toList());
   }
 
+  @Transactional
   public void deleteRole(Long id) {
     roleRepo.deleteById(id);
   }

@@ -17,19 +17,24 @@ import com.xplaza.backend.mapper.ProductMapper;
 import com.xplaza.backend.service.entity.Product;
 
 @Service
-@Transactional
 public class ProductService {
-  @Autowired
-  private ProductRepository productRepo;
-  @Autowired
-  private ProductMapper productMapper;
+  private final ProductRepository productRepo;
+  private final ProductMapper productMapper;
 
+  @Autowired
+  public ProductService(ProductRepository productRepo, ProductMapper productMapper) {
+    this.productRepo = productRepo;
+    this.productMapper = productMapper;
+  }
+
+  @Transactional
   public Product addProduct(Product product) {
     ProductDao productDao = productMapper.toDao(product);
     ProductDao savedProductDao = productRepo.save(productDao);
     return productMapper.toEntityFromDao(savedProductDao);
   }
 
+  @Transactional
   public Product updateProduct(Product product) {
     productRepo.findById(product.getProductId())
         .orElseThrow(() -> new RuntimeException("Product not found with id: " + product.getProductId()));
@@ -38,6 +43,7 @@ public class ProductService {
     return productMapper.toEntityFromDao(updatedProductDao);
   }
 
+  @Transactional
   public void deleteProduct(Long id) {
     productRepo.deleteById(id);
   }
@@ -80,6 +86,7 @@ public class ProductService {
     return productRepo.getName(id);
   }
 
+  @Transactional
   public void updateProductInventory(Long id, int quantity) {
     productRepo.updateInventory(id, quantity);
   }

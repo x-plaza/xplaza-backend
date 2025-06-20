@@ -7,28 +7,30 @@ package com.xplaza.backend.http.controller;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import jakarta.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xplaza.backend.common.util.ApiResponse;
 import com.xplaza.backend.service.AdminUserLoginService;
 import com.xplaza.backend.service.AdminUserService;
 import com.xplaza.backend.service.ConfirmationTokenService;
 import com.xplaza.backend.service.SecurityService;
+import com.xplaza.backend.service.entity.AdminUser;
 import com.xplaza.backend.service.entity.ConfirmationToken;
 import com.xplaza.backend.service.entity.Login;
 
 @RestController
 @RequestMapping("/api/v1/login")
 public class LoginController extends BaseController {
+  private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
+
   @Autowired
   private AdminUserLoginService adminUserLoginService;
 
@@ -45,44 +47,33 @@ public class LoginController extends BaseController {
   private Long responseTime;
 
   @PostMapping
-  public ResponseEntity<String> loginAdminUser(@RequestParam("username") @Valid String username,
+  public ResponseEntity<Login> loginAdminUser(@RequestParam("username") @Valid String username,
       @RequestParam("password") @Valid String password) throws IOException {
     start = new Date();
     Login dtos = adminUserLoginService.getAdminUserDetails(username.toLowerCase());
     if (dtos != null) {
       Boolean isValidUser;
       if (username.equalsIgnoreCase("admin@gmail.com"))
-        isValidUser = adminUserLoginService.isVaidMasterAdmin(username.toLowerCase(), password);
+        isValidUser = adminUserLoginService.isValidMasterAdmin(username.toLowerCase(), password);
       else
-        isValidUser = adminUserLoginService.isVaidUser(username.toLowerCase(), password);
+        isValidUser = adminUserLoginService.isValidAdminUser(username.toLowerCase(), password);
 
       if (isValidUser) {
         dtos.setAuthentication(true);
       } else {
-        dtos.setAuthData(null);
         dtos.setShopList(null);
         dtos.setPermissions(null);
       }
     } else {
-      dtos = new AdminLogin();
+      dtos = new Login();
       dtos.setAuthentication(false);
-      dtos.setAuthData(null);
       dtos.setShopList(null);
       dtos.setPermissions(null);
     }
     end = new Date();
     responseTime = end.getTime() - start.getTime();
 
-    ObjectMapper mapper = new ObjectMapper();
-    String response = "{\n" +
-        "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Authentication And ACL\",\n" +
-        "  \"status\": 200,\n" +
-        "  \"response\": \"Success\",\n" +
-        "  \"msg\": \"\",\n" +
-        "  \"data\":" +
-        mapper.writeValueAsString(dtos) + "\n}";
-    return new ResponseEntity<>(response, HttpStatus.OK);
+    return ResponseEntity.ok(dtos);
   }
 
   @PostMapping("/send-otp")
@@ -133,7 +124,7 @@ public class LoginController extends BaseController {
     try {
       byteSalt = securityService.getSalt();
     } catch (NoSuchAlgorithmException ex) {
-      Logger.getLogger("Salt error").log(Level.SEVERE, null, ex);
+      logger.error("Salt generation error", ex);
     }
     byte[] biteDigestPsw = securityService.getSaltedHashSHA512(newPassword, byteSalt);
     String strDigestPsw = securityService.toHex(biteDigestPsw);

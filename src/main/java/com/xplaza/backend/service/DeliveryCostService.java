@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.xplaza.backend.jpa.dao.DeliveryCostDao;
 import com.xplaza.backend.jpa.repository.DeliveryCostRepository;
@@ -16,16 +17,22 @@ import com.xplaza.backend.service.entity.DeliveryCost;
 
 @Service
 public class DeliveryCostService {
-  @Autowired
-  private DeliveryCostRepository deliveryCostRepo;
-  @Autowired
-  private DeliveryCostMapper deliveryCostMapper;
+  private final DeliveryCostRepository deliveryCostRepo;
+  private final DeliveryCostMapper deliveryCostMapper;
 
+  @Autowired
+  public DeliveryCostService(DeliveryCostRepository deliveryCostRepo, DeliveryCostMapper deliveryCostMapper) {
+    this.deliveryCostRepo = deliveryCostRepo;
+    this.deliveryCostMapper = deliveryCostMapper;
+  }
+
+  @Transactional
   public void addDeliveryCost(DeliveryCost entity) {
     DeliveryCostDao dao = deliveryCostMapper.toDao(entity);
     deliveryCostRepo.save(dao);
   }
 
+  @Transactional
   public void updateDeliveryCost(DeliveryCost entity) {
     DeliveryCostDao dao = deliveryCostMapper.toDao(entity);
     deliveryCostRepo.save(dao);
@@ -36,6 +43,7 @@ public class DeliveryCostService {
     return null;
   }
 
+  @Transactional
   public void deleteDeliveryCost(Long id) {
     deliveryCostRepo.deleteById(id);
   }

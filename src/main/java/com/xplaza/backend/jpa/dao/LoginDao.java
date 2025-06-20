@@ -22,9 +22,12 @@ import org.hibernate.annotations.Immutable;
 @AllArgsConstructor
 public class LoginDao {
   @Id
+  @Column(name = "admin_user_id")
+  private Long adminUserId;
+
   @OneToOne
-  @JoinColumn(name = "admin_user_id")
-  AdminUserDao adminUser;
+  @JoinColumn(name = "admin_user_id", insertable = false, updatable = false)
+  private AdminUserDao adminUser;
 
   String userName;
 

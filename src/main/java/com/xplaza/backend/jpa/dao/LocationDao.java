@@ -22,4 +22,8 @@ public class LocationDao {
   Long locationId;
 
   String locationName;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "fk_city_id")
+  CityDao city;
 }

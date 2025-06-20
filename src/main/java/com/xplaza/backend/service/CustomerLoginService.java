@@ -16,14 +16,19 @@ import com.xplaza.backend.service.entity.Customer;
 
 @Service
 public class CustomerLoginService {
+  private final CustomerUserService customerUserService;
+  private final SecurityService securityService;
+  private final CustomerRepository customerRepo;
+  private final CustomerMapper customerMapper;
+
   @Autowired
-  private CustomerUserService customerUserService;
-  @Autowired
-  private SecurityService securityService;
-  @Autowired
-  private CustomerRepository customerRepo;
-  @Autowired
-  private CustomerMapper customerMapper;
+  public CustomerLoginService(CustomerUserService customerUserService, SecurityService securityService,
+      CustomerRepository customerRepo, CustomerMapper customerMapper) {
+    this.customerUserService = customerUserService;
+    this.securityService = securityService;
+    this.customerRepo = customerRepo;
+    this.customerMapper = customerMapper;
+  }
 
   public Boolean isVaidUser(String username, String password) throws IOException {
     Customer customer = customerUserService.listCustomer(username);

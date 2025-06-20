@@ -19,14 +19,16 @@ import com.xplaza.backend.service.entity.City;
 
 @Service
 public class CityService {
-  @Autowired
-  private CityRepository cityRepo;
+  private final CityRepository cityRepo;
+  private final CityMapper cityMapper;
+  private final LocationMapper locationMapper;
 
   @Autowired
-  private CityMapper cityMapper;
-
-  @Autowired
-  private LocationMapper locationMapper;
+  public CityService(CityRepository cityRepo, CityMapper cityMapper, LocationMapper locationMapper) {
+    this.cityRepo = cityRepo;
+    this.cityMapper = cityMapper;
+    this.locationMapper = locationMapper;
+  }
 
   @Transactional
   public City addCity(City city) {

@@ -6,7 +6,6 @@ package com.xplaza.backend.http.controller;
 
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import jakarta.validation.Valid;
 
@@ -29,62 +28,50 @@ import com.xplaza.backend.service.entity.ProductDiscount;
 @RestController
 @RequestMapping("/api/v1/product-discounts")
 public class ProductDiscountController extends BaseController {
+  private final ProductDiscountService productDiscountService;
+  private final ProductDiscountMapper productDiscountMapper;
+
   @Autowired
-  private ProductDiscountService productDiscountService;
+  public ProductDiscountController(ProductDiscountService productDiscountService,
+      ProductDiscountMapper productDiscountMapper) {
+    this.productDiscountService = productDiscountService;
+    this.productDiscountMapper = productDiscountMapper;
+  }
 
   @Autowired
   private RoleService roleService;
-
-  @Autowired
-  private ProductDiscountMapper productDiscountMapper;
 
   private Date start, end;
   private Long responseTime;
 
   @GetMapping
-  public ResponseEntity<String> getProductDiscounts(
+  public ResponseEntity<ApiResponse> getProductDiscounts(
       @RequestParam(value = "user_id") @Valid Long user_id) throws JsonProcessingException {
     start = new Date();
-    List<ProductDiscount> entities;
-    String role_name = roleService.getRoleNameByUserID(user_id);
-    if (role_name == null)
-      entities = null;
-    else if (role_name.equals("Master Admin"))
-      entities = productDiscountService.listProductDiscounts();
-    else
-      entities = productDiscountService.listProductDiscountsByUserID(user_id);
+    List<ProductDiscount> entities = productDiscountService.listProductDiscounts();
     List<ProductDiscountResponse> dtos = entities.stream()
         .map(productDiscountMapper::toResponse)
-        .collect(Collectors.toList());
+        .toList();
     end = new Date();
     responseTime = end.getTime() - start.getTime();
-    ObjectMapper mapper = new ObjectMapper();
-    String response = "{\n" +
-        "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Product Discount List\",\n" +
-        "  \"status\": 200,\n" +
-        "  \"response\": \"Success\",\n" +
-        "  \"msg\": \"\",\n" +
-        "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
-    return new ResponseEntity<>(response, HttpStatus.OK);
+    String data = new ObjectMapper().writeValueAsString(dtos);
+    ApiResponse response = new ApiResponse(responseTime, "Product Discount List", HttpStatus.OK.value(), "Success", "",
+        data);
+    return ResponseEntity.ok(response);
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<String> getProductDiscountByID(@PathVariable @Valid Long id) throws JsonProcessingException {
+  public ResponseEntity<ApiResponse> getProductDiscountByID(@PathVariable @Valid Long id)
+      throws JsonProcessingException {
     start = new Date();
     ProductDiscount entity = productDiscountService.listProductDiscount(id);
     ProductDiscountResponse dto = productDiscountMapper.toResponse(entity);
     end = new Date();
     responseTime = end.getTime() - start.getTime();
-    ObjectMapper mapper = new ObjectMapper();
-    String response = "{\n" +
-        "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Product Discount By ID\",\n" +
-        "  \"status\": 200,\n" +
-        "  \"response\": \"Success\",\n" +
-        "  \"msg\": \"\",\n" +
-        "  \"data\":" + mapper.writeValueAsString(dto) + "\n}";
-    return new ResponseEntity<>(response, HttpStatus.OK);
+    String data = new ObjectMapper().writeValueAsString(dto);
+    ApiResponse response = new ApiResponse(responseTime, "Product Discount By ID", HttpStatus.OK.value(), "Success", "",
+        data);
+    return ResponseEntity.ok(response);
   }
 
   @PostMapping
@@ -114,7 +101,7 @@ public class ProductDiscountController extends BaseController {
 
   @PutMapping
   public ResponseEntity<ApiResponse> updateProductDiscount(
-      @RequestBody @Valid ProductDiscountRequest productDiscountRequest) {
+      @RequestParam Long id, @RequestBody @Valid ProductDiscountRequest productDiscountRequest) {
     start = new Date();
     ProductDiscount entity = productDiscountMapper.toEntity(productDiscountRequest);
     if (!productDiscountService.checkDiscountValidity(entity)) {
@@ -129,7 +116,7 @@ public class ProductDiscountController extends BaseController {
       return new ResponseEntity<>(new ApiResponse(responseTime, "Update Product Discount", HttpStatus.FORBIDDEN.value(),
           "Error", "Discount date is not valid! Please change discount date.", null), HttpStatus.FORBIDDEN);
     }
-    productDiscountService.updateProductDiscount(entity);
+    productDiscountService.updateProductDiscount(id, entity);
     end = new Date();
     responseTime = end.getTime() - start.getTime();
     return new ResponseEntity<>(new ApiResponse(responseTime, "Update Product Discount", HttpStatus.OK.value(),
@@ -138,12 +125,8 @@ public class ProductDiscountController extends BaseController {
 
   @DeleteMapping("/{id}")
   public ResponseEntity<ApiResponse> deleteProductDiscount(@PathVariable @Valid Long id) {
-    String product_name = productDiscountService.getProductNameByID(id);
-    start = new Date();
     productDiscountService.deleteProductDiscount(id);
-    end = new Date();
-    responseTime = end.getTime() - start.getTime();
-    return new ResponseEntity<>(new ApiResponse(responseTime, "Delete Product Discount", HttpStatus.OK.value(),
-        "Success", "Discount on " + product_name + " has been deleted.", null), HttpStatus.OK);
+    return new ResponseEntity<>(new ApiResponse(0L, "Delete Product Discount", HttpStatus.OK.value(),
+        "Success", "Discount has been deleted.", null), HttpStatus.OK);
   }
 }

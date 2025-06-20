@@ -24,48 +24,39 @@ import com.xplaza.backend.service.entity.Day;
 @RestController
 @RequestMapping("/api/v1/day-names")
 public class DayController extends BaseController {
-  @Autowired
-  private DayService dayService;
+  private final DayService dayService;
+  private final DayMapper dayMapper;
 
   @Autowired
-  private DayMapper dayMapper;
+  public DayController(DayService dayService, DayMapper dayMapper) {
+    this.dayService = dayService;
+    this.dayMapper = dayMapper;
+  }
 
   private Date start, end;
   private Long responseTime;
 
   @GetMapping
-  public ResponseEntity<String> getDays() throws JsonProcessingException {
+  public ResponseEntity<ApiResponse> getDays() throws JsonProcessingException {
     start = new Date();
     var entities = dayService.listDays();
     var dtos = entities.stream().map(dayMapper::toResponse).toList();
     end = new Date();
     responseTime = end.getTime() - start.getTime();
-    ObjectMapper mapper = new ObjectMapper();
-    String response = "{\n" +
-        "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"DayName List\",\n" +
-        "  \"status\": 200,\n" +
-        "  \"response\": \"Success\",\n" +
-        "  \"msg\": \"\",\n" +
-        "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
-    return new ResponseEntity<>(response, HttpStatus.OK);
+    String data = new ObjectMapper().writeValueAsString(dtos);
+    ApiResponse response = new ApiResponse(responseTime, "DayName List", HttpStatus.OK.value(), "Success", "", data);
+    return ResponseEntity.ok(response);
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<String> getDay(@PathVariable @Valid Long id) throws JsonProcessingException {
+  public ResponseEntity<ApiResponse> getDay(@PathVariable @Valid Long id) throws JsonProcessingException {
     start = new Date();
     String dayName = dayService.getDayNameByID(id);
     end = new Date();
     responseTime = end.getTime() - start.getTime();
-    ObjectMapper mapper = new ObjectMapper();
-    String response = "{\n" +
-        "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"DayName By ID\",\n" +
-        "  \"status\": 200,\n" +
-        "  \"response\": \"Success\",\n" +
-        "  \"msg\": \"\",\n" +
-        "  \"data\":" + mapper.writeValueAsString(dayName) + "\n}";
-    return new ResponseEntity<>(response, HttpStatus.OK);
+    String data = new ObjectMapper().writeValueAsString(dayName);
+    ApiResponse response = new ApiResponse(responseTime, "DayName By ID", HttpStatus.OK.value(), "Success", "", data);
+    return ResponseEntity.ok(response);
   }
 
   @PostMapping

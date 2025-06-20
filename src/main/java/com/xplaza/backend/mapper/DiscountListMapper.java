@@ -6,12 +6,12 @@ package com.xplaza.backend.mapper;
 
 import org.mapstruct.Mapper;
 
-import com.xplaza.backend.jpa.dao.DiscountDao;
-import com.xplaza.backend.service.entity.Discount;
+import com.xplaza.backend.jpa.dao.ProductDiscountDao;
+import com.xplaza.backend.service.entity.ProductDiscount;
 
 @Mapper(componentModel = "spring")
 public interface DiscountListMapper {
-  DiscountDao toDao(Discount entity);
+  ProductDiscountDao toDao(ProductDiscount entity);
 
-  Discount toEntityFromDao(DiscountDao dao);
+  ProductDiscount toEntityFromDao(ProductDiscountDao dao);
 }

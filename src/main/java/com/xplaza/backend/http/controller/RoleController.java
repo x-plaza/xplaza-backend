@@ -26,49 +26,41 @@ import com.xplaza.backend.service.entity.Role;
 @RestController
 @RequestMapping("/api/v1/roles")
 public class RoleController extends BaseController {
+  private final RoleService roleService;
+  private final RoleMapper roleMapper;
+
   @Autowired
-  private RoleService roleService;
-  @Autowired
-  private RoleMapper roleMapper;
+  public RoleController(RoleService roleService, RoleMapper roleMapper) {
+    this.roleService = roleService;
+    this.roleMapper = roleMapper;
+  }
 
   private Date start, end;
   private Long responseTime;
 
   @GetMapping
-  public ResponseEntity<String> getRoles() throws JsonProcessingException {
+  public ResponseEntity<ApiResponse> getRoles() throws JsonProcessingException {
     start = new Date();
     List<Role> roles = roleService.listRoles();
     roles.removeIf(r -> r.getRoleName().equals("Master Admin"));
     List<RoleResponse> dtos = roles.stream().map(roleMapper::toResponse).toList();
     end = new Date();
     responseTime = end.getTime() - start.getTime();
-    ObjectMapper mapper = new ObjectMapper();
-    String response = "{\n" +
-        "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Role List\",\n" +
-        "  \"status\": 200,\n" +
-        "  \"response\": \"Success\",\n" +
-        "  \"msg\": \"\",\n" +
-        "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
-    return new ResponseEntity<>(response, HttpStatus.OK);
+    String data = new ObjectMapper().writeValueAsString(dtos);
+    ApiResponse response = new ApiResponse(responseTime, "Role List", HttpStatus.OK.value(), "Success", "", data);
+    return ResponseEntity.ok(response);
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<String> getRole(@PathVariable @Valid Long id) throws JsonProcessingException {
+  public ResponseEntity<ApiResponse> getRole(@PathVariable @Valid Long id) throws JsonProcessingException {
     start = new Date();
     Role entity = roleService.listRole(id);
     RoleResponse dto = roleMapper.toResponse(entity);
     end = new Date();
     responseTime = end.getTime() - start.getTime();
-    ObjectMapper mapper = new ObjectMapper();
-    String response = "{\n" +
-        "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Role by ID\",\n" +
-        "  \"status\": 200,\n" +
-        "  \"response\": \"Success\",\n" +
-        "  \"msg\": \"\",\n" +
-        "  \"data\":" + mapper.writeValueAsString(dto) + "\n}";
-    return new ResponseEntity<>(response, HttpStatus.OK);
+    String data = new ObjectMapper().writeValueAsString(dto);
+    ApiResponse response = new ApiResponse(responseTime, "Role by ID", HttpStatus.OK.value(), "Success", "", data);
+    return ResponseEntity.ok(response);
   }
 
   @PostMapping

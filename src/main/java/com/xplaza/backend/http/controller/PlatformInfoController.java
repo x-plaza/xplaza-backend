@@ -23,28 +23,26 @@ import com.xplaza.backend.service.entity.PlatformInfo;
 @RestController
 @RequestMapping("/api/v1/platform-infos")
 public class PlatformInfoController extends BaseController {
+  private final PlatformInfoService platformInfoService;
+
   @Autowired
-  PlatformInfoService platformInfoService;
+  public PlatformInfoController(PlatformInfoService platformInfoService) {
+    this.platformInfoService = platformInfoService;
+  }
 
   private Date start, end;
   private Long responseTime;
 
   @GetMapping
-  public ResponseEntity<String> getPlatformInfo() throws JsonProcessingException {
+  public ResponseEntity<ApiResponse> getPlatformInfo() throws JsonProcessingException {
     start = new Date();
     PlatformInfo platformInfo = platformInfoService.listPlatform();
     PlatformInfoResponse dto = new PlatformInfoResponse();
     end = new Date();
     responseTime = end.getTime() - start.getTime();
-    ObjectMapper mapper = new ObjectMapper();
-    String response = "{\n" +
-        "  \"responseTime\": " + responseTime + ",\n" +
-        "  \"responseType\": \"Platform Info\",\n" +
-        "  \"status\": 200,\n" +
-        "  \"response\": \"Success\",\n" +
-        "  \"msg\": \"\",\n" +
-        "  \"data\":" + mapper.writeValueAsString(dtos) + "\n}";
-    return new ResponseEntity<>(response, HttpStatus.OK);
+    String data = new ObjectMapper().writeValueAsString(dto);
+    ApiResponse response = new ApiResponse(responseTime, "Platform Info", HttpStatus.OK.value(), "Success", "", data);
+    return ResponseEntity.ok(response);
   }
 
   @PostMapping

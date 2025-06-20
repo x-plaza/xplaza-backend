@@ -29,17 +29,19 @@ import com.xplaza.backend.service.entity.Customer;
 @RestController
 @RequestMapping("/api/v1/customer-login")
 public class CustomerLoginController extends BaseController {
-  @Autowired
-  private CustomerLoginService customerLoginService;
+  private final CustomerLoginService customerLoginService;
+  private final CustomerUserService customerUserService;
+  private final ConfirmationTokenService confirmationTokenService;
+  private final SecurityService securityService;
 
   @Autowired
-  private CustomerUserService customerUserService;
-
-  @Autowired
-  private ConfirmationTokenService confirmationTokenService;
-
-  @Autowired
-  private SecurityService securityService;
+  public CustomerLoginController(CustomerLoginService customerLoginService, CustomerUserService customerUserService,
+      ConfirmationTokenService confirmationTokenService, SecurityService securityService) {
+    this.customerLoginService = customerLoginService;
+    this.customerUserService = customerUserService;
+    this.confirmationTokenService = confirmationTokenService;
+    this.securityService = securityService;
+  }
 
   private Date start, end;
   private Long responseTime;

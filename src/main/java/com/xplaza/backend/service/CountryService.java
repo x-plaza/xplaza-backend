@@ -18,21 +18,26 @@ import com.xplaza.backend.mapper.StateMapper;
 import com.xplaza.backend.service.entity.Country;
 
 @Service
-@Transactional
 public class CountryService {
-  @Autowired
-  private CountryRepository countryRepo;
-  @Autowired
-  private CountryMapper countryMapper;
-  @Autowired
-  private StateMapper stateMapper;
+  private final CountryRepository countryRepo;
+  private final CountryMapper countryMapper;
+  private final StateMapper stateMapper;
 
+  @Autowired
+  public CountryService(CountryRepository countryRepo, CountryMapper countryMapper, StateMapper stateMapper) {
+    this.countryRepo = countryRepo;
+    this.countryMapper = countryMapper;
+    this.stateMapper = stateMapper;
+  }
+
+  @Transactional
   public Country addCountry(Country country) {
     CountryDao countryDao = countryMapper.toDao(country);
     CountryDao savedCountryDao = countryRepo.save(countryDao);
     return countryMapper.toEntityFromDao(savedCountryDao);
   }
 
+  @Transactional
   public Country updateCountry(Country country) {
     CountryDao existingCountryDao = countryRepo.findById(country.getCountryId())
         .orElseThrow(() -> new RuntimeException("Country not found with id: " + country.getCountryId()));
@@ -47,6 +52,7 @@ public class CountryService {
     return countryMapper.toEntityFromDao(updatedCountryDao);
   }
 
+  @Transactional
   public void deleteCountry(Long id) {
     countryRepo.deleteById(id);
   }

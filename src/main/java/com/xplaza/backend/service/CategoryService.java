@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.xplaza.backend.exception.ResourceNotFoundException;
 import com.xplaza.backend.jpa.dao.CategoryDao;
 import com.xplaza.backend.jpa.repository.CategoryRepository;
 import com.xplaza.backend.mapper.CategoryMapper;
@@ -18,11 +19,14 @@ import com.xplaza.backend.service.entity.Category;
 
 @Service
 public class CategoryService {
-  @Autowired
-  private CategoryRepository categoryRepo;
+  private final CategoryRepository categoryRepo;
+  private final CategoryMapper categoryMapper;
 
   @Autowired
-  private CategoryMapper categoryMapper;
+  public CategoryService(CategoryRepository categoryRepo, CategoryMapper categoryMapper) {
+    this.categoryRepo = categoryRepo;
+    this.categoryMapper = categoryMapper;
+  }
 
   @Transactional
   public Category addCategory(Category category) {
@@ -33,8 +37,9 @@ public class CategoryService {
 
   @Transactional
   public Category updateCategory(Long id, Category category) {
-    CategoryDao existingCategoryDao = categoryRepo.findById(id)
-        .orElseThrow(() -> new RuntimeException("Category not found with id: " + id));
+    // Check if category exists
+    categoryRepo.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
 
     category.setCategoryId(id);
     CategoryDao categoryDao = categoryMapper.toDao(category);
@@ -56,7 +61,7 @@ public class CategoryService {
 
   public Category listCategory(Long id) {
     CategoryDao categoryDao = categoryRepo.findById(id)
-        .orElseThrow(() -> new RuntimeException("Category not found with id: " + id));
+        .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
     return categoryMapper.toEntityFromDao(categoryDao);
   }
 

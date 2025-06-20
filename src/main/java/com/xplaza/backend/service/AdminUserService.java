@@ -20,24 +20,30 @@ import com.xplaza.backend.service.entity.AdminUser;
 import com.xplaza.backend.service.entity.PlatformInfo;
 
 @Service
-@Transactional
 public class AdminUserService {
-  @Autowired
-  private AdminUserRepository adminUserRepository;
-  @Autowired
-  private AdminUserMapper adminUserMapper;
-  @Autowired
-  private EmailSenderService emailSenderService;
-  @Autowired
-  private PlatformInfoService platformInfoService;
-  @Autowired
-  private Environment env;
+  private final AdminUserRepository adminUserRepository;
+  private final AdminUserMapper adminUserMapper;
+  private final EmailSenderService emailSenderService;
+  private final PlatformInfoService platformInfoService;
+  private final Environment env;
 
+  @Autowired
+  public AdminUserService(AdminUserRepository adminUserRepository, AdminUserMapper adminUserMapper,
+      EmailSenderService emailSenderService, PlatformInfoService platformInfoService, Environment env) {
+    this.adminUserRepository = adminUserRepository;
+    this.adminUserMapper = adminUserMapper;
+    this.emailSenderService = emailSenderService;
+    this.platformInfoService = platformInfoService;
+    this.env = env;
+  }
+
+  @Transactional
   public void addAdminUser(AdminUser entity) {
     AdminUserDao dao = adminUserMapper.toDao(entity);
     adminUserRepository.save(dao);
   }
 
+  @Transactional
   public void updateAdminUser(AdminUser entity) {
     AdminUserDao dao = adminUserMapper.toDao(entity);
     adminUserRepository.save(dao);
@@ -57,6 +63,7 @@ public class AdminUserService {
     return dao != null ? adminUserMapper.toEntityFromDao(dao) : null;
   }
 
+  @Transactional
   public void deleteAdminUser(Long id) {
     adminUserRepository.deleteById(id);
   }
@@ -78,6 +85,7 @@ public class AdminUserService {
     emailSenderService.sendEmail(mailMessage);
   }
 
+  @Transactional
   public void changeAdminUserPassword(String password, String salt, String username) {
     adminUserRepository.changePassword(password, salt, username);
   }

@@ -26,10 +26,23 @@ public class OrderItemDao {
   private OrderDao order;
 
   @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "fk_product_id")
+  private ProductDao product;
+
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "fk_currency_id")
   private CurrencyDao currency;
 
-  private String productName;
-  private Integer quantity;
-  private Double price;
+  private Long productId;
+  private Double productSellingPrice;
+  private Double productBuyingPrice;
+  private String itemName;
+  private String itemVarTypeName;
+  private Long itemVarTypeValue;
+  private String itemCategory;
+  private Long quantity;
+  private String quantityType;
+  private Double unitPrice;
+  private Double itemTotalPrice;
+  private String itemImage;
 }

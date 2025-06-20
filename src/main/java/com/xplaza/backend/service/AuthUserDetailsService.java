@@ -20,11 +20,14 @@ import com.xplaza.backend.service.entity.AdminUser;
 @Service
 public class AuthUserDetailsService implements UserDetailsService {
 
-  @Autowired
-  private AdminUserRepository adminUserRepository;
+  private final AdminUserRepository adminUserRepository;
+  private final AdminUserMapper adminUserMapper;
 
   @Autowired
-  private AdminUserMapper adminUserMapper;
+  public AuthUserDetailsService(AdminUserRepository adminUserRepository, AdminUserMapper adminUserMapper) {
+    this.adminUserRepository = adminUserRepository;
+    this.adminUserMapper = adminUserMapper;
+  }
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

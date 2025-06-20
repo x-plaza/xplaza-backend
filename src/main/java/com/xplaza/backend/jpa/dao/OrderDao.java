@@ -33,10 +33,44 @@ public class OrderDao {
   @JoinColumn(name = "fk_currency_id")
   CurrencyDao currency;
 
-  Double totalAmount;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "fk_customer_id")
+  CustomerDao customer;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "fk_shop_id")
+  ShopDao shop;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "fk_coupon_id")
+  CouponDao coupon;
+
+  Long invoiceNumber;
+  Double totalPrice;
+  Double discountAmount;
+  Double netTotal;
+  Double grandTotalPrice;
+  String deliveryAddress;
+  Long customerId;
+  Long shopId;
+  Long deliveryCostId;
+  Long paymentTypeId;
+  Long statusId;
+  Long couponId;
+  Date receivedTime;
+  Date dateToDeliver;
+  Long currencyId;
+  String additionalInfo;
+  String remarks;
+  String customerName;
+  String shopName;
+  Double deliveryCost;
+  String couponCode;
+  Double couponAmount;
+  String mobileNo;
+
+  Double totalAmount; // legacy field
   Date createdAt;
-
   Date updatedAt;
 
   @OneToMany(mappedBy = "order", fetch = FetchType.LAZY, cascade = CascadeType.ALL)

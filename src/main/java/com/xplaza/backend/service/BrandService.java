@@ -17,19 +17,24 @@ import com.xplaza.backend.mapper.BrandMapper;
 import com.xplaza.backend.service.entity.Brand;
 
 @Service
-@Transactional
 public class BrandService {
-  @Autowired
-  private BrandRepository brandRepo;
-  @Autowired
-  private BrandMapper brandMapper;
+  private final BrandRepository brandRepo;
+  private final BrandMapper brandMapper;
 
+  @Autowired
+  public BrandService(BrandRepository brandRepo, BrandMapper brandMapper) {
+    this.brandRepo = brandRepo;
+    this.brandMapper = brandMapper;
+  }
+
+  @Transactional
   public Brand addBrand(Brand brand) {
     BrandDao brandDao = brandMapper.toDao(brand);
     BrandDao savedBrandDao = brandRepo.save(brandDao);
     return brandMapper.toEntityFromDao(savedBrandDao);
   }
 
+  @Transactional
   public Brand updateBrand(Brand brand) {
     BrandDao existingBrandDao = brandRepo.findById(brand.getBrandId())
         .orElseThrow(() -> new RuntimeException("Brand not found with id: " + brand.getBrandId()));
@@ -41,6 +46,7 @@ public class BrandService {
     return brandMapper.toEntityFromDao(updatedBrandDao);
   }
 
+  @Transactional
   public void deleteBrand(Long id) {
     brandRepo.deleteById(id);
   }

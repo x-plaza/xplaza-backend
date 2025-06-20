@@ -21,66 +21,58 @@ import com.xplaza.backend.service.entity.Coupon;
 
 @Service
 public class CouponService extends DateConverter {
+  private final CouponRepository couponRepo;
+  private final CouponMapper couponMapper;
+
   @Autowired
-  private CouponRepository couponRepository;
-  @Autowired
-  private CouponMapper couponMapper;
+  public CouponService(CouponRepository couponRepo, CouponMapper couponMapper) {
+    this.couponRepo = couponRepo;
+    this.couponMapper = couponMapper;
+  }
 
   @Transactional
   public void addCoupon(Coupon entity) {
-    CouponDao dao = couponMapper.toDAO(entity);
-    couponRepository.save(dao);
+    CouponDao dao = couponMapper.toDao(entity);
+    couponRepo.save(dao);
     // handle shop links if needed
   }
 
   @Transactional
   public void updateCoupon(Coupon entity) {
-    CouponDao dao = couponMapper.toDAO(entity);
-    couponRepository.save(dao);
+    CouponDao dao = couponMapper.toDao(entity);
+    couponRepo.save(dao);
     // handle shop links if needed
   }
 
   public List<Coupon> listCoupons() {
-    return couponRepository.findAll().stream().map(couponMapper::toEntityFromDAO).collect(Collectors.toList());
+    return couponRepo.findAll().stream().map(couponMapper::toEntityFromDao).collect(Collectors.toList());
   }
 
   public Coupon listCoupon(Long id) {
-    return couponRepository.findById(id).map(couponMapper::toEntityFromDAO).orElse(null);
+    return couponRepo.findById(id).map(couponMapper::toEntityFromDao).orElse(null);
   }
 
   public void deleteCoupon(Long id) {
-    couponRepository.deleteById(id);
+    couponRepo.deleteById(id);
   }
 
   public boolean checkCouponValidity(String couponCode, Double netOrderAmount, Long shopId) {
-    Optional<Coupon> daoOpt = couponRepository.findAll().stream()
-        .filter(dao -> couponCode.equals(dao.getId() != null ? dao.getId().toString() : null))
-        .findFirst();
-    if (daoOpt.isEmpty())
-      return false;
-    Coupon coupon = couponMapper.toEntityFromDAO(daoOpt.get());
-    // Check active, date, min shopping, shop
-    if (coupon.getStartDate() != null && coupon.getEndDate() != null) {
-      Date now = new Date();
-      if (now.before(coupon.getStartDate()) || now.after(coupon.getEndDate()))
-        return false;
-    }
-    // TODO: Add isActive, minShoppingAmount, shopIds checks if fields exist in
-    // CouponEntity
-    if (coupon.getShopIds() != null && !coupon.getShopIds().isEmpty() && !coupon.getShopIds().contains(shopId)) {
+    Coupon coupon = findCouponByCode(couponCode);
+    if (coupon == null) {
       return false;
     }
-    // Add more checks as needed
-    return true;
+
+    return isDateValid(coupon) &&
+        isActiveValid(coupon) &&
+        isMinAmountValid(coupon, netOrderAmount) &&
+        isShopValid(coupon, shopId);
   }
 
   public Double calculateCouponAmount(String couponCode, Double netOrderAmount) {
-    Optional<Coupon> daoOpt = couponDAORepo.findAll().stream()
-        .filter(dao -> couponCode.equals(dao.getId() != null ? dao.getId().toString() : null))
-        .findFirst();
-    if (daoOpt.isEmpty())
+    Coupon coupon = findCouponByCode(couponCode);
+    if (coupon == null) {
       return 0.0;
-    CouponEntity coupon = couponMapper.toEntityFromDAO(daoOpt.get());
+    }
     Double amount = coupon.getAmount();
     Double maxAmount = coupon.getMaxAmount();
     Long discountTypeId = coupon.getDiscountTypeId();
@@ -94,5 +86,36 @@ public class CouponService extends DateConverter {
       calculated = amount;
     }
     return calculated;
+  }
+
+  private Coupon findCouponByCode(String couponCode) {
+    Optional<CouponDao> daoOpt = couponRepo.findAll().stream()
+        .filter(dao -> couponCode.equals(dao.getCouponCode()))
+        .findFirst();
+    return daoOpt.map(couponMapper::toEntityFromDao).orElse(null);
+  }
+
+  private boolean isDateValid(Coupon coupon) {
+    if (coupon.getStartDate() != null && coupon.getEndDate() != null) {
+      Date now = new Date();
+      return !now.before(coupon.getStartDate()) && !now.after(coupon.getEndDate());
+    }
+    return true;
+  }
+
+  private boolean isActiveValid(Coupon coupon) {
+    return coupon.getIsActive() == null || coupon.getIsActive();
+  }
+
+  private boolean isMinAmountValid(Coupon coupon, Double netOrderAmount) {
+    return coupon.getMinShoppingAmount() == null || netOrderAmount >= coupon.getMinShoppingAmount();
+  }
+
+  private boolean isShopValid(Coupon coupon, Long shopId) {
+    if (coupon.getCouponShopLinks() == null || coupon.getCouponShopLinks().isEmpty()) {
+      return true; // No shop restriction
+    }
+    return coupon.getCouponShopLinks().stream()
+        .anyMatch(link -> shopId.equals(link.getShop().getShopId()));
   }
 }

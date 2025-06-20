@@ -6,16 +6,19 @@ package com.xplaza.backend.http.controller;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import jakarta.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.xplaza.backend.common.util.ApiResponse;
 import com.xplaza.backend.http.dto.request.CustomerUserRequest;
 import com.xplaza.backend.http.dto.response.CustomerUserResponse;
 import com.xplaza.backend.mapper.CustomerMapper;
@@ -27,53 +30,72 @@ import com.xplaza.backend.service.entity.Customer;
 @RestController
 @RequestMapping("/api/v1/customers")
 public class CustomerUserController extends BaseController {
+  private static final Logger logger = LoggerFactory.getLogger(CustomerUserController.class);
+  private final CustomerUserService customerUserService;
+  private final CustomerLoginService customerLoginService;
+  private final SecurityService securityService;
+  private final CustomerMapper customerMapper;
+
   @Autowired
-  private CustomerUserService customerUserService;
-  @Autowired
-  private CustomerLoginService customerLoginService;
-  @Autowired
-  private SecurityService securityService;
-  @Autowired
-  private CustomerMapper customerMapper;
+  public CustomerUserController(CustomerUserService customerUserService, CustomerLoginService customerLoginService,
+      SecurityService securityService, CustomerMapper customerMapper) {
+    this.customerUserService = customerUserService;
+    this.customerLoginService = customerLoginService;
+    this.securityService = securityService;
+    this.customerMapper = customerMapper;
+  }
 
   @GetMapping("/{id}")
-  public ResponseEntity<CustomerUserResponse> getCustomer(@PathVariable @Valid Long id) {
+  public ResponseEntity<ApiResponse> getCustomer(@PathVariable @Valid Long id) throws JsonProcessingException {
     Customer entity = customerUserService.getCustomer(id);
     CustomerUserResponse dto = customerMapper.toResponse(entity);
-    return ResponseEntity.ok(dto);
+    String data = new ObjectMapper().writeValueAsString(dto);
+    ApiResponse response = new ApiResponse(0L, "Customer By ID", HttpStatus.OK.value(), "Success", "", data);
+    return ResponseEntity.ok(response);
   }
 
   @PutMapping
-  public ResponseEntity<Void> updateCustomer(@RequestBody @Valid CustomerUserRequest request) {
+  public ResponseEntity<ApiResponse> updateCustomer(@RequestBody @Valid CustomerUserRequest request) {
     Customer entity = customerMapper.toEntity(request);
     customerUserService.updateCustomer(entity);
-    return ResponseEntity.ok().build();
+    ApiResponse response = new ApiResponse(0L, "Update Customer", HttpStatus.OK.value(), "Success",
+        "Customer has been updated.", null);
+    return ResponseEntity.ok(response);
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deleteCustomer(@PathVariable @Valid Long id) {
+  public ResponseEntity<ApiResponse> deleteCustomer(@PathVariable @Valid Long id) {
     customerUserService.deleteCustomer(id);
-    return ResponseEntity.ok().build();
+    ApiResponse response = new ApiResponse(0L, "Delete Customer", HttpStatus.OK.value(), "Success",
+        "Customer has been deleted.", null);
+    return ResponseEntity.ok(response);
   }
 
   @PostMapping("/change-password")
-  public ResponseEntity<Void> changeCustomerUserPassword(@RequestParam("username") @Valid String username,
+  public ResponseEntity<ApiResponse> changeCustomerUserPassword(@RequestParam("username") @Valid String username,
       @RequestParam("oldPassword") @Valid String oldPassword,
       @RequestParam("newPassword") @Valid String newPassword) throws IOException {
     boolean isValidUser = customerLoginService.isVaidUser(username.toLowerCase(), oldPassword);
     if (!isValidUser) {
-      return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+      ApiResponse response = new ApiResponse(0L, "Change Password", HttpStatus.FORBIDDEN.value(), "Error",
+          "Invalid user credentials.", null);
+      return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
     byte[] byteSalt = null;
     try {
       byteSalt = securityService.getSalt();
     } catch (NoSuchAlgorithmException ex) {
-      Logger.getLogger("Salt error").log(Level.SEVERE, null, ex);
+      logger.error("Salt generation error", ex);
+      ApiResponse response = new ApiResponse(0L, "Change Password", HttpStatus.INTERNAL_SERVER_ERROR.value(), "Error",
+          "Salt generation error.", null);
+      return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
     byte[] byteDigestPsw = securityService.getSaltedHashSHA512(newPassword, byteSalt);
     String strDigestPsw = securityService.toHex(byteDigestPsw);
     String strSalt = securityService.toHex(byteSalt);
     customerUserService.changeCustomerPassword(strDigestPsw, strSalt, username.toLowerCase());
-    return ResponseEntity.ok().build();
+    ApiResponse response = new ApiResponse(0L, "Change Password", HttpStatus.OK.value(), "Success",
+        "Password has been changed.", null);
+    return ResponseEntity.ok(response);
   }
 }

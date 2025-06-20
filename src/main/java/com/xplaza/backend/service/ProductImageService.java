@@ -18,22 +18,25 @@ import com.xplaza.backend.service.entity.ProductImage;
 @Service
 public class ProductImageService {
 
-  @Autowired
-  private ProductImageRepository productImageRepository;
+  private final ProductImageRepository productImageRepo;
+  private final ProductImageMapper productImageMapper;
 
   @Autowired
-  private ProductImageMapper productImageMapper;
+  public ProductImageService(ProductImageRepository productImageRepo, ProductImageMapper productImageMapper) {
+    this.productImageRepo = productImageRepo;
+    this.productImageMapper = productImageMapper;
+  }
 
   @Transactional
   public ProductImage addProductImage(ProductImage productImage) {
     ProductImageDao productImageDao = productImageMapper.toDao(productImage);
-    ProductImageDao savedProductImageDao = productImageRepository.save(productImageDao);
+    ProductImageDao savedProductImageDao = productImageRepo.save(productImageDao);
     return productImageMapper.toEntityFromDao(savedProductImageDao);
   }
 
   @Transactional
   public ProductImage updateProductImage(Long id, ProductImage productImage) {
-    ProductImageDao existingProductImageDao = productImageRepository.findById(id)
+    ProductImageDao existingProductImageDao = productImageRepo.findById(id)
         .orElseThrow(() -> new RuntimeException("Product image not found with id: " + id));
 
     ProductImageDao productImageDao = productImageMapper.toDao(productImage);
@@ -41,30 +44,30 @@ public class ProductImageService {
     productImageDao.setCreatedBy(existingProductImageDao.getCreatedBy());
     productImageDao.setCreatedAt(existingProductImageDao.getCreatedAt());
 
-    ProductImageDao updatedProductImageDao = productImageRepository.save(productImageDao);
+    ProductImageDao updatedProductImageDao = productImageRepo.save(productImageDao);
     return productImageMapper.toEntityFromDao(updatedProductImageDao);
   }
 
   @Transactional
   public void deleteProductImage(Long id) {
-    productImageRepository.deleteById(id);
+    productImageRepo.deleteById(id);
   }
 
   public List<ProductImage> listProductImages() {
-    List<ProductImageDao> productImageDaos = productImageRepository.findAll();
+    List<ProductImageDao> productImageDaos = productImageRepo.findAll();
     return productImageDaos.stream()
         .map(productImageMapper::toEntityFromDao)
         .toList();
   }
 
   public ProductImage listProductImage(Long id) {
-    ProductImageDao productImageDao = productImageRepository.findById(id)
+    ProductImageDao productImageDao = productImageRepo.findById(id)
         .orElseThrow(() -> new RuntimeException("Product image not found with id: " + id));
     return productImageMapper.toEntityFromDao(productImageDao);
   }
 
   public List<ProductImage> listProductImagesByProduct(Long productId) {
-    List<ProductImageDao> productImageDaos = productImageRepository.findByProductId(productId);
+    List<ProductImageDao> productImageDaos = productImageRepo.findByProductId(productId);
     return productImageDaos.stream()
         .map(productImageMapper::toEntityFromDao)
         .toList();
