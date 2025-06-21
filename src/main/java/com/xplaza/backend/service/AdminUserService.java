@@ -7,6 +7,7 @@ package com.xplaza.backend.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.xplaza.backend.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.SimpleMailMessage;
@@ -41,13 +42,13 @@ public class AdminUserService {
   public void addAdminUser(AdminUser entity) {
     AdminUserDao dao = adminUserMapper.toDao(entity);
     adminUserRepository.save(dao);
+    this.sendLoginDetails(dao.getUserName(), entity.getPassword());
   }
 
   @Transactional
   public void updateAdminUser(AdminUser entity) {
     AdminUserDao dao = adminUserMapper.toDao(entity);
     adminUserRepository.save(dao);
-    // handle shop links if needed
   }
 
   public List<AdminUser> listAdminUsers() {
@@ -55,7 +56,8 @@ public class AdminUserService {
   }
 
   public AdminUser listAdminUser(Long id) {
-    return adminUserRepository.findById(id).map(adminUserMapper::toEntityFromDao).orElse(null);
+    return adminUserRepository.findById(id).map(adminUserMapper::toEntityFromDao).orElseThrow(
+            ()-> new ResourceNotFoundException("Admin user not found with id: " + id));
   }
 
   public AdminUser listAdminUser(String username) {
@@ -68,7 +70,7 @@ public class AdminUserService {
     adminUserRepository.deleteById(id);
   }
 
-  public void sendLoginDetails(String email, String tempPassword) {
+  private void sendLoginDetails(String email, String tempPassword) {
     // Get platform info
     PlatformInfo platformInfo = platformInfoService.listPlatform();
     // Send email
