@@ -4,7 +4,6 @@
  */
 package com.xplaza.backend.http.controller;
 
-import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
 import jakarta.validation.Valid;
@@ -74,8 +73,8 @@ public class CustomerUserController extends BaseController {
   @PostMapping("/change-password")
   public ResponseEntity<ApiResponse> changeCustomerUserPassword(@RequestParam("username") @Valid String username,
       @RequestParam("oldPassword") @Valid String oldPassword,
-      @RequestParam("newPassword") @Valid String newPassword) throws IOException {
-    boolean isValidUser = customerLoginService.isVaidUser(username.toLowerCase(), oldPassword);
+      @RequestParam("newPassword") @Valid String newPassword) {
+    boolean isValidUser = customerLoginService.isValidCustomerUser(username.toLowerCase(), oldPassword);
     if (!isValidUser) {
       ApiResponse response = new ApiResponse(0L, "Change Password", HttpStatus.FORBIDDEN.value(), "Error",
           "Invalid user credentials.", null);
