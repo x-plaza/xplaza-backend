@@ -35,9 +35,9 @@ spring:
 resilience4j.retry:
   instances:
     globalRetry:
-      max-attempts: 3
-      wait-duration: 1s
-      retry-exceptions:
+      maxAttempts: 3
+      waitDuration: 1000
+      retryExceptions:
         - java.net.SocketTimeoutException
         - java.net.ConnectException
         - org.springframework.dao.OptimisticLockingFailureException
@@ -52,9 +52,13 @@ logging:
         security: DEBUG
 
 management:
-  endpoint:
-    health:
-      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: health
+    endpoint:
+      health:
+        show-details: always
 
 server:
   error:
