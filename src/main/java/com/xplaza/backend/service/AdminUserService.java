@@ -7,13 +7,13 @@ package com.xplaza.backend.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.xplaza.backend.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.xplaza.backend.exception.ResourceNotFoundException;
 import com.xplaza.backend.jpa.dao.AdminUserDao;
 import com.xplaza.backend.jpa.repository.AdminUserRepository;
 import com.xplaza.backend.mapper.AdminUserMapper;
@@ -57,7 +57,7 @@ public class AdminUserService {
 
   public AdminUser listAdminUser(Long id) {
     return adminUserRepository.findById(id).map(adminUserMapper::toEntityFromDao).orElseThrow(
-            ()-> new ResourceNotFoundException("Admin user not found with id: " + id));
+        () -> new ResourceNotFoundException("Admin user not found with id: " + id));
   }
 
   public AdminUser listAdminUser(String username) {
