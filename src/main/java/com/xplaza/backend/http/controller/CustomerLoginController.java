@@ -50,7 +50,7 @@ public class CustomerLoginController extends BaseController {
   public ResponseEntity<String> loginCustomerUser(@RequestParam("username") @Valid String username,
       @RequestParam("password") @Valid String password) throws IOException {
     start = new Date();
-    Boolean isValidUser = customerLoginService.isVaidUser(username.toLowerCase(), password);
+    boolean isValidUser = customerLoginService.isValidCustomerUser(username.toLowerCase(), password);
     Customer dtos = new Customer();
     if (isValidUser) {
       dtos = customerLoginService.getCustomerLoginDetails(username.toLowerCase());
