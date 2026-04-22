@@ -5,13 +5,18 @@
 
 package com.xplaza.backend.config.security;
 
-import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,46 +26,81 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.xplaza.backend.common.ratelimit.RateLimitFilter;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
 
+  @Value("${xplaza.cors.allowed-origins:http://localhost:3000}")
+  private String allowedOrigins;
+
   @Bean
   public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
+    return new BCryptPasswordEncoder(12);
   }
 
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
-    CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOriginPatterns(List.of("*"));
-    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+    var configuration = new CorsConfiguration();
+    configuration.setAllowedOrigins(List.of(allowedOrigins.split(",")));
+    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+    configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept-Language",
+        "X-Refresh-Token", "Idempotency-Key", "X-Requested-With"));
+    configuration.setExposedHeaders(List.of("X-RateLimit-Remaining", "Retry-After", "Location"));
     configuration.setAllowCredentials(true);
-    configuration.setAllowedHeaders(List.of("*"));
+    configuration.setMaxAge(3600L);
 
-    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    var source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", configuration);
     return source;
   }
 
   @Bean
-  public SecurityFilterChain defaultSecurityFilterChain(JwtRequestFilter filterApiRequest, HttpSecurity http)
-      throws Exception {
-    return http.sessionManagement(
-        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .csrf(csrf -> csrf.disable())
-        .authorizeHttpRequests(authorize -> authorize
+  public SecurityFilterChain defaultSecurityFilterChain(JwtRequestFilter jwtFilter,
+      RateLimitFilter rateLimitFilter,
+      ObjectProvider<ClientRegistrationRepository> oauthRepoProvider,
+      HttpSecurity http) throws Exception {
+    var chain = http
+        .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .csrf(AbstractHttpConfigurer::disable)
+        .formLogin(AbstractHttpConfigurer::disable)
+        .httpBasic(AbstractHttpConfigurer::disable)
+        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        .authorizeHttpRequests(authz -> authz
+            // public infra
             .requestMatchers(
-                "/actuator/health",
-                "/api/v1/auth/**",
+                "/actuator/health", "/actuator/health/**", "/actuator/info",
+                "/actuator/prometheus",
+                "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html",
+                "/h2-console/**")
+            .permitAll()
+            // public auth
+            .requestMatchers(
+                "/api/v1/auth/login", "/api/v1/auth/refresh", "/api/v1/auth/register",
+                "/api/v1/auth/forgot-password", "/api/v1/auth/reset-password",
                 "/api/v1/customer/auth/**",
                 "/api/v1/webhooks/**",
-                "/v3/api-docs/**",
-                "/swagger-ui/**")
+                "/api/v1/oauth2/**", "/login/oauth2/**", "/oauth2/**")
+            .permitAll()
+            // public catalog
+            .requestMatchers(HttpMethod.GET,
+                "/api/v1/products/**",
+                "/api/v1/categories/**",
+                "/api/v1/brands/**",
+                "/api/v1/shops/**",
+                "/api/v1/cms/**",
+                "/api/v1/search/**",
+                "/api/v1/reviews/product/**")
             .permitAll()
             .anyRequest().authenticated())
-        .addFilterBefore(filterApiRequest, UsernamePasswordAuthenticationFilter.class)
-        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-        .build();
+        .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
+        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+        .headers(h -> h.frameOptions(f -> f.sameOrigin()));
+
+    if (oauthRepoProvider.getIfAvailable() != null) {
+      chain.oauth2Login(Customizer.withDefaults());
+    }
+    return chain.build();
   }
 }

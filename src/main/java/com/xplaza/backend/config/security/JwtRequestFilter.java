@@ -28,22 +28,27 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.xplaza.backend.auth.service.AuthUserDetailsService;
+import com.xplaza.backend.auth.service.CompositeUserDetailsService;
 import com.xplaza.backend.common.util.ErrorUtils;
 import com.xplaza.backend.common.util.JwtUtil;
 import com.xplaza.backend.exception.InvalidJwtTokenException;
 
+/**
+ * JWT validation filter. Resolves the principal from the appropriate
+ * UserDetailsService based on the {@code role} claim in the access token,
+ * supporting both ADMIN and CUSTOMER tokens out of the same filter.
+ */
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
-  private final AuthUserDetailsService authUserDetailsService;
+  private final CompositeUserDetailsService userDetailsService;
   private final JwtUtil jwtUtil;
   private final ErrorUtils errorUtils;
   private final ObjectMapper objectMapper;
 
-  public JwtRequestFilter(AuthUserDetailsService authUserDetailsService, JwtUtil jwtUtil, ErrorUtils errorUtils,
+  public JwtRequestFilter(CompositeUserDetailsService userDetailsService, JwtUtil jwtUtil, ErrorUtils errorUtils,
       ObjectMapper objectMapper) {
-    this.authUserDetailsService = authUserDetailsService;
+    this.userDetailsService = userDetailsService;
     this.jwtUtil = jwtUtil;
     this.errorUtils = errorUtils;
     this.objectMapper = objectMapper;
@@ -55,20 +60,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
       @NotNull FilterChain filterChain)
       throws ServletException, IOException {
     try {
-      // 1. Extract Token
       String jwt = JwtUtil.extractJwtToken(request);
-
-      // 2. Early Exit if No Token
       if (jwt == null || SecurityContextHolder.getContext().getAuthentication() != null) {
-        logger.warn("No JWT token found in the request.");
         filterChain.doFilter(request, response);
         return;
       }
-
-      // 3. Validate Token and User
       validateTokenAndUser(request, jwt);
-
-      // 4. Continue Filter Chain
       filterChain.doFilter(request, response);
     } catch (InvalidJwtTokenException e) {
       sendInvalidJwtTokenExceptionResponse(response, e);
@@ -87,9 +84,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
   private void validateTokenAndUser(HttpServletRequest request, String jwt) {
     try {
       String username = jwtUtil.extractUsername(jwt);
-      UserDetails userDetails = authUserDetailsService.loadUserByUsername(username);
-      if (jwtUtil.validateJwtToken(jwt, userDetails))
+      String role = jwtUtil.extractRole(jwt);
+      UserDetails userDetails = userDetailsService.loadUserByUsernameWithRole(username, role);
+      if (jwtUtil.validateJwtToken(jwt, userDetails)) {
         setAuthentication(request, jwt, userDetails);
+      }
     } catch (MalformedJwtException | ExpiredJwtException | AuthenticationException e) {
       logger.warn(e.getMessage());
       SecurityContextHolder.clearContext();
@@ -105,7 +104,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
   private UsernamePasswordAuthenticationToken createAuthenticationToken(String jwt, UserDetails userDetails,
       HttpServletRequest request) {
     String role = jwtUtil.extractRole(jwt);
-    List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
+    List<GrantedAuthority> authorities = List.of(
+        new SimpleGrantedAuthority(role),
+        new SimpleGrantedAuthority("ROLE_" + role));
     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
         userDetails, null, authorities);
     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
