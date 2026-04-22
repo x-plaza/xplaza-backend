@@ -17,9 +17,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Tokenised payment method belonging to a customer. The {@code gatewayToken}
- * is the gateway's customer/payment_method id (e.g. Stripe pm_***); we never
- * store raw card data ourselves, only the safe display fields PCI allows.
+ * Tokenised payment method belonging to a customer. The {@code gatewayToken} is
+ * the gateway's customer/payment_method id (e.g. Stripe pm_***); we never store
+ * raw card data ourselves, only the safe display fields PCI allows.
  */
 @Entity
 @Table(name = "customer_payment_methods")
@@ -82,6 +82,9 @@ public class CustomerPaymentMethod {
   private Instant updatedAt = Instant.now();
 
   public enum MethodType {
-    CARD, PAYPAL, BANK_ACCOUNT, WALLET
+    CARD,
+    PAYPAL,
+    BANK_ACCOUNT,
+    WALLET
   }
 }

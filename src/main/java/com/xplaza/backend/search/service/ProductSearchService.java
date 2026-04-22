@@ -8,6 +8,8 @@ package com.xplaza.backend.search.service;
 import java.time.Instant;
 import java.util.*;
 
+import co.elastic.clients.elasticsearch._types.query_dsl.MultiMatchQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +29,6 @@ import com.xplaza.backend.common.events.DomainEvents;
 import com.xplaza.backend.search.document.ProductDocument;
 import com.xplaza.backend.search.repository.ProductDocumentRepository;
 
-import co.elastic.clients.elasticsearch._types.query_dsl.MultiMatchQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
-
 /**
  * Search facade backed by Elasticsearch. The bean is only registered when
  * {@code search.elasticsearch.enabled=true} so the application can run in
@@ -46,8 +45,8 @@ public class ProductSearchService {
 
   @Autowired
   public ProductSearchService(ProductDocumentRepository documentRepository,
-                              ElasticsearchOperations operations,
-                              ProductRepository productRepository) {
+      ElasticsearchOperations operations,
+      ProductRepository productRepository) {
     this.documentRepository = documentRepository;
     this.operations = operations;
     this.productRepository = productRepository;
@@ -79,7 +78,8 @@ public class ProductSearchService {
   }
 
   public List<String> autocomplete(String prefix, int limit) {
-    if (prefix == null || prefix.isBlank()) return List.of();
+    if (prefix == null || prefix.isBlank())
+      return List.of();
     var query = NativeQuery.builder()
         .withQuery(co.elastic.clients.elasticsearch._types.query_dsl.MultiMatchQuery.of(m -> m
             .query(prefix)

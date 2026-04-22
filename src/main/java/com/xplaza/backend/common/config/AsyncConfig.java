@@ -14,11 +14,11 @@ import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 /**
- * Async + scheduling configured to use Java 25 virtual threads everywhere
- * for fast, lightweight concurrency. Spring Boot 4 already enables virtual
- * threads for the request executor when {@code spring.threads.virtual.enabled=true};
- * here we mirror that for {@code @Async} and add a small platform-thread scheduler
- * for cron-style tasks that benefit from steady scheduling.
+ * Async + scheduling configured to use Java 25 virtual threads everywhere for
+ * fast, lightweight concurrency. Spring Boot 4 already enables virtual threads
+ * for the request executor when {@code spring.threads.virtual.enabled=true};
+ * here we mirror that for {@code @Async} and add a small platform-thread
+ * scheduler for cron-style tasks that benefit from steady scheduling.
  */
 @Configuration
 public class AsyncConfig implements AsyncConfigurer {

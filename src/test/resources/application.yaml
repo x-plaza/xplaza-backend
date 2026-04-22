@@ -8,6 +8,26 @@ spring:
   mail:
     username: test-email-user
     password: test-email-password
+  elasticsearch:
+    uris: http://localhost:9200
+  data:
+    redis:
+      host: localhost
+      port: 6379
+    elasticsearch:
+      repositories:
+        enabled: false
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.data.elasticsearch.autoconfigure.ElasticsearchDataAutoConfiguration
+      - org.springframework.boot.data.elasticsearch.autoconfigure.ElasticsearchRepositoriesAutoConfiguration
+      - org.springframework.boot.data.redis.autoconfigure.RedisAutoConfiguration
+      - org.springframework.boot.data.redis.autoconfigure.RedisRepositoriesAutoConfiguration
+      - org.springframework.boot.data.redis.autoconfigure.health.DataRedisHealthContributorAutoConfiguration
+      - org.springframework.boot.data.redis.autoconfigure.health.DataRedisReactiveHealthContributorAutoConfiguration
+      - org.springframework.boot.elasticsearch.autoconfigure.ElasticsearchClientAutoConfiguration
+      - org.springframework.boot.elasticsearch.autoconfigure.ElasticsearchRestClientAutoConfiguration
+      - org.springframework.boot.actuate.autoconfigure.tracing.OpenTelemetryTracingAutoConfiguration
 
 minio:
   url: http://localhost:9000
@@ -25,17 +45,6 @@ management:
   tracing:
     sampling:
       probability: 0.0
-
-spring.elasticsearch.uris: http://localhost:9200
-spring.data.redis.url: ""
-spring.data.elasticsearch.repositories.enabled: false
-spring.autoconfigure.exclude:
-  - org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchDataAutoConfiguration
-  - org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchRepositoriesAutoConfiguration
-  - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
-  - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
-  - org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchClientAutoConfiguration
-  - org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration
 
 telesign:
   customer-id: ""

@@ -8,17 +8,17 @@ package com.xplaza.backend.common.config;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
-
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurer;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.github.benmanes.caffeine.cache.Caffeine;
+
 /**
- * Caffeine-backed cache. In cloud, the application can be configured to
- * use Redis via Spring Data Redis cache manager (autoconfigured when
+ * Caffeine-backed cache. In cloud, the application can be configured to use
+ * Redis via Spring Data Redis cache manager (autoconfigured when
  * {@code spring.cache.type=redis}); the Caffeine manager remains the local
  * default for low-latency reads.
  */

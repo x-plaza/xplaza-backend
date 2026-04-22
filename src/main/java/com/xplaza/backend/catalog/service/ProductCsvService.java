@@ -40,8 +40,8 @@ public class ProductCsvService {
 
   public byte[] exportAll() {
     try (var out = new ByteArrayOutputStream();
-         var writer = new OutputStreamWriter(out, StandardCharsets.UTF_8);
-         var printer = new CSVPrinter(writer, CSVFormat.DEFAULT.builder().setHeader(HEADERS).build())) {
+        var writer = new OutputStreamWriter(out, StandardCharsets.UTF_8);
+        var printer = new CSVPrinter(writer, CSVFormat.DEFAULT.builder().setHeader(HEADERS).build())) {
       for (Product p : productRepository.findAll()) {
         printer.printRecord(p.getProductId(), p.getProductName(), p.getSlug(), p.getProductDescription(),
             p.getProductSellingPrice(), p.getCurrency() == null ? "" : p.getCurrency().getCurrencyName(),
@@ -58,7 +58,8 @@ public class ProductCsvService {
   public ImportSummary importCsv(InputStream input) {
     int created = 0, updated = 0, failed = 0;
     try (var reader = new InputStreamReader(input, StandardCharsets.UTF_8);
-         var parser = CSVParser.parse(reader, CSVFormat.DEFAULT.builder().setHeader().setSkipHeaderRecord(true).build())) {
+        var parser = CSVParser.parse(reader,
+            CSVFormat.DEFAULT.builder().setHeader().setSkipHeaderRecord(true).build())) {
       for (var record : parser) {
         try {
           Long id = parseLong(record.isMapped("id") ? record.get("id") : null);
@@ -69,7 +70,10 @@ public class ProductCsvService {
           product.setProductSellingPrice(parseDouble(record.get("price")));
           product.setQuantity(parseInt(record.get("quantity")));
           var saved = productRepository.save(product);
-          if (id == null) created++; else updated++;
+          if (id == null)
+            created++;
+          else
+            updated++;
           log.debug("Imported product id={} name={}", saved.getProductId(), saved.getProductName());
         } catch (Exception e) {
           log.warn("Failed to import row {}: {}", record.getRecordNumber(), e.getMessage());
@@ -82,11 +86,23 @@ public class ProductCsvService {
     return new ImportSummary(created, updated, failed);
   }
 
-  private static Long parseLong(String s) { return s == null || s.isBlank() ? null : Long.valueOf(s.trim()); }
-  private static Double parseDouble(String s) { return s == null || s.isBlank() ? null : Double.valueOf(s.trim()); }
-  private static Integer parseInt(String s) { return s == null || s.isBlank() ? null : Integer.valueOf(s.trim()); }
+  private static Long parseLong(String s) {
+    return s == null || s.isBlank() ? null : Long.valueOf(s.trim());
+  }
 
-  public record ImportSummary(int created, int updated, int failed) {
+  private static Double parseDouble(String s) {
+    return s == null || s.isBlank() ? null : Double.valueOf(s.trim());
+  }
+
+  private static Integer parseInt(String s) {
+    return s == null || s.isBlank() ? null : Integer.valueOf(s.trim());
+  }
+
+  public record ImportSummary(
+      int created,
+      int updated,
+      int failed
+  ) {
     public List<String> messages() {
       return List.of("created=" + created, "updated=" + updated, "failed=" + failed);
     }

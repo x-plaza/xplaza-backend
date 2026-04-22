@@ -21,7 +21,10 @@ import dev.samstevens.totp.util.Utils;
 
 import org.springframework.stereotype.Service;
 
-/** TOTP-based multi-factor authentication. Issues secrets, generates QR-code data URLs, and verifies codes. */
+/**
+ * TOTP-based multi-factor authentication. Issues secrets, generates QR-code
+ * data URLs, and verifies codes.
+ */
 @Service
 public class MfaService {
 

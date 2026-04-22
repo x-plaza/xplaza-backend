@@ -25,7 +25,14 @@ public class GiftCardController {
 
   private final GiftCardService service;
 
-  public record IssueRequest(BigDecimal amount, String currency, String email, Long customerId, LocalDate expiresOn) {}
+  public record IssueRequest(
+      BigDecimal amount,
+      String currency,
+      String email,
+      Long customerId,
+      LocalDate expiresOn
+  ) {
+  }
 
   @PostMapping
   @PreAuthorize("hasRole('ADMIN')")

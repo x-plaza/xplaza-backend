@@ -92,5 +92,7 @@ public class InvoicePdfService {
     return p;
   }
 
-  private static String safe(String s) { return s == null ? "" : s; }
+  private static String safe(String s) {
+    return s == null ? "" : s;
+  }
 }

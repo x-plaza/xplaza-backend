@@ -21,8 +21,8 @@ import com.xplaza.backend.common.events.DomainEventPublisher;
 import com.xplaza.backend.common.events.DomainEvents;
 import com.xplaza.backend.giftcard.domain.entity.GiftCard;
 import com.xplaza.backend.giftcard.domain.entity.GiftCardTransaction;
-import com.xplaza.backend.giftcard.domain.repository.GiftCardRepositories.GiftCardRepository;
-import com.xplaza.backend.giftcard.domain.repository.GiftCardRepositories.GiftCardTransactionRepository;
+import com.xplaza.backend.giftcard.domain.repository.GiftCardRepository;
+import com.xplaza.backend.giftcard.domain.repository.GiftCardTransactionRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -99,7 +99,8 @@ public class GiftCardService {
   static String generateCode() {
     var sb = new StringBuilder(16);
     for (int i = 0; i < 16; i++) {
-      if (i > 0 && i % 4 == 0) sb.append('-');
+      if (i > 0 && i % 4 == 0)
+        sb.append('-');
       sb.append(ALPHABET.charAt(RNG.nextInt(ALPHABET.length())));
     }
     return sb.toString();

@@ -33,7 +33,8 @@ public class StripePaymentGateway implements PaymentGateway {
                 .setEnabled(true)
                 .build())
         .build();
-    // Stripe-side idempotency: prefer caller-supplied key, fall back to a stable hash.
+    // Stripe-side idempotency: prefer caller-supplied key, fall back to a stable
+    // hash.
     String idempotencyKey = meta.getOrDefault("idempotencyKey",
         "create-pi-" + (description == null ? "" : description.hashCode()) + "-" + amount + currency);
     var options = RequestOptions.builder().setIdempotencyKey(idempotencyKey).build();

@@ -18,8 +18,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * Publishes a {@link DomainEvent} both as a transactional outbox row and as a
  * Spring application event so in-process listeners can subscribe with
  * {@code @TransactionalEventListener(phase = AFTER_COMMIT)}. The outbox row is
- * the source of truth — even if the application crashes after commit, the
- * relay worker will retry delivery.
+ * the source of truth — even if the application crashes after commit, the relay
+ * worker will retry delivery.
  */
 @Component
 public class DomainEventPublisher {

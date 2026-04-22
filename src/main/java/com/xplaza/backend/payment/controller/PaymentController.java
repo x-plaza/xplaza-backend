@@ -198,7 +198,9 @@ public class PaymentController {
       @NotNull UUID orderId,
       @NotNull Long customerId,
       @NotNull @Positive BigDecimal amount,
-      @NotBlank @Size(min = 3, max = 3) String currency) {}
+      @NotBlank @Size(min = 3, max = 3) String currency
+  ) {
+  }
 
   // ==================== Request DTOs ====================
 

@@ -19,8 +19,12 @@ import lombok.*;
 @IdClass(ProductCoPurchase.PK.class)
 public class ProductCoPurchase {
 
-  @Id @Column(name = "product_id") private Long productId;
-  @Id @Column(name = "co_product_id") private Long coProductId;
+  @Id
+  @Column(name = "product_id")
+  private Long productId;
+  @Id
+  @Column(name = "co_product_id")
+  private Long coProductId;
 
   @Column(name = "co_purchase_count")
   private Long coPurchaseCount;

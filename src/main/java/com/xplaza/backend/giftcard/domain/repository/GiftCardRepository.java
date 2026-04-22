@@ -3,18 +3,16 @@
  * Author: Mahiuddin Al Kamal <mahiuddinalkamal>
  */
 
-package com.xplaza.backend.catalog.domain.repository;
+package com.xplaza.backend.giftcard.domain.repository;
 
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.xplaza.backend.catalog.domain.entity.Tag;
+import com.xplaza.backend.giftcard.domain.entity.GiftCard;
 
 @Repository
-public interface TagRepository extends JpaRepository<Tag, Long> {
-  Optional<Tag> findByName(String name);
-
-  Optional<Tag> findBySlug(String slug);
+public interface GiftCardRepository extends JpaRepository<GiftCard, Long> {
+  Optional<GiftCard> findByCode(String code);
 }

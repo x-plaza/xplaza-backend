@@ -17,5 +17,6 @@ import com.xplaza.backend.payment.domain.entity.CustomerPaymentMethod;
 @Repository
 public interface CustomerPaymentMethodRepository extends JpaRepository<CustomerPaymentMethod, UUID> {
   List<CustomerPaymentMethod> findByCustomerId(Long customerId);
+
   Optional<CustomerPaymentMethod> findByCustomerIdAndIsDefaultTrue(Long customerId);
 }

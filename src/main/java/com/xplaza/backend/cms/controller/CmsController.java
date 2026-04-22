@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.*;
 import com.xplaza.backend.cms.domain.entity.CmsBanner;
 import com.xplaza.backend.cms.domain.entity.CmsFaq;
 import com.xplaza.backend.cms.domain.entity.CmsPage;
-import com.xplaza.backend.cms.domain.repository.CmsRepositories.*;
+import com.xplaza.backend.cms.domain.repository.CmsBannerRepository;
+import com.xplaza.backend.cms.domain.repository.CmsFaqRepository;
+import com.xplaza.backend.cms.domain.repository.CmsPageRepository;
 import com.xplaza.backend.common.util.ApiResponse;
 import com.xplaza.backend.exception.ResourceNotFoundException;
 

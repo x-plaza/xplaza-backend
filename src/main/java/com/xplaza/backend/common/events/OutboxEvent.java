@@ -71,7 +71,8 @@ public class OutboxEvent {
 
   public static OutboxEvent newId(DomainEvent event, String payload) {
     var e = of(event, payload);
-    if (e.eventId == null) e.eventId = UUID.randomUUID().toString();
+    if (e.eventId == null)
+      e.eventId = UUID.randomUUID().toString();
     return e;
   }
 }

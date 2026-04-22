@@ -17,10 +17,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service exposing safe at-most-once semantics for mutating endpoints.
- * Callers pass an idempotency key (from the {@code Idempotency-Key} header).
- * If the same key is reused for the same endpoint and request body, the prior
- * stored response is returned instead of repeating the side-effect.
+ * Service exposing safe at-most-once semantics for mutating endpoints. Callers
+ * pass an idempotency key (from the {@code Idempotency-Key} header). If the
+ * same key is reused for the same endpoint and request body, the prior stored
+ * response is returned instead of repeating the side-effect.
  */
 @Service
 public class IdempotencyService {
@@ -39,7 +39,8 @@ public class IdempotencyService {
    */
   @Transactional(readOnly = true)
   public Optional<IdempotencyKey> find(String key) {
-    if (key == null || key.isBlank()) return Optional.empty();
+    if (key == null || key.isBlank())
+      return Optional.empty();
     return repo.findById(key);
   }
 
@@ -65,7 +66,8 @@ public class IdempotencyService {
   }
 
   public String hash(String s) {
-    if (s == null) return null;
+    if (s == null)
+      return null;
     try {
       var md = MessageDigest.getInstance("SHA-256");
       return HexFormat.of().formatHex(md.digest(s.getBytes()));

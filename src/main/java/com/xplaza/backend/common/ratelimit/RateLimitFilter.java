@@ -44,7 +44,8 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
   @Override
   protected boolean shouldNotFilter(HttpServletRequest request) {
-    if (!props.enabled()) return true;
+    if (!props.enabled())
+      return true;
     var path = request.getRequestURI();
     return path.startsWith("/actuator")
         || path.startsWith("/v3/api-docs")
@@ -74,9 +75,9 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
   private Bucket newBucket(String category) {
     int perMinute = switch (category) {
-      case "auth" -> props.authRequestsPerMinute();
-      case "payment" -> props.paymentRequestsPerMinute();
-      default -> props.defaultRequestsPerMinute();
+    case "auth" -> props.authRequestsPerMinute();
+    case "payment" -> props.paymentRequestsPerMinute();
+    default -> props.defaultRequestsPerMinute();
     };
     return Bucket.builder()
         .addLimit(Bandwidth.classic(perMinute, Refill.intervally(perMinute, Duration.ofMinutes(1))))
@@ -85,8 +86,10 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
   private String categorize(HttpServletRequest req) {
     var path = req.getRequestURI();
-    if (path.contains("/auth/")) return "auth";
-    if (path.contains("/payments") || path.contains("/checkout")) return "payment";
+    if (path.contains("/auth/"))
+      return "auth";
+    if (path.contains("/payments") || path.contains("/checkout"))
+      return "payment";
     return "default";
   }
 

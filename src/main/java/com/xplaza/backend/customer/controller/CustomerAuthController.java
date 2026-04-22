@@ -92,13 +92,18 @@ public class CustomerAuthController {
   }
 
   // ---------- Request DTOs ----------
-  public record ForgotPasswordRequest(@NotBlank @Email String email) {}
+  public record ForgotPasswordRequest(@NotBlank @Email String email) {
+  }
 
   public record ResetPasswordRequest(
       @NotBlank String token,
-      @NotBlank String newPassword) {}
+      @NotBlank String newPassword
+  ) {
+  }
 
-  public record MfaConfirmRequest(@NotBlank String code) {}
+  public record MfaConfirmRequest(@NotBlank String code) {
+  }
 
-  public record MfaEnrollResponse(String qrCodeImageDataUri) {}
+  public record MfaEnrollResponse(String qrCodeImageDataUri) {
+  }
 }

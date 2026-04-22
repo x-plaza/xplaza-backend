@@ -34,7 +34,10 @@ public class CustomerGdprController {
     return ResponseEntity.ok(ApiResponse.ok(customerService.exportCustomerData(customer.getCustomerId())));
   }
 
-  /** Right to erasure (GDPR Art. 17). Anonymises identifiers + disables the account. */
+  /**
+   * Right to erasure (GDPR Art. 17). Anonymises identifiers + disables the
+   * account.
+   */
   @DeleteMapping
   public ResponseEntity<ApiResponse<Void>> erase(@AuthenticationPrincipal Customer customer) {
     customerService.eraseCustomerData(customer.getCustomerId());

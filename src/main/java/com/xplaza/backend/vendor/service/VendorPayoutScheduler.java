@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * Scheduled job that collects pending sales per vendor and triggers a
- * disbursement (Stripe Connect or bank transfer). The actual payout
- * adapter lives in the payment module — this scheduler is the trigger.
+ * disbursement (Stripe Connect or bank transfer). The actual payout adapter
+ * lives in the payment module — this scheduler is the trigger.
  */
 @Component
 @Slf4j

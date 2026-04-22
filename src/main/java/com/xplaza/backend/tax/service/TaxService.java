@@ -17,8 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.xplaza.backend.tax.domain.entity.TaxRule;
-import com.xplaza.backend.tax.domain.repository.TaxRepositories.TaxRuleRepository;
-import com.xplaza.backend.tax.domain.repository.TaxRepositories.TaxZoneRepository;
+import com.xplaza.backend.tax.domain.repository.TaxRuleRepository;
+import com.xplaza.backend.tax.domain.repository.TaxZoneRepository;
 
 /**
  * Region-aware tax computation. Lookups are cached because zone/rule data
@@ -32,12 +32,23 @@ public class TaxService {
   private final TaxZoneRepository zoneRepo;
   private final TaxRuleRepository ruleRepo;
 
-  public record TaxBreakdown(BigDecimal taxableAmount, BigDecimal totalTax, List<AppliedTax> appliedTaxes) {}
-  public record AppliedTax(String name, BigDecimal rate, BigDecimal amount) {}
+  public record TaxBreakdown(
+      BigDecimal taxableAmount,
+      BigDecimal totalTax,
+      List<AppliedTax> appliedTaxes
+  ) {
+  }
+
+  public record AppliedTax(
+      String name,
+      BigDecimal rate,
+      BigDecimal amount
+  ) {
+  }
 
   /**
-   * Compute tax for the given pre-tax amount and shipping destination.
-   * If no zone matches, returns zero-tax breakdown.
+   * Compute tax for the given pre-tax amount and shipping destination. If no zone
+   * matches, returns zero-tax breakdown.
    */
   @Cacheable(value = "tax", key = "#countryCode + '-' + #region + '-' + #amount")
   @Transactional(readOnly = true)

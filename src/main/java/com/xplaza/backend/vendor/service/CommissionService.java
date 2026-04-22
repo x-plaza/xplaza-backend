@@ -16,8 +16,8 @@ import org.springframework.stereotype.Service;
 
 /**
  * Splits a sale between the marketplace and the seller. The default rate is
- * configurable but per-shop overrides should be added later via the shop
- * entity once the {@code commission_rate} column is in use.
+ * configurable but per-shop overrides should be added later via the shop entity
+ * once the {@code commission_rate} column is in use.
  */
 @Service
 @RequiredArgsConstructor
@@ -34,5 +34,11 @@ public class CommissionService {
     return new CommissionSplit(grossAmount, rate, commission, sellerNet);
   }
 
-  public record CommissionSplit(BigDecimal gross, BigDecimal rate, BigDecimal commission, BigDecimal sellerNet) {}
+  public record CommissionSplit(
+      BigDecimal gross,
+      BigDecimal rate,
+      BigDecimal commission,
+      BigDecimal sellerNet
+  ) {
+  }
 }

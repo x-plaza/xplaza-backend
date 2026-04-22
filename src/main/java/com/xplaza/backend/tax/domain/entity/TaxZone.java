@@ -17,11 +17,17 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class TaxZone {
-  @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "tax_zone_id") private Long taxZoneId;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "tax_zone_id")
+  private Long taxZoneId;
 
-  @Column(name = "name", nullable = false) private String name;
-  @Column(name = "country_code", length = 2, nullable = false) private String countryCode;
-  @Column(name = "region") private String region;
-  @Column(name = "postal_code_pattern") private String postalCodePattern;
+  @Column(name = "name", nullable = false)
+  private String name;
+  @Column(name = "country_code", length = 2, nullable = false)
+  private String countryCode;
+  @Column(name = "region")
+  private String region;
+  @Column(name = "postal_code_pattern")
+  private String postalCodePattern;
 }

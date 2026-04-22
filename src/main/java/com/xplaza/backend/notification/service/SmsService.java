@@ -13,9 +13,9 @@ import org.springframework.stereotype.Service;
 import com.telesign.MessagingClient;
 
 /**
- * Thin Telesign-backed SMS sender. The Telesign SDK is optional at runtime —
- * if credentials are missing the service logs and returns gracefully so a
- * missing third-party config never blocks order placement.
+ * Thin Telesign-backed SMS sender. The Telesign SDK is optional at runtime — if
+ * credentials are missing the service logs and returns gracefully so a missing
+ * third-party config never blocks order placement.
  */
 @Service
 @Slf4j

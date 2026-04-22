@@ -23,5 +23,11 @@ public class CodPaymentGateway {
     return new CodAuthorizationResult(ref, amount, currency, orderId);
   }
 
-  public record CodAuthorizationResult(String reference, BigDecimal amount, String currency, UUID orderId) {}
+  public record CodAuthorizationResult(
+      String reference,
+      BigDecimal amount,
+      String currency,
+      UUID orderId
+  ) {
+  }
 }

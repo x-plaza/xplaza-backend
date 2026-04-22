@@ -16,10 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Polls the outbox and marks events as published. This loop is intentionally
- * minimal — Spring's {@link org.springframework.transaction.event.TransactionalEventListener}
- * already takes care of in-process delivery; the relay's job is to flag rows
- * as delivered (so the table stays small) and to retry rows that failed
- * earlier delivery (e.g. after a process crash). Plug in an outbound bus
+ * minimal — Spring's
+ * {@link org.springframework.transaction.event.TransactionalEventListener}
+ * already takes care of in-process delivery; the relay's job is to flag rows as
+ * delivered (so the table stays small) and to retry rows that failed earlier
+ * delivery (e.g. after a process crash). Plug in an outbound bus
  * (Kafka/SNS/webhook) here when external delivery is needed.
  */
 @Component
@@ -38,7 +39,8 @@ public class OutboxRelayWorker {
   @Transactional
   public void relay() {
     var batch = repo.findUnpublished(PageRequest.of(0, BATCH));
-    if (batch.isEmpty()) return;
+    if (batch.isEmpty())
+      return;
     var now = Instant.now();
     for (var ev : batch) {
       try {
@@ -53,7 +55,8 @@ public class OutboxRelayWorker {
   }
 
   private static String truncate(String s) {
-    if (s == null) return null;
+    if (s == null)
+      return null;
     return s.length() > 999 ? s.substring(0, 999) : s;
   }
 }

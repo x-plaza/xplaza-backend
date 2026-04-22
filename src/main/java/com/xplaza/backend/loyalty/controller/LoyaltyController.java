@@ -24,7 +24,11 @@ public class LoyaltyController {
 
   private final CustomerRepository customerRepository;
 
-  public record LoyaltyBalance(long points, String tier) {}
+  public record LoyaltyBalance(
+      long points,
+      String tier
+  ) {
+  }
 
   @GetMapping("/balance")
   public ResponseEntity<ApiResponse<LoyaltyBalance>> balance(@AuthenticationPrincipal Customer customer) {

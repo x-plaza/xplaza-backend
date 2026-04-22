@@ -12,10 +12,14 @@ public record RateLimitProperties(
     boolean enabled,
     int authRequestsPerMinute,
     int paymentRequestsPerMinute,
-    int defaultRequestsPerMinute) {
+    int defaultRequestsPerMinute
+) {
   public RateLimitProperties {
-    if (authRequestsPerMinute <= 0) authRequestsPerMinute = 10;
-    if (paymentRequestsPerMinute <= 0) paymentRequestsPerMinute = 30;
-    if (defaultRequestsPerMinute <= 0) defaultRequestsPerMinute = 120;
+    if (authRequestsPerMinute <= 0)
+      authRequestsPerMinute = 10;
+    if (paymentRequestsPerMinute <= 0)
+      paymentRequestsPerMinute = 30;
+    if (defaultRequestsPerMinute <= 0)
+      defaultRequestsPerMinute = 120;
   }
 }

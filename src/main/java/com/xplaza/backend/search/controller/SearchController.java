@@ -54,7 +54,8 @@ public class SearchController {
       @RequestParam("q") String q,
       @RequestParam(name = "limit", defaultValue = "8") int limit) {
     var service = searchProvider.getIfAvailable();
-    if (service == null) return ResponseEntity.ok(ApiResponse.ok(List.of()));
+    if (service == null)
+      return ResponseEntity.ok(ApiResponse.ok(List.of()));
     return ResponseEntity.ok(ApiResponse.ok(service.autocomplete(q, limit)));
   }
 }

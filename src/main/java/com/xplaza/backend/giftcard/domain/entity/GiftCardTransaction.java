@@ -21,15 +21,31 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class GiftCardTransaction {
-  @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "transaction_id") private Long transactionId;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "transaction_id")
+  private Long transactionId;
 
-  @Column(name = "gift_card_id", nullable = false) private Long giftCardId;
-  @Enumerated(EnumType.STRING) @Column(name = "type", length = 20, nullable = false) private TransactionType type;
-  @Column(name = "amount", precision = 15, scale = 2, nullable = false) private BigDecimal amount;
-  @Column(name = "balance_after", precision = 15, scale = 2, nullable = false) private BigDecimal balanceAfter;
-  @Column(name = "order_id") private UUID orderId;
-  @Column(name = "created_at") @Builder.Default private Instant createdAt = Instant.now();
+  @Column(name = "gift_card_id", nullable = false)
+  private Long giftCardId;
+  @Enumerated(EnumType.STRING)
+  @Column(name = "type", length = 20, nullable = false)
+  private TransactionType type;
+  @Column(name = "amount", precision = 15, scale = 2, nullable = false)
+  private BigDecimal amount;
+  @Column(name = "balance_after", precision = 15, scale = 2, nullable = false)
+  private BigDecimal balanceAfter;
+  @Column(name = "order_id")
+  private UUID orderId;
+  @Column(name = "created_at")
+  @Builder.Default
+  private Instant createdAt = Instant.now();
 
-  public enum TransactionType { ISSUE, REDEEM, REFUND, EXPIRE, ADJUST }
+  public enum TransactionType {
+    ISSUE,
+    REDEEM,
+    REFUND,
+    EXPIRE,
+    ADJUST
+  }
 }

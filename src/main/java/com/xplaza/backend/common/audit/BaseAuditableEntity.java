@@ -11,18 +11,19 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import lombok.Getter;
-import lombok.Setter;
-
 /**
- * Base entity providing automatic audit columns: createdAt, createdBy, updatedAt, updatedBy.
- * Soft-delete support via deletedAt is provided by SoftDeletableEntity subclass.
+ * Base entity providing automatic audit columns: createdAt, createdBy,
+ * updatedAt, updatedBy. Soft-delete support via deletedAt is provided by
+ * SoftDeletableEntity subclass.
  */
 @Getter
 @Setter

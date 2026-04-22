@@ -111,7 +111,8 @@ public class Customer implements UserDetails {
 
   @PrePersist
   protected void onCreate() {
-    if (createdAt == null) createdAt = LocalDateTime.now();
+    if (createdAt == null)
+      createdAt = LocalDateTime.now();
   }
 
   @Override

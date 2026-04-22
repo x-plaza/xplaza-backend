@@ -40,10 +40,12 @@ public class IdempotencyInterceptor implements HandlerInterceptor {
 
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-    if (!isMutating(request) || !isProtectedRoute(request)) return true;
+    if (!isMutating(request) || !isProtectedRoute(request))
+      return true;
 
     String key = request.getHeader("Idempotency-Key");
-    if (key == null || key.isBlank()) return true; // header optional; skip if not provided
+    if (key == null || key.isBlank())
+      return true; // header optional; skip if not provided
 
     var existing = service.find(key);
     if (existing.isPresent()) {
@@ -90,7 +92,10 @@ public class IdempotencyInterceptor implements HandlerInterceptor {
     return "";
   }
 
-  /** Wraps the request so the request body can be read both here and by the handler. */
+  /**
+   * Wraps the request so the request body can be read both here and by the
+   * handler.
+   */
   public static final class CachingHttpServletRequest extends HttpServletRequestWrapper {
     private final byte[] cachedBytes;
 
@@ -107,10 +112,24 @@ public class IdempotencyInterceptor implements HandlerInterceptor {
     public ServletInputStream getInputStream() {
       var bais = new java.io.ByteArrayInputStream(cachedBytes);
       return new ServletInputStream() {
-        @Override public int read() { return bais.read(); }
-        @Override public boolean isFinished() { return bais.available() == 0; }
-        @Override public boolean isReady() { return true; }
-        @Override public void setReadListener(ReadListener listener) {}
+        @Override
+        public int read() {
+          return bais.read();
+        }
+
+        @Override
+        public boolean isFinished() {
+          return bais.available() == 0;
+        }
+
+        @Override
+        public boolean isReady() {
+          return true;
+        }
+
+        @Override
+        public void setReadListener(ReadListener listener) {
+        }
       };
     }
   }

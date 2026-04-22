@@ -17,12 +17,21 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class CmsFaq {
-  @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "faq_id") private Long faqId;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "faq_id")
+  private Long faqId;
 
-  @Column(name = "question", nullable = false) private String question;
-  @Column(name = "answer", columnDefinition = "TEXT", nullable = false) private String answer;
-  @Column(name = "category") private String category;
-  @Column(name = "display_order") @Builder.Default private Integer displayOrder = 0;
-  @Column(name = "active") @Builder.Default private Boolean active = true;
+  @Column(name = "question", nullable = false)
+  private String question;
+  @Column(name = "answer", columnDefinition = "TEXT", nullable = false)
+  private String answer;
+  @Column(name = "category")
+  private String category;
+  @Column(name = "display_order")
+  @Builder.Default
+  private Integer displayOrder = 0;
+  @Column(name = "active")
+  @Builder.Default
+  private Boolean active = true;
 }

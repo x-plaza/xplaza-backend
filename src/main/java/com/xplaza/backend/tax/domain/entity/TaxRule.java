@@ -19,14 +19,26 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class TaxRule {
-  @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "tax_rule_id") private Long taxRuleId;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "tax_rule_id")
+  private Long taxRuleId;
 
-  @Column(name = "tax_zone_id", nullable = false) private Long taxZoneId;
-  @Column(name = "name", nullable = false) private String name;
-  @Column(name = "rate", precision = 6, scale = 4, nullable = false) private BigDecimal rate;
-  @Column(name = "category") private String category;
-  @Column(name = "priority") @Builder.Default private Integer priority = 0;
-  @Column(name = "compound") @Builder.Default private Boolean compound = false;
-  @Column(name = "active") @Builder.Default private Boolean active = true;
+  @Column(name = "tax_zone_id", nullable = false)
+  private Long taxZoneId;
+  @Column(name = "name", nullable = false)
+  private String name;
+  @Column(name = "rate", precision = 6, scale = 4, nullable = false)
+  private BigDecimal rate;
+  @Column(name = "category")
+  private String category;
+  @Column(name = "priority")
+  @Builder.Default
+  private Integer priority = 0;
+  @Column(name = "compound")
+  @Builder.Default
+  private Boolean compound = false;
+  @Column(name = "active")
+  @Builder.Default
+  private Boolean active = true;
 }

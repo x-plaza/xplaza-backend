@@ -27,9 +27,9 @@ import com.xplaza.backend.recommendation.domain.repository.ProductCoPurchaseRepo
 import com.xplaza.backend.recommendation.domain.repository.RecentlyViewedProductRepository;
 
 /**
- * Lightweight in-DB recommendation engine. For Amazon-grade ranking this
- * should later be replaced with an offline collaborative-filtering pipeline,
- * but the API contract here is forward-compatible with that swap.
+ * Lightweight in-DB recommendation engine. For Amazon-grade ranking this should
+ * later be replaced with an offline collaborative-filtering pipeline, but the
+ * API contract here is forward-compatible with that swap.
  */
 @Service
 @RequiredArgsConstructor
@@ -46,7 +46,8 @@ public class RecommendationService {
    */
   @Transactional
   public void recordView(Long customerId, Long productId) {
-    if (customerId == null) return;
+    if (customerId == null)
+      return;
     var rec = RecentlyViewedProduct.builder()
         .customerId(customerId)
         .productId(productId)
@@ -69,7 +70,8 @@ public class RecommendationService {
   public List<Product> related(Long productId, int limit) {
     return productRepo.findById(productId).map(p -> {
       // Same category, exclude self.
-      if (p.getCategory() == null) return List.<Product>of();
+      if (p.getCategory() == null)
+        return List.<Product>of();
       return productRepo.findAll().stream()
           .filter(o -> o.getCategory() != null
               && o.getCategory().getCategoryId().equals(p.getCategory().getCategoryId()))

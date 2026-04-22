@@ -3,18 +3,19 @@
  * Author: Mahiuddin Al Kamal <mahiuddinalkamal>
  */
 
-package com.xplaza.backend.catalog.domain.repository;
+package com.xplaza.backend.cms.domain.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.xplaza.backend.catalog.domain.entity.Tag;
+import com.xplaza.backend.cms.domain.entity.CmsBanner;
 
 @Repository
-public interface TagRepository extends JpaRepository<Tag, Long> {
-  Optional<Tag> findByName(String name);
+public interface CmsBannerRepository extends JpaRepository<CmsBanner, Long> {
+  List<CmsBanner> findByActiveTrue();
 
-  Optional<Tag> findBySlug(String slug);
+  Optional<CmsBanner> findByCode(String code);
 }

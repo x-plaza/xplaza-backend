@@ -11,7 +11,8 @@ import java.util.UUID;
 /**
  * Marker interface for transactionally-consistent domain events.
  *
- * <p>Implementations are immutable records that carry the minimal payload the
+ * <p>
+ * Implementations are immutable records that carry the minimal payload the
  * downstream listener needs. Producers publish via
  * {@link DomainEventPublisher#publish(DomainEvent)} which writes to the
  * transactional outbox in the same JDBC transaction; an asynchronous worker

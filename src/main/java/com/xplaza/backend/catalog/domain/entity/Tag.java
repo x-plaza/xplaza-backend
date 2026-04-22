@@ -17,9 +17,13 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class Tag {
-  @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "tag_id") private Long tagId;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "tag_id")
+  private Long tagId;
 
-  @Column(name = "name", unique = true, nullable = false, length = 100) private String name;
-  @Column(name = "slug", unique = true, length = 120) private String slug;
+  @Column(name = "name", unique = true, nullable = false, length = 100)
+  private String name;
+  @Column(name = "slug", unique = true, length = 120)
+  private String slug;
 }

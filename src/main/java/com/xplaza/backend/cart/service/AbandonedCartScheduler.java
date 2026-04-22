@@ -43,7 +43,8 @@ public class AbandonedCartScheduler {
   public void detectAbandoned() {
     var threshold = Instant.now().minus(Duration.ofHours(abandonedAfterHours));
     var inactive = cartRepository.findInactiveCarts(threshold);
-    if (inactive.isEmpty()) return;
+    if (inactive.isEmpty())
+      return;
     log.info("Detected {} abandoned carts (threshold: {}h)", inactive.size(), abandonedAfterHours);
     for (var cart : inactive) {
       cart.setStatus(com.xplaza.backend.cart.domain.entity.Cart.CartStatus.ABANDONED);

@@ -21,8 +21,12 @@ import lombok.*;
 @IdClass(RecentlyViewedProduct.PK.class)
 public class RecentlyViewedProduct {
 
-  @Id @Column(name = "customer_id") private Long customerId;
-  @Id @Column(name = "product_id") private Long productId;
+  @Id
+  @Column(name = "customer_id")
+  private Long customerId;
+  @Id
+  @Column(name = "product_id")
+  private Long productId;
 
   @Column(name = "viewed_at")
   private Instant viewedAt;
