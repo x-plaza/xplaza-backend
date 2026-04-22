@@ -1,0 +1,15 @@
+{
+  "analysis": {
+    "analyzer": {
+      "english_lower": {
+        "type": "custom",
+        "tokenizer": "standard",
+        "filter": ["lowercase", "english_stop", "english_stemmer", "asciifolding"]
+      }
+    },
+    "filter": {
+      "english_stop": { "type": "stop", "stopwords": "_english_" },
+      "english_stemmer": { "type": "stemmer", "language": "english" }
+    }
+  }
+}

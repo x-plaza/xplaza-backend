@@ -69,6 +69,9 @@ public final class DomainEvents {
   public record ProductIndexed(
       UUID eventId, Instant occurredAt, Long productId) implements DomainEvent {}
 
+  public record ProductIndexInvalidated(
+      UUID eventId, Instant occurredAt, Long productId) implements DomainEvent {}
+
   public record ReviewCreated(
       UUID eventId, Instant occurredAt, Long reviewId, Long productId, Long customerId, int rating) implements DomainEvent {}
 

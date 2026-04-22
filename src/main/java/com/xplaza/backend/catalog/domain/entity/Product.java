@@ -67,4 +67,29 @@ public class Product {
 
   @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   private List<ProductImage> images;
+
+  // SEO + slug + soft delete (V2 migration adds the columns).
+  @Column(name = "slug", length = 255, unique = true)
+  private String slug;
+
+  @Column(name = "seo_title", length = 255)
+  private String seoTitle;
+
+  @Column(name = "seo_description", columnDefinition = "TEXT")
+  private String seoDescription;
+
+  @Column(name = "seo_keywords", length = 500)
+  private String seoKeywords;
+
+  @Column(name = "is_published")
+  private Boolean isPublished;
+
+  @Column(name = "deleted_at")
+  private java.time.Instant deletedAt;
+
+  @Column(name = "average_rating")
+  private Double averageRating;
+
+  @Column(name = "review_count")
+  private Integer reviewCount;
 }

@@ -34,6 +34,7 @@ public sealed interface DomainEvent permits
     DomainEvents.InventoryReleased,
     DomainEvents.ProductPriceChanged,
     DomainEvents.ProductIndexed,
+    DomainEvents.ProductIndexInvalidated,
     DomainEvents.ReviewCreated,
     DomainEvents.NotificationRequested,
     DomainEvents.GiftCardIssued,

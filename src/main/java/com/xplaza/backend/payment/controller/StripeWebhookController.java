@@ -23,6 +23,7 @@ import com.stripe.exception.SignatureVerificationException;
 import com.stripe.model.Event;
 import com.stripe.model.PaymentIntent;
 import com.stripe.net.Webhook;
+import com.xplaza.backend.common.idempotency.IdempotencyService;
 import com.xplaza.backend.order.domain.entity.CustomerOrder;
 import com.xplaza.backend.order.domain.repository.CustomerOrderRepository;
 
@@ -36,6 +37,7 @@ public class StripeWebhookController {
   private String webhookSecret;
 
   private final CustomerOrderRepository orderRepository;
+  private final IdempotencyService idempotencyService;
 
   @PostMapping
   public ResponseEntity<String> handleStripeWebhook(
@@ -54,6 +56,19 @@ public class StripeWebhookController {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Webhook error");
     }
 
+    // Idempotent processing: Stripe may retry; reject duplicates by event id.
+    var key = "stripe-evt-" + event.getId();
+    if (idempotencyService.find(key).isPresent()) {
+      log.info("Stripe webhook {} already processed", event.getId());
+      return ResponseEntity.ok("Already processed");
+    }
+    try {
+      idempotencyService.reserve(key, "/api/v1/webhooks/stripe", event.getType());
+    } catch (Exception e) {
+      log.info("Stripe webhook {} concurrently processed, dropping", event.getId());
+      return ResponseEntity.ok("Concurrent");
+    }
+
     if ("payment_intent.succeeded".equals(event.getType())) {
       PaymentIntent paymentIntent = (PaymentIntent) event.getDataObjectDeserializer().getObject().orElse(null);
       if (paymentIntent != null) {
@@ -61,6 +76,7 @@ public class StripeWebhookController {
       }
     }
 
+    idempotencyService.persistResponse(key, 200, "ok");
     return ResponseEntity.ok("Received");
   }
 

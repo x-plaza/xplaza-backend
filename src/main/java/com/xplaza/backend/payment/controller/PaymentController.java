@@ -187,6 +187,19 @@ public class PaymentController {
     return ResponseEntity.ok(clientSecret);
   }
 
+  @Operation(summary = "Create Cash on Delivery payment for an order")
+  @PostMapping("/cod")
+  public ResponseEntity<PaymentTransaction> createCod(@RequestBody @Valid CreateCodRequest request) {
+    var txn = paymentService.createCod(request.orderId(), request.customerId(), request.amount(), request.currency());
+    return ResponseEntity.ok(txn);
+  }
+
+  public record CreateCodRequest(
+      @NotNull UUID orderId,
+      @NotNull Long customerId,
+      @NotNull @Positive BigDecimal amount,
+      @NotBlank @Size(min = 3, max = 3) String currency) {}
+
   // ==================== Request DTOs ====================
 
   public record CreatePaymentIntentRequest(

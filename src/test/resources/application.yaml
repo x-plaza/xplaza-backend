@@ -14,3 +14,29 @@ minio:
   access-key: minioadmin
   secret-key: minioadmin
   bucket-name: xplaza-products-test
+
+# Disable optional integrations during unit/integration tests so the context
+# can boot without external services.
+search:
+  elasticsearch:
+    enabled: false
+
+management:
+  tracing:
+    sampling:
+      probability: 0.0
+
+spring.elasticsearch.uris: http://localhost:9200
+spring.data.redis.url: ""
+spring.data.elasticsearch.repositories.enabled: false
+spring.autoconfigure.exclude:
+  - org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchDataAutoConfiguration
+  - org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchRepositoriesAutoConfiguration
+  - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+  - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+  - org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchClientAutoConfiguration
+  - org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration
+
+telesign:
+  customer-id: ""
+  api-key: ""
