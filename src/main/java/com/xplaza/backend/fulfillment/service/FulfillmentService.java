@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.xplaza.backend.common.util.LogSanitizer;
 import com.xplaza.backend.fulfillment.domain.entity.Carrier;
 import com.xplaza.backend.fulfillment.domain.entity.Return;
 import com.xplaza.backend.fulfillment.domain.entity.Shipment;
@@ -119,7 +120,7 @@ public class FulfillmentService {
     shipment.addTrackingEvent(event);
 
     Shipment savedShipment = shipmentRepository.save(shipment);
-    log.info("Marked shipment as shipped: {} tracking={}", shipmentId, trackingNumber);
+    log.info("Marked shipment as shipped: {} tracking={}", shipmentId, LogSanitizer.forLog(trackingNumber));
 
     // Send notification
     try {
@@ -281,7 +282,7 @@ public class FulfillmentService {
     returnRequest.reject(adminId, reason);
     returnRequest = returnRepository.save(returnRequest);
 
-    log.info("Rejected return {}: {}", returnId, reason);
+    log.info("Rejected return {}: {}", returnId, LogSanitizer.forLog(reason));
     return returnRequest;
   }
 
@@ -295,7 +296,7 @@ public class FulfillmentService {
     returnRequest.markShipped(trackingNumber);
     returnRequest = returnRepository.save(returnRequest);
 
-    log.info("Marked return as shipped: {} tracking={}", returnId, trackingNumber);
+    log.info("Marked return as shipped: {} tracking={}", returnId, LogSanitizer.forLog(trackingNumber));
     return returnRequest;
   }
 

@@ -25,6 +25,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import com.xplaza.backend.common.util.LogSanitizer;
+
 /**
  * Looks for an {@code Idempotency-Key} header on POST/DELETE/PATCH/PUT requests
  * targeting payment, refund, checkout or order routes.
@@ -86,7 +88,7 @@ public class IdempotencyInterceptor implements HandlerInterceptor {
       boolean hashMatches = requestHash != null && requestHash.equals(rec.getRequestHash());
       if (!endpointMatches || !hashMatches) {
         log.warn("Idempotency key reuse rejected: key={}, endpointMatches={}, hashMatches={}",
-            key, endpointMatches, hashMatches);
+            LogSanitizer.forLog(key), endpointMatches, hashMatches);
         writeJson(response, HttpServletResponse.SC_CONFLICT,
             "{\"error\":\"idempotency_key_reuse\","
                 + "\"message\":\"Idempotency-Key was previously used for a different request\"}");
@@ -115,7 +117,7 @@ public class IdempotencyInterceptor implements HandlerInterceptor {
       request.setAttribute(ATTR_KEY, key);
     } catch (DataIntegrityViolationException e) {
       // Lost the race with another request that just inserted the same key.
-      log.warn("Idempotency key collision on insert: {}", key);
+      log.warn("Idempotency key collision on insert: {}", LogSanitizer.forLog(key));
       writeJson(response, HttpServletResponse.SC_CONFLICT, "{\"error\":\"idempotency_conflict\"}");
       return false;
     }

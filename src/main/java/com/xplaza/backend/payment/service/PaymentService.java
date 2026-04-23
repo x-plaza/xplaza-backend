@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.xplaza.backend.common.util.LogSanitizer;
 import com.xplaza.backend.notification.domain.entity.Notification;
 import com.xplaza.backend.notification.service.NotificationService;
 import com.xplaza.backend.payment.domain.entity.PaymentTransaction;
@@ -184,7 +185,7 @@ public class PaymentService {
     txn.markFailed(errorCode, errorMessage);
     txn = transactionRepository.save(txn);
 
-    log.info("Failed transaction {}: {}", transactionId, errorMessage);
+    log.info("Failed transaction {}: {}", transactionId, LogSanitizer.forLog(errorMessage));
     return txn;
   }
 
@@ -278,7 +279,7 @@ public class PaymentService {
     refund.reject(adminId, reason);
     refund = refundRepository.save(refund);
 
-    log.info("Rejected refund {}: {}", refundId, reason);
+    log.info("Rejected refund {}: {}", refundId, LogSanitizer.forLog(reason));
     return refund;
   }
 

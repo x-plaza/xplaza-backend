@@ -5,7 +5,11 @@
 
 package com.xplaza.backend.notification.service;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
+import java.util.HexFormat;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
@@ -62,7 +66,8 @@ public class PushNotificationService {
     if (existing != null) {
       if (!customerId.equals(existing.getCustomerId())) {
         log.warn("Rejecting push token re-registration: token already bound to a different customer "
-            + "(attemptedBy={}, tokenPrefix={})", customerId, redact(token));
+            + "(attemptedBy={}, boundTo={}, fingerprint={})",
+            customerId, existing.getCustomerId(), fingerprint(token));
         throw new org.springframework.security.access.AccessDeniedException(
             "Push token is already registered to a different customer");
       }
@@ -120,32 +125,52 @@ public class PushNotificationService {
   }
 
   private void dispatch(PushToken token, String title, String body) {
+    // Identify the device by its DB primary key in logs, never the raw token.
+    // Logging even a substring of the token is reportable as CWE-532 (sensitive
+    // info in logs), so we keep the surface minimal.
+    Long tokenId = token.getId();
     switch (token.getPlatform()) {
     case ANDROID, WEB -> {
       if (fcmEnabled) {
         // TODO: integrate Firebase Admin SDK; intentionally left out of OSS
         // build because credentials are deployment-specific.
-        log.info("[FCM] -> token={} title='{}' body='{}'", redact(token.getToken()), title, body);
+        log.info("[FCM] -> tokenId={} title='{}' body length={}", tokenId, title, length(body));
       } else {
-        log.debug("FCM disabled, skipping push to token {}", redact(token.getToken()));
+        log.debug("FCM disabled, skipping push to tokenId={}", tokenId);
       }
     }
     case IOS -> {
       if (apnsEnabled) {
         // TODO: integrate Pushy or apns-http2 client.
-        log.info("[APNs] -> token={} title='{}' body='{}'", redact(token.getToken()), title, body);
+        log.info("[APNs] -> tokenId={} title='{}' body length={}", tokenId, title, length(body));
       } else {
-        log.debug("APNs disabled, skipping push to token {}", redact(token.getToken()));
+        log.debug("APNs disabled, skipping push to tokenId={}", tokenId);
       }
     }
-    default -> log.warn("Unknown platform {} for token {}", token.getPlatform(), token.getId());
+    default -> log.warn("Unknown platform {} for tokenId {}", token.getPlatform(), tokenId);
     }
   }
 
-  private static String redact(String token) {
-    if (token == null || token.length() < 8) {
+  private static int length(String s) {
+    return s == null ? 0 : s.length();
+  }
+
+  /**
+   * Stable, non-reversible identifier for a push token. We log only the first 12
+   * hex characters of SHA-256 so two events for the same device can be correlated
+   * without exposing token material. Returns {@code "***"} if SHA-256 is somehow
+   * unavailable so logging never throws.
+   */
+  private static String fingerprint(String token) {
+    if (token == null) {
       return "***";
     }
-    return token.substring(0, 4) + "..." + token.substring(token.length() - 4);
+    try {
+      MessageDigest md = MessageDigest.getInstance("SHA-256");
+      byte[] digest = md.digest(token.getBytes(StandardCharsets.UTF_8));
+      return HexFormat.of().formatHex(digest).substring(0, 12);
+    } catch (NoSuchAlgorithmException e) {
+      return "***";
+    }
   }
 }

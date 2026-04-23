@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 import com.xplaza.backend.catalog.domain.entity.Product;
 import com.xplaza.backend.catalog.domain.repository.ProductRepository;
 import com.xplaza.backend.common.events.DomainEvents;
+import com.xplaza.backend.common.util.LogSanitizer;
 import com.xplaza.backend.search.document.ProductDocument;
 import com.xplaza.backend.search.repository.ProductDocumentRepository;
 
@@ -136,7 +137,7 @@ public class ProductSearchService {
       long parsed = Long.parseLong(v.trim());
       b.filter(TermQuery.of(t -> t.field(field).value(parsed))._toQuery());
     } catch (NumberFormatException e) {
-      log.debug("Skipping non-numeric filter for '{}' = '{}'", key, v);
+      log.debug("Skipping non-numeric filter for '{}' = '{}'", LogSanitizer.forLog(key), LogSanitizer.forLog(v));
     }
   }
 
@@ -154,7 +155,7 @@ public class ProductSearchService {
       boolean parsed = Boolean.parseBoolean(trimmed);
       b.filter(TermQuery.of(t -> t.field(field).value(parsed))._toQuery());
     } else {
-      log.debug("Skipping non-boolean filter for '{}' = '{}'", key, v);
+      log.debug("Skipping non-boolean filter for '{}' = '{}'", LogSanitizer.forLog(key), LogSanitizer.forLog(v));
     }
   }
 

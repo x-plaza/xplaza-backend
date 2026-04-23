@@ -27,6 +27,7 @@ import com.xplaza.backend.cart.domain.entity.CartItem;
 import com.xplaza.backend.cart.domain.repository.CartRepository;
 import com.xplaza.backend.common.events.DomainEventPublisher;
 import com.xplaza.backend.common.events.DomainEvents;
+import com.xplaza.backend.common.util.LogSanitizer;
 import com.xplaza.backend.inventory.service.InventoryService;
 import com.xplaza.backend.notification.domain.entity.Notification;
 import com.xplaza.backend.notification.service.NotificationService;
@@ -536,7 +537,7 @@ public class CustomerOrderService {
     orderItemRepository.updateStatusForOrder(orderId, CustomerOrderItem.ItemStatus.CANCELLED);
 
     CustomerOrder saved = orderRepository.save(order);
-    log.info("Cancelled order: {} - Reason: {}", order.getOrderNumber(), reason);
+    log.info("Cancelled order: {} - Reason: {}", order.getOrderNumber(), LogSanitizer.forLog(reason));
 
     // Trigger refund if payment was made
     if ("PAID".equals(order.getPaymentStatus())) {

@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.xplaza.backend.common.util.LogSanitizer;
 import com.xplaza.backend.marketing.domain.entity.Campaign;
 import com.xplaza.backend.marketing.domain.repository.CampaignRepository;
 
@@ -41,7 +42,7 @@ public class CampaignService {
     }
     campaign.setStatus(Campaign.CampaignStatus.DRAFT);
     campaign = campaignRepository.save(campaign);
-    log.info("Created campaign: {}", campaign.getCode());
+    log.info("Created campaign: {}", LogSanitizer.forLog(campaign.getCode()));
     return campaign;
   }
 

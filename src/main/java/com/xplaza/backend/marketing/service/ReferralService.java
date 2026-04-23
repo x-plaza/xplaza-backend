@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.xplaza.backend.common.events.DomainEvents;
+import com.xplaza.backend.common.util.LogSanitizer;
 import com.xplaza.backend.loyalty.service.LoyaltyService;
 import com.xplaza.backend.marketing.domain.entity.Referral;
 import com.xplaza.backend.marketing.domain.repository.ReferralRepository;
@@ -75,7 +76,7 @@ public class ReferralService {
     var ref = referralRepository.findByCode(code)
         .orElseThrow(() -> new IllegalArgumentException("Unknown referral code: " + code));
     if (ref.getStatus() != Referral.ReferralStatus.PENDING) {
-      log.debug("Referral {} already in state {}; ignoring accept", code, ref.getStatus());
+      log.debug("Referral {} already in state {}; ignoring accept", LogSanitizer.forLog(code), ref.getStatus());
       return;
     }
     ref.setRefereeId(refereeCustomerId);

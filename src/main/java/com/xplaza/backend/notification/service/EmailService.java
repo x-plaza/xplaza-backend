@@ -22,6 +22,8 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import com.xplaza.backend.common.util.LogSanitizer;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -70,9 +72,10 @@ public class EmailService {
       helper.setFrom("noreply@xplaza.com");
 
       mailSender.send(mimeMessage);
-      log.info("HTML Email '{}' (template={}) sent to {}", subject, template, to);
+      log.info("HTML Email '{}' (template={}) sent to {}",
+          LogSanitizer.forLog(subject), LogSanitizer.forLog(template), LogSanitizer.forLog(to));
     } catch (MessagingException e) {
-      log.error("Failed to send HTML email to {}", to, e);
+      log.error("Failed to send HTML email to {}", LogSanitizer.forLog(to), e);
     }
   }
 }
