@@ -72,6 +72,20 @@ CREATE INDEX IF NOT EXISTS idx_referrals_email ON referrals(referee_email);
 CREATE INDEX IF NOT EXISTS idx_referrals_referee_status ON referrals(referee_id, status);
 
 -- ---------- Product image variants ----------
+-- The ProductImage JPA entity expects a `product_images` table that the V1
+-- baseline never created (V1 only modelled per-variant `variant_images`).
+-- Create it here on the fly so the v1.1.0 image-pipeline columns can land.
+CREATE TABLE IF NOT EXISTS product_images (
+    product_images_id   BIGSERIAL PRIMARY KEY,
+    fk_product_id       BIGINT REFERENCES products(product_id) ON DELETE CASCADE,
+    product_image_name  VARCHAR(255),
+    product_image_path  VARCHAR(500),
+    created_by          INTEGER,
+    created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_updated_by     INTEGER,
+    last_updated_at     TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_product_images_product ON product_images(fk_product_id);
 ALTER TABLE product_images ADD COLUMN IF NOT EXISTS thumbnail_url VARCHAR(500);
 ALTER TABLE product_images ADD COLUMN IF NOT EXISTS medium_url    VARCHAR(500);
 ALTER TABLE product_images ADD COLUMN IF NOT EXISTS large_url     VARCHAR(500);

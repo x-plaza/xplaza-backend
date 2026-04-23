@@ -154,9 +154,16 @@
 			<artifactId>h2</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+		<!--
+			Spring Boot 4.x modularized auto-configuration: Flyway support is no
+			longer activated by simply having flyway-core on the classpath.
+			The starter brings in spring-boot-flyway-autoconfigure which
+			registers FlywayAutoConfiguration so migrations run before Hibernate
+			schema validation.
+		-->
 		<dependency>
-			<groupId>org.flywaydb</groupId>
-			<artifactId>flyway-core</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-flyway</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.flywaydb</groupId>

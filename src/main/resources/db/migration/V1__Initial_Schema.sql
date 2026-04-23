@@ -122,7 +122,7 @@ ALTER TABLE products ADD COLUMN IF NOT EXISTS published_at TIMESTAMP;
 
 -- Product Variants (the purchasable items)
 CREATE TABLE IF NOT EXISTS product_variants (
-    variant_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    variant_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     product_id BIGINT NOT NULL REFERENCES products(product_id) ON DELETE CASCADE,
     sku VARCHAR(100) NOT NULL UNIQUE,
     name VARCHAR(255),
@@ -152,7 +152,7 @@ CREATE TABLE IF NOT EXISTS variant_attributes (
 
 -- Variant Images (images specific to variants, e.g., color-specific images)
 CREATE TABLE IF NOT EXISTS variant_images (
-    image_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    image_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     variant_id UUID NOT NULL REFERENCES product_variants(variant_id) ON DELETE CASCADE,
     url VARCHAR(500) NOT NULL,
     alt_text VARCHAR(255),
@@ -253,7 +253,7 @@ ALTER TABLE customers ADD COLUMN IF NOT EXISTS lifetime_spend DECIMAL(15, 2) DEF
 
 -- Saved Payment Methods
 CREATE TABLE IF NOT EXISTS customer_payment_methods (
-    payment_method_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    payment_method_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     customer_id BIGINT NOT NULL REFERENCES customers(customer_id) ON DELETE CASCADE,
     type VARCHAR(20) NOT NULL, -- CARD, PAYPAL, BANK_ACCOUNT, WALLET
     is_default BOOLEAN DEFAULT FALSE,
@@ -272,7 +272,7 @@ CREATE TABLE IF NOT EXISTS customer_payment_methods (
 
 -- Wishlists
 CREATE TABLE IF NOT EXISTS wishlists (
-    wishlist_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    wishlist_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     customer_id BIGINT NOT NULL REFERENCES customers(customer_id) ON DELETE CASCADE,
     name VARCHAR(100) DEFAULT 'My Wishlist',
     visibility VARCHAR(20) DEFAULT 'PRIVATE', -- PRIVATE, SHARED, PUBLIC
@@ -283,7 +283,7 @@ CREATE TABLE IF NOT EXISTS wishlists (
 
 -- Wishlist Items
 CREATE TABLE IF NOT EXISTS wishlist_items (
-    wishlist_item_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    wishlist_item_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     wishlist_id UUID NOT NULL REFERENCES wishlists(wishlist_id) ON DELETE CASCADE,
     product_id BIGINT NOT NULL REFERENCES products(product_id) ON DELETE CASCADE,
     variant_id UUID REFERENCES product_variants(variant_id) ON DELETE SET NULL,
@@ -336,7 +336,7 @@ CREATE TABLE IF NOT EXISTS coupons (
 
 -- Shopping Carts (proper implementation)
 CREATE TABLE IF NOT EXISTS carts (
-    cart_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    cart_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     customer_id BIGINT REFERENCES customers(customer_id) ON DELETE SET NULL,
     session_id VARCHAR(100), -- for guest carts
     status VARCHAR(20) DEFAULT 'ACTIVE', -- ACTIVE, MERGED, CONVERTED, ABANDONED
@@ -355,7 +355,7 @@ CREATE TABLE IF NOT EXISTS carts (
 
 -- Cart Items
 CREATE TABLE IF NOT EXISTS cart_items (
-    cart_item_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    cart_item_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     cart_id UUID NOT NULL REFERENCES carts(cart_id) ON DELETE CASCADE,
     product_id BIGINT NOT NULL REFERENCES products(product_id),
     variant_id UUID REFERENCES product_variants(variant_id),
@@ -388,7 +388,7 @@ CREATE TABLE IF NOT EXISTS cart_coupons (
 
 -- Customer Orders
 CREATE TABLE IF NOT EXISTS customer_orders (
-    order_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    order_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     customer_id BIGINT NOT NULL REFERENCES customers(customer_id),
     shop_id BIGINT NOT NULL REFERENCES shops(shop_id),
     cart_id UUID,
@@ -456,7 +456,7 @@ CREATE TABLE IF NOT EXISTS customer_orders (
 
 -- Customer Order Items
 CREATE TABLE IF NOT EXISTS customer_order_items (
-    order_item_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    order_item_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     order_id UUID NOT NULL REFERENCES customer_orders(order_id) ON DELETE CASCADE,
     product_id BIGINT NOT NULL REFERENCES products(product_id),
     variant_id UUID REFERENCES product_variants(variant_id),
@@ -489,7 +489,7 @@ CREATE TABLE IF NOT EXISTS customer_order_items (
 
 -- Product Reviews
 CREATE TABLE IF NOT EXISTS reviews (
-    review_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    review_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     product_id BIGINT NOT NULL REFERENCES products(product_id) ON DELETE CASCADE,
     variant_id UUID REFERENCES product_variants(variant_id),
     order_id UUID REFERENCES customer_orders(order_id),
@@ -532,7 +532,7 @@ CREATE TABLE IF NOT EXISTS reviews (
 
 -- Review Images
 CREATE TABLE IF NOT EXISTS review_images (
-    image_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    image_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     review_id UUID NOT NULL REFERENCES reviews(review_id) ON DELETE CASCADE,
     url VARCHAR(500) NOT NULL,
     alt_text VARCHAR(255),
@@ -542,7 +542,7 @@ CREATE TABLE IF NOT EXISTS review_images (
 
 -- Review Videos
 CREATE TABLE IF NOT EXISTS review_videos (
-    video_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    video_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     review_id UUID NOT NULL REFERENCES reviews(review_id) ON DELETE CASCADE,
     url VARCHAR(500) NOT NULL,
     thumbnail_url VARCHAR(500),
@@ -552,7 +552,7 @@ CREATE TABLE IF NOT EXISTS review_videos (
 
 -- Vendor Responses to Reviews
 CREATE TABLE IF NOT EXISTS review_responses (
-    response_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    response_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     review_id UUID NOT NULL UNIQUE REFERENCES reviews(review_id) ON DELETE CASCADE,
     body TEXT NOT NULL,
     responded_by BIGINT NOT NULL REFERENCES admin_users(id),
@@ -562,7 +562,7 @@ CREATE TABLE IF NOT EXISTS review_responses (
 
 -- Review Votes (helpful/unhelpful tracking)
 CREATE TABLE IF NOT EXISTS review_votes (
-    vote_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    vote_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     review_id UUID NOT NULL REFERENCES reviews(review_id) ON DELETE CASCADE,
     customer_id BIGINT NOT NULL REFERENCES customers(customer_id) ON DELETE CASCADE,
     is_helpful BOOLEAN NOT NULL,
@@ -603,7 +603,7 @@ CREATE TABLE IF NOT EXISTS shop_ratings (
 
 -- Payment Transactions
 CREATE TABLE IF NOT EXISTS payment_transactions (
-    transaction_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    transaction_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     order_id UUID REFERENCES customer_orders(order_id),
     customer_id BIGINT REFERENCES customers(customer_id),
     type VARCHAR(20) NOT NULL, -- AUTHORIZATION, CAPTURE, SALE, REFUND, VOID
@@ -659,7 +659,7 @@ CREATE TABLE IF NOT EXISTS payment_transactions (
 
 -- Refunds
 CREATE TABLE IF NOT EXISTS refunds (
-    refund_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    refund_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     order_id UUID NOT NULL REFERENCES customer_orders(order_id),
     transaction_id UUID REFERENCES payment_transactions(transaction_id),
     status VARCHAR(20) NOT NULL DEFAULT 'PENDING', -- PENDING, APPROVED, PROCESSING, COMPLETED, REJECTED
@@ -694,7 +694,7 @@ CREATE TABLE IF NOT EXISTS refunds (
 
 -- Refund Items
 CREATE TABLE IF NOT EXISTS refund_items (
-    refund_item_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    refund_item_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     refund_id UUID NOT NULL REFERENCES refunds(refund_id) ON DELETE CASCADE,
     order_item_id UUID NOT NULL,
     quantity INTEGER NOT NULL,
@@ -720,7 +720,7 @@ CREATE TABLE IF NOT EXISTS carriers (
 
 -- Shipments
 CREATE TABLE IF NOT EXISTS shipments (
-    shipment_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    shipment_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     order_id UUID NOT NULL REFERENCES customer_orders(order_id),
     shop_id BIGINT NOT NULL REFERENCES shops(shop_id),
     status VARCHAR(30) NOT NULL DEFAULT 'PENDING',
@@ -765,7 +765,7 @@ CREATE TABLE IF NOT EXISTS shipments (
 
 -- Shipment Items
 CREATE TABLE IF NOT EXISTS shipment_items (
-    shipment_item_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    shipment_item_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     shipment_id UUID NOT NULL REFERENCES shipments(shipment_id) ON DELETE CASCADE,
     order_item_id UUID NOT NULL,
     quantity INTEGER NOT NULL,
@@ -774,7 +774,7 @@ CREATE TABLE IF NOT EXISTS shipment_items (
 
 -- Shipment Tracking Events
 CREATE TABLE IF NOT EXISTS shipment_tracking_events (
-    event_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    event_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     shipment_id UUID NOT NULL REFERENCES shipments(shipment_id) ON DELETE CASCADE,
     status VARCHAR(50) NOT NULL,
     description TEXT,
@@ -789,7 +789,7 @@ CREATE TABLE IF NOT EXISTS shipment_tracking_events (
 
 -- Returns
 CREATE TABLE IF NOT EXISTS returns (
-    return_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    return_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     order_id UUID NOT NULL REFERENCES customer_orders(order_id),
     shop_id BIGINT NOT NULL REFERENCES shops(shop_id),
     customer_id BIGINT NOT NULL REFERENCES customers(customer_id),
@@ -825,7 +825,7 @@ CREATE TABLE IF NOT EXISTS returns (
 
 -- Return Items
 CREATE TABLE IF NOT EXISTS return_items (
-    return_item_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    return_item_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     return_id UUID NOT NULL REFERENCES returns(return_id) ON DELETE CASCADE,
     order_item_id UUID NOT NULL,
     variant_id UUID REFERENCES product_variants(variant_id),
@@ -874,7 +874,7 @@ CREATE TABLE IF NOT EXISTS warehouses (
 
 -- Inventory Items (stock per variant per warehouse)
 CREATE TABLE IF NOT EXISTS inventory_items (
-    inventory_item_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    inventory_item_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     variant_id UUID NOT NULL REFERENCES product_variants(variant_id) ON DELETE CASCADE,
     warehouse_id BIGINT NOT NULL REFERENCES warehouses(warehouse_id) ON DELETE CASCADE,
     sku VARCHAR(100) NOT NULL,
@@ -882,7 +882,7 @@ CREATE TABLE IF NOT EXISTS inventory_items (
     -- Quantities
     on_hand INTEGER NOT NULL DEFAULT 0,
     reserved INTEGER NOT NULL DEFAULT 0,
-    available INTEGER GENERATED ALWAYS AS (on_hand - reserved),
+    available INTEGER GENERATED ALWAYS AS (on_hand - reserved) STORED,
     incoming INTEGER DEFAULT 0, -- from purchase orders
     damaged INTEGER DEFAULT 0,
     
@@ -906,7 +906,7 @@ CREATE TABLE IF NOT EXISTS inventory_items (
 
 -- Inventory Movements (audit trail)
 CREATE TABLE IF NOT EXISTS inventory_movements (
-    movement_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    movement_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     inventory_item_id UUID NOT NULL REFERENCES inventory_items(inventory_item_id),
     type VARCHAR(30) NOT NULL, -- PURCHASE, SALE, RETURN, ADJUSTMENT, TRANSFER, RESERVATION, RELEASE
     quantity INTEGER NOT NULL, -- positive or negative
@@ -923,7 +923,7 @@ CREATE TABLE IF NOT EXISTS inventory_movements (
 
 -- Stock Reservations (hold stock for carts/pending orders)
 CREATE TABLE IF NOT EXISTS stock_reservations (
-    reservation_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    reservation_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     inventory_item_id UUID NOT NULL REFERENCES inventory_items(inventory_item_id),
     reference_type VARCHAR(30) NOT NULL, -- CART, ORDER
     reference_id UUID NOT NULL,
@@ -959,7 +959,7 @@ ALTER TABLE shops ADD COLUMN IF NOT EXISTS metadata TEXT;
 
 -- Vendor Bank Accounts
 CREATE TABLE IF NOT EXISTS vendor_bank_accounts (
-    bank_account_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    bank_account_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     shop_id BIGINT NOT NULL REFERENCES shops(shop_id) ON DELETE CASCADE,
     account_name VARCHAR(255) NOT NULL,
     account_number_encrypted VARCHAR(500) NOT NULL,
@@ -988,7 +988,7 @@ CREATE TABLE IF NOT EXISTS commission_rates (
 
 -- Vendor Payouts
 CREATE TABLE IF NOT EXISTS vendor_payouts (
-    payout_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    payout_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     shop_id BIGINT NOT NULL REFERENCES shops(shop_id),
     status VARCHAR(20) NOT NULL DEFAULT 'PENDING', -- PENDING, PROCESSING, COMPLETED, FAILED
     period_start DATE NOT NULL,
@@ -1015,7 +1015,7 @@ CREATE TABLE IF NOT EXISTS vendor_payouts (
 
 -- Payout Items (detail)
 CREATE TABLE IF NOT EXISTS payout_items (
-    payout_item_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    payout_item_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     payout_id UUID NOT NULL REFERENCES vendor_payouts(payout_id) ON DELETE CASCADE,
     order_id UUID NOT NULL REFERENCES customer_orders(order_id),
     order_number VARCHAR(50),
@@ -1032,7 +1032,7 @@ CREATE TABLE IF NOT EXISTS payout_items (
 
 -- Campaigns (extends coupons)
 CREATE TABLE IF NOT EXISTS campaigns (
-    campaign_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    campaign_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT,
     type VARCHAR(30) NOT NULL, -- DISCOUNT, BUY_X_GET_Y, FREE_SHIPPING, FLASH_SALE, BUNDLE
@@ -1075,7 +1075,7 @@ CREATE TABLE IF NOT EXISTS campaigns (
 
 -- Loyalty Points Transactions
 CREATE TABLE IF NOT EXISTS loyalty_transactions (
-    transaction_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    transaction_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     customer_id BIGINT NOT NULL REFERENCES customers(customer_id),
     type VARCHAR(30) NOT NULL, -- EARN, REDEEM, EXPIRE, ADJUST
     points INTEGER NOT NULL, -- positive for earn, negative for redeem
@@ -1093,7 +1093,7 @@ CREATE TABLE IF NOT EXISTS loyalty_transactions (
 
 -- Notification Templates
 CREATE TABLE IF NOT EXISTS notification_templates (
-    template_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    template_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     code VARCHAR(100) NOT NULL, -- ORDER_PLACED, ORDER_SHIPPED, etc.
     channel VARCHAR(20) NOT NULL, -- EMAIL, SMS, PUSH, IN_APP
     name VARCHAR(255) NOT NULL,
@@ -1108,7 +1108,7 @@ CREATE TABLE IF NOT EXISTS notification_templates (
 
 -- Notification Log
 CREATE TABLE IF NOT EXISTS notifications (
-    notification_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    notification_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     template_id UUID REFERENCES notification_templates(template_id),
     recipient_id BIGINT NOT NULL,
     recipient_type VARCHAR(20) NOT NULL, -- CUSTOMER, ADMIN, VENDOR
@@ -1128,7 +1128,7 @@ CREATE TABLE IF NOT EXISTS notifications (
 
 -- Notification Preferences
 CREATE TABLE IF NOT EXISTS notification_preferences (
-    preference_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    preference_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id BIGINT NOT NULL,
     user_type VARCHAR(20) NOT NULL, -- CUSTOMER, ADMIN, VENDOR
     channel VARCHAR(20) NOT NULL,
@@ -1147,7 +1147,7 @@ CREATE TABLE IF NOT EXISTS notification_preferences (
 
 -- Order History
 CREATE TABLE IF NOT EXISTS order_history (
-    history_id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    history_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     order_id UUID NOT NULL REFERENCES customer_orders(order_id) ON DELETE CASCADE,
     status VARCHAR(30) NOT NULL,
     note TEXT,

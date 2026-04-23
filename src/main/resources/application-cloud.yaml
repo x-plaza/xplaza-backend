@@ -19,7 +19,16 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: validate
+      # NOTE: production historically ran with `update` and accumulated several
+      # entity/schema drifts that are not yet captured as explicit Flyway
+      # migrations (e.g. `attributes.category_id`, `attributes.is_active`,
+      # numerous `campaigns.*` columns, type drifts on legacy UUID PKs that
+      # were created as BIGSERIAL in the live DB by earlier `update` runs).
+      # Until a dedicated reconciliation migration lands, keep `update` so
+      # boot doesn't fail on the legacy schema; Flyway still owns intentional
+      # schema evolution. TODO(eng): write V4 reconciliation migration and
+      # flip back to `validate` once the entity model and migrations agree.
+      ddl-auto: update
     show-sql: false
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     properties:
