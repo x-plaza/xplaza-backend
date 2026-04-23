@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.xplaza.backend.catalog.domain.entity.Product;
 import com.xplaza.backend.catalog.domain.repository.ProductRepository;
 import com.xplaza.backend.common.events.DomainEvents;
+import com.xplaza.backend.order.domain.repository.CustomerOrderRepository;
 import com.xplaza.backend.recommendation.domain.entity.ProductCoPurchase;
 import com.xplaza.backend.recommendation.domain.entity.RecentlyViewedProduct;
 import com.xplaza.backend.recommendation.domain.repository.ProductCoPurchaseRepository;
@@ -39,6 +40,7 @@ public class RecommendationService {
   private final RecentlyViewedProductRepository recentlyViewedRepo;
   private final ProductCoPurchaseRepository coPurchaseRepo;
   private final ProductRepository productRepo;
+  private final CustomerOrderRepository orderRepo;
 
   /**
    * Records a product view for a customer. Idempotent because the row id is
@@ -92,11 +94,38 @@ public class RecommendationService {
         .toList();
   }
 
+  /**
+   * Walk the just-placed order's line items and increment the symmetric
+   * co-purchase counter for each unordered (a, b) pair. Runs asynchronously so it
+   * never blocks the checkout commit.
+   */
   @Async
   @EventListener
+  @Transactional
   public void onOrderPlaced(DomainEvents.OrderPlaced event) {
-    // TODO: increment co-purchase counters from the order line items. Left as a
-    // hook so a downstream worker can populate the recommendation table.
-    log.debug("Recording co-purchases for order {}", event.orderId());
+    try {
+      var order = orderRepo.findByIdWithItems(event.orderId()).orElse(null);
+      if (order == null || order.getItems() == null || order.getItems().size() < 2) {
+        return;
+      }
+      var productIds = order.getItems().stream()
+          .map(i -> i.getProductId())
+          .filter(java.util.Objects::nonNull)
+          .distinct()
+          .sorted()
+          .toList();
+      for (int i = 0; i < productIds.size(); i++) {
+        for (int j = i + 1; j < productIds.size(); j++) {
+          Long a = productIds.get(i);
+          Long b = productIds.get(j);
+          coPurchaseRepo.incrementPair(a, b);
+          coPurchaseRepo.incrementPair(b, a);
+        }
+      }
+      log.debug("Recorded {} co-purchase pairs for order {}",
+          productIds.size() * (productIds.size() - 1), event.orderId());
+    } catch (Exception e) {
+      log.warn("Failed to record co-purchases for order {}: {}", event.orderId(), e.toString());
+    }
   }
 }

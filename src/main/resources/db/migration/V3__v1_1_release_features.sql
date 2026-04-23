@@ -77,7 +77,11 @@ ALTER TABLE product_images ADD COLUMN IF NOT EXISTS alt_text      VARCHAR(255);
 ALTER TABLE product_images ADD COLUMN IF NOT EXISTS sort_order    INTEGER DEFAULT 0;
 
 -- ---------- Soft-delete bookkeeping for entities that gain @SQLDelete ----------
-ALTER TABLE shops ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP;
+ALTER TABLE shops     ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP;
+ALTER TABLE products  ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP;
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP;
+CREATE INDEX IF NOT EXISTS idx_products_deleted_at  ON products(deleted_at);
+CREATE INDEX IF NOT EXISTS idx_customers_deleted_at ON customers(deleted_at);
 
 -- ---------- Subscription Java-entity tweaks ----------
 -- The base `subscriptions` table already exists from V2. The Java entity
@@ -91,3 +95,7 @@ ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS last_error          VARCHAR(5
 -- The resolver compares a candidate price list's currency to the cart's
 -- currency, so make currency NOT NULL to avoid surprises.
 ALTER TABLE price_list_items ADD COLUMN IF NOT EXISTS notes VARCHAR(500);
+
+-- ---------- Recommendation: align co-purchase table with JPA entity ----------
+ALTER TABLE product_co_purchases ADD COLUMN IF NOT EXISTS co_purchase_count BIGINT NOT NULL DEFAULT 0;
+CREATE INDEX IF NOT EXISTS idx_copurchases_count ON product_co_purchases(product_id, co_purchase_count DESC);

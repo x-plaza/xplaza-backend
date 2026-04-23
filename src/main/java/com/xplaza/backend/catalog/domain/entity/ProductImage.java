@@ -30,6 +30,26 @@ public class ProductImage {
 
   private String productImagePath;
 
+  /** Thumb (~150px) URL produced by the image pipeline. */
+  @Column(name = "thumbnail_url", length = 500)
+  private String thumbnailUrl;
+
+  /** Medium (~500px) URL produced by the image pipeline. */
+  @Column(name = "medium_url", length = 500)
+  private String mediumUrl;
+
+  /** Large (~1500px) URL produced by the image pipeline. */
+  @Column(name = "large_url", length = 500)
+  private String largeUrl;
+
+  /** Alt text for accessibility / SEO. */
+  @Column(name = "alt_text", length = 255)
+  private String altText;
+
+  /** Display order within the product gallery. */
+  @Column(name = "sort_order")
+  private Integer sortOrder;
+
   private Integer createdBy;
 
   private Date createdAt;

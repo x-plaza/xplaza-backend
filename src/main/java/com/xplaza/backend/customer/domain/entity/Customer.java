@@ -15,6 +15,8 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,6 +28,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@SQLDelete(sql = "UPDATE customers SET deleted_at = CURRENT_TIMESTAMP WHERE customer_id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class Customer implements UserDetails {
 
   @Id
@@ -108,6 +112,9 @@ public class Customer implements UserDetails {
   // ---------- Lifecycle ----------
   private LocalDateTime createdAt;
   private LocalDateTime lastLoginAt;
+
+  @Column(name = "deleted_at")
+  private Instant deletedAt;
 
   @PrePersist
   protected void onCreate() {
