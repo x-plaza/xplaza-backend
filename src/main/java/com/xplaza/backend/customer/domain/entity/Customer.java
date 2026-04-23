@@ -17,6 +17,7 @@ import lombok.*;
 
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.envers.Audited;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,6 +31,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Builder
 @SQLDelete(sql = "UPDATE customers SET deleted_at = CURRENT_TIMESTAMP WHERE customer_id = ?")
 @SQLRestriction("deleted_at IS NULL")
+@Audited
 public class Customer implements UserDetails {
 
   @Id

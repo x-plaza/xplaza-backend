@@ -24,6 +24,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.xplaza.backend.b2b.service.PriceListResolver;
 import com.xplaza.backend.cart.domain.entity.Cart;
 import com.xplaza.backend.cart.domain.entity.CartItem;
 import com.xplaza.backend.cart.domain.repository.CartItemRepository;
@@ -57,6 +58,9 @@ class CartServiceTest {
   @Mock
   private ProductDiscountService productDiscountService;
 
+  @Mock
+  private PriceListResolver priceListResolver;
+
   @InjectMocks
   private CartService cartService;
 
@@ -72,6 +76,9 @@ class CartServiceTest {
         .status(Cart.CartStatus.ACTIVE)
         .items(new ArrayList<>())
         .build();
+    org.mockito.Mockito.lenient()
+        .when(priceListResolver.resolveUnitPrice(any(), any(), org.mockito.ArgumentMatchers.anyInt(), any()))
+        .thenAnswer(inv -> inv.getArgument(3));
   }
 
   @Test

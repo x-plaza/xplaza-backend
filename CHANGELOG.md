@@ -4,6 +4,127 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-04-23
+
+This release closes every "known gap" left open by `1.0.0` and hardens the
+platform with auditing, resilience patterns and richer storefront-facing
+content APIs. Schema changes are additive and shipped as
+`V3__v1_1_release_features.sql` so a rolling production deploy needs no manual
+intervention.
+
+### Promotions, pricing and tax
+
+- `Campaign.calculateDiscount` now implements the full set of promotion types:
+  percentage, fixed amount, BOGO, free shipping and bundle, driven by a
+  richer `DiscountContext` (cart subtotal, item count, eligible products).
+- `CheckoutService` recomputes tax via `TaxService` whenever the shipping
+  address or applied discount changes, and skips tax when the resolved
+  customer is flagged as B2B tax-exempt.
+- New `b2b` module: `CustomerGroup`, `PriceList`, `PriceListItem` plus a
+  `PriceListResolver` consulted by `CartService` so contract pricing and
+  quantity breaks apply transparently to every line.
+
+### Subscriptions
+
+- Domain entities + lifecycle service for create, pause, resume and cancel,
+  plus a renewal scheduler that emits `SubscriptionRenewed` and creates the
+  follow-up order via the existing checkout pipeline.
+
+### Multi-vendor checkout
+
+- `CustomerOrderService.createOrderFromCheckout` now splits a single cart
+  into one parent order and N per-shop child orders, allocating shipping,
+  discount and tax proportionally. New `GET /customer-orders/{id}/children`
+  exposes the resulting child orders.
+- `Shop` entity gains `commissionRate` and `payoutAccount`; `CommissionService`
+  uses the per-shop rate when present and falls back to the global default.
+
+### Referrals
+
+- `Referral` entity, controller and service implement code generation, lookup
+  and reward credit on first qualifying order.
+
+### Catalog & i18n
+
+- `ProductImage` entity now carries `thumbnailUrl`, `mediumUrl`, `largeUrl`,
+  `altText` and `sortOrder`, exposed on `ProductImageResponse` so storefronts
+  can pick the right size for the viewport.
+- `ProductTranslation` and `CategoryTranslation` entities + repositories +
+  `ProductTranslationService` apply locale-specific names/descriptions to
+  product and category responses based on a `?locale=` query parameter.
+- Soft-delete (`@SQLDelete` + `@SQLRestriction`) on `Product`, `Customer`
+  and `Shop`, with `deleted_at` columns indexed for tombstone scans.
+
+### Search
+
+- `ProductSearchService` adds a faceted search overload (filters for shop,
+  brand, category, price range, published flag, plus brand/category/price
+  histogram aggregations) and a bulk `reindexAll` that streams the full
+  catalog into Elasticsearch.
+- `SearchController` exposes `/search/products` with structured filters,
+  `/search/faceted` for the storefront filter sidebar, and an admin-only
+  `/search/reindex`.
+- `ProductService.add/update/delete` now publishes `ProductIndexInvalidated`
+  events so the search index stays in sync with the catalog.
+
+### Recommendations
+
+- `RecommendationService` listens to `OrderPlaced` and atomically increments
+  `product_co_purchases` rows via a Postgres `INSERT ... ON CONFLICT DO
+  UPDATE` upsert, replacing the previous read-only stub.
+
+### Notifications
+
+- New `notification` push module: `PushToken` entity, `PushNotificationService`
+  and customer-facing `PushTokenController` (`/api/v1/push-tokens`) for
+  register/unregister/list. FCM and APNs dispatch is feature-flagged via
+  `push.fcm.enabled` and `push.apns.enabled`.
+- Six new Thymeleaf templates wired through a generic
+  `EmailService.sendTemplate(...)`: `order-confirmation`, `order-shipped`,
+  `order-delivered`, `abandoned-cart`, `password-reset` and `invoice`. Styles
+  are inlined for cross-client compatibility.
+
+### CMS
+
+- `CmsBlock` entity + repository + cached `CmsBlockService` + public
+  `CmsBlockController` for static storefront content slots (hero banner,
+  footer copy, return policy, ...). Public read endpoints, admin-gated
+  write endpoints.
+
+### Auditing & resilience
+
+- Hibernate Envers wired in via `org.hibernate.orm:hibernate-envers`.
+  `Customer`, `CustomerOrder`, `PaymentTransaction` and `Refund` are
+  `@Audited`; child collections are `@NotAudited` to keep the audit tables
+  manageable. Envers is disabled in the test profile because H2 cannot
+  represent its `TINYINT` `revtype` column.
+- Resilience4j `@CircuitBreaker` + `@Retry` wrappers around the external
+  integrations: `StripePaymentGateway`, `MinioFileStorageService`,
+  `EmailService` and `ProductSearchService`. Configurations live in
+  `application.yaml`.
+
+### Caching
+
+- `CacheConfig` registers the missing `priceLists`, `cms-blocks` and `tax`
+  caches so the new `@Cacheable` methods stop emitting "Cannot find cache"
+  warnings (and stop returning `400`s when the strict cache resolver is
+  active).
+
+### Tests
+
+- `CmsAndCustomerOrderEndpointsTest` exercises the new CMS block CRUD and the
+  per-vendor child-order endpoint via MockMvc.
+- `CartServiceTest` mocks the new `PriceListResolver` collaborator.
+- Test profile disables Envers so H2 can build the schema cleanly.
+
+### Schema (Flyway V3)
+
+- Adds columns/indexes for: subscriptions tweaks, B2B `price_list_items.notes`,
+  per-shop commission/payout, multi-vendor `customer_orders.parent_order_id`,
+  push tokens, referral codes, image-variant URLs on `product_images`,
+  soft-delete columns on `products`/`customers`/`shops`, and the
+  `product_co_purchases.co_purchase_count` column with its index.
+
 ## [1.0.0] - 2026-04-22
 
 This release is a major overhaul that lifts the project to a marketplace-grade

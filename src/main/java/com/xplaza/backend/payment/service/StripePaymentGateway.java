@@ -9,6 +9,9 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
+
 import org.springframework.stereotype.Service;
 
 import com.stripe.exception.StripeException;
@@ -20,6 +23,8 @@ import com.stripe.param.PaymentIntentCreateParams;
 public class StripePaymentGateway implements PaymentGateway {
 
   @Override
+  @CircuitBreaker(name = "stripe")
+  @Retry(name = "stripe")
   public PaymentIntent createPaymentIntent(BigDecimal amount, String currency, String description,
       Map<String, String> metadata) throws StripeException {
     Map<String, String> meta = metadata == null ? new HashMap<>() : new HashMap<>(metadata);
@@ -42,6 +47,8 @@ public class StripePaymentGateway implements PaymentGateway {
   }
 
   @Override
+  @CircuitBreaker(name = "stripe")
+  @Retry(name = "stripe")
   public PaymentIntent confirmPaymentIntent(String paymentIntentId) throws StripeException {
     PaymentIntent paymentIntent = PaymentIntent.retrieve(paymentIntentId);
     Map<String, Object> params = new HashMap<>();
