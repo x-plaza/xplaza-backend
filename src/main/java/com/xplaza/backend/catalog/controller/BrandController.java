@@ -50,11 +50,6 @@ public class BrandController {
   private final BrandService brandService;
   private final BrandMapper brandMapper;
 
-  /**
-   * GET /api/v1/brands
-   * 
-   * List brands with pagination and optional search.
-   */
   @GetMapping
   @Operation(summary = "List brands", description = "Get paginated list of brands with optional search")
   public ResponseEntity<ApiResponse<List<BrandResponse>>> getBrands(
@@ -83,11 +78,6 @@ public class BrandController {
     return ResponseEntity.ok(ApiResponse.ok(dtos, pageMeta));
   }
 
-  /**
-   * GET /api/v1/brands/{id}
-   * 
-   * Get single brand by ID.
-   */
   @GetMapping("/{id}")
   @Operation(summary = "Get brand by ID", description = "Retrieve a specific brand by its ID")
   public ResponseEntity<ApiResponse<BrandResponse>> getBrand(
@@ -99,11 +89,6 @@ public class BrandController {
     return ResponseEntity.ok(ApiResponse.ok(dto));
   }
 
-  /**
-   * POST /api/v1/brands
-   * 
-   * Create a new brand.
-   */
   @PostMapping
   @Operation(summary = "Create brand", description = "Create a new brand")
   public ResponseEntity<ApiResponse<BrandResponse>> createBrand(
@@ -118,11 +103,6 @@ public class BrandController {
         .body(ApiResponse.created(dto));
   }
 
-  /**
-   * PUT /api/v1/brands/{id}
-   * 
-   * Update an existing brand.
-   */
   @PutMapping("/{id}")
   @Operation(summary = "Update brand", description = "Update an existing brand by ID")
   public ResponseEntity<ApiResponse<BrandResponse>> updateBrand(
@@ -137,11 +117,6 @@ public class BrandController {
     return ResponseEntity.ok(ApiResponse.ok(dto));
   }
 
-  /**
-   * DELETE /api/v1/brands/{id}
-   * 
-   * Delete a brand.
-   */
   @DeleteMapping("/{id}")
   @Operation(summary = "Delete brand", description = "Delete a brand by ID")
   public ResponseEntity<ApiResponse<Void>> deleteBrand(

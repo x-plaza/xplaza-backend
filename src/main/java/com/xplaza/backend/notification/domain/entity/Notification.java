@@ -12,9 +12,6 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-/**
- * Customer notification.
- */
 @Entity
 @Table(name = "notifications", indexes = {
     @Index(name = "idx_notification_customer", columnList = "customer_id"),
@@ -192,39 +189,24 @@ public class Notification {
     this.updatedAt = Instant.now();
   }
 
-  /**
-   * Mark notification as read.
-   */
   public void markAsRead() {
     this.isRead = true;
     this.readAt = Instant.now();
   }
 
-  /**
-   * Mark notification as sent.
-   */
   public void markAsSent() {
     this.isSent = true;
     this.sentAt = Instant.now();
   }
 
-  /**
-   * Mark as failed.
-   */
   public void markAsFailed(String error) {
     this.errorMessage = error;
   }
 
-  /**
-   * Check if notification is expired.
-   */
   public boolean isExpired() {
     return expiresAt != null && Instant.now().isAfter(expiresAt);
   }
 
-  /**
-   * Check if notification should be sent now.
-   */
   public boolean isReadyToSend() {
     if (isSent) {
       return false;

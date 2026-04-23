@@ -33,10 +33,6 @@ public class IdempotencyService {
     this.repo = repo;
   }
 
-  /**
-   * Returns an existing record if present, or {@link Optional#empty()} when the
-   * key is fresh and the caller may proceed with the write.
-   */
   @Transactional(readOnly = true)
   public Optional<IdempotencyKey> find(String key) {
     if (key == null || key.isBlank()) {
@@ -78,7 +74,6 @@ public class IdempotencyService {
     }
   }
 
-  /** Periodically purge expired keys to avoid unbounded growth. */
   @Scheduled(cron = "0 0 * * * *")
   @Transactional
   public void purgeExpired() {

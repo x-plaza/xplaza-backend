@@ -44,9 +44,6 @@ public class PaymentService {
   private final PaymentGateway paymentGateway;
   private final CodPaymentGateway codGateway;
 
-  /**
-   * Create a Stripe PaymentIntent.
-   */
   public String createPaymentIntent(BigDecimal amount, String currency, String description,
       Map<String, String> metadata) {
     try {
@@ -57,13 +54,6 @@ public class PaymentService {
     }
   }
 
-  /**
-   * Cash on Delivery: register an authorization-like transaction that completes
-   * when the courier confirms collection. The transaction is marked SUCCESS as
-   * soon as it is created so order placement proceeds; reconciliation happens via
-   * {@link #completeTransaction(UUID, String, String)} when the courier confirms
-   * collection.
-   */
   public PaymentTransaction createCod(UUID orderId, Long customerId, BigDecimal amount, String currency) {
     var auth = codGateway.createCodAuthorization(amount, currency, orderId);
     PaymentTransaction txn = PaymentTransaction.builder()
@@ -84,9 +74,6 @@ public class PaymentService {
     return txn;
   }
 
-  /**
-   * Create a payment authorization.
-   */
   public PaymentTransaction createAuthorization(UUID orderId, Long customerId, BigDecimal amount,
       String currency, PaymentTransaction.PaymentMethodType methodType,
       String lastFourDigits, String cardBrand) {
@@ -109,9 +96,6 @@ public class PaymentService {
     return transaction;
   }
 
-  /**
-   * Create a sale transaction (authorization + capture combined).
-   */
   public PaymentTransaction createSale(UUID orderId, Long customerId, BigDecimal amount,
       String currency, PaymentTransaction.PaymentMethodType methodType) {
     PaymentTransaction transaction = PaymentTransaction.builder()
@@ -131,9 +115,6 @@ public class PaymentService {
     return transaction;
   }
 
-  /**
-   * Capture an authorized payment.
-   */
   public PaymentTransaction capture(UUID authorizationId, BigDecimal amount) {
     PaymentTransaction auth = transactionRepository.findById(authorizationId)
         .orElseThrow(() -> new IllegalArgumentException("Authorization not found: " + authorizationId));
@@ -160,9 +141,6 @@ public class PaymentService {
     return capture;
   }
 
-  /**
-   * Complete a transaction (simulates gateway response).
-   */
   public PaymentTransaction completeTransaction(UUID transactionId, String gatewayTransactionId,
       String authorizationCode) {
     PaymentTransaction txn = transactionRepository.findById(transactionId)
@@ -175,9 +153,6 @@ public class PaymentService {
     return txn;
   }
 
-  /**
-   * Fail a transaction.
-   */
   public PaymentTransaction failTransaction(UUID transactionId, String errorCode, String errorMessage) {
     PaymentTransaction txn = transactionRepository.findById(transactionId)
         .orElseThrow(() -> new IllegalArgumentException("Transaction not found: " + transactionId));
@@ -189,42 +164,27 @@ public class PaymentService {
     return txn;
   }
 
-  /**
-   * Get transactions for an order.
-   */
   @Transactional(readOnly = true)
   public List<PaymentTransaction> getOrderTransactions(UUID orderId) {
     return transactionRepository.findByOrderId(orderId);
   }
 
-  /**
-   * Get completed sale for an order.
-   */
   @Transactional(readOnly = true)
   public Optional<PaymentTransaction> getCompletedSale(UUID orderId) {
     return transactionRepository.findCompletedSaleByOrderId(orderId);
   }
 
-  /**
-   * Get customer payment history.
-   */
   @Transactional(readOnly = true)
   public Page<PaymentTransaction> getCustomerTransactions(Long customerId, Pageable pageable) {
     return transactionRepository.findByCustomerId(customerId, pageable);
   }
 
-  /**
-   * Get total paid amount for an order.
-   */
   @Transactional(readOnly = true)
   public BigDecimal getTotalPaidAmount(UUID orderId) {
     BigDecimal paid = transactionRepository.sumCompletedAmountByOrderId(orderId);
     return paid != null ? paid : BigDecimal.ZERO;
   }
 
-  /**
-   * Get total refunded amount for an order.
-   */
   @Transactional(readOnly = true)
   public BigDecimal getTotalRefundedAmount(UUID orderId) {
     BigDecimal refunded = transactionRepository.sumRefundedAmountByOrderId(orderId);
@@ -233,9 +193,6 @@ public class PaymentService {
 
   // Refund operations
 
-  /**
-   * Create a refund request.
-   */
   public Refund createRefundRequest(UUID orderId, BigDecimal amount, String currency,
       Refund.RefundReason reason, String reasonDetail, Long requestedBy,
       Refund.RequesterType requesterType) {
@@ -255,9 +212,6 @@ public class PaymentService {
     return refund;
   }
 
-  /**
-   * Approve a refund request.
-   */
   public Refund approveRefund(UUID refundId, Long adminId) {
     Refund refund = refundRepository.findById(refundId)
         .orElseThrow(() -> new IllegalArgumentException("Refund not found: " + refundId));
@@ -269,9 +223,6 @@ public class PaymentService {
     return refund;
   }
 
-  /**
-   * Reject a refund request.
-   */
   public Refund rejectRefund(UUID refundId, Long adminId, String reason) {
     Refund refund = refundRepository.findById(refundId)
         .orElseThrow(() -> new IllegalArgumentException("Refund not found: " + refundId));
@@ -283,9 +234,6 @@ public class PaymentService {
     return refund;
   }
 
-  /**
-   * Process approved refund.
-   */
   public Refund processRefund(UUID refundId, String gatewayRefundId) {
     Refund refund = refundRepository.findById(refundId)
         .orElseThrow(() -> new IllegalArgumentException("Refund not found: " + refundId));
@@ -320,25 +268,16 @@ public class PaymentService {
     return completedRefund;
   }
 
-  /**
-   * Get pending refunds.
-   */
   @Transactional(readOnly = true)
   public Page<Refund> getPendingRefunds(Pageable pageable) {
     return refundRepository.findPendingRefunds(pageable);
   }
 
-  /**
-   * Get refunds for an order.
-   */
   @Transactional(readOnly = true)
   public List<Refund> getOrderRefunds(UUID orderId) {
     return refundRepository.findByOrderId(orderId);
   }
 
-  /**
-   * Clean up stale pending transactions.
-   */
   public int cleanupStalePendingTransactions() {
     Instant cutoff = Instant.now().minus(24, ChronoUnit.HOURS);
     List<PaymentTransaction> stale = transactionRepository.findStalePendingTransactions(cutoff);

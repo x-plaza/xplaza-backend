@@ -49,9 +49,6 @@ public class FulfillmentService {
 
   // Shipment operations
 
-  /**
-   * Create a shipment for an order.
-   */
   public Shipment createShipment(UUID orderId, Long warehouseId, Long carrierId,
       Shipment.ShippingMethod method, String recipientName, String recipientPhone,
       String addressLine1, String addressLine2, String city, String state,
@@ -79,9 +76,6 @@ public class FulfillmentService {
     return shipment;
   }
 
-  /**
-   * Add item to shipment.
-   */
   public void addShipmentItem(UUID shipmentId, UUID orderItemId, Long productId,
       UUID variantId, String sku, String productName, int quantity) {
     Shipment shipment = shipmentRepository.findById(shipmentId)
@@ -101,9 +95,6 @@ public class FulfillmentService {
     shipmentRepository.save(shipment);
   }
 
-  /**
-   * Mark shipment as shipped.
-   */
   public Shipment markShipped(UUID shipmentId, String trackingNumber, String trackingUrl) {
     Shipment shipment = shipmentRepository.findById(shipmentId)
         .orElseThrow(() -> new IllegalArgumentException("Shipment not found: " + shipmentId));
@@ -140,9 +131,6 @@ public class FulfillmentService {
     return savedShipment;
   }
 
-  /**
-   * Update shipment tracking.
-   */
   public void addTrackingEvent(UUID shipmentId, Shipment.ShipmentStatus status,
       String description, String location) {
     Shipment shipment = shipmentRepository.findById(shipmentId)
@@ -163,9 +151,6 @@ public class FulfillmentService {
     log.info("Added tracking event to shipment {}: {}", shipmentId, status);
   }
 
-  /**
-   * Mark shipment as delivered.
-   */
   public Shipment markDelivered(UUID shipmentId) {
     Shipment shipment = shipmentRepository.findById(shipmentId)
         .orElseThrow(() -> new IllegalArgumentException("Shipment not found: " + shipmentId));
@@ -201,33 +186,21 @@ public class FulfillmentService {
     return savedShipment;
   }
 
-  /**
-   * Get shipments for an order.
-   */
   @Transactional(readOnly = true)
   public List<Shipment> getOrderShipments(UUID orderId) {
     return shipmentRepository.findByOrderId(orderId);
   }
 
-  /**
-   * Get shipment by tracking number.
-   */
   @Transactional(readOnly = true)
   public Optional<Shipment> getShipmentByTracking(String trackingNumber) {
     return shipmentRepository.findByTrackingNumber(trackingNumber);
   }
 
-  /**
-   * Get shipment with full details.
-   */
   @Transactional(readOnly = true)
   public Optional<Shipment> getShipmentWithDetails(UUID shipmentId) {
     return shipmentRepository.findByIdWithDetails(shipmentId);
   }
 
-  /**
-   * Get pending shipments for a warehouse.
-   */
   @Transactional(readOnly = true)
   public List<Shipment> getPendingShipments(Long warehouseId) {
     return shipmentRepository.findPendingShipmentsByWarehouse(warehouseId);
@@ -235,9 +208,6 @@ public class FulfillmentService {
 
   // Return operations
 
-  /**
-   * Create a return request.
-   */
   public Return createReturnRequest(UUID orderId, Long customerId, Return.ReturnReason reason,
       String reasonDetail, Return.ReturnType type) {
     Return returnRequest = Return.builder()
@@ -253,9 +223,6 @@ public class FulfillmentService {
     return returnRequest;
   }
 
-  /**
-   * Approve a return request.
-   */
   public Return approveReturn(UUID returnId, Long adminId, String returnAddressLine1,
       String returnCity, String returnPostalCode, String returnCountryCode) {
     Return returnRequest = returnRepository.findById(returnId)
@@ -272,9 +239,6 @@ public class FulfillmentService {
     return returnRequest;
   }
 
-  /**
-   * Reject a return request.
-   */
   public Return rejectReturn(UUID returnId, Long adminId, String reason) {
     Return returnRequest = returnRepository.findById(returnId)
         .orElseThrow(() -> new IllegalArgumentException("Return not found: " + returnId));
@@ -286,9 +250,6 @@ public class FulfillmentService {
     return returnRequest;
   }
 
-  /**
-   * Mark return as shipped by customer.
-   */
   public Return markReturnShipped(UUID returnId, String trackingNumber) {
     Return returnRequest = returnRepository.findById(returnId)
         .orElseThrow(() -> new IllegalArgumentException("Return not found: " + returnId));
@@ -300,9 +261,6 @@ public class FulfillmentService {
     return returnRequest;
   }
 
-  /**
-   * Mark return as received at warehouse.
-   */
   public Return markReturnReceived(UUID returnId) {
     Return returnRequest = returnRepository.findById(returnId)
         .orElseThrow(() -> new IllegalArgumentException("Return not found: " + returnId));
@@ -314,9 +272,6 @@ public class FulfillmentService {
     return returnRequest;
   }
 
-  /**
-   * Complete return with resolution.
-   */
   public Return completeReturn(UUID returnId, Return.Resolution resolution) {
     Return returnRequest = returnRepository.findById(returnId)
         .orElseThrow(() -> new IllegalArgumentException("Return not found: " + returnId));
@@ -328,33 +283,21 @@ public class FulfillmentService {
     return returnRequest;
   }
 
-  /**
-   * Get return by RMA number.
-   */
   @Transactional(readOnly = true)
   public Optional<Return> getReturnByRma(String rmaNumber) {
     return returnRepository.findByRmaNumber(rmaNumber);
   }
 
-  /**
-   * Get returns for an order.
-   */
   @Transactional(readOnly = true)
   public List<Return> getOrderReturns(UUID orderId) {
     return returnRepository.findByOrderId(orderId);
   }
 
-  /**
-   * Get customer returns.
-   */
   @Transactional(readOnly = true)
   public Page<Return> getCustomerReturns(Long customerId, Pageable pageable) {
     return returnRepository.findByCustomerId(customerId, pageable);
   }
 
-  /**
-   * Get pending return requests.
-   */
   @Transactional(readOnly = true)
   public Page<Return> getPendingReturns(Pageable pageable) {
     return returnRepository.findPendingReturns(pageable);
@@ -362,17 +305,11 @@ public class FulfillmentService {
 
   // Carrier operations
 
-  /**
-   * Get active carriers.
-   */
   @Transactional(readOnly = true)
   public List<Carrier> getActiveCarriers() {
     return carrierRepository.findByIsActiveTrue();
   }
 
-  /**
-   * Get carriers for a country.
-   */
   @Transactional(readOnly = true)
   public List<Carrier> getCarriersForCountry(String countryCode) {
     return carrierRepository.findActiveCarriersByCountry(countryCode);

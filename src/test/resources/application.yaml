@@ -5,9 +5,6 @@ stripe:
 spring:
   profiles:
     active: local
-  # Disable Hibernate Envers in tests: H2 (even in PostgreSQL mode) does not
-  # accept TINYINT, which Envers uses for the `revtype` column on every _AUD
-  # table. Production runs against Postgres where TINYINT is unnecessary.
   jpa:
     properties:
       hibernate:

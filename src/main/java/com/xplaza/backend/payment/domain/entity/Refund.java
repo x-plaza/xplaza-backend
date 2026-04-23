@@ -41,9 +41,6 @@ public class Refund {
   @Column(name = "order_id", nullable = false)
   private UUID orderId;
 
-  /**
-   * Original payment transaction being refunded.
-   */
   @Column(name = "transaction_id")
   private UUID transactionId;
 
@@ -123,24 +120,16 @@ public class Refund {
   private List<RefundItem> items = new ArrayList<>();
 
   public enum RefundStatus {
-    /** Refund requested */
     PENDING,
-    /** Approved by admin */
     APPROVED,
-    /** Being processed with payment gateway */
     PROCESSING,
-    /** Successfully refunded */
     COMPLETED,
-    /** Refund rejected */
     REJECTED
   }
 
   public enum RefundType {
-    /** Full order refund */
     FULL,
-    /** Partial refund */
     PARTIAL,
-    /** Store credit instead of payment refund */
     EXCHANGE_CREDIT
   }
 
@@ -166,34 +155,22 @@ public class Refund {
     this.updatedAt = Instant.now();
   }
 
-  /**
-   * Approve the refund request.
-   */
   public void approve(Long adminId) {
     this.status = RefundStatus.APPROVED;
     this.approvedBy = adminId;
     this.approvedAt = Instant.now();
   }
 
-  /**
-   * Reject the refund request.
-   */
   public void reject(Long adminId, String reason) {
     this.status = RefundStatus.REJECTED;
     this.approvedBy = adminId;
     this.internalNote = reason;
   }
 
-  /**
-   * Mark as processing.
-   */
   public void startProcessing() {
     this.status = RefundStatus.PROCESSING;
   }
 
-  /**
-   * Complete the refund.
-   */
   public void complete(String gatewayRefundId) {
     this.status = RefundStatus.COMPLETED;
     this.gatewayRefundId = gatewayRefundId;
@@ -205,9 +182,6 @@ public class Refund {
     item.setRefund(this);
   }
 
-  /**
-   * Calculate total from items if not set.
-   */
   public void calculateTotal() {
     if (items != null && !items.isEmpty()) {
       this.itemsAmount = items.stream()

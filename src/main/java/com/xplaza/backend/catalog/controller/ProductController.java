@@ -53,17 +53,6 @@ public class ProductController {
   private final ProductMapper productMapper;
   private final ProductTranslationService translationService;
 
-  /**
-   * GET /api/v1/products
-   * 
-   * Unified product listing with optional filters and pagination.
-   * 
-   * Query Parameters: - shopId: Filter by shop (optional) - categoryId: Filter by
-   * category (optional) - brandId: Filter by brand (optional) - search: Search by
-   * product name (optional) - page: Page number (0-indexed, default: 0) - size:
-   * Page size (default: 20, max: 100) - sort: Sort field (default: productId) -
-   * direction: Sort direction (ASC/DESC, default: ASC)
-   */
   @GetMapping
   @Operation(summary = "List products", description = "Get paginated list of products with optional filters for shop, category, brand, and search")
   public ResponseEntity<ApiResponse<List<ProductResponse>>> getProducts(
@@ -110,11 +99,6 @@ public class ProductController {
     return ResponseEntity.ok(ApiResponse.ok(dtos, pageMeta));
   }
 
-  /**
-   * GET /api/v1/products/{id}
-   * 
-   * Get a single product by ID.
-   */
   @GetMapping("/{id}")
   @Operation(summary = "Get product by ID", description = "Retrieve a specific product by its ID")
   public ResponseEntity<ApiResponse<ProductResponse>> getProduct(
@@ -130,11 +114,6 @@ public class ProductController {
     return ResponseEntity.ok(ApiResponse.ok(dto));
   }
 
-  /**
-   * POST /api/v1/products
-   * 
-   * Create a new product.
-   */
   @PostMapping
   @Operation(summary = "Create product", description = "Create a new product")
   public ResponseEntity<ApiResponse<ProductResponse>> createProduct(
@@ -149,11 +128,6 @@ public class ProductController {
         .body(ApiResponse.created(dto));
   }
 
-  /**
-   * PUT /api/v1/products/{id}
-   * 
-   * Update an existing product.
-   */
   @PutMapping("/{id}")
   @Operation(summary = "Update product", description = "Update an existing product by ID")
   public ResponseEntity<ApiResponse<ProductResponse>> updateProduct(
@@ -170,11 +144,6 @@ public class ProductController {
     return ResponseEntity.ok(ApiResponse.ok(dto));
   }
 
-  /**
-   * DELETE /api/v1/products/{id}
-   * 
-   * Delete a product.
-   */
   @DeleteMapping("/{id}")
   @Operation(summary = "Delete product", description = "Delete a product by ID")
   public ResponseEntity<ApiResponse<Void>> deleteProduct(
@@ -186,11 +155,6 @@ public class ProductController {
     return ResponseEntity.ok(ApiResponse.ok(productName + " has been deleted"));
   }
 
-  /**
-   * PATCH /api/v1/products/{id}/inventory
-   * 
-   * Update product inventory (partial update).
-   */
   @PatchMapping("/{id}/inventory")
   @Operation(summary = "Update product inventory", description = "Update product inventory quantity")
   public ResponseEntity<ApiResponse<Void>> updateInventory(
@@ -202,11 +166,6 @@ public class ProductController {
     return ResponseEntity.ok(ApiResponse.ok("Inventory updated"));
   }
 
-  /**
-   * POST /api/v1/products/{id}/images
-   * 
-   * Upload product images.
-   */
   @PostMapping(value = "/{id}/images", consumes = "multipart/form-data")
   @Operation(summary = "Upload product images", description = "Upload images for a product or variant (max 10 total)")
   public ResponseEntity<ApiResponse<List<String>>> uploadProductImages(

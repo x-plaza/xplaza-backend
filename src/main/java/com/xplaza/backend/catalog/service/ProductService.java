@@ -68,10 +68,6 @@ public class ProductService {
     publishIndexInvalidated(id);
   }
 
-  /**
-   * Emit a {@code ProductIndexInvalidated} event so the search service (when
-   * enabled) re-syncs this product. Safe to call from any write path.
-   */
   private void publishIndexInvalidated(Long productId) {
     if (productId == null) {
       return;

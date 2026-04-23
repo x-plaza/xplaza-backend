@@ -37,9 +37,6 @@ public class ReviewService {
   private final ReviewRepository reviewRepository;
   private final CustomerOrderService customerOrderService;
 
-  /**
-   * Create a new review.
-   */
   public Review createReview(Long productId, Long customerId, UUID orderId, Long shopId,
       String title, String body, Integer ratingOverall,
       Integer ratingQuality, Integer ratingValue, Integer ratingShipping) {
@@ -83,9 +80,6 @@ public class ReviewService {
     return review;
   }
 
-  /**
-   * Add image to review.
-   */
   public void addImage(UUID reviewId, String url, String altText) {
     Review review = reviewRepository.findById(reviewId)
         .orElseThrow(() -> new IllegalArgumentException("Review not found: " + reviewId));
@@ -101,9 +95,6 @@ public class ReviewService {
     reviewRepository.save(review);
   }
 
-  /**
-   * Add video to review.
-   */
   public void addVideo(UUID reviewId, String url, String thumbnailUrl, Integer durationSeconds) {
     Review review = reviewRepository.findById(reviewId)
         .orElseThrow(() -> new IllegalArgumentException("Review not found: " + reviewId));
@@ -119,41 +110,26 @@ public class ReviewService {
     reviewRepository.save(review);
   }
 
-  /**
-   * Get product reviews (approved only).
-   */
   @Transactional(readOnly = true)
   public Page<Review> getProductReviews(Long productId, Pageable pageable) {
     return reviewRepository.findApprovedByProductId(productId, pageable);
   }
 
-  /**
-   * Get verified product reviews.
-   */
   @Transactional(readOnly = true)
   public Page<Review> getVerifiedProductReviews(Long productId, Pageable pageable) {
     return reviewRepository.findVerifiedByProductId(productId, pageable);
   }
 
-  /**
-   * Get customer reviews.
-   */
   @Transactional(readOnly = true)
   public Page<Review> getCustomerReviews(Long customerId, Pageable pageable) {
     return reviewRepository.findByCustomerId(customerId, pageable);
   }
 
-  /**
-   * Get pending reviews for moderation.
-   */
   @Transactional(readOnly = true)
   public Page<Review> getPendingReviews(Pageable pageable) {
     return reviewRepository.findPendingReviews(pageable);
   }
 
-  /**
-   * Approve a review.
-   */
   public Review approveReview(UUID reviewId, Long moderatorId) {
     Review review = reviewRepository.findById(reviewId)
         .orElseThrow(() -> new IllegalArgumentException("Review not found: " + reviewId));
@@ -165,9 +141,6 @@ public class ReviewService {
     return review;
   }
 
-  /**
-   * Reject a review.
-   */
   public Review rejectReview(UUID reviewId, Long moderatorId, String reason) {
     Review review = reviewRepository.findById(reviewId)
         .orElseThrow(() -> new IllegalArgumentException("Review not found: " + reviewId));
@@ -179,9 +152,6 @@ public class ReviewService {
     return review;
   }
 
-  /**
-   * Flag a review for further inspection.
-   */
   public Review flagReview(UUID reviewId, String reason) {
     Review review = reviewRepository.findById(reviewId)
         .orElseThrow(() -> new IllegalArgumentException("Review not found: " + reviewId));
@@ -193,9 +163,6 @@ public class ReviewService {
     return review;
   }
 
-  /**
-   * Mark review as helpful.
-   */
   public void markHelpful(UUID reviewId) {
     Review review = reviewRepository.findById(reviewId)
         .orElseThrow(() -> new IllegalArgumentException("Review not found: " + reviewId));
@@ -204,9 +171,6 @@ public class ReviewService {
     reviewRepository.save(review);
   }
 
-  /**
-   * Mark review as not helpful.
-   */
   public void markNotHelpful(UUID reviewId) {
     Review review = reviewRepository.findById(reviewId)
         .orElseThrow(() -> new IllegalArgumentException("Review not found: " + reviewId));
@@ -215,9 +179,6 @@ public class ReviewService {
     reviewRepository.save(review);
   }
 
-  /**
-   * Add vendor response to review.
-   */
   public ReviewResponse addVendorResponse(UUID reviewId, Long respondedBy, String body) {
     Review review = reviewRepository.findById(reviewId)
         .orElseThrow(() -> new IllegalArgumentException("Review not found: " + reviewId));
@@ -240,9 +201,6 @@ public class ReviewService {
     return reviewResponse;
   }
 
-  /**
-   * Get product rating summary.
-   */
   @Transactional(readOnly = true)
   public ProductRatingSummary getProductRatingSummary(Long productId) {
     Double averageRating = reviewRepository.getAverageRatingByProductId(productId);
@@ -257,17 +215,11 @@ public class ReviewService {
         dimensionalAverages);
   }
 
-  /**
-   * Get review by ID.
-   */
   @Transactional(readOnly = true)
   public Optional<Review> getReview(UUID reviewId) {
     return reviewRepository.findById(reviewId);
   }
 
-  /**
-   * Check if customer has reviewed a product.
-   */
   @Transactional(readOnly = true)
   public boolean hasCustomerReviewed(Long productId, Long customerId) {
     return reviewRepository.existsByProductIdAndCustomerId(productId, customerId);

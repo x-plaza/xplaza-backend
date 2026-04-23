@@ -125,17 +125,11 @@ public class Warehouse {
   private List<InventoryItem> inventoryItems = new ArrayList<>();
 
   public enum WarehouseType {
-    /** Main fulfillment center */
     FULFILLMENT_CENTER,
-    /** Retail store with ship-from-store */
     RETAIL_STORE,
-    /** Third party logistics */
     THIRD_PARTY,
-    /** Cross-dock facility */
     CROSS_DOCK,
-    /** Returns processing center */
     RETURNS_CENTER,
-    /** Drop ship vendor location */
     DROP_SHIP
   }
 
@@ -144,9 +138,6 @@ public class Warehouse {
     this.updatedAt = Instant.now();
   }
 
-  /**
-   * Check if warehouse supports a carrier.
-   */
   public boolean supportsCarrier(String carrierCode) {
     if (supportedCarriers == null || supportedCarriers.isEmpty()) {
       return true;
@@ -154,9 +145,6 @@ public class Warehouse {
     return supportedCarriers.contains(carrierCode);
   }
 
-  /**
-   * Calculate distance to a location (Haversine formula).
-   */
   public double calculateDistanceKm(BigDecimal targetLat, BigDecimal targetLon) {
     if (latitude == null || longitude == null || targetLat == null || targetLon == null) {
       return Double.MAX_VALUE;

@@ -35,10 +35,6 @@ public class CompositeUserDetailsService implements UserDetailsService {
     return loadUserByUsernameWithRole(username, null);
   }
 
-  /**
-   * Like {@link #loadUserByUsername(String)} but biased by the role hint to avoid
-   * an unnecessary first lookup against the wrong table.
-   */
   public UserDetails loadUserByUsernameWithRole(String username, String roleHint) throws UsernameNotFoundException {
     if ("CUSTOMER".equalsIgnoreCase(roleHint)) {
       return customerService.loadUserByUsername(username);

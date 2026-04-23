@@ -61,27 +61,6 @@ public class SecurityConfiguration {
       RateLimitFilter rateLimitFilter,
       ObjectProvider<ClientRegistrationRepository> oauthRepoProvider,
       HttpSecurity http) throws Exception {
-    // CSRF protection is intentionally disabled.
-    //
-    // This filter chain authenticates every request via a stateless JWT
-    // (`Authorization: Bearer …`) — no Spring session cookie is issued (see
-    // SessionCreationPolicy.STATELESS above) and form login / HTTP basic are
-    // also disabled. Without an ambient credential the browser carries no
-    // implicit authority that a third-party origin could ride on, so the CSRF
-    // attack model does not apply. CORS is locked down to the allowed-origins
-    // list above for an additional layer of defence.
-    //
-    // OAuth2 authorization-code login (when enabled below) carries its own
-    // state parameter end-to-end, which Spring Security validates.
-    //
-    // This is the configuration recommended by the Spring Security reference
-    // for token-only REST APIs:
-    // https://docs.spring.io/spring-security/reference/features/exploits/csrf.html
-    //
-    // CodeQL flags `java/spring-disabled-csrf-protection` regardless of
-    // session policy; alerts are dismissed as `won't fix` with this comment as
-    // justification. Re-enable CSRF if the API ever starts issuing session
-    // cookies or accepting form submissions from browsers.
     var chain = http
         .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .csrf(AbstractHttpConfigurer::disable)

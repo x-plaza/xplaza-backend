@@ -31,11 +31,6 @@ import com.stripe.param.PaymentIntentCreateParams;
 @Slf4j
 public class StripePaymentGateway implements PaymentGateway {
 
-  /**
-   * Conventional metadata keys callers can populate so the fallback idempotency
-   * key remains stable across retries while still being unique per business
-   * operation. Listed in priority order — the first non-blank value wins.
-   */
   private static final String[] IDENTITY_META_KEYS = {
       "orderId", "checkoutSessionId", "cartId", "customerId", "paymentIntentRef"
   };
@@ -61,24 +56,6 @@ public class StripePaymentGateway implements PaymentGateway {
     return PaymentIntent.create(params, options);
   }
 
-  /**
-   * Builds a Stripe idempotency key with enough entropy to never collide across
-   * unrelated payments while still de-duplicating intentional retries.
-   *
-   * <p>
-   * Resolution order:
-   * <ol>
-   * <li>Caller-supplied {@code metadata.idempotencyKey} — wins outright.</li>
-   * <li>SHA-256 over {@code amount}, {@code currency}, {@code description} and
-   * the entire (sorted) metadata map. Stable across retries of the same logical
-   * operation, distinct as soon as <em>any</em> identifying field differs.</li>
-   * <li>If the metadata map is empty <em>and</em> {@code description} is null
-   * (i.e. nothing differentiates this call), we fall through to a per-call UUID
-   * and log a warning. Without identifying context the only safe default is to
-   * forfeit Stripe-side retry de-duplication rather than silently collide with
-   * every other amount-equal payment.</li>
-   * </ol>
-   */
   private String resolveIdempotencyKey(BigDecimal amount, String currency, String description,
       Map<String, String> meta) {
     String supplied = meta.get("idempotencyKey");

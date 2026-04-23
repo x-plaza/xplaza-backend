@@ -53,10 +53,6 @@ public class ProductTranslationService {
     return categoryTranslationRepo.findByCategoryIdAndLocale(categoryId, locale);
   }
 
-  /**
-   * Mutate the response in-place with the requested locale's translation if one
-   * exists. Returns the same instance for chaining.
-   */
   public ProductResponse applyLocale(ProductResponse response, String locale) {
     if (response == null || response.getProductId() == null || locale == null || locale.isBlank()) {
       return response;

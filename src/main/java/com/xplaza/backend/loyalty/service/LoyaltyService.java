@@ -34,15 +34,6 @@ public class LoyaltyService {
 
   private final CustomerRepository customerRepository;
   private final DomainEventPublisher eventPublisher;
-  /**
-   * Self-reference injected lazily so the {@link #on(DomainEvents.OrderPlaced)}
-   * listener can route through the Spring AOP proxy when calling
-   * {@link #accrue(Long, BigDecimal, java.util.UUID)}. A direct
-   * {@code this.accrue(...)} bypasses the proxy, which silently strips the
-   * {@code @Transactional} boundary and breaks {@link DomainEventPublisher}'s
-   * {@code Propagation.MANDATORY} requirement (silently losing the
-   * {@code LoyaltyPointsEarned} outbox event on every order).
-   */
   private final LoyaltyService self;
 
   public LoyaltyService(CustomerRepository customerRepository,
@@ -72,13 +63,6 @@ public class LoyaltyService {
     return points;
   }
 
-  /**
-   * Credit a fixed number of points to a customer with a caller-supplied
-   * {@code reason}. Used for non-order-derived grants (referral rewards,
-   * customer-service goodwill, etc.). Persists the balance and emits a single
-   * {@link DomainEvents.LoyaltyPointsEarned} event — callers must not publish
-   * their own event on top, otherwise the outbox double-counts the grant.
-   */
   @Transactional
   public long grantPoints(Long customerId, long points, String reason) {
     if (points <= 0) {
@@ -129,9 +113,6 @@ public class LoyaltyService {
       return;
     }
     try {
-      // Route through the proxy so @Transactional(accrue) is honoured and
-      // DomainEventPublisher.publish() finds the enclosing transaction it
-      // mandates.
       self.accrue(event.customerId(), event.total(), event.orderId());
     } catch (Exception e) {
       log.error("Loyalty accrual failed for order {} (customer {}): {}",

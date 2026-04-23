@@ -117,7 +117,6 @@ public class CustomerService {
     return new AuthenticationResponse(jwtToken, refreshToken);
   }
 
-  /** Verifies an MFA code; assumes credentials were just validated. */
   public boolean verifyMfa(Customer customer, String code) {
     return Boolean.TRUE.equals(customer.getMfaEnabled())
         && customer.getMfaSecret() != null

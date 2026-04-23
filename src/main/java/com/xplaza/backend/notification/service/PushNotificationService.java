@@ -44,16 +44,6 @@ public class PushNotificationService {
   @Value("${push.apns.enabled:false}")
   private boolean apnsEnabled;
 
-  /**
-   * Idempotently register or refresh a push token for a customer.
-   *
-   * <p>
-   * If the token value already exists in the database, the existing row is only
-   * refreshed when it belongs to the <em>same</em> customer. A leaked or guessed
-   * token cannot be silently re-associated to a different account — the call
-   * fails with {@link org.springframework.security.access.AccessDeniedException}
-   * so operators can detect the attempt and rotate/ban the token.
-   */
   @Transactional
   public PushToken registerToken(Long customerId, PushToken.Platform platform, String token, String deviceId) {
     if (token == null || token.isBlank()) {
@@ -86,12 +76,6 @@ public class PushNotificationService {
         .build());
   }
 
-  /**
-   * Revoke a push token on behalf of the currently authenticated customer. Only
-   * deletes when the token's {@code customer_id} matches; other customers' tokens
-   * are ignored so an attacker who learns a token value cannot revoke someone
-   * else's device.
-   */
   @Transactional
   public void unregisterToken(Long customerId, String token) {
     if (customerId == null || token == null || token.isBlank()) {
@@ -107,11 +91,6 @@ public class PushNotificationService {
     return tokenRepo.findByCustomerId(customerId);
   }
 
-  /**
-   * Send a push notification to all of a customer's registered devices. Always
-   * asynchronous so transactional callers (e.g. order placement) are not delayed
-   * by network round-trips to FCM/APNs.
-   */
   @Async
   public void sendToCustomer(Long customerId, String title, String body) {
     var tokens = tokensForCustomer(customerId);
@@ -125,9 +104,6 @@ public class PushNotificationService {
   }
 
   private void dispatch(PushToken token, String title, String body) {
-    // Identify the device by its DB primary key in logs, never the raw token.
-    // Logging even a substring of the token is reportable as CWE-532 (sensitive
-    // info in logs), so we keep the surface minimal.
     Long tokenId = token.getId();
     switch (token.getPlatform()) {
     case ANDROID, WEB -> {
@@ -155,12 +131,6 @@ public class PushNotificationService {
     return s == null ? 0 : s.length();
   }
 
-  /**
-   * Stable, non-reversible identifier for a push token. We log only the first 12
-   * hex characters of SHA-256 so two events for the same device can be correlated
-   * without exposing token material. Returns {@code "***"} if SHA-256 is somehow
-   * unavailable so logging never throws.
-   */
   private static String fingerprint(String token) {
     if (token == null) {
       return "***";

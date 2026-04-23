@@ -12,9 +12,6 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-/**
- * Product included in a campaign with specific discount.
- */
 @Entity
 @Table(name = "campaign_products", indexes = {
     @Index(name = "idx_campaign_product_campaign", columnList = "campaign_id"),
@@ -73,9 +70,6 @@ public class CampaignProduct {
   @Builder.Default
   private Instant createdAt = Instant.now();
 
-  /**
-   * Check if product has available quantity.
-   */
   public boolean hasAvailableQuantity(int requestedQuantity) {
     if (availableQuantity == null) {
       return true;
@@ -83,16 +77,10 @@ public class CampaignProduct {
     return (availableQuantity - soldQuantity) >= requestedQuantity;
   }
 
-  /**
-   * Record sale.
-   */
   public void recordSale(int quantity) {
     this.soldQuantity += quantity;
   }
 
-  /**
-   * Check if within max per order limit.
-   */
   public boolean withinMaxPerOrder(int quantity) {
     if (maxQuantityPerOrder == null) {
       return true;

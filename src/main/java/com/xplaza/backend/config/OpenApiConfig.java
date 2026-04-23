@@ -24,10 +24,6 @@ public class OpenApiConfig {
 
   private static final String SECURITY_SCHEME_NAME = "bearerAuth";
 
-  /**
-   * Main OpenAPI configuration with security and general info. Server URL is
-   * automatically inferred from the request URL by SpringDoc.
-   */
   @Bean
   public OpenAPI customOpenAPI() {
     return new OpenAPI()

@@ -204,9 +204,6 @@ public class PaymentController {
       throw new AccessDeniedException("Authentication required");
     }
     Long customerId = principal.getCustomerId();
-    // Ownership check: the order must belong to the authenticated customer.
-    // This prevents an authenticated user from creating a COD transaction
-    // against another customer's order by guessing the order id.
     CustomerOrder order = customerOrderRepository.findById(request.orderId())
         .orElseThrow(() -> new IllegalArgumentException("Order not found: " + request.orderId()));
     if (!customerId.equals(order.getCustomerId())) {

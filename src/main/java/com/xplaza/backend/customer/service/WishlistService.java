@@ -35,9 +35,6 @@ public class WishlistService {
 
   private static final int MAX_WISHLISTS_PER_CUSTOMER = 10;
 
-  /**
-   * Get or create default wishlist for customer.
-   */
   public Wishlist getOrCreateDefaultWishlist(Long customerId) {
     List<Wishlist> wishlists = wishlistRepository.findByCustomerId(customerId);
     if (wishlists.isEmpty()) {
@@ -46,9 +43,6 @@ public class WishlistService {
     return wishlists.get(0);
   }
 
-  /**
-   * Create a new wishlist.
-   */
   public Wishlist createWishlist(Long customerId, String name) {
     long count = wishlistRepository.countByCustomerId(customerId);
     if (count >= MAX_WISHLISTS_PER_CUSTOMER) {
@@ -63,33 +57,21 @@ public class WishlistService {
     return wishlistRepository.save(wishlist);
   }
 
-  /**
-   * Get wishlist by ID with items.
-   */
   @Transactional(readOnly = true)
   public Optional<Wishlist> getWishlistWithItems(UUID wishlistId) {
     return wishlistRepository.findByIdWithItems(wishlistId);
   }
 
-  /**
-   * Get all wishlists for a customer.
-   */
   @Transactional(readOnly = true)
   public List<Wishlist> getCustomerWishlists(Long customerId) {
     return wishlistRepository.findByCustomerId(customerId);
   }
 
-  /**
-   * Get public wishlist by share token.
-   */
   @Transactional(readOnly = true)
   public Optional<Wishlist> getPublicWishlist(String shareToken) {
     return wishlistRepository.findByShareToken(shareToken);
   }
 
-  /**
-   * Add item to wishlist.
-   */
   public WishlistItem addItem(UUID wishlistId, Long productId, UUID variantId, BigDecimal priceAtAdd) {
     Wishlist wishlist = wishlistRepository.findById(wishlistId)
         .orElseThrow(() -> new IllegalArgumentException("Wishlist not found: " + wishlistId));
@@ -117,9 +99,6 @@ public class WishlistService {
     return item;
   }
 
-  /**
-   * Remove item from wishlist.
-   */
   public void removeItem(UUID wishlistId, UUID itemId) {
     WishlistItem item = wishlistItemRepository.findById(itemId)
         .orElseThrow(() -> new IllegalArgumentException("Wishlist item not found: " + itemId));
@@ -136,9 +115,6 @@ public class WishlistService {
     log.info("Removed item from wishlist {}: itemId={}", wishlistId, itemId);
   }
 
-  /**
-   * Move item to another wishlist.
-   */
   public WishlistItem moveItem(UUID sourceWishlistId, UUID itemId, UUID targetWishlistId) {
     WishlistItem item = wishlistItemRepository.findById(itemId)
         .orElseThrow(() -> new IllegalArgumentException("Wishlist item not found: " + itemId));
@@ -156,9 +132,6 @@ public class WishlistService {
     return newItem;
   }
 
-  /**
-   * Update wishlist settings.
-   */
   public Wishlist updateWishlist(UUID wishlistId, String name, Wishlist.WishlistVisibility visibility) {
     Wishlist wishlist = wishlistRepository.findById(wishlistId)
         .orElseThrow(() -> new IllegalArgumentException("Wishlist not found: " + wishlistId));
@@ -176,9 +149,6 @@ public class WishlistService {
     return wishlistRepository.save(wishlist);
   }
 
-  /**
-   * Delete wishlist.
-   */
   public void deleteWishlist(UUID wishlistId, Long customerId) {
     Wishlist wishlist = wishlistRepository.findById(wishlistId)
         .orElseThrow(() -> new IllegalArgumentException("Wishlist not found: " + wishlistId));
@@ -194,9 +164,6 @@ public class WishlistService {
     log.info("Deleted wishlist: {}", wishlistId);
   }
 
-  /**
-   * Check if product is in any of customer's wishlists.
-   */
   @Transactional(readOnly = true)
   public boolean isInWishlist(Long customerId, Long productId) {
     List<Wishlist> wishlists = wishlistRepository.findByCustomerId(customerId);
@@ -208,25 +175,16 @@ public class WishlistService {
     return false;
   }
 
-  /**
-   * Get items needing price drop notification for a product.
-   */
   @Transactional(readOnly = true)
   public List<WishlistItem> getItemsForPriceDropNotification(Long productId) {
     return wishlistItemRepository.findByProductIdWithPriceDropNotification(productId);
   }
 
-  /**
-   * Get items needing back-in-stock notification for a product.
-   */
   @Transactional(readOnly = true)
   public List<WishlistItem> getItemsForBackInStockNotification(Long productId) {
     return wishlistItemRepository.findByProductIdWithBackInStockNotification(productId);
   }
 
-  /**
-   * Enable price drop notification for an item.
-   */
   public void enablePriceDropNotification(UUID itemId) {
     WishlistItem item = wishlistItemRepository.findById(itemId)
         .orElseThrow(() -> new IllegalArgumentException("Wishlist item not found: " + itemId));
@@ -234,9 +192,6 @@ public class WishlistService {
     wishlistItemRepository.save(item);
   }
 
-  /**
-   * Enable back-in-stock notification for an item.
-   */
   public void enableBackInStockNotification(UUID itemId) {
     WishlistItem item = wishlistItemRepository.findById(itemId)
         .orElseThrow(() -> new IllegalArgumentException("Wishlist item not found: " + itemId));

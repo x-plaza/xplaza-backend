@@ -22,10 +22,6 @@ public interface ProductCoPurchaseRepository extends JpaRepository<ProductCoPurc
   @Query("SELECT cp FROM ProductCoPurchase cp WHERE cp.productId = :productId ORDER BY cp.coPurchaseCount DESC")
   List<ProductCoPurchase> findTopByProductId(@Param("productId") Long productId, Pageable page);
 
-  /**
-   * Atomic upsert/increment for the (product, coProduct) pair. Postgres
-   * {@code ON CONFLICT} keeps the worker race-free under bursty traffic.
-   */
   @Modifying
   @Query(value = "INSERT INTO product_co_purchases(product_id, co_product_id, co_purchase_count) "
       + "VALUES (:productId, :coProductId, 1) "

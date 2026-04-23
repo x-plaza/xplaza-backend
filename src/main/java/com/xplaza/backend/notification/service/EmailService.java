@@ -32,12 +32,6 @@ public class EmailService {
   private final JavaMailSender mailSender;
   private final TemplateEngine templateEngine;
 
-  /**
-   * Generic plaintext-into-html-template send. Kept for backwards compatibility;
-   * new transactional flows should call
-   * {@link #sendTemplate(String, String, String, Map)} so the per-event Thymeleaf
-   * template is selected.
-   */
   @Async
   @CircuitBreaker(name = "mail")
   @Retry(name = "mail")
@@ -46,12 +40,6 @@ public class EmailService {
         Map.of("title", subject, "message", text));
   }
 
-  /**
-   * Render the given Thymeleaf template with the supplied model and send the
-   * result as an HTML email. The Thymeleaf templates live under
-   * {@code src/main/resources/templates}: order-confirmation, order-shipped,
-   * order-delivered, abandoned-cart, password-reset, invoice etc.
-   */
   @Async
   @CircuitBreaker(name = "mail")
   @Retry(name = "mail")

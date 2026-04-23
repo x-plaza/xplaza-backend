@@ -129,9 +129,6 @@ public class Carrier {
     this.updatedAt = Instant.now();
   }
 
-  /**
-   * Generate tracking URL for a shipment.
-   */
   public String generateTrackingUrl(String trackingNumber) {
     if (trackingUrlTemplate == null || trackingNumber == null) {
       return null;
@@ -139,9 +136,6 @@ public class Carrier {
     return trackingUrlTemplate.replace("{tracking_number}", trackingNumber);
   }
 
-  /**
-   * Check if carrier supports the destination country.
-   */
   public boolean supportsCountry(String countryCode) {
     if (supportedCountries == null || supportedCountries.isEmpty()) {
       return true; // If not specified, assume all countries
@@ -149,9 +143,6 @@ public class Carrier {
     return supportedCountries.contains(countryCode);
   }
 
-  /**
-   * Calculate shipping cost estimate.
-   */
   public BigDecimal calculateCost(BigDecimal weightKg) {
     if (baseRate == null) {
       return BigDecimal.ZERO;

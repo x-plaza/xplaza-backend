@@ -44,10 +44,6 @@ public class CustomerAddress {
   @Builder.Default
   private Boolean isDefault = false;
 
-  /**
-   * User-friendly label for the address. Examples: "Home", "Office", "Parents'
-   * House"
-   */
   @Column(name = "label", length = 50)
   private String label;
 
@@ -75,41 +71,25 @@ public class CustomerAddress {
   @Column(name = "postal_code", nullable = false, length = 20)
   private String postalCode;
 
-  /**
-   * ISO 3166-1 alpha-2 country code (e.g., "US", "DE", "GB").
-   */
   @Column(name = "country_code", nullable = false, length = 2)
   private String countryCode;
 
   @Column(name = "phone", length = 20)
   private String phone;
 
-  /**
-   * Special delivery instructions. Examples: "Leave at door", "Ring doorbell
-   * twice"
-   */
   @Column(name = "instructions", columnDefinition = "TEXT")
   private String instructions;
 
-  /**
-   * GPS coordinates for precise delivery.
-   */
   @Column(name = "latitude", precision = 10, scale = 8)
   private BigDecimal latitude;
 
   @Column(name = "longitude", precision = 11, scale = 8)
   private BigDecimal longitude;
 
-  /**
-   * Whether this address has been verified (via postal service API).
-   */
   @Column(name = "is_verified")
   @Builder.Default
   private Boolean isVerified = false;
 
-  /**
-   * Whether this address is active (soft delete).
-   */
   @Column(name = "is_active")
   @Builder.Default
   private Boolean isActive = true;
@@ -133,16 +113,10 @@ public class CustomerAddress {
     this.updatedAt = Instant.now();
   }
 
-  /**
-   * Get full name.
-   */
   public String getFullName() {
     return firstName + " " + lastName;
   }
 
-  /**
-   * Get formatted address for display.
-   */
   public String getFormattedAddress() {
     StringBuilder sb = new StringBuilder();
     sb.append(addressLine1);
@@ -158,9 +132,6 @@ public class CustomerAddress {
     return sb.toString();
   }
 
-  /**
-   * Get a short display string for lists.
-   */
   public String getDisplayString() {
     String labelPart = label != null ? label + ": " : "";
     return labelPart + addressLine1 + ", " + city;

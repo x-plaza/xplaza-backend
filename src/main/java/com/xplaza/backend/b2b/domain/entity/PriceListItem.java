@@ -11,12 +11,6 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-/**
- * One row in a {@link PriceList}: the negotiated unit price for a product when
- * bought in quantities ≥ {@code minQuantity}. Multiple rows for the same
- * product implement quantity-break pricing — the resolver picks the highest
- * {@code minQuantity} that the cart line still qualifies for.
- */
 @Entity
 @Table(name = "price_list_items", uniqueConstraints = {
     @UniqueConstraint(columnNames = { "price_list_id", "product_id", "min_quantity" })

@@ -23,10 +23,6 @@ package com.xplaza.backend.common.util;
  */
 public final class LogSanitizer {
 
-  /**
-   * Cap log fragments so attackers cannot bury operator output under MB-sized
-   * strings.
-   */
   private static final int MAX_LOG_LENGTH = 256;
 
   private static final String NULL_PLACEHOLDER = "<null>";
@@ -36,18 +32,6 @@ public final class LogSanitizer {
   private LogSanitizer() {
   }
 
-  /**
-   * Render an arbitrary value for inclusion in a log message.
-   *
-   * <ul>
-   * <li>{@code null} becomes {@code "<null>"} so the log line still parses
-   * cleanly.</li>
-   * <li>CR ({@code \r}), LF ({@code \n}) and other ASCII control characters
-   * (except TAB) are replaced by an underscore to defeat log forging.</li>
-   * <li>Strings longer than {@link #MAX_LOG_LENGTH} characters are truncated with
-   * a clear marker.</li>
-   * </ul>
-   */
   public static String forLog(Object value) {
     if (value == null) {
       return NULL_PLACEHOLDER;

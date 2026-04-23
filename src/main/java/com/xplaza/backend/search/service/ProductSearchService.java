@@ -59,7 +59,6 @@ public class ProductSearchService {
     this.productRepository = productRepository;
   }
 
-  /** Reindex a single product. Called from event listener. */
   @Async
   @CircuitBreaker(name = "elasticsearch")
   @Retry(name = "elasticsearch")
@@ -75,12 +74,6 @@ public class ProductSearchService {
     return search(q, filters, page, size, false);
   }
 
-  /**
-   * Full-text search + structured filters + (optional) facet aggregations.
-   * Filters honoured: shopId, brand, category, minPrice, maxPrice, published.
-   * When {@code withFacets} is true the response includes term aggregations for
-   * brand and category and a histogram for price.
-   */
   public SearchHits<ProductDocument> search(String q, Map<String, String> filters, int page, int size,
       boolean withFacets) {
     var bool = BoolQuery.of(b -> {
@@ -92,9 +85,6 @@ public class ProductSearchService {
             .fuzziness("AUTO"))._toQuery());
       }
       if (filters != null) {
-        // Numeric and boolean filters must be parsed to their typed FieldValue
-        // otherwise Elasticsearch's term query compiles as a string comparison
-        // against an indexed long/bool field and silently returns zero hits.
         applyLongTermFilter(b, filters, "shopId", "shopId");
         applyStringTermFilter(b, filters, "brand", "brand");
         applyStringTermFilter(b, filters, "category", "category");
@@ -148,9 +138,6 @@ public class ProductSearchService {
       return;
     }
     String trimmed = v.trim();
-    // Only accept the canonical spellings so we don't silently treat "yes"
-    // as false. Anything else is ignored (a filter-not-applied is safer than
-    // a wrong filter applied).
     if (trimmed.equalsIgnoreCase("true") || trimmed.equalsIgnoreCase("false")) {
       boolean parsed = Boolean.parseBoolean(trimmed);
       b.filter(TermQuery.of(t -> t.field(field).value(parsed))._toQuery());
@@ -191,11 +178,6 @@ public class ProductSearchService {
     }
   }
 
-  /**
-   * Walk the entire products table in batches and rebuild the search index.
-   * Intended to be triggered manually (admin endpoint) after schema changes or as
-   * a recovery step when a partial outage left the index stale.
-   */
   public int reindexAll(int batchSize) {
     int total = 0;
     int page = 0;

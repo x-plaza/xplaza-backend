@@ -74,9 +74,6 @@ public class RefundItem {
     USED
   }
 
-  /**
-   * Calculate amount from quantity and unit price.
-   */
   public void calculateAmount() {
     this.amount = unitPrice.multiply(BigDecimal.valueOf(quantity));
   }

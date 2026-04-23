@@ -13,13 +13,6 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-/**
- * An item within a customer order.
- *
- * This is a snapshot of the product/variant at the time of purchase. All
- * product details are copied so that the order remains accurate even if the
- * product changes later.
- */
 @Entity
 @Table(name = "customer_order_items", indexes = {
     @Index(name = "idx_cust_order_items_order", columnList = "order_id"),
@@ -148,30 +141,18 @@ public class CustomerOrderItem {
     return order != null ? order.getOrderId() : null;
   }
 
-  /**
-   * Get quantity still pending shipment.
-   */
   public int getQuantityPending() {
     return quantity - quantityShipped;
   }
 
-  /**
-   * Check if item is fully shipped.
-   */
   public boolean isFullyShipped() {
     return quantityShipped >= quantity;
   }
 
-  /**
-   * Check if item is fully returned.
-   */
   public boolean isFullyReturned() {
     return quantityReturned >= quantity;
   }
 
-  /**
-   * Calculate profit margin for this item.
-   */
   public BigDecimal getProfitMargin() {
     if (costPrice == null || costPrice.compareTo(BigDecimal.ZERO) == 0) {
       return null;

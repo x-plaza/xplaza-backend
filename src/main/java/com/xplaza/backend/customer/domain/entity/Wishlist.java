@@ -50,9 +50,6 @@ public class Wishlist {
   @Builder.Default
   private WishlistVisibility visibility = WishlistVisibility.PRIVATE;
 
-  /**
-   * Token for sharing the wishlist via URL. Only used when visibility is SHARED.
-   */
   @Column(name = "share_token", length = 64)
   private String shareToken;
 
@@ -69,11 +66,8 @@ public class Wishlist {
   private List<WishlistItem> items = new ArrayList<>();
 
   public enum WishlistVisibility {
-    /** Only visible to the owner */
     PRIVATE,
-    /** Accessible via share link */
     SHARED,
-    /** Visible to anyone */
     PUBLIC
   }
 
@@ -96,9 +90,6 @@ public class Wishlist {
     return items != null ? items.size() : 0;
   }
 
-  /**
-   * Generate a share token if the wishlist is shareable.
-   */
   public void makeShareable() {
     if (this.shareToken == null) {
       this.shareToken = UUID.randomUUID().toString().replace("-", "");
@@ -106,17 +97,11 @@ public class Wishlist {
     this.visibility = WishlistVisibility.SHARED;
   }
 
-  /**
-   * Revoke sharing access.
-   */
   public void makePrivate() {
     this.visibility = WishlistVisibility.PRIVATE;
     // Keep the token in case they want to re-share
   }
 
-  /**
-   * Check if wishlist is public.
-   */
   public boolean isPublic() {
     return this.visibility == WishlistVisibility.PUBLIC;
   }

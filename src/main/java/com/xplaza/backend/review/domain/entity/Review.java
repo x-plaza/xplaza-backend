@@ -41,15 +41,9 @@ public class Review {
   @Column(name = "product_id", nullable = false)
   private Long productId;
 
-  /**
-   * Optional: specific variant reviewed.
-   */
   @Column(name = "variant_id")
   private UUID variantId;
 
-  /**
-   * Optional: order that this review is for (for verified purchase).
-   */
   @Column(name = "order_id")
   private UUID orderId;
 
@@ -87,16 +81,10 @@ public class Review {
   @Column(name = "body", columnDefinition = "TEXT")
   private String body;
 
-  /**
-   * List of pros mentioned in the review.
-   */
   @JdbcTypeCode(SqlTypes.ARRAY)
   @Column(name = "pros")
   private String[] pros;
 
-  /**
-   * List of cons mentioned in the review.
-   */
   @JdbcTypeCode(SqlTypes.ARRAY)
   @Column(name = "cons")
   private String[] cons;
@@ -110,16 +98,10 @@ public class Review {
   @Builder.Default
   private Integer unhelpfulVotes = 0;
 
-  /**
-   * True if the reviewer actually purchased this product.
-   */
   @Column(name = "is_verified_purchase")
   @Builder.Default
   private Boolean isVerifiedPurchase = false;
 
-  /**
-   * True if the reviewer wants to remain anonymous.
-   */
   @Column(name = "is_anonymous")
   @Builder.Default
   private Boolean isAnonymous = false;
@@ -162,13 +144,9 @@ public class Review {
   private ReviewResponse vendorResponse;
 
   public enum ReviewStatus {
-    /** Awaiting moderation */
     PENDING,
-    /** Approved and visible */
     APPROVED,
-    /** Rejected by moderator */
     REJECTED,
-    /** Flagged for review */
     FLAGGED
   }
 
@@ -177,9 +155,6 @@ public class Review {
     this.updatedAt = Instant.now();
   }
 
-  /**
-   * Approve and publish this review.
-   */
   public void approve(Long moderatorId) {
     this.status = ReviewStatus.APPROVED;
     this.moderatedBy = moderatorId;
@@ -187,9 +162,6 @@ public class Review {
     this.publishedAt = Instant.now();
   }
 
-  /**
-   * Reject this review.
-   */
   public void reject(Long moderatorId, String reason) {
     this.status = ReviewStatus.REJECTED;
     this.moderatedBy = moderatorId;
@@ -197,49 +169,31 @@ public class Review {
     this.rejectReason = reason;
   }
 
-  /**
-   * Flag this review for further inspection.
-   */
   public void flag(String reason) {
     this.status = ReviewStatus.FLAGGED;
     this.flagReason = reason;
   }
 
-  /**
-   * Add a helpful vote.
-   */
   public void addHelpfulVote() {
     this.helpfulVotes = (helpfulVotes != null ? helpfulVotes : 0) + 1;
   }
 
-  /**
-   * Add an unhelpful vote.
-   */
   public void addUnhelpfulVote() {
     this.unhelpfulVotes = (unhelpfulVotes != null ? unhelpfulVotes : 0) + 1;
   }
 
-  /**
-   * Remove a helpful vote.
-   */
   public void removeHelpfulVote() {
     if (helpfulVotes != null && helpfulVotes > 0) {
       this.helpfulVotes--;
     }
   }
 
-  /**
-   * Remove an unhelpful vote.
-   */
   public void removeUnhelpfulVote() {
     if (unhelpfulVotes != null && unhelpfulVotes > 0) {
       this.unhelpfulVotes--;
     }
   }
 
-  /**
-   * Get helpfulness percentage.
-   */
   public Double getHelpfulnessPercentage() {
     int total = (helpfulVotes != null ? helpfulVotes : 0) + (unhelpfulVotes != null ? unhelpfulVotes : 0);
     if (total == 0) {

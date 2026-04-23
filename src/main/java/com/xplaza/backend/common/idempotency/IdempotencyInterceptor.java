@@ -55,7 +55,6 @@ public class IdempotencyInterceptor implements HandlerInterceptor {
 
   private static final Logger log = LoggerFactory.getLogger(IdempotencyInterceptor.class);
 
-  /** Request attribute name for the idempotency key once it has been reserved. */
   static final String ATTR_KEY = IdempotencyInterceptor.class.getName() + ".key";
 
   private final IdempotencyService service;
@@ -94,9 +93,6 @@ public class IdempotencyInterceptor implements HandlerInterceptor {
                 + "\"message\":\"Idempotency-Key was previously used for a different request\"}");
         return false;
       }
-      // No persisted response yet means an earlier request with this key is
-      // still in flight. Returning the original 0-byte body would silently
-      // mislead the caller, so we surface it as a conflict.
       if (rec.getResponseStatus() == null) {
         writeJson(response, HttpServletResponse.SC_CONFLICT,
             "{\"error\":\"idempotency_in_flight\","

@@ -15,9 +15,6 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-/**
- * Inventory stock item per warehouse/variant combination.
- */
 @Entity
 @Table(name = "inventory_items", indexes = {
     @Index(name = "idx_inventory_product", columnList = "product_id"),
@@ -148,37 +145,22 @@ public class InventoryItem {
     this.updatedAt = Instant.now();
   }
 
-  /**
-   * Calculate available quantity (on hand minus reserved).
-   */
   public int getAvailableQuantity() {
     return quantityOnHand - quantityReserved;
   }
 
-  /**
-   * Check if item is in stock.
-   */
   public boolean isInStock() {
     return getAvailableQuantity() > 0;
   }
 
-  /**
-   * Check if item needs reordering.
-   */
   public boolean needsReorder() {
     return (quantityOnHand - quantityReserved + quantityIncoming) <= reorderPoint;
   }
 
-  /**
-   * Check if stock is below safety level.
-   */
   public boolean isBelowSafetyStock() {
     return (quantityOnHand - quantityReserved) <= safetyStock;
   }
 
-  /**
-   * Reserve stock for an order.
-   */
   public boolean reserve(int quantity) {
     if (getAvailableQuantity() >= quantity) {
       this.quantityReserved += quantity;
@@ -187,41 +169,26 @@ public class InventoryItem {
     return false;
   }
 
-  /**
-   * Release reserved stock.
-   */
   public void releaseReservation(int quantity) {
     this.quantityReserved = Math.max(0, this.quantityReserved - quantity);
   }
 
-  /**
-   * Fulfill reserved stock (decrease on-hand and reserved).
-   */
   public void fulfill(int quantity) {
     this.quantityOnHand -= quantity;
     this.quantityReserved -= quantity;
   }
 
-  /**
-   * Receive incoming stock.
-   */
   public void receiveStock(int quantity) {
     this.quantityOnHand += quantity;
     this.quantityIncoming = Math.max(0, this.quantityIncoming - quantity);
     this.lastReceivedAt = Instant.now();
   }
 
-  /**
-   * Adjust stock (for inventory counts).
-   */
   public void adjustStock(int newQuantity) {
     this.quantityOnHand = newQuantity;
     this.lastCountedAt = Instant.now();
   }
 
-  /**
-   * Calculate inventory value.
-   */
   public BigDecimal getInventoryValue() {
     if (unitCost == null) {
       return BigDecimal.ZERO;

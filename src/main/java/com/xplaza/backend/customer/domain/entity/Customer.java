@@ -71,9 +71,6 @@ public class Customer implements UserDetails {
   @Column(name = "verified_email_at")
   private Instant emailVerifiedAt;
 
-  // ---------- Account lockout ----------
-  // Hidden from JSON: leaking these aids credential-stuffing attackers in
-  // timing their next attempt window.
   @Column(name = "failed_login_attempts", nullable = false)
   @Builder.Default
   @JsonIgnore
@@ -88,9 +85,6 @@ public class Customer implements UserDetails {
   @Builder.Default
   private Boolean mfaEnabled = false;
 
-  // The TOTP shared-secret. Exposing it would let anyone with a stolen
-  // session token also generate valid second-factor codes, completely
-  // defeating MFA — it must never leave the server.
   @Column(name = "mfa_secret", length = 200)
   @JsonIgnore
   private String mfaSecret;

@@ -91,9 +91,6 @@ public class StripeWebhookController {
             orderRepository.save(order);
             log.info("Order {} confirmed via Stripe webhook", orderId);
 
-            // Record transaction if not exists
-            // In a real scenario, you might want to link this to the transaction created
-            // earlier
           }
         });
       } catch (Exception e) {
