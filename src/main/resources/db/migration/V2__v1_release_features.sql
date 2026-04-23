@@ -6,6 +6,53 @@
 -- product translations, recommendations, full-text search.
 -- =====================================================
 
+-- ---------- Compatibility preamble (cart table rename) ----------
+-- Early production environments ran with `spring.flyway.baseline-on-migrate=true`
+-- against a schema that Hibernate `ddl-auto=update` had already built. In that
+-- era the Cart aggregate mapped to `shopping_carts` (see commit 4a9f321 — the
+-- rename to `carts`). Because baseline-on-migrate back-stamped V1 as "applied"
+-- without executing its body, the canonical `carts` table from V1 never got
+-- created on those environments. V2 (below) indexes `carts(...)` and therefore
+-- fails with `relation "carts" does not exist`.
+--
+-- This block heals that drift idempotently:
+--   1. If `carts` is missing but `shopping_carts` exists -> rename it.
+--   2. If neither exists (clean DB that baselined on an even older schema) ->
+--      fall through to the CREATE TABLE IF NOT EXISTS below.
+-- Column-level drift (e.g. `id` vs `cart_id`, `currency_code` vs `currency`)
+-- is still covered by Hibernate `ddl-auto=update` until V4 reconciliation.
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.tables
+    WHERE table_schema = current_schema() AND table_name = 'carts'
+  ) AND EXISTS (
+    SELECT 1 FROM information_schema.tables
+    WHERE table_schema = current_schema() AND table_name = 'shopping_carts'
+  ) THEN
+    EXECUTE 'ALTER TABLE shopping_carts RENAME TO carts';
+  END IF;
+END
+$$;
+
+CREATE TABLE IF NOT EXISTS carts (
+    cart_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    customer_id BIGINT REFERENCES customers(customer_id) ON DELETE SET NULL,
+    session_id VARCHAR(100),
+    status VARCHAR(20) DEFAULT 'ACTIVE',
+    currency VARCHAR(3) DEFAULT 'USD',
+    subtotal DECIMAL(15, 2) DEFAULT 0,
+    discount_total DECIMAL(15, 2) DEFAULT 0,
+    shipping_estimate DECIMAL(15, 2) DEFAULT 0,
+    tax_estimate DECIMAL(15, 2) DEFAULT 0,
+    total_estimate DECIMAL(15, 2) DEFAULT 0,
+    item_count INTEGER DEFAULT 0,
+    converted_order_id UUID,
+    expires_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- ---------- Customers/Admins extras ----------
 ALTER TABLE customers ADD COLUMN IF NOT EXISTS oauth_provider VARCHAR(30);
 ALTER TABLE customers ADD COLUMN IF NOT EXISTS oauth_subject VARCHAR(200);
