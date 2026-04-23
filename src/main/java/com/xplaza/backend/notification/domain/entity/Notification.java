@@ -12,6 +12,9 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
+/**
+ * Customer notification.
+ */
 @Entity
 @Table(name = "notifications", indexes = {
     @Index(name = "idx_notification_customer", columnList = "customer_id"),

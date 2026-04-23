@@ -1,3 +1,10 @@
+-- =====================================================
+-- X-Plaza v1.0.0 release features
+-- Adds: idempotency, transactional outbox, audit log,
+-- auth flows (verify/reset/MFA/OAuth), CMS, gift cards,
+-- subscriptions, B2B groups + price lists, tax engine,
+-- product translations, recommendations, full-text search.
+-- =====================================================
 
 -- ---------- Customers/Admins extras ----------
 ALTER TABLE customers ADD COLUMN IF NOT EXISTS oauth_provider VARCHAR(30);
@@ -240,6 +247,12 @@ CREATE TABLE IF NOT EXISTS price_list_items (
     UNIQUE(price_list_id, product_id, min_quantity)
 );
 
+-- ---------- Tax engine ----------
+-- Column names mirror the JPA entity exactly so that
+-- spring.jpa.hibernate.ddl-auto=validate (cloud profile) succeeds. The
+-- non-mapped `code` column is retained as a stable lookup key for the seed
+-- inserts below (Hibernate's `validate` only checks that mapped columns
+-- exist; extra columns are allowed).
 CREATE TABLE IF NOT EXISTS tax_zones (
     tax_zone_id          BIGSERIAL PRIMARY KEY,
     code                 VARCHAR(50) NOT NULL UNIQUE,

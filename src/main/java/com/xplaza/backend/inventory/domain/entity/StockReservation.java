@@ -13,6 +13,9 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
+/**
+ * Stock reservation for orders.
+ */
 @Entity
 @Table(name = "stock_reservations", indexes = {
     @Index(name = "idx_reservation_inventory", columnList = "inventory_id"),

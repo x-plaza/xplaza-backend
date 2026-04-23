@@ -12,6 +12,11 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
+/**
+ * Referral record. A customer (the {@code referrer}) sends an invitation to an
+ * email address; once that referee registers and places their first order the
+ * referral is marked {@code REWARDED} and the referrer is credited.
+ */
 @Entity
 @Table(name = "referrals", indexes = {
     @Index(name = "idx_referrals_referrer", columnList = "referrer_id"),

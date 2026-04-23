@@ -14,6 +14,9 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
+/**
+ * Marketing campaign.
+ */
 @Entity
 @Table(name = "campaigns", indexes = {
     @Index(name = "idx_campaign_status", columnList = "status"),

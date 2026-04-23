@@ -13,6 +13,13 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
+/**
+ * An item within a customer order.
+ *
+ * This is a snapshot of the product/variant at the time of purchase. All
+ * product details are copied so that the order remains accurate even if the
+ * product changes later.
+ */
 @Entity
 @Table(name = "customer_order_items", indexes = {
     @Index(name = "idx_cust_order_items_order", columnList = "order_id"),

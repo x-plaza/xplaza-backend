@@ -15,6 +15,11 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
+/**
+ * Represents a shipment for order fulfillment.
+ *
+ * A single order may have multiple shipments (split shipment).
+ */
 @Entity
 @Table(name = "shipments", indexes = {
     @Index(name = "idx_shipments_order", columnList = "order_id"),

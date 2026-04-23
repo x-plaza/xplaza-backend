@@ -13,6 +13,9 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
+/**
+ * An item in a customer's wishlist.
+ */
 @Entity
 @Table(name = "wishlist_items", uniqueConstraints = {
     @UniqueConstraint(columnNames = { "wishlist_id", "product_id", "variant_id" })

@@ -74,27 +74,24 @@
 
 	<properties>
 		<java.version>25</java.version>
-		
+		<!-- Pinned: 2.4.x SpringBoot3Verifier rejects Spring Boot 4; track resilience4j#2267. -->
 		<resilience4j.version>2.3.0</resilience4j.version>
 		<bucket4j.version>8.10.1</bucket4j.version>
-		<!-- openpdf 3.x is a namespace rename (com.lowagie → org.openpdf) — hold
-		     at 2.x until we schedule the import migration. -->
+		<!-- openpdf 3.x is a namespace rename (com.lowagie → org.openpdf); hold at 2.x until import migration is scheduled. -->
 		<openpdf.version>2.0.3</openpdf.version>
 		<totp.version>1.7.1</totp.version>
 		<commons-csv.version>1.14.1</commons-csv.version>
 		<logstash-logback.version>9.0</logstash-logback.version>
 		<testcontainers.version>1.21.4</testcontainers.version>
 
-		
-		<!-- Spring Boot 4.0.5 still ships Tomcat 11.0.20; CVE-2026-34483,
-		     CVE-2026-34487 and CVE-2026-34500 require 11.0.21+. -->
+		<!-- Security overrides on top of the Spring Boot BOM (driven by open Dependabot advisories). -->
+		<!-- CVE-2026-34483 / CVE-2026-34487 / CVE-2026-34500 — require Tomcat 11.0.21+. -->
 		<tomcat.version>11.0.21</tomcat.version>
-		<!-- Spring Boot 4.0.5 still ships Thymeleaf 3.1.3.RELEASE; CVE-2026-40477
-		     and CVE-2026-40478 (both critical) require 3.1.4.RELEASE+. -->
+		<!-- CVE-2026-40477 / CVE-2026-40478 (critical) — require Thymeleaf 3.1.4.RELEASE+. -->
 		<thymeleaf.version>3.1.5.RELEASE</thymeleaf.version>
-		
+		<!-- GHSA-72hv-8253-57qq / GHSA-2m67-wjpj-xhg9 / CVE-2026-29062 — require Jackson 3.1.1+. -->
 		<jackson-bom.version>3.1.2</jackson-bom.version>
-		
+		<!-- CVE-2026-0636 (Bouncy Castle LDAP injection) — require 1.84+; not managed by the BOM. -->
 		<bouncycastle.version>1.84</bouncycastle.version>
 	</properties>
 
@@ -163,7 +160,7 @@
 			<artifactId>h2</artifactId>
 			<scope>runtime</scope>
 		</dependency>
-		
+		<!-- Required: Spring Boot 4.x only activates FlywayAutoConfiguration via the starter, not plain flyway-core. -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-flyway</artifactId>
@@ -223,7 +220,7 @@
 			<artifactId>minio</artifactId>
 			<version>9.0.0</version>
 		</dependency>
-		
+		<!-- okhttp + kotlin-stdlib: transitive via MinIO; pinned only if a CVE forces an override (not currently). -->
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>
 			<artifactId>okhttp</artifactId>
@@ -367,7 +364,7 @@
 
 	<dependencyManagement>
 		<dependencies>
-			
+			<!-- Pin Bouncy Castle (CVE-2026-0636); MinIO still pulls 1.82 transitively and the BOM doesn't manage it. -->
 			<dependency>
 				<groupId>org.bouncycastle</groupId>
 				<artifactId>bcprov-jdk18on</artifactId>

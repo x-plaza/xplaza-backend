@@ -12,6 +12,9 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
+/**
+ * Product included in a campaign with specific discount.
+ */
 @Entity
 @Table(name = "campaign_products", indexes = {
     @Index(name = "idx_campaign_product_campaign", columnList = "campaign_id"),

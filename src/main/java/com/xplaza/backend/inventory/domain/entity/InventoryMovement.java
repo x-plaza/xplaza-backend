@@ -12,6 +12,9 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
+/**
+ * Inventory movement/transaction record.
+ */
 @Entity
 @Table(name = "inventory_movements", indexes = {
     @Index(name = "idx_movement_inventory", columnList = "inventory_id"),

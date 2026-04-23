@@ -12,6 +12,9 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
+/**
+ * Tracks the history of status changes for an order.
+ */
 @Entity
 @Table(name = "customer_order_status_history", indexes = {
     @Index(name = "idx_cust_order_status_history_order", columnList = "order_id")

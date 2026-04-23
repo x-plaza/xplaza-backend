@@ -20,6 +20,13 @@ import lombok.*;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 
+/**
+ * CustomerOrder represents a confirmed purchase from a customer.
+ *
+ * An order is created when a customer completes checkout. It captures: - The
+ * items purchased (from cart) - Payment information - Shipping details -
+ * Pricing at time of purchase
+ */
 @Entity
 @Table(name = "customer_orders", indexes = {
     @Index(name = "idx_cust_orders_customer", columnList = "customer_id"),
