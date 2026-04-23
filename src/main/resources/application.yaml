@@ -94,11 +94,6 @@ telesign:
   api-key: ${TELESIGN_API_KEY:}
   enabled: ${TELESIGN_ENABLED:false}
 
-push:
-  fcm:
-    enabled: ${FCM_ENABLED:false}
-    project-id: ${FCM_PROJECT_ID:}
-
 xplaza:
   cors:
     allowed-origins: ${ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173}
@@ -174,9 +169,13 @@ resilience4j:
 # ---------- Push notifications (FCM/APNs) ----------
 # Both providers ship disabled in OSS builds. Set the env vars in production
 # to enable real fan-out; the dispatcher's API contract stays the same.
+# `PUSH_FCM_PROJECT_ID` is the GCP project that owns the Firebase Messaging
+# credentials; left blank, the FCM dispatcher refuses to send even when
+# enabled (fail-closed), so an accidental enable cannot silently no-op.
 push:
   fcm:
     enabled: ${PUSH_FCM_ENABLED:false}
+    project-id: ${PUSH_FCM_PROJECT_ID:}
   apns:
     enabled: ${PUSH_APNS_ENABLED:false}
 
