@@ -42,6 +42,13 @@ public class CustomerOrderController {
         .orElse(ResponseEntity.notFound().build());
   }
 
+  @Operation(summary = "List per-vendor child orders for a parent order id")
+  @GetMapping("/{orderId}/children")
+  public ResponseEntity<List<CustomerOrder>> getChildOrders(
+      @Parameter(description = "Parent order id") @PathVariable UUID orderId) {
+    return ResponseEntity.ok(customerOrderService.getChildOrders(orderId));
+  }
+
   @Operation(summary = "Get order by order number")
   @GetMapping("/number/{orderNumber}")
   public ResponseEntity<CustomerOrder> getOrderByNumber(

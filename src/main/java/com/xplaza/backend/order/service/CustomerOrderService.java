@@ -57,6 +57,7 @@ public class CustomerOrderService {
 
   private static final DateTimeFormatter ORDER_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
   private static final Random RANDOM = new Random();
+  private static final java.math.RoundingMode HALF_UP = java.math.RoundingMode.HALF_UP;
 
   /**
    * Create an order from a checkout session.
@@ -105,9 +106,7 @@ public class CustomerOrderService {
         .placedAt(Instant.now())
         .build();
 
-    // Copy cart items to order items
     for (CartItem cartItem : cart.getActiveItems()) {
-      // Reserve stock
       inventoryService.reserveStockAnyWarehouse(cartItem.getProductId(), cartItem.getVariantId(),
           cartItem.getQuantity(), order.getOrderId());
 
@@ -126,12 +125,16 @@ public class CustomerOrderService {
       order.addItem(orderItem);
     }
 
-    // Record initial status
     order.changeStatus(CustomerOrder.OrderStatus.PENDING, "Order created", "system");
 
     CustomerOrder savedOrder = orderRepository.save(order);
 
-    // Mark cart as converted
+    // Multi-vendor split: when the cart spans multiple shops the saved order
+    // becomes the *parent*; per-shop child orders are then minted with shared
+    // ids in `parent_order_id`. Each child carries a proportional slice of
+    // shipping / tax / discount so vendor payouts are clean.
+    splitForVendorsIfNeeded(savedOrder, cart);
+
     cart.markConverted();
     cartRepository.save(cart);
 
@@ -166,6 +169,88 @@ public class CustomerOrderService {
     }
 
     return savedOrder;
+  }
+
+  /**
+   * Walk the cart's lines, group them by shop, and if more than one shop is
+   * represented mint per-shop child orders linked to the parent via
+   * {@code parent_order_id}. Each child gets the full per-shop subtotal and a
+   * proportional slice of shipping, discount and tax.
+   */
+  private void splitForVendorsIfNeeded(CustomerOrder parent, Cart cart) {
+    var byShop = cart.getActiveItems().stream()
+        .collect(java.util.stream.Collectors.groupingBy(CartItem::getShopId));
+    if (byShop.size() < 2) {
+      return;
+    }
+    BigDecimal parentSubtotal = parent.getSubtotal();
+    if (parentSubtotal == null || parentSubtotal.signum() <= 0) {
+      return;
+    }
+    int childIndex = 0;
+    for (var entry : byShop.entrySet()) {
+      Long shopId = entry.getKey();
+      var lines = entry.getValue();
+      BigDecimal shopSubtotal = lines.stream()
+          .map(CartItem::getLineTotal)
+          .reduce(BigDecimal.ZERO, BigDecimal::add);
+      BigDecimal weight = shopSubtotal.divide(parentSubtotal, 6, HALF_UP);
+      BigDecimal shopShipping = nz(parent.getShippingCost()).multiply(weight).setScale(2, HALF_UP);
+      BigDecimal shopDiscount = nz(parent.getDiscountAmount()).multiply(weight).setScale(2, HALF_UP);
+      BigDecimal shopTax = nz(parent.getTaxAmount()).multiply(weight).setScale(2, HALF_UP);
+      BigDecimal shopTotal = shopSubtotal.add(shopShipping).add(shopTax).subtract(shopDiscount).max(BigDecimal.ZERO);
+
+      CustomerOrder child = CustomerOrder.builder()
+          .orderNumber(parent.getOrderNumber() + "-V" + (++childIndex))
+          .customerId(parent.getCustomerId())
+          .shopId(shopId)
+          .cartId(parent.getCartId())
+          .parentOrderId(parent.getOrderId())
+          .status(CustomerOrder.OrderStatus.PENDING)
+          .subtotal(shopSubtotal)
+          .discountAmount(shopDiscount)
+          .shippingCost(shopShipping)
+          .taxAmount(shopTax)
+          .grandTotal(shopTotal)
+          .currency(parent.getCurrency())
+          .shippingAddressId(parent.getShippingAddressId())
+          .billingAddressId(parent.getBillingAddressId())
+          .billingSameAsShipping(parent.getBillingSameAsShipping())
+          .placedAt(parent.getPlacedAt())
+          .paymentTypeId(parent.getPaymentTypeId())
+          .paymentMethod(parent.getPaymentMethod())
+          .build();
+      for (CartItem ci : lines) {
+        child.addItem(CustomerOrderItem.builder()
+            .order(child)
+            .productId(ci.getProductId())
+            .variantId(ci.getVariantId())
+            .shopId(ci.getShopId())
+            .productName(ci.getProductName() != null ? ci.getProductName() : "Product " + ci.getProductId())
+            .quantity(ci.getQuantity())
+            .unitPrice(ci.getUnitPrice())
+            .discountAmount(ci.getDiscountAmount())
+            .totalPrice(ci.getLineTotal())
+            .build());
+      }
+      child.changeStatus(CustomerOrder.OrderStatus.PENDING,
+          "Auto-split from parent " + parent.getOrderNumber(), "system");
+      orderRepository.save(child);
+    }
+    log.info("Split order {} into {} per-shop child orders", parent.getOrderNumber(), byShop.size());
+  }
+
+  private static BigDecimal nz(BigDecimal v) {
+    return v == null ? BigDecimal.ZERO : v;
+  }
+
+  /**
+   * Return per-shop child orders for a parent order id. Empty list when the order
+   * is stand-alone.
+   */
+  @Transactional(readOnly = true)
+  public List<CustomerOrder> getChildOrders(UUID parentOrderId) {
+    return orderRepository.findByParentOrderId(parentOrderId);
   }
 
   /**
