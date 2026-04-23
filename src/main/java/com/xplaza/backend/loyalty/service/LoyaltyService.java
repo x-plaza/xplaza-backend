@@ -10,10 +10,10 @@ import java.math.RoundingMode;
 import java.time.Instant;
 import java.util.UUID;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -29,12 +29,29 @@ import com.xplaza.backend.customer.domain.repository.CustomerRepository;
  * tuned without redeploying.
  */
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class LoyaltyService {
 
   private final CustomerRepository customerRepository;
   private final DomainEventPublisher eventPublisher;
+  /**
+   * Self-reference injected lazily so the {@link #on(DomainEvents.OrderPlaced)}
+   * listener can route through the Spring AOP proxy when calling
+   * {@link #accrue(Long, BigDecimal, java.util.UUID)}. A direct
+   * {@code this.accrue(...)} bypasses the proxy, which silently strips the
+   * {@code @Transactional} boundary and breaks {@link DomainEventPublisher}'s
+   * {@code Propagation.MANDATORY} requirement (silently losing the
+   * {@code LoyaltyPointsEarned} outbox event on every order).
+   */
+  private final LoyaltyService self;
+
+  public LoyaltyService(CustomerRepository customerRepository,
+      DomainEventPublisher eventPublisher,
+      @Lazy LoyaltyService self) {
+    this.customerRepository = customerRepository;
+    this.eventPublisher = eventPublisher;
+    this.self = self;
+  }
 
   @Value("${loyalty.points.earn-rate:1}")
   private long earnRate; // points per currency unit spent
@@ -90,9 +107,13 @@ public class LoyaltyService {
       return;
     }
     try {
-      accrue(event.customerId(), event.total(), event.orderId());
+      // Route through the proxy so @Transactional(accrue) is honoured and
+      // DomainEventPublisher.publish() finds the enclosing transaction it
+      // mandates.
+      self.accrue(event.customerId(), event.total(), event.orderId());
     } catch (Exception e) {
-      log.warn("Loyalty accrual failed for {}", event.orderId(), e);
+      log.error("Loyalty accrual failed for order {} (customer {}): {}",
+          event.orderId(), event.customerId(), e.getMessage(), e);
     }
   }
 }

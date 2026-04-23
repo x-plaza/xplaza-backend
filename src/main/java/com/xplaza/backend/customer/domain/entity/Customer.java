@@ -22,6 +22,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Table(name = "customers")
 @Entity
 @Getter
@@ -48,6 +50,7 @@ public class Customer implements UserDetails {
   private String email;
 
   @Column(nullable = false)
+  @JsonIgnore
   private String password;
 
   private String phoneNumber;
@@ -69,11 +72,15 @@ public class Customer implements UserDetails {
   private Instant emailVerifiedAt;
 
   // ---------- Account lockout ----------
+  // Hidden from JSON: leaking these aids credential-stuffing attackers in
+  // timing their next attempt window.
   @Column(name = "failed_login_attempts", nullable = false)
   @Builder.Default
+  @JsonIgnore
   private Integer failedLoginAttempts = 0;
 
   @Column(name = "locked_until")
+  @JsonIgnore
   private Instant lockedUntil;
 
   // ---------- MFA ----------
@@ -81,14 +88,21 @@ public class Customer implements UserDetails {
   @Builder.Default
   private Boolean mfaEnabled = false;
 
+  // The TOTP shared-secret. Exposing it would let anyone with a stolen
+  // session token also generate valid second-factor codes, completely
+  // defeating MFA — it must never leave the server.
   @Column(name = "mfa_secret", length = 200)
+  @JsonIgnore
   private String mfaSecret;
 
   // ---------- OAuth ----------
   @Column(name = "oauth_provider", length = 30)
   private String oauthProvider;
 
+  // The provider-specific subject identifier — treated as a credential and
+  // hidden from API responses to prevent account takeover via lookup tables.
   @Column(name = "oauth_subject", length = 200)
+  @JsonIgnore
   private String oauthSubject;
 
   // ---------- Loyalty ----------

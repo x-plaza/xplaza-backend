@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.xplaza.backend.common.util.ApiResponse;
 import com.xplaza.backend.customer.domain.entity.Customer;
+import com.xplaza.backend.customer.dto.response.CustomerProfileResponse;
 import com.xplaza.backend.customer.service.CustomerService;
 
 @RestController
@@ -30,8 +31,9 @@ public class CustomerGdprController {
 
   /** Right to access (GDPR Art. 15). */
   @GetMapping(value = "/export", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<ApiResponse<Customer>> export(@AuthenticationPrincipal Customer customer) {
-    return ResponseEntity.ok(ApiResponse.ok(customerService.exportCustomerData(customer.getCustomerId())));
+  public ResponseEntity<ApiResponse<CustomerProfileResponse>> export(@AuthenticationPrincipal Customer customer) {
+    Customer data = customerService.exportCustomerData(customer.getCustomerId());
+    return ResponseEntity.ok(ApiResponse.ok(CustomerProfileResponse.from(data)));
   }
 
   /**
