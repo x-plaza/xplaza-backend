@@ -12,12 +12,12 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Set up JDK 25
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'sapmachine'
           java-version: '25'
@@ -67,7 +67,7 @@ jobs:
         run: mvn test jacoco:report -Dspring.profiles.active=local
 
       - name: Publish Test Report
-        uses: mikepenz/action-junit-report@v4
+        uses: mikepenz/action-junit-report@v5
         if: success() || failure() # Always run even if tests fail
         with:
           report_paths: '**/target/surefire-reports/TEST-*.xml'
