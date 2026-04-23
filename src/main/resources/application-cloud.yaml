@@ -87,4 +87,7 @@ xplaza:
 
 logging:
   level:
+    root: ${ROOT_LOG_LEVEL:WARN}
     com.xplaza.backend: ${LOG_LEVEL:INFO}
+    org.springframework.data.repository.config: ERROR
+    org.hibernate.SQL: WARN
