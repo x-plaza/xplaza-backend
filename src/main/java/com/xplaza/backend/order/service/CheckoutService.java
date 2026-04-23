@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.xplaza.backend.b2b.service.PriceListResolver;
 import com.xplaza.backend.cart.domain.entity.Cart;
 import com.xplaza.backend.cart.domain.entity.CartItem;
 import com.xplaza.backend.cart.domain.repository.CartRepository;
@@ -45,6 +46,7 @@ public class CheckoutService {
   private final CampaignService campaignService;
   private final TaxService taxService;
   private final CustomerAddressRepository customerAddressRepository;
+  private final PriceListResolver priceListResolver;
 
   /**
    * Start a new checkout session for a cart.
@@ -127,6 +129,11 @@ public class CheckoutService {
    */
   private void recalculateTax(CheckoutSession checkout) {
     if (checkout.getShippingAddressId() == null) {
+      return;
+    }
+    if (priceListResolver.isTaxExempt(checkout.getCustomerId())) {
+      checkout.setTaxAmount(BigDecimal.ZERO);
+      checkout.calculateGrandTotal();
       return;
     }
     CustomerAddress addr = customerAddressRepository.findById(checkout.getShippingAddressId()).orElse(null);
