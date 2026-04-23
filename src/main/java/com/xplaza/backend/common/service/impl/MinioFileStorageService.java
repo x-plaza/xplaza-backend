@@ -75,7 +75,10 @@ public class MinioFileStorageService implements FileStorageService {
           PutObjectArgs.builder()
               .bucket(bucketName)
               .object(fileName)
-              .stream(inputStream, file.getSize(), -1)
+              // MinIO 9.x tightened the signature of PutObjectArgs.Builder.stream
+              // to `(InputStream, long, long)`; the auto-partSize sentinel must
+              // now be a literal `long` (-1L), not the previously accepted int.
+              .stream(inputStream, file.getSize(), -1L)
               .contentType(file.getContentType())
               .build());
 

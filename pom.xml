@@ -74,13 +74,19 @@
 
 	<properties>
 		<java.version>25</java.version>
+		<!-- Resilience4j 2.4.x ships a SpringBoot3Verifier that fails fast with
+		     "Module ... is only compatible with Spring Boot 3.x" against our
+		     Spring Boot 4.x parent. No spring-boot4 module exists yet upstream,
+		     so we stay on 2.3.0 until one ships (tracked in resilience4j#2267). -->
 		<resilience4j.version>2.3.0</resilience4j.version>
 		<bucket4j.version>8.10.1</bucket4j.version>
+		<!-- openpdf 3.x is a namespace rename (com.lowagie → org.openpdf) — hold
+		     at 2.x until we schedule the import migration. -->
 		<openpdf.version>2.0.3</openpdf.version>
 		<totp.version>1.7.1</totp.version>
-		<commons-csv.version>1.11.0</commons-csv.version>
-		<logstash-logback.version>8.0</logstash-logback.version>
-		<testcontainers.version>1.20.4</testcontainers.version>
+		<commons-csv.version>1.14.1</commons-csv.version>
+		<logstash-logback.version>9.0</logstash-logback.version>
+		<testcontainers.version>1.21.4</testcontainers.version>
 	</properties>
 
 	<dependencies>
@@ -141,7 +147,7 @@
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
-			<version>42.7.9</version>
+			<version>42.7.10</version>
 		</dependency>
 		<dependency>
 			<groupId>com.h2database</groupId>
@@ -205,8 +211,13 @@
 		<dependency>
 			<groupId>io.minio</groupId>
 			<artifactId>minio</artifactId>
-			<version>8.6.0</version>
+			<version>9.0.0</version>
 		</dependency>
+		<!-- okhttp + kotlin-stdlib are transitive-only (MinIO is the sole
+		     consumer). Previously pinned to keep CVE scanners happy; MinIO 9.x
+		     already ships with current okhttp 4.x / kotlin-stdlib 2.x, so we
+		     let the SDK own the coordinate instead of fighting it. Reintroduce
+		     pins here if a CVE later forces an override. -->
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>
 			<artifactId>okhttp</artifactId>
@@ -222,7 +233,7 @@
 		<dependency>
 			<groupId>com.stripe</groupId>
 			<artifactId>stripe-java</artifactId>
-			<version>31.2.0</version>
+			<version>32.0.0</version>
 		</dependency>
 
 		<!-- ============ SMS ============ -->
@@ -282,18 +293,18 @@
 		<dependency>
 			<groupId>jakarta.xml.bind</groupId>
 			<artifactId>jakarta.xml.bind-api</artifactId>
-			<version>4.0.4</version>
+			<version>4.0.5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jetbrains</groupId>
 			<artifactId>annotations</artifactId>
-			<version>26.0.2-1</version>
+			<version>26.1.0</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.42</version>
+			<version>1.18.46</version>
 			<optional>true</optional>
 		</dependency>
 
@@ -301,7 +312,7 @@
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-			<version>3.0.1</version>
+			<version>3.0.3</version>
 		</dependency>
 
 		<!-- ============ Dev Tools ============ -->
@@ -367,7 +378,7 @@
 			<plugin>
 				<groupId>com.diffplug.spotless</groupId>
 				<artifactId>spotless-maven-plugin</artifactId>
-				<version>3.1.0</version>
+				<version>3.4.0</version>
 				<configuration>
 					<trimTrailingWhitespace/>
 					<endWithNewline/>
@@ -439,7 +450,7 @@
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
-							<version>1.18.42</version>
+							<version>1.18.46</version>
 						</path>
 						<path>
 							<groupId>org.mapstruct</groupId>
