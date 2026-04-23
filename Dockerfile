@@ -28,11 +28,19 @@ LABEL org.opencontainers.image.source="https://github.com/x-plaza/xplaza-backend
 LABEL org.opencontainers.image.description="X-Plaza e-commerce backend"
 LABEL org.opencontainers.image.licenses="Proprietary"
 
+# Ubuntu Noble ships with a default `ubuntu` user at UID/GID 1000, which
+# collides with `groupadd --gid 1000` and fails the build with
+# `groupadd: GID '1000' already exists` (apt exit code 4). We drop that
+# default account and claim UID/GID 10001 for the service user — still a
+# non-privileged, non-login account, just well above the typical host-user
+# range so a bind-mount from the host won't silently map to `xplaza`.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends curl \
     && rm -rf /var/lib/apt/lists/* \
-    && groupadd --system --gid 1000 xplaza \
-    && useradd --system --uid 1000 --gid xplaza --no-create-home --shell /usr/sbin/nologin xplaza
+    && (userdel --remove ubuntu 2>/dev/null || true) \
+    && (getent group ubuntu >/dev/null && groupdel ubuntu || true) \
+    && groupadd --system --gid 10001 xplaza \
+    && useradd --system --uid 10001 --gid xplaza --no-create-home --shell /usr/sbin/nologin xplaza
 
 USER xplaza:xplaza
 WORKDIR /app
