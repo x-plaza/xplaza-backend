@@ -20,8 +20,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import com.xplaza.backend.customer.domain.entity.Customer;
+import com.xplaza.backend.order.domain.entity.CustomerOrder;
+import com.xplaza.backend.order.domain.repository.CustomerOrderRepository;
 import com.xplaza.backend.payment.domain.entity.PaymentTransaction;
 import com.xplaza.backend.payment.domain.entity.Refund;
 import com.xplaza.backend.payment.service.PaymentService;
@@ -36,6 +42,7 @@ import com.xplaza.backend.payment.service.PaymentService;
 public class PaymentController {
 
   private final PaymentService paymentService;
+  private final CustomerOrderRepository customerOrderRepository;
 
   // ==================== Transaction Operations ====================
 
@@ -185,6 +192,39 @@ public class PaymentController {
         request.description(),
         request.metadata());
     return ResponseEntity.ok(clientSecret);
+  }
+
+  @Operation(summary = "Create Cash on Delivery payment for an order")
+  @PostMapping("/cod")
+  @PreAuthorize("hasRole('CUSTOMER')")
+  public ResponseEntity<PaymentTransaction> createCod(
+      @AuthenticationPrincipal Customer principal,
+      @RequestBody @Valid CreateCodRequest request) {
+    if (principal == null) {
+      throw new AccessDeniedException("Authentication required");
+    }
+    Long customerId = principal.getCustomerId();
+    // Ownership check: the order must belong to the authenticated customer.
+    // This prevents an authenticated user from creating a COD transaction
+    // against another customer's order by guessing the order id.
+    CustomerOrder order = customerOrderRepository.findById(request.orderId())
+        .orElseThrow(() -> new IllegalArgumentException("Order not found: " + request.orderId()));
+    if (!customerId.equals(order.getCustomerId())) {
+      throw new AccessDeniedException("Order does not belong to the authenticated customer");
+    }
+    var txn = paymentService.createCod(request.orderId(), customerId, request.amount(), request.currency());
+    return ResponseEntity.ok(txn);
+  }
+
+  /**
+   * COD request payload. {@code customerId} is intentionally absent — it is
+   * always derived from the authenticated principal in {@link #createCod}.
+   */
+  public record CreateCodRequest(
+      @NotNull UUID orderId,
+      @NotNull @Positive BigDecimal amount,
+      @NotBlank @Size(min = 3, max = 3) String currency
+  ) {
   }
 
   // ==================== Request DTOs ====================
