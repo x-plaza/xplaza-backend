@@ -2,6 +2,10 @@ spring:
   application:
     name: Xplaza-Backend
 
+  main:
+    banner-mode: off
+    log-startup-info: false
+
   profiles:
     active: local
 
@@ -171,9 +175,25 @@ push:
 
 logging:
   level:
-    org.springframework.security: INFO
-    org.springframework.web: INFO
+    root: WARN
     com.xplaza.backend: INFO
+    org.springframework: WARN
+    org.springframework.boot.autoconfigure: WARN
+    org.springframework.data: WARN
+    org.springframework.data.repository.config: ERROR
+    org.springframework.web: WARN
+    org.springframework.security: WARN
+    org.hibernate: WARN
+    org.hibernate.SQL: WARN
+    org.hibernate.orm.deprecation: ERROR
+    org.apache.catalina: WARN
+    org.apache.coyote: WARN
+    com.zaxxer.hikari: WARN
+    io.lettuce.core: WARN
+    io.netty: WARN
+    org.flywaydb: INFO
+    org.elasticsearch: WARN
+    co.elastic.clients: WARN
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [traceId=%X{traceId:-},spanId=%X{spanId:-}] %-5level %logger{36} - %msg%n"
 
