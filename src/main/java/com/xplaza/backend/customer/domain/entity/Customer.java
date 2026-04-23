@@ -5,6 +5,8 @@
 
 package com.xplaza.backend.customer.domain.entity;
 
+import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -25,6 +27,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @AllArgsConstructor
 @Builder
 public class Customer implements UserDetails {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long customerId;
@@ -51,12 +54,66 @@ public class Customer implements UserDetails {
   @Builder.Default
   private Boolean enabled = true;
 
+  // ---------- Email verification ----------
+  @Column(name = "verified_email", nullable = false)
+  @Builder.Default
+  private Boolean emailVerified = false;
+
+  @Column(name = "verified_email_at")
+  private Instant emailVerifiedAt;
+
+  // ---------- Account lockout ----------
+  @Column(name = "failed_login_attempts", nullable = false)
+  @Builder.Default
+  private Integer failedLoginAttempts = 0;
+
+  @Column(name = "locked_until")
+  private Instant lockedUntil;
+
+  // ---------- MFA ----------
+  @Column(name = "mfa_enabled", nullable = false)
+  @Builder.Default
+  private Boolean mfaEnabled = false;
+
+  @Column(name = "mfa_secret", length = 200)
+  private String mfaSecret;
+
+  // ---------- OAuth ----------
+  @Column(name = "oauth_provider", length = 30)
+  private String oauthProvider;
+
+  @Column(name = "oauth_subject", length = 200)
+  private String oauthSubject;
+
+  // ---------- Loyalty ----------
+  @Column(name = "loyalty_points", nullable = false)
+  @Builder.Default
+  private Long loyaltyPoints = 0L;
+
+  @Column(name = "loyalty_tier", length = 20)
+  @Builder.Default
+  private String loyaltyTier = "BRONZE";
+
+  @Column(name = "store_credit", precision = 14, scale = 2)
+  @Builder.Default
+  private BigDecimal storeCredit = BigDecimal.ZERO;
+
+  // ---------- B2B ----------
+  @Column(name = "customer_group_id")
+  private Long customerGroupId;
+
+  @Column(name = "tax_id", length = 50)
+  private String taxId;
+
+  // ---------- Lifecycle ----------
   private LocalDateTime createdAt;
   private LocalDateTime lastLoginAt;
 
   @PrePersist
   protected void onCreate() {
-    createdAt = LocalDateTime.now();
+    if (createdAt == null) {
+      createdAt = LocalDateTime.now();
+    }
   }
 
   @Override
@@ -66,7 +123,7 @@ public class Customer implements UserDetails {
 
   @Override
   public String getUsername() {
-    return email; // Use email as username
+    return email;
   }
 
   @Override
@@ -76,7 +133,7 @@ public class Customer implements UserDetails {
 
   @Override
   public boolean isAccountNonLocked() {
-    return true;
+    return lockedUntil == null || lockedUntil.isBefore(Instant.now());
   }
 
   @Override
@@ -86,6 +143,6 @@ public class Customer implements UserDetails {
 
   @Override
   public boolean isEnabled() {
-    return enabled;
+    return Boolean.TRUE.equals(enabled);
   }
 }

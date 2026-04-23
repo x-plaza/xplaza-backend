@@ -189,7 +189,10 @@ public class PaymentTransaction {
     BANK_TRANSFER,
     WALLET,
     APPLE_PAY,
-    GOOGLE_PAY
+    GOOGLE_PAY,
+    CASH_ON_DELIVERY,
+    GIFT_CARD,
+    STORE_CREDIT
   }
 
   public enum RiskLevel {

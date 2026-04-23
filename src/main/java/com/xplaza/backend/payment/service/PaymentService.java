@@ -41,6 +41,7 @@ public class PaymentService {
   private final RefundRepository refundRepository;
   private final NotificationService notificationService;
   private final PaymentGateway paymentGateway;
+  private final CodPaymentGateway codGateway;
 
   /**
    * Create a Stripe PaymentIntent.
@@ -53,6 +54,33 @@ public class PaymentService {
       log.error("Error creating payment intent", e);
       throw new RuntimeException("Failed to create payment intent", e);
     }
+  }
+
+  /**
+   * Cash on Delivery: register an authorization-like transaction that completes
+   * when the courier confirms collection. The transaction is marked SUCCESS as
+   * soon as it is created so order placement proceeds; reconciliation happens via
+   * {@link #completeTransaction(UUID, String, String)} when the courier confirms
+   * collection.
+   */
+  public PaymentTransaction createCod(UUID orderId, Long customerId, BigDecimal amount, String currency) {
+    var auth = codGateway.createCodAuthorization(amount, currency, orderId);
+    PaymentTransaction txn = PaymentTransaction.builder()
+        .orderId(orderId)
+        .customerId(customerId)
+        .type(PaymentTransaction.TransactionType.AUTHORIZATION)
+        .amount(amount)
+        .currency(currency)
+        .amountInCents(amount.multiply(BigDecimal.valueOf(100)).longValue())
+        .gateway("cod")
+        .paymentMethodType(PaymentTransaction.PaymentMethodType.CASH_ON_DELIVERY)
+        .gatewayTransactionId(auth.reference())
+        .status(PaymentTransaction.TransactionStatus.PENDING)
+        .build();
+    txn = transactionRepository.save(txn);
+    log.info("Created COD authorization for order {}: txn={} ref={}", orderId, txn.getTransactionId(),
+        auth.reference());
+    return txn;
   }
 
   /**

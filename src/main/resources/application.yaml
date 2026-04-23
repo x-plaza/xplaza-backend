@@ -1,16 +1,20 @@
 spring:
-  web:
-    resources:
-      add-mappings: false
+  application:
+    name: Xplaza-Backend
 
   profiles:
     active: local
 
-  application:
-    name: Xplaza-Backend
+  threads:
+    virtual:
+      enabled: true
+
+  web:
+    resources:
+      add-mappings: false
 
   messages:
-    basename: messages.messages
+    basename: i18n/messages
     fallback-to-system-locale: false
     encoding: UTF-8
 
@@ -20,10 +24,10 @@ spring:
       max-request-size: 100MB
 
   mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${EMAIL_USERNAME}
-    password: ${EMAIL_PASSWORD}
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${EMAIL_USERNAME:}
+    password: ${EMAIL_PASSWORD:}
     properties:
       mail:
         debug: false
@@ -32,45 +36,178 @@ spring:
           starttls:
             enable: true
 
+  cache:
+    type: caffeine
+    cache-names:
+      - products
+      - categories
+      - shops
+      - currencies
+      - taxRules
+      - customerSegments
+    caffeine:
+      spec: maximumSize=10000,expireAfterWrite=10m
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 5000ms
+    elasticsearch:
+      repositories:
+        enabled: true
+
+  elasticsearch:
+    uris: ${ELASTICSEARCH_URIS:http://localhost:9200}
+    connection-timeout: 5s
+    socket-timeout: 30s
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:}
+            client-secret: ${GOOGLE_CLIENT_SECRET:}
+            scope:
+              - email
+              - profile
+          facebook:
+            client-id: ${FACEBOOK_CLIENT_ID:}
+            client-secret: ${FACEBOOK_CLIENT_SECRET:}
+            scope:
+              - email
+              - public_profile
+
 stripe:
-  api-key: ${STRIPE_API_KEY}
-  webhook-secret: ${STRIPE_WEBHOOK_SECRET}
+  api-key: ${STRIPE_API_KEY:}
+  webhook-secret: ${STRIPE_WEBHOOK_SECRET:}
 
 minio:
-  url: http://localhost:9000
-  access-key: minioadmin
-  secret-key: minioadmin
-  bucket-name: xplaza-products
+  url: ${MINIO_URL:http://localhost:9000}
+  access-key: ${MINIO_ACCESS_KEY:minioadmin}
+  secret-key: ${MINIO_SECRET_KEY:minioadmin}
+  bucket-name: ${MINIO_BUCKET:xplaza-products}
 
-resilience4j.retry:
-  instances:
-    globalRetry:
-      maxAttempts: 3
-      waitDuration: 1000
-      retryExceptions:
-        - java.net.SocketTimeoutException
-        - java.net.ConnectException
-        - org.springframework.dao.OptimisticLockingFailureException
-        - org.springframework.web.client.HttpServerErrorException
+telesign:
+  customer-id: ${TELESIGN_CUSTOMER_ID:}
+  api-key: ${TELESIGN_API_KEY:}
+  enabled: ${TELESIGN_ENABLED:false}
+
+push:
+  fcm:
+    enabled: ${FCM_ENABLED:false}
+    project-id: ${FCM_PROJECT_ID:}
+
+xplaza:
+  cors:
+    allowed-origins: ${ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173}
+  rate-limit:
+    enabled: true
+    auth-requests-per-minute: 10
+    payment-requests-per-minute: 30
+    default-requests-per-minute: 120
+    # Bound the in-memory bucket cache so unique-client cardinality cannot
+    # leak heap. Buckets idle for `bucket-idle-minutes` are evicted; a fresh
+    # bucket starts full, which matches what a fully-refilled bucket would
+    # have anyway after that much idle time.
+    max-buckets: 100000
+    bucket-idle-minutes: 10
+  abandoned-cart:
+    enabled: true
+    threshold-hours: 1
+    reminder-cron: "0 0 */1 * * *"
+  vendor-payout:
+    cron: "0 0 2 * * MON"
+    minimum-amount: 50.00
+  recommendations:
+    enabled: true
+    max-related: 12
+  search:
+    enabled: true
+    index-name: products
+  loyalty:
+    enabled: true
+    points-per-currency-unit: 1
+    redemption-rate: 0.01
+  invoice:
+    company-name: "X-Plaza"
+    address: ""
+
+resilience4j:
+  retry:
+    instances:
+      stripe:
+        max-attempts: 3
+        wait-duration: 1s
+        retry-exceptions:
+          - java.net.SocketTimeoutException
+          - java.net.ConnectException
+      minio:
+        max-attempts: 3
+        wait-duration: 500ms
+      mail:
+        max-attempts: 3
+        wait-duration: 1s
+      elasticsearch:
+        max-attempts: 3
+        wait-duration: 500ms
+  circuitbreaker:
+    instances:
+      stripe:
+        sliding-window-size: 20
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 30s
+      elasticsearch:
+        sliding-window-size: 20
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 30s
 
 logging:
   level:
-    org:
-      springframework:
-        boot:
-          actuate: DEBUG
-        security: DEBUG
+    org.springframework.security: INFO
+    org.springframework.web: INFO
+    com.xplaza.backend: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [traceId=%X{traceId:-},spanId=%X{spanId:-}] %-5level %logger{36} - %msg%n"
 
 management:
   endpoints:
     web:
       exposure:
-        include: health
+        include: health,info,metrics,prometheus,loggers
     endpoint:
       health:
-        show-details: always
+        show-details: when-authorized
+        probes:
+          enabled: true
+      prometheus:
+        enabled: true
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+    tags:
+      application: ${spring.application.name}
+  tracing:
+    sampling:
+      probability: ${TRACING_SAMPLE_RATE:0.1}
+  otlp:
+    tracing:
+      endpoint: ${OTLP_ENDPOINT:http://localhost:4318/v1/traces}
 
 server:
   error:
     include-messages: always
     include-binding-errors: always
+  shutdown: graceful
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/css,text/javascript
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
