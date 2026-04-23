@@ -2,6 +2,16 @@
 
 # ---- Stage 1: Build ----
 FROM maven:3.9.11-sapmachine-25 AS build
+# The upstream maven image ships `ENV MAVEN_CONFIG=/root/.m2` so its entrypoint
+# script can point Maven at the mounted local repo. During `docker build`,
+# `RUN` skips the entrypoint, so that variable leaks into the shell unchanged.
+# The `mvnw` script then splices `$MAVEN_CONFIG` straight into Maven's CLI
+# args (see `MAVEN_CMD_LINE_ARGS="$MAVEN_CONFIG $@"` near the bottom of mvnw),
+# causing Maven to interpret `/root/.m2` as a lifecycle phase and fail with
+# `Unknown lifecycle phase "/root/.m2"`. Clearing it for the build stage keeps
+# the wrapper behaviour sane while the BuildKit cache mount below still
+# provides the `/root/.m2` directory at build time.
+ENV MAVEN_CONFIG=""
 WORKDIR /workspace
 COPY pom.xml mvnw ./
 COPY .mvn ./.mvn
