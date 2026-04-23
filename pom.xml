@@ -68,7 +68,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.0.1</version>
+		<version>4.0.5</version>
 		<relativePath/>
 	</parent>
 
@@ -87,6 +87,24 @@
 		<commons-csv.version>1.14.1</commons-csv.version>
 		<logstash-logback.version>9.0</logstash-logback.version>
 		<testcontainers.version>1.21.4</testcontainers.version>
+
+		<!-- ========= Security overrides on top of the Spring Boot BOM =========
+		     Each pin below is driven by an open Dependabot advisory. Keep them
+		     in lock-step with the BOM and remove once the parent catches up. -->
+		<!-- Spring Boot 4.0.5 still ships Tomcat 11.0.20; CVE-2026-34483,
+		     CVE-2026-34487 and CVE-2026-34500 require 11.0.21+. -->
+		<tomcat.version>11.0.21</tomcat.version>
+		<!-- Spring Boot 4.0.5 still ships Thymeleaf 3.1.3.RELEASE; CVE-2026-40477
+		     and CVE-2026-40478 (both critical) require 3.1.4.RELEASE+. -->
+		<thymeleaf.version>3.1.5.RELEASE</thymeleaf.version>
+		<!-- logstash-logback-encoder 9.0 transitively pulls Jackson 3.x, which
+		     the BOM pins at 3.1.0; advisories GHSA-72hv-8253-57qq,
+		     GHSA-2m67-wjpj-xhg9 and CVE-2026-29062 are fixed in 3.1.1+. -->
+		<jackson-bom.version>3.1.2</jackson-bom.version>
+		<!-- MinIO 9.0.0 transitively pulls Bouncy Castle 1.82; CVE-2026-0636
+		     (LDAP injection) requires 1.84+. The BOM does not manage it, so
+		     pin via dependencyManagement below. -->
+		<bouncycastle.version>1.84</bouncycastle.version>
 	</properties>
 
 	<dependencies>
@@ -366,12 +384,35 @@
 		</dependency>
 	</dependencies>
 
+	<dependencyManagement>
+		<dependencies>
+			<!-- Pin Bouncy Castle to a CVE-2026-0636 patched release. The MinIO
+			     SDK still depends on 1.82 transitively and the Spring Boot BOM
+			     does not manage these coordinates. -->
+			<dependency>
+				<groupId>org.bouncycastle</groupId>
+				<artifactId>bcprov-jdk18on</artifactId>
+				<version>${bouncycastle.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.bouncycastle</groupId>
+				<artifactId>bcpkix-jdk18on</artifactId>
+				<version>${bouncycastle.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.bouncycastle</groupId>
+				<artifactId>bcutil-jdk18on</artifactId>
+				<version>${bouncycastle.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>4.0.1</version>
+				<version>4.0.5</version>
 				<configuration>
 					<excludes>
 						<exclude>
