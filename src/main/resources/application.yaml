@@ -107,6 +107,12 @@ xplaza:
     auth-requests-per-minute: 10
     payment-requests-per-minute: 30
     default-requests-per-minute: 120
+    # Bound the in-memory bucket cache so unique-client cardinality cannot
+    # leak heap. Buckets idle for `bucket-idle-minutes` are evicted; a fresh
+    # bucket starts full, which matches what a fully-refilled bucket would
+    # have anyway after that much idle time.
+    max-buckets: 100000
+    bucket-idle-minutes: 10
   abandoned-cart:
     enabled: true
     threshold-hours: 1

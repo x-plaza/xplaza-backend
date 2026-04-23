@@ -7,8 +7,6 @@ package com.xplaza.backend.common.ratelimit;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,22 +22,45 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+
 /**
  * In-memory token-bucket rate limiter. Buckets are keyed by client IP (or the
  * authenticated principal name when present) and the route bucket category
- * (auth, payment, default). For multi-instance deployments this should be
- * replaced with a Redis-backed bucket store; the bucket key contract is
- * unchanged so the swap is local to this filter.
+ * (auth, payment, default).
+ *
+ * <p>
+ * Bucket storage is a bounded Caffeine cache: it has a maximum size and evicts
+ * entries that have been idle for
+ * {@code xplaza.rate-limit.bucket-idle-minutes}. This is essential because the
+ * keyspace is unbounded in practice (one bucket per unique client IP /
+ * principal x route category) — a plain {@code ConcurrentHashMap} would grow
+ * forever and leak memory.
+ *
+ * <p>
+ * Dropping an idle bucket is safe: the bucket window is one minute, so a client
+ * that has been silent for several minutes would have a fully-refilled bucket
+ * anyway, which is exactly what they get from a fresh entry.
+ *
+ * <p>
+ * For multi-instance deployments this should be replaced with a Redis-backed
+ * bucket store; the bucket key contract is unchanged so the swap is local to
+ * this filter.
  */
 @Component
 @EnableConfigurationProperties(RateLimitProperties.class)
 public class RateLimitFilter extends OncePerRequestFilter {
 
   private final RateLimitProperties props;
-  private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
+  private final Cache<String, Bucket> buckets;
 
   public RateLimitFilter(RateLimitProperties props) {
     this.props = props;
+    this.buckets = Caffeine.newBuilder()
+        .maximumSize(props.maxBuckets())
+        .expireAfterAccess(Duration.ofMinutes(props.bucketIdleMinutes()))
+        .build();
   }
 
   @Override
@@ -59,7 +80,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
       throws ServletException, IOException {
     var category = categorize(request);
     var key = clientKey(request) + "|" + category;
-    var bucket = buckets.computeIfAbsent(key, k -> newBucket(category));
+    var bucket = buckets.get(key, k -> newBucket(category));
     ConsumptionProbe probe = bucket.tryConsumeAndReturnRemaining(1);
     if (probe.isConsumed()) {
       response.setHeader("X-RateLimit-Remaining", String.valueOf(probe.getRemainingTokens()));
