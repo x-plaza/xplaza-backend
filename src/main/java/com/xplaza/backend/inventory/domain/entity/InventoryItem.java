@@ -15,6 +15,9 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
+/**
+ * Inventory stock item per warehouse/variant combination.
+ */
 @Entity
 @Table(name = "inventory_items", indexes = {
     @Index(name = "idx_inventory_product", columnList = "product_id"),

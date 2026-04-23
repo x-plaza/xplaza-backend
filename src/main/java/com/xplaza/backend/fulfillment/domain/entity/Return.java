@@ -15,6 +15,9 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
+/**
+ * Return merchandise authorization (RMA).
+ */
 @Entity
 @Table(name = "returns", indexes = {
     @Index(name = "idx_returns_order", columnList = "order_id"),

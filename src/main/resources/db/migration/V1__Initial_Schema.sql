@@ -1,7 +1,19 @@
+-- =====================================================
+-- X-Plaza Enterprise E-Commerce Schema
+-- Version: 1.0.0
+-- Date: 2025-12-06
+-- Description: Initial Schema
+-- =====================================================
 
+-- =====================================================
+-- SEQUENCES
+-- =====================================================
 
 CREATE SEQUENCE IF NOT EXISTS order_number_seq START WITH 1 INCREMENT BY 1;
 
+-- =====================================================
+-- CATALOG CONTEXT
+-- =====================================================
 
 -- Categories
 CREATE TABLE IF NOT EXISTS categories (
@@ -164,6 +176,9 @@ CREATE TABLE IF NOT EXISTS product_tags (
     PRIMARY KEY (product_id, tag)
 );
 
+-- =====================================================
+-- CUSTOMER CONTEXT
+-- =====================================================
 
 
 -- Admin Users
@@ -280,6 +295,9 @@ CREATE TABLE IF NOT EXISTS wishlist_items (
     UNIQUE(wishlist_id, product_id, variant_id)
 );
 
+-- =====================================================
+-- PROMOTION CONTEXT
+-- =====================================================
 
 -- Discount Types
 CREATE TABLE IF NOT EXISTS discount_types (
@@ -312,6 +330,9 @@ CREATE TABLE IF NOT EXISTS coupons (
     last_updated_at TIMESTAMP
 );
 
+-- =====================================================
+-- CART CONTEXT
+-- =====================================================
 
 -- Shopping Carts (proper implementation)
 CREATE TABLE IF NOT EXISTS carts (
@@ -361,6 +382,9 @@ CREATE TABLE IF NOT EXISTS cart_coupons (
 );
 
 
+-- =====================================================
+-- ORDER CONTEXT
+-- =====================================================
 
 -- Customer Orders
 CREATE TABLE IF NOT EXISTS customer_orders (
@@ -459,6 +483,9 @@ CREATE TABLE IF NOT EXISTS customer_order_items (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- =====================================================
+-- REVIEW CONTEXT
+-- =====================================================
 
 -- Product Reviews
 CREATE TABLE IF NOT EXISTS reviews (
@@ -570,6 +597,9 @@ CREATE TABLE IF NOT EXISTS shop_ratings (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- =====================================================
+-- PAYMENT CONTEXT
+-- =====================================================
 
 -- Payment Transactions
 CREATE TABLE IF NOT EXISTS payment_transactions (
@@ -673,6 +703,9 @@ CREATE TABLE IF NOT EXISTS refund_items (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- =====================================================
+-- FULFILLMENT CONTEXT
+-- =====================================================
 
 -- Carriers
 CREATE TABLE IF NOT EXISTS carriers (
@@ -803,6 +836,9 @@ CREATE TABLE IF NOT EXISTS return_items (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- =====================================================
+-- INVENTORY CONTEXT
+-- =====================================================
 
 -- Warehouses
 CREATE TABLE IF NOT EXISTS warehouses (
@@ -897,6 +933,9 @@ CREATE TABLE IF NOT EXISTS stock_reservations (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- =====================================================
+-- VENDOR CONTEXT ENHANCEMENTS
+-- =====================================================
 
 -- Enhanced Shop columns
 ALTER TABLE shops ADD COLUMN IF NOT EXISTS slug VARCHAR(100);
@@ -987,6 +1026,9 @@ CREATE TABLE IF NOT EXISTS payout_items (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- =====================================================
+-- PROMOTION CONTEXT ENHANCEMENTS
+-- =====================================================
 
 -- Campaigns (extends coupons)
 CREATE TABLE IF NOT EXISTS campaigns (
@@ -1045,6 +1087,9 @@ CREATE TABLE IF NOT EXISTS loyalty_transactions (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- =====================================================
+-- NOTIFICATION CONTEXT
+-- =====================================================
 
 -- Notification Templates
 CREATE TABLE IF NOT EXISTS notification_templates (
@@ -1093,6 +1138,9 @@ CREATE TABLE IF NOT EXISTS notification_preferences (
     UNIQUE(user_id, user_type, channel, notification_type)
 );
 
+-- =====================================================
+-- ENHANCED ORDER COLUMNS
+-- =====================================================
 
 
 -- Order Items enhancements
@@ -1108,6 +1156,9 @@ CREATE TABLE IF NOT EXISTS order_history (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- =====================================================
+-- INDEXES FOR PERFORMANCE
+-- =====================================================
 
 -- Product Variants
 CREATE INDEX IF NOT EXISTS idx_variants_product ON product_variants(product_id);
@@ -1190,6 +1241,9 @@ CREATE INDEX IF NOT EXISTS idx_products_slug ON products(slug);
 CREATE INDEX IF NOT EXISTS idx_products_status ON products(status);
 CREATE INDEX IF NOT EXISTS idx_products_shop_category ON products(fk_shop_id, fk_category_id);
 
+-- =====================================================
+-- SEED DATA
+-- =====================================================
 
 -- Default Attributes
 INSERT INTO attributes (name, code, type, is_variant_attribute, is_filterable, is_searchable, position)

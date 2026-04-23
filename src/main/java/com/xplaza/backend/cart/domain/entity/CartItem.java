@@ -13,6 +13,9 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
+/**
+ * Entity representing an item in a shopping cart.
+ */
 @Entity
 @Table(name = "cart_items", indexes = {
     @Index(name = "idx_cart_item_cart_id", columnList = "cart_id"),

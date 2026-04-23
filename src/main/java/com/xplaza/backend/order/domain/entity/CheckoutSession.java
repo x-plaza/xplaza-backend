@@ -15,6 +15,14 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
+/**
+ * Checkout session captures the checkout process before order confirmation.
+ *
+ * This allows customers to: - Review their cart - Select shipping address -
+ * Choose delivery slot - Select payment method - Apply coupons
+ *
+ * The checkout session expires after a certain time if not completed.
+ */
 @Entity
 @Table(name = "checkout_sessions", indexes = {
     @Index(name = "idx_checkout_cart", columnList = "cart_id"),

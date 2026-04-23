@@ -11,6 +11,12 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
+/**
+ * Represents a possible value for an attribute.
+ * 
+ * Examples: - For "Color" attribute: Red, Blue, Green, Black, White - For
+ * "Size" attribute: XS, S, M, L, XL, XXL
+ */
 @Entity
 @Table(name = "attribute_values", uniqueConstraints = {
     @UniqueConstraint(columnNames = { "attribute_id", "code" })

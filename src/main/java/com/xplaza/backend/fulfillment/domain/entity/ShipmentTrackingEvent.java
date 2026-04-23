@@ -12,6 +12,9 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
+/**
+ * Tracking event for shipment.
+ */
 @Entity
 @Table(name = "shipment_tracking_events", indexes = {
     @Index(name = "idx_tracking_shipment", columnList = "shipment_id"),

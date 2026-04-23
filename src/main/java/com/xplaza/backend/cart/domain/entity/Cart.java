@@ -17,6 +17,10 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
+/**
+ * Aggregate root representing a shopping cart. Supports both guest and
+ * authenticated customers.
+ */
 @Entity
 @Table(name = "carts", indexes = {
     @Index(name = "idx_cart_customer_id", columnList = "customer_id"),
