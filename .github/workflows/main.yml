@@ -88,3 +88,19 @@ jobs:
           draft: false
           prerelease: false
           generate_release_notes: true
+
+      # Tells Coolify to pull the image we just pushed to GHCR and recreate the
+      # container. Kept last so a transient Coolify outage doesn't block the
+      # immutable artefacts (Maven package, Docker tag, GitHub release) — those
+      # are already safe by the time we get here, and a failed webhook just
+      # means someone clicks "Deploy" in the Coolify UI.
+      - name: Trigger Coolify deployment
+        env:
+          COOLIFY_WEBHOOK_URL: ${{ secrets.COOLIFY_WEBHOOK_URL }}
+          COOLIFY_API_TOKEN: ${{ secrets.COOLIFY_API_TOKEN }}
+        run: |
+          curl --fail --silent --show-error --location \
+            --retry 3 --retry-delay 5 --max-time 30 \
+            --request GET \
+            --header "Authorization: Bearer ${COOLIFY_API_TOKEN}" \
+            "${COOLIFY_WEBHOOK_URL}"
