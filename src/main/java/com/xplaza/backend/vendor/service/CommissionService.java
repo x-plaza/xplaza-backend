@@ -41,11 +41,6 @@ public class CommissionService {
     return new CommissionSplit(grossAmount, rate, commission, sellerNet);
   }
 
-  /**
-   * Calculate using the shop's negotiated commission rate (or the marketplace
-   * default when the shop has none). This is the variant payouts and order-split
-   * logic should call.
-   */
   public CommissionSplit calculateForShop(Long shopId, BigDecimal grossAmount) {
     BigDecimal rate = shopRepository.findById(shopId)
         .map(s -> s.getCommissionRate() == null ? defaultRate : s.getCommissionRate())

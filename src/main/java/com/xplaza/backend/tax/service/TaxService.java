@@ -46,10 +46,6 @@ public class TaxService {
   ) {
   }
 
-  /**
-   * Compute tax for the given pre-tax amount and shipping destination. If no zone
-   * matches, returns zero-tax breakdown.
-   */
   @Cacheable(value = "tax", key = "#countryCode + '-' + #region + '-' + #amount")
   @Transactional(readOnly = true)
   public TaxBreakdown computeTax(BigDecimal amount, String countryCode, String region) {

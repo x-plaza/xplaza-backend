@@ -47,9 +47,6 @@ public class VariantAttribute {
   @JoinColumn(name = "value_id", nullable = false)
   private AttributeValue attributeValue;
 
-  /**
-   * Create a VariantAttribute linking a variant to an attribute value.
-   */
   public static VariantAttribute of(UUID variantId, AttributeValue attributeValue) {
     return VariantAttribute.builder()
         .variantId(variantId)

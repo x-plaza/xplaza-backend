@@ -76,9 +76,6 @@ class CartServiceTest {
         .status(Cart.CartStatus.ACTIVE)
         .items(new ArrayList<>())
         .build();
-    // CartService calls the 5-arg overload (Long, Long, int, String, BigDecimal)
-    // — return the catalog price unchanged so the cart flow under test
-    // behaves as-if contract pricing were not applicable.
     org.mockito.Mockito.lenient()
         .when(priceListResolver.resolveUnitPrice(any(), any(),
             org.mockito.ArgumentMatchers.anyInt(),

@@ -15,11 +15,6 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-/**
- * Represents a shipment for order fulfillment.
- *
- * A single order may have multiple shipments (split shipment).
- */
 @Entity
 @Table(name = "shipments", indexes = {
     @Index(name = "idx_shipments_order", columnList = "order_id"),
@@ -174,29 +169,17 @@ public class Shipment {
   private List<ShipmentTrackingEvent> trackingEvents = new ArrayList<>();
 
   public enum ShipmentStatus {
-    /** Shipment created */
     PENDING,
-    /** Label created */
     LABEL_CREATED,
-    /** Picked by warehouse */
     PICKED,
-    /** Packed and ready */
     PACKED,
-    /** Handed to carrier */
     SHIPPED,
-    /** In transit */
     IN_TRANSIT,
-    /** Out for delivery */
     OUT_FOR_DELIVERY,
-    /** Delivered */
     DELIVERED,
-    /** Delivery attempted */
     DELIVERY_ATTEMPTED,
-    /** Returned to sender */
     RETURNED,
-    /** Lost in transit */
     LOST,
-    /** Cancelled */
     CANCELLED
   }
 
@@ -237,9 +220,6 @@ public class Shipment {
     event.setShipment(this);
   }
 
-  /**
-   * Mark shipment as shipped.
-   */
   public void ship(String trackingNumber, String trackingUrl) {
     this.trackingNumber = trackingNumber;
     this.trackingUrl = trackingUrl;
@@ -247,24 +227,15 @@ public class Shipment {
     this.shippedAt = Instant.now();
   }
 
-  /**
-   * Mark shipment as delivered.
-   */
   public void deliver() {
     this.status = ShipmentStatus.DELIVERED;
     this.deliveredAt = Instant.now();
   }
 
-  /**
-   * Cancel shipment.
-   */
   public void cancel() {
     this.status = ShipmentStatus.CANCELLED;
   }
 
-  /**
-   * Calculate total weight of all items.
-   */
   public BigDecimal calculateTotalWeight() {
     if (items == null || items.isEmpty()) {
       return BigDecimal.ZERO;

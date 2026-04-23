@@ -14,9 +14,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
  */
 @NoArgsConstructor
 public class PathProvider {
-  /**
-   * returns the current path of the request
-   */
   public static String getCurrentPath() {
     return ServletUriComponentsBuilder.fromCurrentRequest().build().getPath();
   }

@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.xplaza.backend.common.util.LogSanitizer;
 import com.xplaza.backend.marketing.domain.entity.Campaign;
 import com.xplaza.backend.marketing.domain.repository.CampaignRepository;
 
@@ -32,22 +33,16 @@ public class CampaignService {
 
   private final CampaignRepository campaignRepository;
 
-  /**
-   * Create a new campaign.
-   */
   public Campaign createCampaign(Campaign campaign) {
     if (campaignRepository.existsByCode(campaign.getCode())) {
       throw new IllegalArgumentException("Campaign code already exists: " + campaign.getCode());
     }
     campaign.setStatus(Campaign.CampaignStatus.DRAFT);
     campaign = campaignRepository.save(campaign);
-    log.info("Created campaign: {}", campaign.getCode());
+    log.info("Created campaign: {}", LogSanitizer.forLog(campaign.getCode()));
     return campaign;
   }
 
-  /**
-   * Update an existing campaign.
-   */
   public Campaign updateCampaign(Long campaignId, Campaign updates) {
     Campaign existing = getCampaignOrThrow(campaignId);
 
@@ -82,57 +77,36 @@ public class CampaignService {
     return campaignRepository.save(existing);
   }
 
-  /**
-   * Get campaign by ID.
-   */
   @Transactional(readOnly = true)
   public Optional<Campaign> getCampaign(Long campaignId) {
     return campaignRepository.findById(campaignId);
   }
 
-  /**
-   * Get campaign by code.
-   */
   @Transactional(readOnly = true)
   public Optional<Campaign> getCampaignByCode(String code) {
     return campaignRepository.findByCode(code);
   }
 
-  /**
-   * Get active campaigns.
-   */
   @Transactional(readOnly = true)
   public List<Campaign> getActiveCampaigns() {
     return campaignRepository.findActiveCampaigns(Instant.now());
   }
 
-  /**
-   * Get homepage campaigns.
-   */
   @Transactional(readOnly = true)
   public List<Campaign> getHomepageCampaigns() {
     return campaignRepository.findHomepageCampaigns(Instant.now());
   }
 
-  /**
-   * Get campaigns by status (paginated).
-   */
   @Transactional(readOnly = true)
   public Page<Campaign> getCampaignsByStatus(Campaign.CampaignStatus status, Pageable pageable) {
     return campaignRepository.findByStatus(status, pageable);
   }
 
-  /**
-   * Get active campaigns for a product.
-   */
   @Transactional(readOnly = true)
   public List<Campaign> getActiveCampaignsForProduct(Long productId) {
     return campaignRepository.findActiveCampaignsForProduct(productId, Instant.now());
   }
 
-  /**
-   * Activate a campaign.
-   */
   public Campaign activateCampaign(Long campaignId) {
     Campaign campaign = getCampaignOrThrow(campaignId);
 
@@ -148,9 +122,6 @@ public class CampaignService {
     return campaign;
   }
 
-  /**
-   * Pause a campaign.
-   */
   public Campaign pauseCampaign(Long campaignId) {
     Campaign campaign = getCampaignOrThrow(campaignId);
 
@@ -164,9 +135,6 @@ public class CampaignService {
     return campaign;
   }
 
-  /**
-   * End a campaign.
-   */
   public Campaign endCampaign(Long campaignId) {
     Campaign campaign = getCampaignOrThrow(campaignId);
     campaign.end();
@@ -175,9 +143,6 @@ public class CampaignService {
     return campaign;
   }
 
-  /**
-   * Schedule a campaign for future activation.
-   */
   public Campaign scheduleCampaign(Long campaignId) {
     Campaign campaign = getCampaignOrThrow(campaignId);
 
@@ -195,28 +160,17 @@ public class CampaignService {
     return campaign;
   }
 
-  /**
-   * Apply campaign to an order and calculate discount.
-   */
   public BigDecimal applyCampaign(String code, BigDecimal subtotal, int customerUseCount) {
     BigDecimal discount = validateCoupon(code, subtotal, customerUseCount);
     recordUsage(code);
     return discount;
   }
 
-  /**
-   * Validate coupon and calculate discount without recording usage.
-   */
   @Transactional(readOnly = true)
   public BigDecimal validateCoupon(String code, BigDecimal subtotal, int customerUseCount) {
     return validateCoupon(code, Campaign.DiscountContext.of(subtotal), customerUseCount);
   }
 
-  /**
-   * Validate coupon against a richer cart context so BOGO/FREE_SHIPPING/BUNDLE
-   * campaigns calculate correctly. Used by checkout when shipping cost and cart
-   * line items are known.
-   */
   @Transactional(readOnly = true)
   public BigDecimal validateCoupon(String code, Campaign.DiscountContext ctx, int customerUseCount) {
     Campaign campaign = campaignRepository.findByCode(code)
@@ -237,9 +191,6 @@ public class CampaignService {
     return campaign.calculateDiscount(ctx);
   }
 
-  /**
-   * Record usage of a campaign.
-   */
   public void recordUsage(String code) {
     Campaign campaign = campaignRepository.findByCode(code)
         .orElseThrow(() -> new IllegalArgumentException("Campaign not found: " + code));
@@ -249,9 +200,6 @@ public class CampaignService {
     log.info("Recorded usage for campaign: {}", code);
   }
 
-  /**
-   * Scheduled job to activate campaigns.
-   */
   public int activateScheduledCampaigns() {
     List<Campaign> toActivate = campaignRepository.findCampaignsToActivate(Instant.now());
     for (Campaign campaign : toActivate) {
@@ -262,9 +210,6 @@ public class CampaignService {
     return toActivate.size();
   }
 
-  /**
-   * Scheduled job to end expired campaigns.
-   */
   public int endExpiredCampaigns() {
     List<Campaign> toEnd = campaignRepository.findCampaignsToEnd(Instant.now());
     for (Campaign campaign : toEnd) {

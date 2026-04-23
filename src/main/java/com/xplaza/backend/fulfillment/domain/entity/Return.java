@@ -15,9 +15,6 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-/**
- * Return merchandise authorization (RMA).
- */
 @Entity
 @Table(name = "returns", indexes = {
     @Index(name = "idx_returns_order", columnList = "order_id"),
@@ -143,40 +140,24 @@ public class Return {
   private List<ReturnItem> items = new ArrayList<>();
 
   public enum ReturnStatus {
-    /** Return requested */
     REQUESTED,
-    /** Approved by admin */
     APPROVED,
-    /** Return label generated */
     LABEL_GENERATED,
-    /** Item shipped by customer */
     SHIPPED,
-    /** Item received at warehouse */
     RECEIVED,
-    /** Item being inspected */
     INSPECTING,
-    /** Inspection passed */
     INSPECTION_PASSED,
-    /** Inspection failed */
     INSPECTION_FAILED,
-    /** Refund/exchange processing */
     PROCESSING,
-    /** Return completed */
     COMPLETED,
-    /** Return rejected */
     REJECTED,
-    /** Return cancelled */
     CANCELLED
   }
 
   public enum ReturnType {
-    /** Full return for refund */
     RETURN,
-    /** Exchange for different item */
     EXCHANGE,
-    /** Repair warranty claim */
     WARRANTY_REPAIR,
-    /** Replace defective item */
     WARRANTY_REPLACE
   }
 
@@ -226,17 +207,11 @@ public class Return {
     item.setReturnRequest(this);
   }
 
-  /**
-   * Approve the return request.
-   */
   public void approve(Long adminId) {
     this.status = ReturnStatus.APPROVED;
     this.approvedBy = adminId;
   }
 
-  /**
-   * Reject the return request.
-   */
   public void reject(Long adminId, String reason) {
     this.status = ReturnStatus.REJECTED;
     this.approvedBy = adminId;
@@ -244,43 +219,28 @@ public class Return {
     this.resolution = Resolution.REJECTED;
   }
 
-  /**
-   * Mark as shipped by customer.
-   */
   public void markShipped(String trackingNumber) {
     this.status = ReturnStatus.SHIPPED;
     this.returnTrackingNumber = trackingNumber;
     this.shippedAt = Instant.now();
   }
 
-  /**
-   * Mark as received at warehouse.
-   */
   public void markReceived() {
     this.status = ReturnStatus.RECEIVED;
     this.receivedAt = Instant.now();
   }
 
-  /**
-   * Complete inspection.
-   */
   public void completeInspection(boolean passed) {
     this.status = passed ? ReturnStatus.INSPECTION_PASSED : ReturnStatus.INSPECTION_FAILED;
     this.inspectedAt = Instant.now();
   }
 
-  /**
-   * Complete the return process.
-   */
   public void complete(Resolution resolution) {
     this.status = ReturnStatus.COMPLETED;
     this.resolution = resolution;
     this.completedAt = Instant.now();
   }
 
-  /**
-   * Cancel the return.
-   */
   public void cancel() {
     this.status = ReturnStatus.CANCELLED;
   }

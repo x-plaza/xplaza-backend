@@ -46,24 +46,14 @@ public class Attribute {
   @Builder.Default
   private AttributeType type = AttributeType.SELECT;
 
-  /**
-   * If true, this attribute creates product variants (e.g., Color, Size). Each
-   * combination of variant attributes creates a unique SKU.
-   */
   @Column(name = "is_variant_attribute")
   @Builder.Default
   private Boolean isVariantAttribute = false;
 
-  /**
-   * If true, customers can filter products by this attribute in search/listing.
-   */
   @Column(name = "is_filterable")
   @Builder.Default
   private Boolean isFilterable = true;
 
-  /**
-   * If true, this attribute's values are included in product search.
-   */
   @Column(name = "is_searchable")
   @Builder.Default
   private Boolean isSearchable = true;
@@ -72,17 +62,10 @@ public class Attribute {
   @Builder.Default
   private Integer position = 0;
 
-  /**
-   * If true, this attribute is available for use.
-   */
   @Column(name = "is_active")
   @Builder.Default
   private Boolean isActive = true;
 
-  /**
-   * Optional category restriction. If set, this attribute only applies to
-   * products in this category. If null, it's a global attribute.
-   */
   @Column(name = "category_id")
   private Long categoryId;
 
@@ -102,15 +85,10 @@ public class Attribute {
    * Supported attribute types.
    */
   public enum AttributeType {
-    /** Single selection from predefined values */
     SELECT,
-    /** Multiple selections from predefined values */
     MULTI_SELECT,
-    /** Free text input */
     TEXT,
-    /** Numeric value */
     NUMBER,
-    /** True/False */
     BOOLEAN
   }
 

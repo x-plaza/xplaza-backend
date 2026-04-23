@@ -40,16 +40,6 @@ public class PushNotificationService {
   @Value("${push.apns.enabled:false}")
   private boolean apnsEnabled;
 
-  /**
-   * Idempotently register or refresh a push token for a customer.
-   *
-   * <p>
-   * If the token value already exists in the database, the existing row is only
-   * refreshed when it belongs to the <em>same</em> customer. A leaked or guessed
-   * token cannot be silently re-associated to a different account — the call
-   * fails with {@link org.springframework.security.access.AccessDeniedException}
-   * so operators can detect the attempt and rotate/ban the token.
-   */
   @Transactional
   public PushToken registerToken(Long customerId, PushToken.Platform platform, String token, String deviceId) {
     if (token == null || token.isBlank()) {
@@ -62,7 +52,8 @@ public class PushNotificationService {
     if (existing != null) {
       if (!customerId.equals(existing.getCustomerId())) {
         log.warn("Rejecting push token re-registration: token already bound to a different customer "
-            + "(attemptedBy={}, tokenPrefix={})", customerId, redact(token));
+            + "(attemptedBy={}, boundTo={}, tokenId={})",
+            customerId, existing.getCustomerId(), existing.getId());
         throw new org.springframework.security.access.AccessDeniedException(
             "Push token is already registered to a different customer");
       }
@@ -81,12 +72,6 @@ public class PushNotificationService {
         .build());
   }
 
-  /**
-   * Revoke a push token on behalf of the currently authenticated customer. Only
-   * deletes when the token's {@code customer_id} matches; other customers' tokens
-   * are ignored so an attacker who learns a token value cannot revoke someone
-   * else's device.
-   */
   @Transactional
   public void unregisterToken(Long customerId, String token) {
     if (customerId == null || token == null || token.isBlank()) {
@@ -102,16 +87,12 @@ public class PushNotificationService {
     return tokenRepo.findByCustomerId(customerId);
   }
 
-  /**
-   * Send a push notification to all of a customer's registered devices. Always
-   * asynchronous so transactional callers (e.g. order placement) are not delayed
-   * by network round-trips to FCM/APNs.
-   */
   @Async
   public void sendToCustomer(Long customerId, String title, String body) {
     var tokens = tokensForCustomer(customerId);
     if (tokens.isEmpty()) {
-      log.debug("No push tokens for customer {}, skipping push '{}'", customerId, title);
+      log.debug("No push tokens for customer {}, skipping push (title length={})",
+          customerId, length(title));
       return;
     }
     for (PushToken pt : tokens) {
@@ -120,32 +101,32 @@ public class PushNotificationService {
   }
 
   private void dispatch(PushToken token, String title, String body) {
+    Long tokenId = token.getId();
     switch (token.getPlatform()) {
     case ANDROID, WEB -> {
       if (fcmEnabled) {
         // TODO: integrate Firebase Admin SDK; intentionally left out of OSS
         // build because credentials are deployment-specific.
-        log.info("[FCM] -> token={} title='{}' body='{}'", redact(token.getToken()), title, body);
+        log.info("[FCM] -> tokenId={} title length={} body length={}",
+            tokenId, length(title), length(body));
       } else {
-        log.debug("FCM disabled, skipping push to token {}", redact(token.getToken()));
+        log.debug("FCM disabled, skipping push to tokenId={}", tokenId);
       }
     }
     case IOS -> {
       if (apnsEnabled) {
         // TODO: integrate Pushy or apns-http2 client.
-        log.info("[APNs] -> token={} title='{}' body='{}'", redact(token.getToken()), title, body);
+        log.info("[APNs] -> tokenId={} title length={} body length={}",
+            tokenId, length(title), length(body));
       } else {
-        log.debug("APNs disabled, skipping push to token {}", redact(token.getToken()));
+        log.debug("APNs disabled, skipping push to tokenId={}", tokenId);
       }
     }
-    default -> log.warn("Unknown platform {} for token {}", token.getPlatform(), token.getId());
+    default -> log.warn("Unknown platform {} for tokenId {}", token.getPlatform(), tokenId);
     }
   }
 
-  private static String redact(String token) {
-    if (token == null || token.length() < 8) {
-      return "***";
-    }
-    return token.substring(0, 4) + "..." + token.substring(token.length() - 4);
+  private static int length(String s) {
+    return s == null ? 0 : s.length();
   }
 }

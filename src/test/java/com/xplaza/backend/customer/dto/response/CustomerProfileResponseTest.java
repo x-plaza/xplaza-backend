@@ -26,9 +26,6 @@ import com.xplaza.backend.customer.domain.entity.Customer;
 class CustomerProfileResponseTest {
 
   private static final ObjectMapper MAPPER = new ObjectMapper()
-      // Mirror Spring Boot's default visibility — fields are not auto-detected
-      // unless they have public accessors. This is the behaviour Jackson uses
-      // when serialising controller responses.
       .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.NONE)
       .setVisibility(PropertyAccessor.GETTER, JsonAutoDetect.Visibility.PUBLIC_ONLY);
 

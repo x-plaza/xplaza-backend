@@ -20,13 +20,6 @@ import lombok.*;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 
-/**
- * CustomerOrder represents a confirmed purchase from a customer.
- *
- * An order is created when a customer completes checkout. It captures: - The
- * items purchased (from cart) - Payment information - Shipping details -
- * Pricing at time of purchase
- */
 @Entity
 @Table(name = "customer_orders", indexes = {
     @Index(name = "idx_cust_orders_customer", columnList = "customer_id"),
@@ -47,9 +40,6 @@ public class CustomerOrder {
   @Builder.Default
   private UUID orderId = UUID.randomUUID();
 
-  /**
-   * Human-readable order number for customer reference. Format: ORD-YYYYMMDD-XXXX
-   */
   @Column(name = "order_number", nullable = false, unique = true, length = 50)
   private String orderNumber;
 
@@ -59,17 +49,9 @@ public class CustomerOrder {
   @Column(name = "shop_id", nullable = false)
   private Long shopId;
 
-  /**
-   * Cart this order was created from.
-   */
   @Column(name = "cart_id")
   private UUID cartId;
 
-  /**
-   * Multi-vendor split: when a checkout spans products from N shops, a single
-   * parent order carries the customer-facing aggregates and N child orders (one
-   * per shop) carry per-vendor fulfilment. Null on stand-alone orders.
-   */
   @Column(name = "parent_order_id")
   private UUID parentOrderId;
 
@@ -228,27 +210,16 @@ public class CustomerOrder {
   private List<OrderStatusHistory> statusHistory = new ArrayList<>();
 
   public enum OrderStatus {
-    /** Order created but not yet confirmed */
     PENDING,
-    /** Payment received, order confirmed */
     CONFIRMED,
-    /** Order is being prepared/packed */
     PROCESSING,
-    /** Order handed to carrier */
     SHIPPED,
-    /** Order out for delivery */
     OUT_FOR_DELIVERY,
-    /** Order delivered to customer */
     DELIVERED,
-    /** Order cancelled */
     CANCELLED,
-    /** Return requested */
     RETURN_REQUESTED,
-    /** Return in progress */
     RETURNING,
-    /** Order returned and refunded */
     RETURNED,
-    /** Partial return completed */
     PARTIALLY_RETURNED
   }
 
@@ -257,26 +228,17 @@ public class CustomerOrder {
     this.updatedAt = Instant.now();
   }
 
-  /**
-   * Add an item to the order.
-   */
   public void addItem(CustomerOrderItem item) {
     items.add(item);
     item.setOrder(this);
   }
 
-  /**
-   * Get total number of items.
-   */
   public int getTotalItemCount() {
     return items.stream()
         .mapToInt(CustomerOrderItem::getQuantity)
         .sum();
   }
 
-  /**
-   * Record a status change.
-   */
   public void changeStatus(OrderStatus newStatus, String reason, String changedBy) {
     OrderStatusHistory history = OrderStatusHistory.builder()
         .order(this)
@@ -303,23 +265,14 @@ public class CustomerOrder {
     }
   }
 
-  /**
-   * Check if order can be cancelled.
-   */
   public boolean canBeCancelled() {
     return status == OrderStatus.PENDING || status == OrderStatus.CONFIRMED;
   }
 
-  /**
-   * Check if order can be modified.
-   */
   public boolean canBeModified() {
     return status == OrderStatus.PENDING;
   }
 
-  /**
-   * Get the full shipping address as a formatted string.
-   */
   public String getFormattedShippingAddress() {
     StringBuilder sb = new StringBuilder();
     sb.append(shippingFirstName).append(" ").append(shippingLastName).append("\n");

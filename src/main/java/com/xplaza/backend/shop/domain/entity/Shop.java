@@ -45,10 +45,6 @@ public class Shop {
 
   private String shopOwner;
 
-  /**
-   * Per-shop commission override. When null the marketplace default
-   * ({@code marketplace.default-commission-rate}) is used.
-   */
   @Column(name = "commission_rate", precision = 5, scale = 4)
   private BigDecimal commissionRate;
 

@@ -59,9 +59,6 @@ public class PaymentTransaction {
   @Column(name = "currency", nullable = false, length = 3)
   private String currency;
 
-  /**
-   * Amount in smallest currency unit (cents for USD). Used for gateway API calls.
-   */
   @Column(name = "amount_in_cents", nullable = false)
   private Long amountInCents;
 
@@ -144,9 +141,6 @@ public class PaymentTransaction {
   @Column(name = "metadata", columnDefinition = "TEXT")
   private String metadata;
 
-  /**
-   * Parent transaction for refunds (points to original payment).
-   */
   @Column(name = "parent_transaction_id")
   private UUID parentTransactionId;
 
@@ -163,26 +157,17 @@ public class PaymentTransaction {
   private Instant updatedAt = Instant.now();
 
   public enum TransactionType {
-    /** Reserve funds on customer's payment method */
     AUTHORIZATION,
-    /** Capture previously authorized funds */
     CAPTURE,
-    /** Immediate charge (auth + capture) */
     SALE,
-    /** Return funds to customer */
     REFUND,
-    /** Cancel an authorization */
     VOID
   }
 
   public enum TransactionStatus {
-    /** Transaction initiated */
     PENDING,
-    /** Transaction completed successfully */
     SUCCESS,
-    /** Transaction failed */
     FAILED,
-    /** Transaction was cancelled */
     CANCELLED
   }
 
@@ -209,9 +194,6 @@ public class PaymentTransaction {
     this.updatedAt = Instant.now();
   }
 
-  /**
-   * Mark the transaction as successful.
-   */
   public void markSuccess(String gatewayTransactionId, String authorizationCode) {
     this.status = TransactionStatus.SUCCESS;
     this.gatewayTransactionId = gatewayTransactionId;
@@ -219,9 +201,6 @@ public class PaymentTransaction {
     this.processedAt = Instant.now();
   }
 
-  /**
-   * Mark the transaction as failed.
-   */
   public void markFailed(String responseCode, String responseMessage) {
     this.status = TransactionStatus.FAILED;
     this.responseCode = responseCode;
@@ -229,9 +208,6 @@ public class PaymentTransaction {
     this.processedAt = Instant.now();
   }
 
-  /**
-   * Get masked card number for display.
-   */
   public String getMaskedCardNumber() {
     if (cardLast4 == null) {
       return null;
@@ -239,9 +215,6 @@ public class PaymentTransaction {
     return "•••• •••• •••• " + cardLast4;
   }
 
-  /**
-   * Check if this is a refundable transaction.
-   */
   public boolean isRefundable() {
     return status == TransactionStatus.SUCCESS &&
         (type == TransactionType.SALE || type == TransactionType.CAPTURE);

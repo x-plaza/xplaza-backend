@@ -30,9 +30,6 @@ import com.xplaza.backend.common.util.ApiResponse;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-  /**
-   * Handle resource already exists (409)
-   */
   @ExceptionHandler(ResourceAlreadyExistsException.class)
   public ResponseEntity<ApiResponse<Void>> handleResourceAlreadyExists(ResourceAlreadyExistsException ex) {
     log.warn("Resource already exists: {}", ex.getMessage());
@@ -41,9 +38,6 @@ public class GlobalExceptionHandler {
         .body(ApiResponse.error("RESOURCE_ALREADY_EXISTS", ex.getMessage()));
   }
 
-  /**
-   * Handle bad credentials (401)
-   */
   @ExceptionHandler(BadCredentialsException.class)
   public ResponseEntity<ApiResponse<Void>> handleBadCredentials(
       BadCredentialsException ex) {
@@ -53,10 +47,6 @@ public class GlobalExceptionHandler {
         .body(ApiResponse.error("BAD_CREDENTIALS", "Invalid username or password"));
   }
 
-  /**
-   * Handle illegal state (400) - e.g. Insufficient stock if not using specific
-   * exception
-   */
   @ExceptionHandler(IllegalStateException.class)
   public ResponseEntity<ApiResponse<Void>> handleIllegalState(IllegalStateException ex) {
     log.warn("Illegal state: {}", ex.getMessage());
@@ -65,9 +55,6 @@ public class GlobalExceptionHandler {
         .body(ApiResponse.error("ILLEGAL_STATE", ex.getMessage()));
   }
 
-  /**
-   * Handle resource not found (404)
-   */
   @ExceptionHandler(ResourceNotFoundException.class)
   public ResponseEntity<ApiResponse<Void>> handleResourceNotFound(ResourceNotFoundException ex) {
     log.warn("Resource not found: {}", ex.getMessage());
@@ -76,9 +63,6 @@ public class GlobalExceptionHandler {
         .body(ApiResponse.error("RESOURCE_NOT_FOUND", ex.getMessage()));
   }
 
-  /**
-   * Handle insufficient inventory (422)
-   */
   @ExceptionHandler(InsufficientInventoryException.class)
   public ResponseEntity<ApiResponse<Void>> handleInsufficientInventory(InsufficientInventoryException ex) {
     log.warn("Insufficient inventory: productId={}, requested={}, available={}",
@@ -95,9 +79,6 @@ public class GlobalExceptionHandler {
         .body(ApiResponse.error("INSUFFICIENT_INVENTORY", ex.getMessage(), details));
   }
 
-  /**
-   * Handle validation errors (400)
-   */
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ApiResponse<Void>> handleValidationErrors(MethodArgumentNotValidException ex) {
     Map<String, String> errors = new HashMap<>();
@@ -113,9 +94,6 @@ public class GlobalExceptionHandler {
         .body(ApiResponse.error("VALIDATION_ERROR", "Validation failed", errors));
   }
 
-  /**
-   * Handle missing request parameters (400)
-   */
   @ExceptionHandler(MissingServletRequestParameterException.class)
   public ResponseEntity<ApiResponse<Void>> handleMissingParams(MissingServletRequestParameterException ex) {
     log.warn("Missing parameter: {}", ex.getParameterName());
@@ -125,9 +103,6 @@ public class GlobalExceptionHandler {
             String.format("Required parameter '%s' is missing", ex.getParameterName())));
   }
 
-  /**
-   * Handle type mismatch (400)
-   */
   @ExceptionHandler(MethodArgumentTypeMismatchException.class)
   public ResponseEntity<ApiResponse<Void>> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
     log.warn("Type mismatch for parameter: {}", ex.getName());
@@ -138,9 +113,6 @@ public class GlobalExceptionHandler {
                 ex.getName(), ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "unknown")));
   }
 
-  /**
-   * Handle illegal arguments (400)
-   */
   @ExceptionHandler(IllegalArgumentException.class)
   public ResponseEntity<ApiResponse<Void>> handleIllegalArgument(IllegalArgumentException ex) {
     log.warn("Illegal argument: {}", ex.getMessage());
@@ -149,9 +121,6 @@ public class GlobalExceptionHandler {
         .body(ApiResponse.error("INVALID_ARGUMENT", ex.getMessage()));
   }
 
-  /**
-   * Handle authentication failures (401)
-   */
   @ExceptionHandler(AuthenticationException.class)
   public ResponseEntity<ApiResponse<Void>> handleAuthenticationFailure(AuthenticationException ex) {
     log.warn("Authentication failed: {}", ex.getMessage());
@@ -160,11 +129,6 @@ public class GlobalExceptionHandler {
         .body(ApiResponse.error("AUTHENTICATION_FAILED", ex.getMessage()));
   }
 
-  /**
-   * Handle authorization failures (403). Without this the default Spring Security
-   * AccessDeniedHandler turns every ownership-check violation into a 500 because
-   * our SecurityFilterChain doesn't install a handler.
-   */
   @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
   public ResponseEntity<ApiResponse<Void>> handleAccessDenied(
       org.springframework.security.access.AccessDeniedException ex) {
@@ -174,9 +138,6 @@ public class GlobalExceptionHandler {
         .body(ApiResponse.error("ACCESS_DENIED", ex.getMessage()));
   }
 
-  /**
-   * Catch-all for unexpected errors (500)
-   */
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ApiResponse<Void>> handleGenericException(Exception ex) {
     log.error("Unexpected error occurred", ex);

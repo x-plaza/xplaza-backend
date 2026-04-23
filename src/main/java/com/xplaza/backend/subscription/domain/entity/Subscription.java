@@ -78,20 +78,10 @@ public class Subscription {
   @Builder.Default
   private Instant updatedAt = Instant.now();
 
-  // Bidirectional association: SubscriptionItem.subscription is the owning
-  // side. A unidirectional @JoinColumn here would make Hibernate INSERT child
-  // rows with a NULL FK and then UPDATE, which fails the NOT NULL constraint
-  // on `subscription_id`. The `addItem` helper keeps both sides in sync so
-  // callers can just mutate `items` and let CascadeType.ALL persist them.
   @OneToMany(mappedBy = "subscription", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   @Builder.Default
   private List<SubscriptionItem> items = new ArrayList<>();
 
-  /**
-   * Attach a child item to this subscription while keeping the bidirectional
-   * back-reference consistent (required for the owning-side INSERT to carry a
-   * non-null {@code subscription_id}).
-   */
   public void addItem(SubscriptionItem item) {
     item.setSubscription(this);
     items.add(item);

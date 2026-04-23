@@ -13,9 +13,6 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-/**
- * Stock reservation for orders.
- */
 @Entity
 @Table(name = "stock_reservations", indexes = {
     @Index(name = "idx_reservation_inventory", columnList = "inventory_id"),
@@ -80,22 +77,15 @@ public class StockReservation {
   private Instant updatedAt = Instant.now();
 
   public enum ReservationStatus {
-    /** Stock reserved */
     RESERVED,
-    /** Reservation fulfilled (order shipped) */
     FULFILLED,
-    /** Reservation released (order cancelled or expired) */
     RELEASED,
-    /** Reservation expired */
     EXPIRED
   }
 
   public enum ReservationType {
-    /** Reserved for cart (temporary) */
     CART,
-    /** Reserved for placed order */
     ORDER,
-    /** Reserved for backorder */
     BACKORDER
   }
 
@@ -116,40 +106,25 @@ public class StockReservation {
     this.updatedAt = Instant.now();
   }
 
-  /**
-   * Check if reservation is expired.
-   */
   public boolean isExpired() {
     return expiresAt != null && Instant.now().isAfter(expiresAt);
   }
 
-  /**
-   * Fulfill the reservation (order shipped).
-   */
   public void fulfill() {
     this.status = ReservationStatus.FULFILLED;
     this.fulfilledAt = Instant.now();
   }
 
-  /**
-   * Release the reservation.
-   */
   public void release() {
     this.status = ReservationStatus.RELEASED;
     this.releasedAt = Instant.now();
   }
 
-  /**
-   * Mark as expired.
-   */
   public void expire() {
     this.status = ReservationStatus.EXPIRED;
     this.releasedAt = Instant.now();
   }
 
-  /**
-   * Convert cart reservation to order reservation.
-   */
   public void convertToOrder(UUID orderId) {
     this.orderId = orderId;
     this.type = ReservationType.ORDER;

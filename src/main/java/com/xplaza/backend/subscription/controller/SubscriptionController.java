@@ -47,11 +47,6 @@ public class SubscriptionController {
   @PreAuthorize("hasRole('CUSTOMER')")
   public ResponseEntity<Subscription> create(@AuthenticationPrincipal Customer principal,
       @RequestBody @Valid CreateSubscriptionRequest request) {
-    // Resolve the unit price server-side from catalog + active product discounts
-    // + any B2B contract pricing the customer is entitled to. Any client-supplied
-    // price is intentionally ignored: otherwise a malicious client could
-    // subscribe for $0.01 and happily pull renewal invoices at that price
-    // forever.
     var items = request.items().stream()
         .map(it -> {
           Product product = productRepository.findById(it.productId())

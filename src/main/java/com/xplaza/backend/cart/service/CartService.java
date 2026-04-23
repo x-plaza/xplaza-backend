@@ -45,30 +45,20 @@ public class CartService {
   private final ProductDiscountService productDiscountService;
   private final PriceListResolver priceListResolver;
 
-  /** Default cart expiration in days */
   private static final int DEFAULT_CART_EXPIRATION_DAYS = 30;
 
   // ==================== Cart Operations ====================
 
-  /**
-   * Get or create active cart for an authenticated customer.
-   */
   public Cart getOrCreateCart(Long customerId) {
     return cartRepository.findActiveCartByCustomerId(customerId)
         .orElseGet(() -> createCart(customerId, null));
   }
 
-  /**
-   * Get or create active cart for a guest (by session ID).
-   */
   public Cart getOrCreateGuestCart(String sessionId) {
     return cartRepository.findActiveCartBySessionId(sessionId)
         .orElseGet(() -> createCart(null, sessionId));
   }
 
-  /**
-   * Create a new cart.
-   */
   private Cart createCart(Long customerId, String sessionId) {
     Cart cart = Cart.builder()
         .customerId(customerId)
@@ -79,25 +69,16 @@ public class CartService {
     return cartRepository.save(cart);
   }
 
-  /**
-   * Get cart by ID with items.
-   */
   @Transactional(readOnly = true)
   public Optional<Cart> getCart(UUID cartId) {
     return cartRepository.findByIdWithItems(cartId);
   }
 
-  /**
-   * Get active cart for customer with items.
-   */
   @Transactional(readOnly = true)
   public Optional<Cart> getActiveCartForCustomer(Long customerId) {
     return cartRepository.findActiveCartByCustomerIdWithItems(customerId);
   }
 
-  /**
-   * Get active cart for session with items.
-   */
   @Transactional(readOnly = true)
   public Optional<Cart> getActiveCartForSession(String sessionId) {
     return cartRepository.findActiveCartBySessionIdWithItems(sessionId);
@@ -105,9 +86,6 @@ public class CartService {
 
   // ==================== Item Operations ====================
 
-  /**
-   * Add item to cart.
-   */
   public CartItem addItem(UUID cartId, Long productId, UUID variantId, Long shopId,
       int quantity, BigDecimal unitPrice, String productName, String variantName,
       String sku, String imageUrl) {
@@ -130,11 +108,6 @@ public class CartService {
           .orElseThrow(() -> new IllegalArgumentException("Variant not found: " + variantId));
     }
 
-    // B2B contract pricing: if the customer belongs to a customer group with
-    // an applicable price list, the resolver returns the negotiated price.
-    // Falls back to the catalog/discounted price when there is no contract.
-    // Currency is passed through so a EUR cart never receives a USD contract
-    // price (or vice versa).
     BigDecimal catalogPrice = actualPrice;
     actualPrice = priceListResolver.resolveUnitPrice(
         cart.getCustomerId(), productId, quantity, cart.getCurrencyCode(), actualPrice);
@@ -155,12 +128,6 @@ public class CartService {
       if (availableStock < newTotal) {
         throw new IllegalStateException("Insufficient stock for total quantity. Available: " + availableStock);
       }
-      // Re-resolve the contract price against the post-merge total quantity:
-      // a quantity-break price list (e.g. $9 for 10+, $8 for 50+) would leave
-      // the existing line priced too high if we naively reused the original
-      // per-increment price. Tier moves only apply in the favourable
-      // direction — if the tier for the new total quantity is strictly lower
-      // than the already-charged unit price, we update the line.
       BigDecimal mergedPrice = priceListResolver.resolveUnitPrice(
           cart.getCustomerId(), productId, newTotal, cart.getCurrencyCode(), catalogPrice);
       if (mergedPrice != null
@@ -193,9 +160,6 @@ public class CartService {
     return cartItemRepository.save(item);
   }
 
-  /**
-   * Update item quantity.
-   */
   public CartItem updateItemQuantity(UUID cartId, UUID itemId, int newQuantity) {
     Cart cart = cartRepository.findByIdWithItems(cartId)
         .orElseThrow(() -> new IllegalArgumentException("Cart not found: " + cartId));
@@ -215,9 +179,6 @@ public class CartService {
     return cartItemRepository.save(item);
   }
 
-  /**
-   * Remove item from cart.
-   */
   public void removeItem(UUID cartId, UUID itemId) {
     Cart cart = cartRepository.findByIdWithItems(cartId)
         .orElseThrow(() -> new IllegalArgumentException("Cart not found: " + cartId));
@@ -229,18 +190,12 @@ public class CartService {
     cartRepository.save(cart);
   }
 
-  /**
-   * Save item for later.
-   */
   public CartItem saveForLater(UUID cartId, UUID itemId) {
     CartItem item = getCartItem(cartId, itemId);
     item.saveForLater();
     return cartItemRepository.save(item);
   }
 
-  /**
-   * Move item back to cart from saved for later.
-   */
   public CartItem moveToCart(UUID cartId, UUID itemId) {
     CartItem item = getCartItem(cartId, itemId);
     item.moveToCart();
@@ -260,9 +215,6 @@ public class CartService {
 
   // ==================== Cart Actions ====================
 
-  /**
-   * Clear cart (remove all items).
-   */
   public void clearCart(UUID cartId) {
     Cart cart = cartRepository.findByIdWithItems(cartId)
         .orElseThrow(() -> new IllegalArgumentException("Cart not found: " + cartId));
@@ -271,9 +223,6 @@ public class CartService {
     cartRepository.save(cart);
   }
 
-  /**
-   * Apply coupon to cart.
-   */
   public Cart applyCoupon(UUID cartId, String couponCode, BigDecimal discountAmount) {
     Cart cart = cartRepository.findById(cartId)
         .orElseThrow(() -> new IllegalArgumentException("Cart not found: " + cartId));
@@ -282,9 +231,6 @@ public class CartService {
     return cartRepository.save(cart);
   }
 
-  /**
-   * Remove coupon from cart.
-   */
   public Cart removeCoupon(UUID cartId) {
     Cart cart = cartRepository.findById(cartId)
         .orElseThrow(() -> new IllegalArgumentException("Cart not found: " + cartId));
@@ -293,9 +239,6 @@ public class CartService {
     return cartRepository.save(cart);
   }
 
-  /**
-   * Merge guest cart into customer cart.
-   */
   public Cart mergeGuestCart(String sessionId, Long customerId) {
     Optional<Cart> guestCartOpt = cartRepository.findActiveCartBySessionIdWithItems(sessionId);
     if (guestCartOpt.isEmpty()) {
@@ -337,9 +280,6 @@ public class CartService {
     return cartRepository.save(customerCart);
   }
 
-  /**
-   * Mark cart as converted (when order is created).
-   */
   public void markCartConverted(UUID cartId) {
     Cart cart = cartRepository.findById(cartId)
         .orElseThrow(() -> new IllegalArgumentException("Cart not found: " + cartId));
@@ -350,9 +290,6 @@ public class CartService {
 
   // ==================== Cart Calculations ====================
 
-  /**
-   * Get cart summary.
-   */
   @Transactional(readOnly = true)
   public CartSummary getCartSummary(UUID cartId) {
     Cart cart = cartRepository.findByIdWithItems(cartId)
@@ -370,23 +307,14 @@ public class CartService {
 
   // ==================== Maintenance ====================
 
-  /**
-   * Mark abandoned carts.
-   */
   public int markAbandonedCarts() {
     return cartRepository.markAbandonedCarts(Instant.now());
   }
 
-  /**
-   * Delete old abandoned carts.
-   */
   public int deleteOldAbandonedCarts(int daysOld) {
     return cartRepository.deleteOldAbandonedCarts(Instant.now().minus(daysOld, ChronoUnit.DAYS));
   }
 
-  /**
-   * Find inactive carts for reminder.
-   */
   @Transactional(readOnly = true)
   public List<Cart> findInactiveCarts(int daysInactive) {
     return cartRepository.findInactiveCarts(Instant.now().minus(daysInactive, ChronoUnit.DAYS));

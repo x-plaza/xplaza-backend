@@ -23,9 +23,6 @@ public record RateLimitProperties(
       paymentRequestsPerMinute = 30;
     if (defaultRequestsPerMinute <= 0)
       defaultRequestsPerMinute = 120;
-    // Cap on the number of cached buckets; protects against unbounded memory
-    // growth driven by the unique-client cardinality (one bucket per client
-    // key x route category). 100k entries ~ a few MB of heap.
     if (maxBuckets <= 0)
       maxBuckets = 100_000L;
     // Buckets refill on a 1-minute window, so after several minutes of idle

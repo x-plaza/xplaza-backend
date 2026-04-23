@@ -39,53 +39,32 @@ public class ApiResponse<T> {
 
   // ===== Success Responses =====
 
-  /**
-   * Success response with data only (for single resource)
-   */
   public static <T> ApiResponse<T> ok(T data) {
     return new ApiResponse<>(true, data, null, null);
   }
 
-  /**
-   * Success response with data and pagination meta
-   */
   public static <T> ApiResponse<T> ok(T data, PageMeta pagination) {
     return new ApiResponse<>(true, data, null, new Meta(pagination, null));
   }
 
-  /**
-   * Success response for create operations (201)
-   */
   public static <T> ApiResponse<T> created(T data) {
     return new ApiResponse<>(true, data, null, null);
   }
 
-  /**
-   * Success response for delete/update with message
-   */
   public static ApiResponse<Void> ok(String message) {
     return new ApiResponse<>(true, null, null, new Meta(null, message));
   }
 
-  /**
-   * Empty success response (for 204 No Content scenarios)
-   */
   public static ApiResponse<Void> noContent() {
     return new ApiResponse<>(true, null, null, null);
   }
 
   // ===== Error Responses =====
 
-  /**
-   * Error response with code, message, and optional details
-   */
   public static <T> ApiResponse<T> error(String code, String message) {
     return new ApiResponse<>(false, null, new ErrorInfo(code, message, null), null);
   }
 
-  /**
-   * Error response with validation details
-   */
   public static <T> ApiResponse<T> error(String code, String message, Object details) {
     return new ApiResponse<>(false, null, new ErrorInfo(code, message, details), null);
   }
@@ -138,9 +117,6 @@ public class ApiResponse<T> {
       this.hasPrevious = page > 0;
     }
 
-    /**
-     * Create from Spring Data Page
-     */
     public static PageMeta from(Page<?> page) {
       return new PageMeta(
           page.getNumber(),

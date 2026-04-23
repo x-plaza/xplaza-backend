@@ -12,9 +12,6 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-/**
- * Inventory movement/transaction record.
- */
 @Entity
 @Table(name = "inventory_movements", indexes = {
     @Index(name = "idx_movement_inventory", columnList = "inventory_id"),
@@ -74,29 +71,17 @@ public class InventoryMovement {
   private Instant createdAt = Instant.now();
 
   public enum MovementType {
-    /** Stock received from supplier */
     RECEIVE,
-    /** Stock shipped for order */
     SHIP,
-    /** Stock reserved for order */
     RESERVE,
-    /** Reserved stock released */
     RELEASE,
-    /** Stock returned from customer */
     RETURN,
-    /** Stock adjustment (count correction) */
     ADJUSTMENT,
-    /** Stock damaged */
     DAMAGE,
-    /** Stock transferred between warehouses */
     TRANSFER_OUT,
-    /** Stock received from transfer */
     TRANSFER_IN,
-    /** Stock written off */
     WRITE_OFF,
-    /** Stock moved for quality hold */
     QUALITY_HOLD,
-    /** Stock released from quality hold */
     QUALITY_RELEASE
   }
 
@@ -109,9 +94,6 @@ public class InventoryMovement {
     MANUAL_ADJUSTMENT
   }
 
-  /**
-   * Create a receive movement.
-   */
   public static InventoryMovement createReceive(InventoryItem item, int quantity, String purchaseOrderId,
       Long userId) {
     int before = item.getQuantityOnHand();
@@ -127,9 +109,6 @@ public class InventoryMovement {
         .build();
   }
 
-  /**
-   * Create a ship movement.
-   */
   public static InventoryMovement createShip(InventoryItem item, int quantity, UUID orderId, Long userId) {
     int before = item.getQuantityOnHand();
     return InventoryMovement.builder()
@@ -144,9 +123,6 @@ public class InventoryMovement {
         .build();
   }
 
-  /**
-   * Create an adjustment movement.
-   */
   public static InventoryMovement createAdjustment(InventoryItem item, int newQuantity, String reason, Long userId) {
     int before = item.getQuantityOnHand();
     int diff = newQuantity - before;

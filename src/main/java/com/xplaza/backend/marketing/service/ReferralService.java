@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.xplaza.backend.common.events.DomainEvents;
+import com.xplaza.backend.common.util.LogSanitizer;
 import com.xplaza.backend.loyalty.service.LoyaltyService;
 import com.xplaza.backend.marketing.domain.entity.Referral;
 import com.xplaza.backend.marketing.domain.repository.ReferralRepository;
@@ -75,7 +76,7 @@ public class ReferralService {
     var ref = referralRepository.findByCode(code)
         .orElseThrow(() -> new IllegalArgumentException("Unknown referral code: " + code));
     if (ref.getStatus() != Referral.ReferralStatus.PENDING) {
-      log.debug("Referral {} already in state {}; ignoring accept", code, ref.getStatus());
+      log.debug("Referral {} already in state {}; ignoring accept", LogSanitizer.forLog(code), ref.getStatus());
       return;
     }
     ref.setRefereeId(refereeCustomerId);
@@ -83,11 +84,6 @@ public class ReferralService {
     referralRepository.save(ref);
   }
 
-  /**
-   * The referee's first order triggers the reward. We rely on the transactional
-   * outbox (inside {@link LoyaltyService#grantPoints}) so the credit is durable
-   * even if the listener crashes before settlement.
-   */
   @Async
   @EventListener
   @Transactional
@@ -102,16 +98,10 @@ public class ReferralService {
 
   private void reward(Referral ref, DomainEvents.OrderPlaced event) {
     try {
-      // Single source of truth for the grant: LoyaltyService persists the
-      // points and publishes LoyaltyPointsEarned. We do NOT publish our own
-      // event on top — that would double-count the reward in the outbox.
       loyaltyService.grantPoints(ref.getReferrerId(), rewardPoints, "referral:" + ref.getCode());
     } catch (Exception e) {
       log.error("Failed to credit referral loyalty points for referrer {} (order {}): {}",
           ref.getReferrerId(), event.orderId(), e.toString(), e);
-      // Do not mark the referral as REWARDED if we could not credit the
-      // points; the scheduler-driven retry path (future iteration) will pick
-      // up ACCEPTED referrals and try again.
       return;
     }
     ref.setStatus(Referral.ReferralStatus.REWARDED);

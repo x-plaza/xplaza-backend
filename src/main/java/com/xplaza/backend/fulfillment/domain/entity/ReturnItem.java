@@ -90,16 +90,10 @@ public class ReturnItem {
     FAILED_USED
   }
 
-  /**
-   * Calculate total price from quantity and unit price.
-   */
   public void calculateTotalPrice() {
     this.totalPrice = unitPrice.multiply(BigDecimal.valueOf(quantity));
   }
 
-  /**
-   * Complete inspection.
-   */
   public void completeInspection(InspectionResult result, String notes) {
     this.inspectionResult = result;
     this.inspectionNotes = notes;

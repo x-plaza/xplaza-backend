@@ -50,15 +50,6 @@ public class ShopController {
   private final ShopService shopService;
   private final ShopMapper shopMapper;
 
-  /**
-   * GET /api/v1/shops
-   * 
-   * List shops with pagination and optional filters.
-   * 
-   * Query Parameters: - locationId: Filter by location (optional) - ownerId:
-   * Filter by owner (optional) - search: Search by shop name (optional) - page,
-   * size, sort, direction: Pagination params
-   */
   @GetMapping
   @Operation(summary = "List shops", description = "Get paginated list of shops with optional filters")
   public ResponseEntity<ApiResponse<List<ShopResponse>>> getShops(
@@ -93,11 +84,6 @@ public class ShopController {
     return ResponseEntity.ok(ApiResponse.ok(dtos, pageMeta));
   }
 
-  /**
-   * GET /api/v1/shops/{id}
-   * 
-   * Get single shop by ID.
-   */
   @GetMapping("/{id}")
   @Operation(summary = "Get shop by ID", description = "Retrieve a specific shop by its ID")
   public ResponseEntity<ApiResponse<ShopResponse>> getShop(
@@ -109,11 +95,6 @@ public class ShopController {
     return ResponseEntity.ok(ApiResponse.ok(dto));
   }
 
-  /**
-   * POST /api/v1/shops
-   * 
-   * Create a new shop.
-   */
   @PostMapping
   @Operation(summary = "Create shop", description = "Create a new shop")
   public ResponseEntity<ApiResponse<ShopResponse>> createShop(
@@ -128,11 +109,6 @@ public class ShopController {
         .body(ApiResponse.created(dto));
   }
 
-  /**
-   * PUT /api/v1/shops/{id}
-   * 
-   * Update an existing shop.
-   */
   @PutMapping("/{id}")
   @Operation(summary = "Update shop", description = "Update an existing shop by ID")
   public ResponseEntity<ApiResponse<ShopResponse>> updateShop(
@@ -146,11 +122,6 @@ public class ShopController {
     return ResponseEntity.ok(ApiResponse.ok(dto));
   }
 
-  /**
-   * DELETE /api/v1/shops/{id}
-   * 
-   * Delete a shop.
-   */
   @DeleteMapping("/{id}")
   @Operation(summary = "Delete shop", description = "Delete a shop by ID")
   public ResponseEntity<ApiResponse<Void>> deleteShop(

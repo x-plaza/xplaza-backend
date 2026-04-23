@@ -29,17 +29,12 @@ public class CustomerGdprController {
 
   private final CustomerService customerService;
 
-  /** Right to access (GDPR Art. 15). */
   @GetMapping(value = "/export", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<ApiResponse<CustomerProfileResponse>> export(@AuthenticationPrincipal Customer customer) {
     Customer data = customerService.exportCustomerData(customer.getCustomerId());
     return ResponseEntity.ok(ApiResponse.ok(CustomerProfileResponse.from(data)));
   }
 
-  /**
-   * Right to erasure (GDPR Art. 17). Anonymises identifiers + disables the
-   * account.
-   */
   @DeleteMapping
   public ResponseEntity<ApiResponse<Void>> erase(@AuthenticationPrincipal Customer customer) {
     customerService.eraseCustomerData(customer.getCustomerId());

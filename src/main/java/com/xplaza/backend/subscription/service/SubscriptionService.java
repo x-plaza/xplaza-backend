@@ -50,9 +50,6 @@ public class SubscriptionService {
         .map(i -> i.getUnitPrice().multiply(BigDecimal.valueOf(i.getQuantity())))
         .reduce(BigDecimal.ZERO, BigDecimal::add);
     sub.setTotalAmount(total);
-    // Bidirectional association — addItem() wires up the back-reference so
-    // the owning SubscriptionItem.subscription INSERT carries a non-null FK.
-    // CascadeType.ALL then persists the children as part of the parent flush.
     items.forEach(sub::addItem);
     var saved = subscriptionRepository.save(sub);
     eventPublisher.publish(new DomainEvents.SubscriptionCreated(
@@ -97,10 +94,6 @@ public class SubscriptionService {
     return subscriptionRepository.save(s);
   }
 
-  /**
-   * Compute the next renewal timestamp from the subscription cadence. Public
-   * because the renewal scheduler uses it after a successful order.
-   */
   public Instant advance(Instant from, Subscription subscription) {
     int n = subscription.getIntervalCount() == null ? 1 : subscription.getIntervalCount();
     return switch (subscription.getIntervalUnit()) {

@@ -50,10 +50,6 @@ public class SearchController {
     return ResponseEntity.ok(ApiResponse.ok(docs));
   }
 
-  /**
-   * Faceted search returning hits + aggregations (brand / category / price
-   * histogram). Storefronts use this to render filter sidebars.
-   */
   @GetMapping("/products/faceted")
   public ResponseEntity<ApiResponse<Map<String, Object>>> faceted(
       @RequestParam(name = "q", required = false) String q,
@@ -73,10 +69,6 @@ public class SearchController {
     return ResponseEntity.ok(ApiResponse.ok(body));
   }
 
-  /**
-   * Admin-only bulk reindex. Walks the products table in batches and pushes every
-   * row to Elasticsearch. Returns the number of documents indexed.
-   */
   @PostMapping("/reindex")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<ApiResponse<Map<String, Object>>> reindex(

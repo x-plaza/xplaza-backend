@@ -73,11 +73,6 @@ class StripePaymentGatewayKeyTest {
     assertNotEquals(a, b);
   }
 
-  /**
-   * The original bug: with {@code description == null} and an empty metadata map,
-   * every payment of the same {@code amount + currency} collapsed onto the same
-   * key, causing Stripe to reject the second one.
-   */
   @Test
   void nullDescriptionWithoutMetadata_doesNotCollideAcrossPayments() throws Exception {
     String a = key(new BigDecimal("25.00"), "usd", null, new HashMap<>());

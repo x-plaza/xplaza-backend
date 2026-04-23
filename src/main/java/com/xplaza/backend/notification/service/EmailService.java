@@ -22,6 +22,8 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import com.xplaza.backend.common.util.LogSanitizer;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -30,12 +32,6 @@ public class EmailService {
   private final JavaMailSender mailSender;
   private final TemplateEngine templateEngine;
 
-  /**
-   * Generic plaintext-into-html-template send. Kept for backwards compatibility;
-   * new transactional flows should call
-   * {@link #sendTemplate(String, String, String, Map)} so the per-event Thymeleaf
-   * template is selected.
-   */
   @Async
   @CircuitBreaker(name = "mail")
   @Retry(name = "mail")
@@ -44,12 +40,6 @@ public class EmailService {
         Map.of("title", subject, "message", text));
   }
 
-  /**
-   * Render the given Thymeleaf template with the supplied model and send the
-   * result as an HTML email. The Thymeleaf templates live under
-   * {@code src/main/resources/templates}: order-confirmation, order-shipped,
-   * order-delivered, abandoned-cart, password-reset, invoice etc.
-   */
   @Async
   @CircuitBreaker(name = "mail")
   @Retry(name = "mail")
@@ -70,9 +60,10 @@ public class EmailService {
       helper.setFrom("noreply@xplaza.com");
 
       mailSender.send(mimeMessage);
-      log.info("HTML Email '{}' (template={}) sent to {}", subject, template, to);
+      log.info("HTML Email '{}' (template={}) sent to {}",
+          LogSanitizer.forLog(subject), LogSanitizer.forLog(template), LogSanitizer.forLog(to));
     } catch (MessagingException e) {
-      log.error("Failed to send HTML email to {}", to, e);
+      log.error("Failed to send HTML email to {}", LogSanitizer.forLog(to), e);
     }
   }
 }

@@ -42,10 +42,6 @@ public class RecommendationService {
   private final ProductRepository productRepo;
   private final CustomerOrderRepository orderRepo;
 
-  /**
-   * Records a product view for a customer. Idempotent because the row id is
-   * (customer_id, product_id) so we just bump the timestamp.
-   */
   @Transactional
   public void recordView(Long customerId, Long productId) {
     if (customerId == null) {
@@ -94,11 +90,6 @@ public class RecommendationService {
         .toList();
   }
 
-  /**
-   * Walk the just-placed order's line items and increment the symmetric
-   * co-purchase counter for each unordered (a, b) pair. Runs asynchronously so it
-   * never blocks the checkout commit.
-   */
   @Async
   @EventListener
   @Transactional

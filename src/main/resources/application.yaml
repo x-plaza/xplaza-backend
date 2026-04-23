@@ -102,10 +102,6 @@ xplaza:
     auth-requests-per-minute: 10
     payment-requests-per-minute: 30
     default-requests-per-minute: 120
-    # Bound the in-memory bucket cache so unique-client cardinality cannot
-    # leak heap. Buckets idle for `bucket-idle-minutes` are evicted; a fresh
-    # bucket starts full, which matches what a fully-refilled bucket would
-    # have anyway after that much idle time.
     max-buckets: 100000
     bucket-idle-minutes: 10
   abandoned-cart:
@@ -166,12 +162,6 @@ resilience4j:
         failure-rate-threshold: 50
         wait-duration-in-open-state: 30s
 
-# ---------- Push notifications (FCM/APNs) ----------
-# Both providers ship disabled in OSS builds. Set the env vars in production
-# to enable real fan-out; the dispatcher's API contract stays the same.
-# `PUSH_FCM_PROJECT_ID` is the GCP project that owns the Firebase Messaging
-# credentials; left blank, the FCM dispatcher refuses to send even when
-# enabled (fail-closed), so an accidental enable cannot silently no-op.
 push:
   fcm:
     enabled: ${PUSH_FCM_ENABLED:false}

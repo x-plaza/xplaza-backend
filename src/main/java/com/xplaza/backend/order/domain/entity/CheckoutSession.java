@@ -15,14 +15,6 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-/**
- * Checkout session captures the checkout process before order confirmation.
- *
- * This allows customers to: - Review their cart - Select shipping address -
- * Choose delivery slot - Select payment method - Apply coupons
- *
- * The checkout session expires after a certain time if not completed.
- */
 @Entity
 @Table(name = "checkout_sessions", indexes = {
     @Index(name = "idx_checkout_cart", columnList = "cart_id"),
@@ -166,19 +158,12 @@ public class CheckoutSession {
   private Instant completedAt;
 
   public enum CheckoutStatus {
-    /** Checkout started */
     STARTED,
-    /** Shipping selected */
     SHIPPING_SELECTED,
-    /** Payment selected */
     PAYMENT_SELECTED,
-    /** Awaiting payment confirmation */
     AWAITING_PAYMENT,
-    /** Checkout completed, order created */
     COMPLETED,
-    /** Checkout abandoned/expired */
     ABANDONED,
-    /** Checkout failed (e.g., payment failed) */
     FAILED
   }
 
@@ -187,9 +172,6 @@ public class CheckoutSession {
     this.updatedAt = Instant.now();
   }
 
-  /**
-   * Calculate grand total based on components.
-   */
   public void calculateGrandTotal() {
     BigDecimal total = subtotal != null ? subtotal : BigDecimal.ZERO;
     total = total.add(shippingCost != null ? shippingCost : BigDecimal.ZERO);
@@ -201,9 +183,6 @@ public class CheckoutSession {
     this.grandTotal = total;
   }
 
-  /**
-   * Check if checkout is ready for order creation.
-   */
   public boolean isReadyForOrder() {
     return shippingAddressId != null
         && paymentMethodId != null
@@ -214,40 +193,25 @@ public class CheckoutSession {
         && status != CheckoutStatus.ABANDONED;
   }
 
-  /**
-   * Check if checkout session has expired.
-   */
   public boolean isExpired() {
     return expiresAt != null && Instant.now().isAfter(expiresAt);
   }
 
-  /**
-   * Mark checkout as completed.
-   */
   public void complete(UUID orderId) {
     this.orderId = orderId;
     this.status = CheckoutStatus.COMPLETED;
     this.completedAt = Instant.now();
   }
 
-  /**
-   * Mark checkout as failed.
-   */
   public void fail(String reason) {
     this.status = CheckoutStatus.FAILED;
     this.failureReason = reason;
   }
 
-  /**
-   * Mark checkout as abandoned.
-   */
   public void abandon() {
     this.status = CheckoutStatus.ABANDONED;
   }
 
-  /**
-   * Set default expiration (30 minutes from now).
-   */
   public void setDefaultExpiration() {
     this.expiresAt = Instant.now().plusSeconds(30 * 60);
   }

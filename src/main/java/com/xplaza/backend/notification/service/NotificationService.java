@@ -35,9 +35,6 @@ public class NotificationService {
   private final EmailService emailService;
   private final CustomerRepository customerRepository;
 
-  /**
-   * Create and send a notification.
-   */
   public Notification createNotification(Long customerId, Notification.NotificationType type,
       Notification.NotificationChannel channel, String title, String message,
       Notification.ReferenceType referenceType, String referenceId) {
@@ -66,60 +63,39 @@ public class NotificationService {
     return notification;
   }
 
-  /**
-   * Create an in-app notification.
-   */
   public Notification createInAppNotification(Long customerId, Notification.NotificationType type,
       String title, String message) {
     return createNotification(customerId, type, Notification.NotificationChannel.IN_APP,
         title, message, null, null);
   }
 
-  /**
-   * Create order notification.
-   */
   public Notification createOrderNotification(Long customerId, Notification.NotificationType type,
       String title, String message, String orderId) {
     return createNotification(customerId, type, Notification.NotificationChannel.IN_APP,
         title, message, Notification.ReferenceType.ORDER, orderId);
   }
 
-  /**
-   * Create product notification.
-   */
   public Notification createProductNotification(Long customerId, Notification.NotificationType type,
       String title, String message, Long productId) {
     return createNotification(customerId, type, Notification.NotificationChannel.IN_APP,
         title, message, Notification.ReferenceType.PRODUCT, productId.toString());
   }
 
-  /**
-   * Get notifications for customer (paginated).
-   */
   @Transactional(readOnly = true)
   public Page<Notification> getNotifications(Long customerId, Pageable pageable) {
     return notificationRepository.findByCustomerId(customerId, pageable);
   }
 
-  /**
-   * Get unread notifications for customer.
-   */
   @Transactional(readOnly = true)
   public Page<Notification> getUnreadNotifications(Long customerId, Pageable pageable) {
     return notificationRepository.findUnreadByCustomerId(customerId, pageable);
   }
 
-  /**
-   * Count unread notifications.
-   */
   @Transactional(readOnly = true)
   public long countUnread(Long customerId) {
     return notificationRepository.countUnreadByCustomerId(customerId);
   }
 
-  /**
-   * Mark notification as read.
-   */
   public Notification markAsRead(UUID notificationId) {
     Notification notification = notificationRepository.findById(notificationId)
         .orElseThrow(() -> new IllegalArgumentException("Notification not found: " + notificationId));
@@ -127,33 +103,21 @@ public class NotificationService {
     return notificationRepository.save(notification);
   }
 
-  /**
-   * Mark all notifications as read for customer.
-   */
   public int markAllAsRead(Long customerId) {
     int updated = notificationRepository.markAllAsReadByCustomerId(customerId, Instant.now());
     log.info("Marked {} notifications as read for customer {}", updated, customerId);
     return updated;
   }
 
-  /**
-   * Delete notification.
-   */
   public void deleteNotification(UUID notificationId) {
     notificationRepository.deleteById(notificationId);
   }
 
-  /**
-   * Find notifications ready to send.
-   */
   @Transactional(readOnly = true)
   public List<Notification> getNotificationsReadyToSend() {
     return notificationRepository.findReadyToSend(Instant.now());
   }
 
-  /**
-   * Process pending notifications.
-   */
   public int processPendingNotifications() {
     List<Notification> pending = getNotificationsReadyToSend();
     int processed = 0;
@@ -176,16 +140,9 @@ public class NotificationService {
     return processed;
   }
 
-  /**
-   * Send notification (placeholder for integration).
-   */
   private void sendNotification(Notification notification) {
     switch (notification.getChannel()) {
     case EMAIL:
-      // Email is handled by the createNotification method directly for immediate
-      // sending,
-      // or by the scheduled task if it was queued.
-      // If we are here from the scheduled task:
       customerRepository.findById(notification.getCustomerId()).ifPresent(customer -> {
         emailService.sendEmail(customer.getEmail(), notification.getTitle(), notification.getMessage());
       });
@@ -205,9 +162,6 @@ public class NotificationService {
     }
   }
 
-  /**
-   * Cleanup old notifications.
-   */
   public int cleanupOldNotifications(int daysOld) {
     Instant cutoff = Instant.now().minus(daysOld, ChronoUnit.DAYS);
     int deleted = notificationRepository.deleteOlderThan(cutoff);
@@ -215,9 +169,6 @@ public class NotificationService {
     return deleted;
   }
 
-  /**
-   * Get notifications by reference.
-   */
   @Transactional(readOnly = true)
   public List<Notification> getNotificationsByReference(Notification.ReferenceType type, String refId) {
     return notificationRepository.findByReference(type, refId);

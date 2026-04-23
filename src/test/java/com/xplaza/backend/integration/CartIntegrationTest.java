@@ -35,21 +35,11 @@ public class CartIntegrationTest extends BaseIntegrationTest {
 
     String cartId = objectMapper.readTree(cartResponse).path("id").asText();
 
-    // 2. Add Item
-    // We need a valid shopId, but for cart it might not validate existence strictly
-    // if we pass it.
-    // However, let's try to be realistic.
     Long shopId = 1L; // Assuming ID 1 exists or we don't care for this test if DB is empty?
     // Actually, if FK constraints exist, we MUST create a shop.
     // Let's use the admin token to create a shop first.
     String adminToken = getAdminToken();
     Long createdProductId = createProduct(adminToken);
-    // Note: createProduct creates a shop internally, but we don't get the ID back
-    // easily.
-    // Let's just use a dummy shopId and see if it fails. If it fails, we know we
-    // need to be stricter.
-    // But wait, createProduct returns productId. We can fetch the product to get
-    // the shopId.
 
     String productDetails = mockMvc.perform(get("/api/v1/products/" + createdProductId)
         .header("Authorization", "Bearer " + adminToken))

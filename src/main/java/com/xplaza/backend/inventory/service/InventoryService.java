@@ -34,43 +34,28 @@ public class InventoryService {
   private final InventoryItemRepository inventoryRepository;
   private final WarehouseRepository warehouseRepository;
 
-  /**
-   * Get available quantity for a product across all warehouses.
-   */
   @Transactional(readOnly = true)
   public int getAvailableQuantity(Long productId) {
     Integer total = inventoryRepository.sumAvailableQuantityByProductId(productId);
     return total != null ? total : 0;
   }
 
-  /**
-   * Get available quantity for a variant across all warehouses.
-   */
   @Transactional(readOnly = true)
   public int getAvailableQuantityByVariant(UUID variantId) {
     Integer total = inventoryRepository.sumAvailableQuantityByVariantId(variantId);
     return total != null ? total : 0;
   }
 
-  /**
-   * Check if product is in stock.
-   */
   @Transactional(readOnly = true)
   public boolean isInStock(Long productId) {
     return getAvailableQuantity(productId) > 0;
   }
 
-  /**
-   * Check if variant is in stock.
-   */
   @Transactional(readOnly = true)
   public boolean isVariantInStock(UUID variantId) {
     return getAvailableQuantityByVariant(variantId) > 0;
   }
 
-  /**
-   * Reserve stock for an order.
-   */
   public StockReservation reserveStock(Long productId, UUID variantId, Long warehouseId, int quantity,
       UUID orderId, UUID cartId) {
     InventoryItem item;
@@ -103,9 +88,6 @@ public class InventoryService {
     return reservation;
   }
 
-  /**
-   * Reserve stock from any available warehouse.
-   */
   public StockReservation reserveStockAnyWarehouse(Long productId, UUID variantId, int quantity, UUID orderId) {
     List<InventoryItem> items;
     if (variantId != null) {
@@ -123,9 +105,6 @@ public class InventoryService {
     throw new IllegalStateException("Insufficient stock for product: " + productId);
   }
 
-  /**
-   * Release a reservation.
-   */
   public void releaseReservation(UUID reservationId) {
     // Find reservation and release
     List<InventoryItem> items = inventoryRepository.findAll();
@@ -146,9 +125,6 @@ public class InventoryService {
     throw new IllegalArgumentException("Reservation not found: " + reservationId);
   }
 
-  /**
-   * Fulfill reserved stock (when order is shipped).
-   */
   public void fulfillReservation(UUID reservationId) {
     List<InventoryItem> items = inventoryRepository.findAll();
     for (InventoryItem item : items) {
@@ -169,9 +145,6 @@ public class InventoryService {
     throw new IllegalArgumentException("Reservation not found: " + reservationId);
   }
 
-  /**
-   * Receive stock from supplier.
-   */
   public InventoryItem receiveStock(String sku, Long warehouseId, int quantity, Long userId) {
     InventoryItem item = inventoryRepository.findBySku(sku)
         .filter(i -> i.getWarehouse().getWarehouseId().equals(warehouseId))
@@ -189,9 +162,6 @@ public class InventoryService {
     return item;
   }
 
-  /**
-   * Adjust stock (for inventory counts).
-   */
   public InventoryItem adjustStock(UUID inventoryId, int newQuantity, String reason, Long userId) {
     InventoryItem item = inventoryRepository.findById(inventoryId)
         .orElseThrow(() -> new IllegalArgumentException("Inventory not found: " + inventoryId));
@@ -208,33 +178,21 @@ public class InventoryService {
     return item;
   }
 
-  /**
-   * Get items that need reordering.
-   */
   @Transactional(readOnly = true)
   public List<InventoryItem> getItemsNeedingReorder() {
     return inventoryRepository.findItemsNeedingReorder();
   }
 
-  /**
-   * Get items below safety stock.
-   */
   @Transactional(readOnly = true)
   public List<InventoryItem> getItemsBelowSafetyStock() {
     return inventoryRepository.findItemsBelowSafetyStock();
   }
 
-  /**
-   * Get active warehouses.
-   */
   @Transactional(readOnly = true)
   public List<Warehouse> getActiveWarehouses() {
     return warehouseRepository.findByIsActiveTrue();
   }
 
-  /**
-   * Find best warehouse for fulfillment based on stock and location.
-   */
   @Transactional(readOnly = true)
   public Optional<Warehouse> findBestWarehouseForProduct(Long productId, String countryCode) {
     List<InventoryItem> available = inventoryRepository.findAvailableInventoryByProductId(productId);
@@ -249,17 +207,11 @@ public class InventoryService {
         .max((w1, w2) -> Integer.compare(w1.getPriority(), w2.getPriority()));
   }
 
-  /**
-   * Get inventory for a product at a specific warehouse.
-   */
   @Transactional(readOnly = true)
   public Optional<InventoryItem> getInventory(Long productId, Long warehouseId) {
     return inventoryRepository.findByProductIdAndWarehouseId(productId, warehouseId);
   }
 
-  /**
-   * Create inventory item for a new product/variant at a warehouse.
-   */
   public InventoryItem createInventoryItem(Long productId, UUID variantId, String sku,
       Long warehouseId, int initialQuantity) {
     Warehouse warehouse = warehouseRepository.findById(warehouseId)

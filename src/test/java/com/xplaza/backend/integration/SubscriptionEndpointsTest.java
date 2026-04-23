@@ -79,10 +79,6 @@ public class SubscriptionEndpointsTest extends BaseIntegrationTest {
         .andExpect(jsonPath("$.id").exists())
         .andExpect(jsonPath("$.status").value("ACTIVE"))
         .andExpect(jsonPath("$.currency").value("USD"))
-        // Product was created with price 100, qty 2 → 200. The server
-        // resolved the price instead of trusting the client payload.
-        // notNullValue() avoids Jackson's Integer-vs-Double boxing of
-        // BigDecimal amounts in jsonPath matchers.
         .andExpect(jsonPath("$.totalAmount").value(notNullValue()))
         .andReturn().getResponse().getContentAsString();
 

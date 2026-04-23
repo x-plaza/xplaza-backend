@@ -24,11 +24,6 @@ class AccountLockoutPolicyTest {
     assertNull(AccountLockoutPolicy.computeLockedUntil(attempts));
   }
 
-  /**
-   * Regression test for the "5 → 2 minute" drop bug. Lockout duration must be
-   * monotonically non-decreasing as failures accumulate, so an attacker can never
-   * reduce their effective lockout by typing one more wrong password.
-   */
   @ParameterizedTest(name = "{0} attempts ⇒ {1} minutes (monotonic, ≥5)")
   @CsvSource({
       "5,  5",
@@ -45,11 +40,6 @@ class AccountLockoutPolicyTest {
     Instant before = Instant.now();
     Instant lockedUntil = AccountLockoutPolicy.computeLockedUntil(attempts);
     assertNotNull(lockedUntil);
-    // The policy returns `Instant.now() + duration`, captured on its own
-    // clock read between our `before` and a later `Instant.now()`. So the
-    // delta from `before` is in the half-open interval [duration, duration+ε)
-    // for some small ε. We assert the seconds-level truncation matches the
-    // expected minute boundary exactly.
     long actualSeconds = Duration.between(before, lockedUntil).getSeconds();
     long expectedSeconds = expectedMinutes * 60L;
     assertTrue(actualSeconds >= expectedSeconds,
@@ -68,9 +58,6 @@ class AccountLockoutPolicyTest {
       Instant lockedUntil = AccountLockoutPolicy.computeLockedUntil(attempts);
       assertNotNull(lockedUntil);
       long seconds = Duration.between(before, lockedUntil).getSeconds();
-      // Each subsequent attempt must lock the account for at least as long
-      // as the previous attempt — never less. This is the property the
-      // original `Math.pow(2, n - 7)` violated at n=8 (5min → 2min drop).
       final long capturedPrev = previousSeconds;
       final long capturedCur = seconds;
       final int capturedAttempts = attempts;

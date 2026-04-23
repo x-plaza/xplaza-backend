@@ -27,6 +27,7 @@ import com.xplaza.backend.cart.domain.entity.CartItem;
 import com.xplaza.backend.cart.domain.repository.CartRepository;
 import com.xplaza.backend.common.events.DomainEventPublisher;
 import com.xplaza.backend.common.events.DomainEvents;
+import com.xplaza.backend.common.util.LogSanitizer;
 import com.xplaza.backend.inventory.service.InventoryService;
 import com.xplaza.backend.notification.domain.entity.Notification;
 import com.xplaza.backend.notification.service.NotificationService;
@@ -59,9 +60,6 @@ public class CustomerOrderService {
   private static final Random RANDOM = new Random();
   private static final java.math.RoundingMode HALF_UP = java.math.RoundingMode.HALF_UP;
 
-  /**
-   * Create an order from a checkout session.
-   */
   public CustomerOrder createOrderFromCheckout(CheckoutSession checkout) {
     // Get the cart
     Cart cart = cartRepository.findByIdWithItems(checkout.getCartId())
@@ -129,10 +127,6 @@ public class CustomerOrderService {
 
     CustomerOrder savedOrder = orderRepository.save(order);
 
-    // Multi-vendor split: when the cart spans multiple shops the saved order
-    // becomes the *parent*; per-shop child orders are then minted with shared
-    // ids in `parent_order_id`. Each child carries a proportional slice of
-    // shipping / tax / discount so vendor payouts are clean.
     splitForVendorsIfNeeded(savedOrder, cart);
 
     cart.markConverted();
@@ -171,17 +165,6 @@ public class CustomerOrderService {
     return savedOrder;
   }
 
-  /**
-   * Mint a renewal order for a subscription without going through the cart
-   * pipeline. The caller supplies the resolved line items (already priced by the
-   * subscription's snapshot), and we create a {@link CustomerOrder} in
-   * {@code PENDING} state, publish {@code OrderPlaced} and return it.
-   *
-   * <p>
-   * The order uses a synthetic order number suffixed with {@code -SUB<id>} so
-   * renewals are easy to spot in reports and so a reconciliation job can map them
-   * back to the originating subscription without touching metadata.
-   */
   public CustomerOrder createSubscriptionOrder(Long customerId, String currency,
       List<SubscriptionOrderLine> lines, Long subscriptionId) {
     if (lines == null || lines.isEmpty()) {
@@ -194,13 +177,6 @@ public class CustomerOrderService {
         .map(l -> l.unitPrice().multiply(BigDecimal.valueOf(l.quantity())))
         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-    // Pick the shop of the first line as the "primary" shop so the single-shop
-    // summary renders sensibly. Multi-vendor split is intentionally NOT run
-    // for renewals in this release: the renewal snapshot carries only the
-    // item list + subscription price, not the shipping/tax allocation that
-    // the split logic needs. v1.2 will revisit this once
-    // `OrderService.createSubscriptionOrder(...)` can consult the tax/shipping
-    // engine at renewal time.
     Long primaryShopId = lines.get(0).shopId();
 
     CustomerOrder order = CustomerOrder.builder()
@@ -263,12 +239,6 @@ public class CustomerOrderService {
   ) {
   }
 
-  /**
-   * Walk the cart's lines, group them by shop, and if more than one shop is
-   * represented mint per-shop child orders linked to the parent via
-   * {@code parent_order_id}. Each child gets the full per-shop subtotal and a
-   * proportional slice of shipping, discount and tax.
-   */
   private void splitForVendorsIfNeeded(CustomerOrder parent, Cart cart) {
     var byShop = cart.getActiveItems().stream()
         .collect(java.util.stream.Collectors.groupingBy(CartItem::getShopId));
@@ -336,82 +306,51 @@ public class CustomerOrderService {
     return v == null ? BigDecimal.ZERO : v;
   }
 
-  /**
-   * Return per-shop child orders for a parent order id. Empty list when the order
-   * is stand-alone.
-   */
   @Transactional(readOnly = true)
   public List<CustomerOrder> getChildOrders(UUID parentOrderId) {
     return orderRepository.findByParentOrderId(parentOrderId);
   }
 
-  /**
-   * Get order by ID.
-   */
   @Transactional(readOnly = true)
   public Optional<CustomerOrder> getOrder(UUID orderId) {
     return orderRepository.findById(orderId);
   }
 
-  /**
-   * Get order by ID with items.
-   */
   @Transactional(readOnly = true)
   public Optional<CustomerOrder> getOrderWithItems(UUID orderId) {
     return orderRepository.findByIdWithItems(orderId);
   }
 
-  /**
-   * Get order by ID with full details.
-   */
   @Transactional(readOnly = true)
   public Optional<CustomerOrder> getOrderWithDetails(UUID orderId) {
     return orderRepository.findByIdWithDetails(orderId);
   }
 
-  /**
-   * Get order by order number.
-   */
   @Transactional(readOnly = true)
   public Optional<CustomerOrder> getOrderByNumber(String orderNumber) {
     return orderRepository.findByOrderNumber(orderNumber);
   }
 
-  /**
-   * Get orders for a customer.
-   */
   @Transactional(readOnly = true)
   public List<CustomerOrder> getCustomerOrders(Long customerId) {
     return orderRepository.findByCustomerIdOrderByCreatedAtDesc(customerId);
   }
 
-  /**
-   * Get orders for a customer (paginated).
-   */
   @Transactional(readOnly = true)
   public Page<CustomerOrder> getCustomerOrders(Long customerId, Pageable pageable) {
     return orderRepository.findByCustomerId(customerId, pageable);
   }
 
-  /**
-   * Get orders for a shop.
-   */
   @Transactional(readOnly = true)
   public List<CustomerOrder> getShopOrders(Long shopId) {
     return orderRepository.findByShopIdOrderByCreatedAtDesc(shopId);
   }
 
-  /**
-   * Get orders for a shop (paginated).
-   */
   @Transactional(readOnly = true)
   public Page<CustomerOrder> getShopOrders(Long shopId, Pageable pageable) {
     return orderRepository.findByShopId(shopId, pageable);
   }
 
-  /**
-   * Get orders by status.
-   */
   @Transactional(readOnly = true)
   public List<CustomerOrder> getOrdersByStatus(CustomerOrder.OrderStatus status) {
     return orderRepository.findByStatus(status);
@@ -422,17 +361,11 @@ public class CustomerOrderService {
     return orderRepository.countByCouponCode(couponCode);
   }
 
-  /**
-   * Get shop orders by status.
-   */
   @Transactional(readOnly = true)
   public List<CustomerOrder> getShopOrdersByStatus(Long shopId, CustomerOrder.OrderStatus status) {
     return orderRepository.findByShopIdAndStatus(shopId, status);
   }
 
-  /**
-   * Confirm an order (payment received).
-   */
   public CustomerOrder confirmOrder(UUID orderId, UUID paymentTransactionId) {
     CustomerOrder order = getOrderOrThrow(orderId);
 
@@ -450,9 +383,6 @@ public class CustomerOrderService {
     return saved;
   }
 
-  /**
-   * Start processing an order.
-   */
   public CustomerOrder startProcessing(UUID orderId, String processedBy) {
     CustomerOrder order = getOrderOrThrow(orderId);
 
@@ -464,9 +394,6 @@ public class CustomerOrderService {
     return orderRepository.save(order);
   }
 
-  /**
-   * Mark order as shipped.
-   */
   public CustomerOrder markShipped(UUID orderId, String carrier, String trackingNumber, String shippedBy) {
     CustomerOrder order = getOrderOrThrow(orderId);
 
@@ -483,9 +410,6 @@ public class CustomerOrderService {
     return orderRepository.save(order);
   }
 
-  /**
-   * Mark order as out for delivery.
-   */
   public CustomerOrder markOutForDelivery(UUID orderId, String updatedBy) {
     CustomerOrder order = getOrderOrThrow(orderId);
 
@@ -499,9 +423,6 @@ public class CustomerOrderService {
     return orderRepository.save(order);
   }
 
-  /**
-   * Mark order as delivered.
-   */
   public CustomerOrder markDelivered(UUID orderId, String deliveredBy) {
     CustomerOrder order = getOrderOrThrow(orderId);
 
@@ -519,9 +440,6 @@ public class CustomerOrderService {
     return orderRepository.save(order);
   }
 
-  /**
-   * Cancel an order.
-   */
   public CustomerOrder cancelOrder(UUID orderId, String reason, String cancelledBy) {
     CustomerOrder order = getOrderOrThrow(orderId);
 
@@ -536,7 +454,7 @@ public class CustomerOrderService {
     orderItemRepository.updateStatusForOrder(orderId, CustomerOrderItem.ItemStatus.CANCELLED);
 
     CustomerOrder saved = orderRepository.save(order);
-    log.info("Cancelled order: {} - Reason: {}", order.getOrderNumber(), reason);
+    log.info("Cancelled order: {} - Reason: {}", order.getOrderNumber(), LogSanitizer.forLog(reason));
 
     // Trigger refund if payment was made
     if ("PAID".equals(order.getPaymentStatus())) {
@@ -554,9 +472,6 @@ public class CustomerOrderService {
     return saved;
   }
 
-  /**
-   * Request return for an order.
-   */
   public CustomerOrder requestReturn(UUID orderId, String reason, String requestedBy) {
     CustomerOrder order = getOrderOrThrow(orderId);
 
@@ -576,9 +491,6 @@ public class CustomerOrderService {
     return orderRepository.save(order);
   }
 
-  /**
-   * Add internal note to order.
-   */
   public CustomerOrder addInternalNote(UUID orderId, String note) {
     CustomerOrder order = getOrderOrThrow(orderId);
     String existingNotes = order.getInternalNotes();
@@ -594,27 +506,18 @@ public class CustomerOrderService {
     return orderRepository.save(order);
   }
 
-  /**
-   * Calculate customer lifetime value.
-   */
   @Transactional(readOnly = true)
   public BigDecimal getCustomerLifetimeValue(Long customerId) {
     BigDecimal total = orderRepository.calculateCustomerLifetimeValue(customerId);
     return total != null ? total : BigDecimal.ZERO;
   }
 
-  /**
-   * Get shop revenue for a date range.
-   */
   @Transactional(readOnly = true)
   public BigDecimal getShopRevenue(Long shopId, Instant start, Instant end) {
     BigDecimal total = orderRepository.calculateShopRevenue(shopId, start, end);
     return total != null ? total : BigDecimal.ZERO;
   }
 
-  /**
-   * Count customer orders.
-   */
   @Transactional(readOnly = true)
   public long countCustomerOrders(Long customerId) {
     return orderRepository.countByCustomerId(customerId);

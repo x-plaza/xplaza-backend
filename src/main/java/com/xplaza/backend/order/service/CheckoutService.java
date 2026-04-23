@@ -48,9 +48,6 @@ public class CheckoutService {
   private final CustomerAddressRepository customerAddressRepository;
   private final PriceListResolver priceListResolver;
 
-  /**
-   * Start a new checkout session for a cart.
-   */
   public CheckoutSession startCheckout(UUID cartId, Long customerId) {
     // Check if cart exists and has items
     Cart cart = cartRepository.findByIdWithItems(cartId)
@@ -87,18 +84,11 @@ public class CheckoutService {
     return saved;
   }
 
-  /**
-   * Get checkout session by ID.
-   */
   @Transactional(readOnly = true)
   public Optional<CheckoutSession> getCheckout(UUID checkoutId) {
     return checkoutSessionRepository.findById(checkoutId);
   }
 
-  /**
-   * Set shipping address for checkout. Re-runs the tax engine because the
-   * shipping destination determines which tax zone applies.
-   */
   public CheckoutSession setShippingAddress(UUID checkoutId, Long addressId) {
     CheckoutSession checkout = getActiveCheckout(checkoutId);
     checkout.setShippingAddressId(addressId);
@@ -109,11 +99,6 @@ public class CheckoutService {
     return checkoutSessionRepository.save(checkout);
   }
 
-  /**
-   * Set shipping method and cost. Tax usually depends on the pre-tax subtotal,
-   * not the shipping line, but free-shipping promotions are validated here so we
-   * recompute the grand total after.
-   */
   public CheckoutSession setShippingMethod(UUID checkoutId, Long methodId, String methodName, BigDecimal cost) {
     CheckoutSession checkout = getActiveCheckout(checkoutId);
     checkout.setShippingMethodId(methodId);
@@ -123,10 +108,6 @@ public class CheckoutService {
     return checkoutSessionRepository.save(checkout);
   }
 
-  /**
-   * Resolve the shipping address and recompute the tax breakdown using
-   * {@link TaxService}. Called whenever the destination changes.
-   */
   private void recalculateTax(CheckoutSession checkout) {
     if (checkout.getShippingAddressId() == null) {
       return;
@@ -149,9 +130,6 @@ public class CheckoutService {
     checkout.calculateGrandTotal();
   }
 
-  /**
-   * Set delivery schedule.
-   */
   public CheckoutSession setDeliverySchedule(UUID checkoutId, LocalDate date, LocalTime slotStart, LocalTime slotEnd,
       String instructions) {
     CheckoutSession checkout = getActiveCheckout(checkoutId);
@@ -162,9 +140,6 @@ public class CheckoutService {
     return checkoutSessionRepository.save(checkout);
   }
 
-  /**
-   * Set billing address.
-   */
   public CheckoutSession setBillingAddress(UUID checkoutId, Long addressId, boolean sameAsShipping) {
     CheckoutSession checkout = getActiveCheckout(checkoutId);
     checkout.setBillingAddressId(addressId);
@@ -172,9 +147,6 @@ public class CheckoutService {
     return checkoutSessionRepository.save(checkout);
   }
 
-  /**
-   * Set payment method.
-   */
   public CheckoutSession setPaymentMethod(UUID checkoutId, Long methodId, String methodType) {
     CheckoutSession checkout = getActiveCheckout(checkoutId);
     checkout.setPaymentMethodId(methodId);
@@ -185,10 +157,6 @@ public class CheckoutService {
     return checkoutSessionRepository.save(checkout);
   }
 
-  /**
-   * Apply coupon to checkout. Builds a {@link Campaign.DiscountContext} from the
-   * cart so BOGO/FREE_SHIPPING/BUNDLE campaigns can compute correctly.
-   */
   public CheckoutSession applyCoupon(UUID checkoutId, String couponCode) {
     CheckoutSession checkout = getActiveCheckout(checkoutId);
 
@@ -223,9 +191,6 @@ public class CheckoutService {
     return new Campaign.DiscountLine(item.getProductId(), item.getQuantity(), item.getUnitPrice());
   }
 
-  /**
-   * Remove coupon from checkout.
-   */
   public CheckoutSession removeCoupon(UUID checkoutId) {
     CheckoutSession checkout = getActiveCheckout(checkoutId);
     if (checkout.getCouponDiscountAmount() != null) {
@@ -238,18 +203,12 @@ public class CheckoutService {
     return checkoutSessionRepository.save(checkout);
   }
 
-  /**
-   * Set customer notes for the order.
-   */
   public CheckoutSession setCustomerNotes(UUID checkoutId, String notes) {
     CheckoutSession checkout = getActiveCheckout(checkoutId);
     checkout.setCustomerNotes(notes);
     return checkoutSessionRepository.save(checkout);
   }
 
-  /**
-   * Complete the checkout and create the order.
-   */
   public CustomerOrder completeCheckout(UUID checkoutId) {
     CheckoutSession checkout = getActiveCheckout(checkoutId);
 
@@ -279,9 +238,6 @@ public class CheckoutService {
     return order;
   }
 
-  /**
-   * Abandon checkout session.
-   */
   public void abandonCheckout(UUID checkoutId) {
     CheckoutSession checkout = checkoutSessionRepository.findById(checkoutId)
         .orElseThrow(() -> new IllegalArgumentException("Checkout not found: " + checkoutId));
@@ -291,9 +247,6 @@ public class CheckoutService {
     log.info("Abandoned checkout session: {}", checkoutId);
   }
 
-  /**
-   * Expire old checkout sessions.
-   */
   public int expireOldCheckouts() {
     int expired = checkoutSessionRepository.abandonExpiredCheckouts(Instant.now());
     log.info("Expired {} checkout sessions", expired);

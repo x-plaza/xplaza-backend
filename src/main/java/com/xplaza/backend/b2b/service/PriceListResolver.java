@@ -53,14 +53,6 @@ public class PriceListResolver {
   private final PriceListRepository priceListRepository;
   private final PriceListItemRepository priceListItemRepository;
 
-  /**
-   * Resolve the unit price for a customer/product/quantity <em>in a given
-   * currency</em>. Only price lists whose {@code currency} equals (case-
-   * insensitively) the caller-supplied {@code currency} are considered, so a
-   * multi-currency catalogue cannot accidentally return a USD contract rate for a
-   * EUR cart. Returns {@code catalogPrice} unchanged when no matching contract
-   * applies.
-   */
   @Cacheable(value = "priceLists", key = "#customerId + ':' + #productId + ':' + #quantity + ':' + (#currency == null ? '_' : #currency)")
   @Transactional(readOnly = true)
   public BigDecimal resolveUnitPrice(Long customerId, Long productId, int quantity, String currency,
@@ -101,11 +93,6 @@ public class PriceListResolver {
     return applyGroupDiscount(catalogPrice, group);
   }
 
-  /**
-   * Backwards-compatible overload. Callers that genuinely do not know the cart
-   * currency (e.g. legacy code paths) get catalog-price fallback when any
-   * matching contract exists in a different currency.
-   */
   public BigDecimal resolveUnitPrice(Long customerId, Long productId, int quantity, BigDecimal catalogPrice) {
     return resolveUnitPrice(customerId, productId, quantity, null, catalogPrice);
   }
@@ -122,10 +109,6 @@ public class PriceListResolver {
     return cartCurrency.equalsIgnoreCase(priceListCurrency);
   }
 
-  /**
-   * Returns whether the customer is tax-exempt by virtue of group membership.
-   * Used by tax engine plumbing to skip rule application.
-   */
   @Cacheable(value = "priceLists", key = "'tax_exempt:' + #customerId")
   @Transactional(readOnly = true)
   public boolean isTaxExempt(Long customerId) {
@@ -139,9 +122,6 @@ public class PriceListResolver {
         .orElse(false);
   }
 
-  /**
-   * Helper for callers that already have a resolved {@link CustomerGroup}.
-   */
   public Optional<CustomerGroup> findGroupForCustomer(Long customerId) {
     if (customerId == null) {
       return Optional.empty();
