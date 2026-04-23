@@ -17,6 +17,9 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
+
 /**
  * CustomerOrder represents a confirmed purchase from a customer.
  *
@@ -36,6 +39,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Audited
 public class CustomerOrder {
 
   @Id
@@ -60,6 +64,14 @@ public class CustomerOrder {
    */
   @Column(name = "cart_id")
   private UUID cartId;
+
+  /**
+   * Multi-vendor split: when a checkout spans products from N shops, a single
+   * parent order carries the customer-facing aggregates and N child orders (one
+   * per shop) carry per-vendor fulfilment. Null on stand-alone orders.
+   */
+  @Column(name = "parent_order_id")
+  private UUID parentOrderId;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "status", nullable = false, length = 30)
@@ -207,10 +219,12 @@ public class CustomerOrder {
 
   @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   @Builder.Default
+  @NotAudited
   private List<CustomerOrderItem> items = new ArrayList<>();
 
   @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   @Builder.Default
+  @NotAudited
   private List<OrderStatusHistory> statusHistory = new ArrayList<>();
 
   public enum OrderStatus {

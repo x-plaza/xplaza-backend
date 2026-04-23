@@ -21,6 +21,7 @@ import com.xplaza.backend.auth.dto.response.AuthenticationResponse;
 import com.xplaza.backend.common.util.ApiResponse;
 import com.xplaza.backend.customer.domain.entity.Customer;
 import com.xplaza.backend.customer.dto.CustomerRequest;
+import com.xplaza.backend.customer.dto.response.CustomerProfileResponse;
 import com.xplaza.backend.customer.service.CustomerService;
 
 @RestController
@@ -87,8 +88,8 @@ public class CustomerAuthController {
 
   @GetMapping("/me")
   @PreAuthorize("hasRole('CUSTOMER')")
-  public ResponseEntity<ApiResponse<Customer>> me(@AuthenticationPrincipal Customer customer) {
-    return ResponseEntity.ok(ApiResponse.ok(customer));
+  public ResponseEntity<ApiResponse<CustomerProfileResponse>> me(@AuthenticationPrincipal Customer customer) {
+    return ResponseEntity.ok(ApiResponse.ok(CustomerProfileResponse.from(customer)));
   }
 
   // ---------- Request DTOs ----------

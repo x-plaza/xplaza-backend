@@ -24,6 +24,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.xplaza.backend.b2b.service.PriceListResolver;
 import com.xplaza.backend.cart.domain.entity.Cart;
 import com.xplaza.backend.cart.domain.entity.CartItem;
 import com.xplaza.backend.cart.domain.repository.CartItemRepository;
@@ -57,6 +58,9 @@ class CartServiceTest {
   @Mock
   private ProductDiscountService productDiscountService;
 
+  @Mock
+  private PriceListResolver priceListResolver;
+
   @InjectMocks
   private CartService cartService;
 
@@ -72,6 +76,20 @@ class CartServiceTest {
         .status(Cart.CartStatus.ACTIVE)
         .items(new ArrayList<>())
         .build();
+    // CartService calls the 5-arg overload (Long, Long, int, String, BigDecimal)
+    // — return the catalog price unchanged so the cart flow under test
+    // behaves as-if contract pricing were not applicable.
+    org.mockito.Mockito.lenient()
+        .when(priceListResolver.resolveUnitPrice(any(), any(),
+            org.mockito.ArgumentMatchers.anyInt(),
+            org.mockito.ArgumentMatchers.nullable(String.class),
+            any(BigDecimal.class)))
+        .thenAnswer(inv -> inv.getArgument(4));
+    // Legacy 4-arg overload kept working for other callers/tests.
+    org.mockito.Mockito.lenient()
+        .when(priceListResolver.resolveUnitPrice(any(), any(),
+            org.mockito.ArgumentMatchers.anyInt(), any(BigDecimal.class)))
+        .thenAnswer(inv -> inv.getArgument(3));
   }
 
   @Test

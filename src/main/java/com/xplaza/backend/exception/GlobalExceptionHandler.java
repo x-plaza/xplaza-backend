@@ -161,6 +161,20 @@ public class GlobalExceptionHandler {
   }
 
   /**
+   * Handle authorization failures (403). Without this the default Spring Security
+   * AccessDeniedHandler turns every ownership-check violation into a 500 because
+   * our SecurityFilterChain doesn't install a handler.
+   */
+  @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+  public ResponseEntity<ApiResponse<Void>> handleAccessDenied(
+      org.springframework.security.access.AccessDeniedException ex) {
+    log.warn("Access denied: {}", ex.getMessage());
+    return ResponseEntity
+        .status(HttpStatus.FORBIDDEN)
+        .body(ApiResponse.error("ACCESS_DENIED", ex.getMessage()));
+  }
+
+  /**
    * Catch-all for unexpected errors (500)
    */
   @ExceptionHandler(Exception.class)

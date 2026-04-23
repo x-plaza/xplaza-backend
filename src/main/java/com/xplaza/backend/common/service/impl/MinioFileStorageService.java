@@ -10,6 +10,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import io.minio.BucketExistsArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
@@ -45,6 +47,8 @@ public class MinioFileStorageService implements FileStorageService {
   }
 
   @Override
+  @CircuitBreaker(name = "minio")
+  @Retry(name = "minio")
   public String uploadFile(MultipartFile file) {
     validateFile(file);
     try {
@@ -96,6 +100,8 @@ public class MinioFileStorageService implements FileStorageService {
   }
 
   @Override
+  @CircuitBreaker(name = "minio")
+  @Retry(name = "minio")
   public void deleteFile(String fileUrl) {
     try {
       String fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);

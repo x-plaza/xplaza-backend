@@ -26,6 +26,8 @@ import com.xplaza.backend.catalog.domain.repository.ProductImageRepository;
 import com.xplaza.backend.catalog.domain.repository.ProductRepository;
 import com.xplaza.backend.catalog.domain.repository.ProductVariantRepository;
 import com.xplaza.backend.catalog.domain.repository.VariantImageRepository;
+import com.xplaza.backend.common.events.DomainEventPublisher;
+import com.xplaza.backend.common.events.DomainEvents;
 import com.xplaza.backend.common.service.FileStorageService;
 import com.xplaza.backend.exception.ResourceNotFoundException;
 import com.xplaza.backend.exception.ValidationException;
@@ -38,10 +40,13 @@ public class ProductService {
   private final ProductVariantRepository productVariantRepository;
   private final VariantImageRepository variantImageRepository;
   private final FileStorageService fileStorageService;
+  private final DomainEventPublisher domainEventPublisher;
 
   @Transactional
   public Product addProduct(Product product) {
-    return productRepository.save(product);
+    Product saved = productRepository.save(product);
+    publishIndexInvalidated(saved.getProductId());
+    return saved;
   }
 
   @Transactional
@@ -49,7 +54,9 @@ public class ProductService {
     productRepository.findById(product.getProductId())
         .orElseThrow(
             () -> new ResourceNotFoundException("Product not found with id: " + product.getProductId()));
-    return productRepository.save(product);
+    Product saved = productRepository.save(product);
+    publishIndexInvalidated(saved.getProductId());
+    return saved;
   }
 
   @Transactional
@@ -58,6 +65,23 @@ public class ProductService {
       throw new ResourceNotFoundException("Product not found with id: " + id);
     }
     productRepository.deleteById(id);
+    publishIndexInvalidated(id);
+  }
+
+  /**
+   * Emit a {@code ProductIndexInvalidated} event so the search service (when
+   * enabled) re-syncs this product. Safe to call from any write path.
+   */
+  private void publishIndexInvalidated(Long productId) {
+    if (productId == null) {
+      return;
+    }
+    try {
+      domainEventPublisher.publish(new DomainEvents.ProductIndexInvalidated(
+          java.util.UUID.randomUUID(), java.time.Instant.now(), productId));
+    } catch (Exception ignored) {
+      // Indexing must never break a successful catalog write.
+    }
   }
 
   public List<Product> listProducts() {

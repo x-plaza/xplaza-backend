@@ -55,8 +55,7 @@ public class AbandonedCartScheduler {
         email = customerRepository.findById(cart.getCustomerId()).map(c -> c.getEmail()).orElse(null);
       }
       eventPublisher.publish(new DomainEvents.CartAbandoned(
-          UUID.randomUUID(), Instant.now(), cart.getId().getMostSignificantBits(),
-          cart.getCustomerId(), email));
+          UUID.randomUUID(), Instant.now(), cart.getId(), cart.getCustomerId(), email));
     }
   }
 }

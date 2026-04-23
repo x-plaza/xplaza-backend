@@ -22,7 +22,7 @@ import lombok.*;
  * authenticated customers.
  */
 @Entity
-@Table(name = "shopping_carts", indexes = {
+@Table(name = "carts", indexes = {
     @Index(name = "idx_cart_customer_id", columnList = "customer_id"),
     @Index(name = "idx_cart_session_id", columnList = "session_id"),
     @Index(name = "idx_cart_status", columnList = "status")
@@ -36,6 +36,7 @@ public class Cart {
 
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
+  @Column(name = "cart_id")
   private UUID id;
 
   /** Customer ID for authenticated users (nullable for guests) */
@@ -51,8 +52,11 @@ public class Cart {
   @Builder.Default
   private CartStatus status = CartStatus.ACTIVE;
 
-  /** Currency code (ISO 4217) */
-  @Column(name = "currency_code", length = 3)
+  /**
+   * Currency code (ISO 4217). Maps to canonical {@code currency} column on
+   * {@code carts}.
+   */
+  @Column(name = "currency", length = 3)
   @Builder.Default
   private String currencyCode = "USD";
 

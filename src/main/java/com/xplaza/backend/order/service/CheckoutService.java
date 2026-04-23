@@ -18,12 +18,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.xplaza.backend.b2b.service.PriceListResolver;
 import com.xplaza.backend.cart.domain.entity.Cart;
+import com.xplaza.backend.cart.domain.entity.CartItem;
 import com.xplaza.backend.cart.domain.repository.CartRepository;
+import com.xplaza.backend.customer.domain.entity.CustomerAddress;
+import com.xplaza.backend.customer.domain.repository.CustomerAddressRepository;
+import com.xplaza.backend.marketing.domain.entity.Campaign;
 import com.xplaza.backend.marketing.service.CampaignService;
 import com.xplaza.backend.order.domain.entity.CheckoutSession;
 import com.xplaza.backend.order.domain.entity.CustomerOrder;
 import com.xplaza.backend.order.domain.repository.CheckoutSessionRepository;
+import com.xplaza.backend.tax.service.TaxService;
 
 /**
  * Service for checkout operations.
@@ -38,6 +44,9 @@ public class CheckoutService {
   private final CartRepository cartRepository;
   private final CustomerOrderService customerOrderService;
   private final CampaignService campaignService;
+  private final TaxService taxService;
+  private final CustomerAddressRepository customerAddressRepository;
+  private final PriceListResolver priceListResolver;
 
   /**
    * Start a new checkout session for a cart.
@@ -87,7 +96,8 @@ public class CheckoutService {
   }
 
   /**
-   * Set shipping address for checkout.
+   * Set shipping address for checkout. Re-runs the tax engine because the
+   * shipping destination determines which tax zone applies.
    */
   public CheckoutSession setShippingAddress(UUID checkoutId, Long addressId) {
     CheckoutSession checkout = getActiveCheckout(checkoutId);
@@ -95,11 +105,14 @@ public class CheckoutService {
     checkout.setShippingCompleted(true);
     checkout.setCurrentStep("PAYMENT");
     checkout.setStatus(CheckoutSession.CheckoutStatus.SHIPPING_SELECTED);
+    recalculateTax(checkout);
     return checkoutSessionRepository.save(checkout);
   }
 
   /**
-   * Set shipping method and cost.
+   * Set shipping method and cost. Tax usually depends on the pre-tax subtotal,
+   * not the shipping line, but free-shipping promotions are validated here so we
+   * recompute the grand total after.
    */
   public CheckoutSession setShippingMethod(UUID checkoutId, Long methodId, String methodName, BigDecimal cost) {
     CheckoutSession checkout = getActiveCheckout(checkoutId);
@@ -108,6 +121,32 @@ public class CheckoutService {
     checkout.setShippingCost(cost);
     checkout.calculateGrandTotal();
     return checkoutSessionRepository.save(checkout);
+  }
+
+  /**
+   * Resolve the shipping address and recompute the tax breakdown using
+   * {@link TaxService}. Called whenever the destination changes.
+   */
+  private void recalculateTax(CheckoutSession checkout) {
+    if (checkout.getShippingAddressId() == null) {
+      return;
+    }
+    if (priceListResolver.isTaxExempt(checkout.getCustomerId())) {
+      checkout.setTaxAmount(BigDecimal.ZERO);
+      checkout.calculateGrandTotal();
+      return;
+    }
+    CustomerAddress addr = customerAddressRepository.findById(checkout.getShippingAddressId()).orElse(null);
+    if (addr == null) {
+      return;
+    }
+    BigDecimal taxableBase = checkout.getSubtotal() == null ? BigDecimal.ZERO : checkout.getSubtotal();
+    if (checkout.getDiscountAmount() != null) {
+      taxableBase = taxableBase.subtract(checkout.getDiscountAmount()).max(BigDecimal.ZERO);
+    }
+    var breakdown = taxService.computeTax(taxableBase, addr.getCountryCode(), addr.getState());
+    checkout.setTaxAmount(breakdown.totalTax());
+    checkout.calculateGrandTotal();
   }
 
   /**
@@ -147,16 +186,16 @@ public class CheckoutService {
   }
 
   /**
-   * Apply coupon to checkout.
+   * Apply coupon to checkout. Builds a {@link Campaign.DiscountContext} from the
+   * cart so BOGO/FREE_SHIPPING/BUNDLE campaigns can compute correctly.
    */
   public CheckoutSession applyCoupon(UUID checkoutId, String couponCode) {
     CheckoutSession checkout = getActiveCheckout(checkoutId);
 
-    // Validate coupon and calculate discount
     long usageCount = customerOrderService.countOrdersByCouponCode(couponCode);
-    BigDecimal discountAmount = campaignService.validateCoupon(couponCode, checkout.getSubtotal(), (int) usageCount);
+    var ctx = buildDiscountContext(checkout);
+    BigDecimal discountAmount = campaignService.validateCoupon(couponCode, ctx, (int) usageCount);
 
-    // Get campaign ID
     Long campaignId = campaignService.getCampaignByCode(couponCode)
         .map(c -> c.getCampaignId())
         .orElseThrow(() -> new IllegalArgumentException("Campaign not found: " + couponCode));
@@ -165,8 +204,23 @@ public class CheckoutService {
     checkout.setCouponCode(couponCode);
     checkout.setCouponDiscountAmount(discountAmount);
     checkout.setDiscountAmount(checkout.getDiscountAmount().add(discountAmount));
-    checkout.calculateGrandTotal();
+    recalculateTax(checkout);
     return checkoutSessionRepository.save(checkout);
+  }
+
+  private Campaign.DiscountContext buildDiscountContext(CheckoutSession checkout) {
+    BigDecimal subtotal = checkout.getSubtotal() == null ? BigDecimal.ZERO : checkout.getSubtotal();
+    BigDecimal shipping = checkout.getShippingCost() == null ? BigDecimal.ZERO : checkout.getShippingCost();
+    var lines = cartRepository.findByIdWithItems(checkout.getCartId())
+        .map(c -> c.getActiveItems().stream()
+            .map(this::toDiscountLine)
+            .toList())
+        .orElse(java.util.List.of());
+    return new Campaign.DiscountContext(subtotal, shipping, lines);
+  }
+
+  private Campaign.DiscountLine toDiscountLine(CartItem item) {
+    return new Campaign.DiscountLine(item.getProductId(), item.getQuantity(), item.getUnitPrice());
   }
 
   /**
@@ -180,7 +234,7 @@ public class CheckoutService {
     checkout.setCouponId(null);
     checkout.setCouponCode(null);
     checkout.setCouponDiscountAmount(null);
-    checkout.calculateGrandTotal();
+    recalculateTax(checkout);
     return checkoutSessionRepository.save(checkout);
   }
 

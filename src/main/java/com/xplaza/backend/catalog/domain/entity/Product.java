@@ -11,6 +11,9 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import com.xplaza.backend.shop.domain.entity.Shop;
 
 @Table(name = "products")
@@ -20,6 +23,8 @@ import com.xplaza.backend.shop.domain.entity.Shop;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@SQLDelete(sql = "UPDATE products SET deleted_at = CURRENT_TIMESTAMP WHERE product_id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class Product {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

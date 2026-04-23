@@ -28,7 +28,8 @@ public class CacheConfig implements CachingConfigurer {
   static final List<String> CACHE_NAMES = List.of(
       "products", "productById", "categories", "categoryById",
       "shops", "currencies", "taxRules", "customerSegments",
-      "homepageCampaigns", "deliveryCosts", "recommendations");
+      "homepageCampaigns", "deliveryCosts", "recommendations",
+      "priceLists", "cms-blocks", "tax");
 
   @Override
   @Bean

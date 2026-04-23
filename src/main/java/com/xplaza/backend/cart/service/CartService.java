@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.xplaza.backend.b2b.service.PriceListResolver;
 import com.xplaza.backend.cart.domain.entity.Cart;
 import com.xplaza.backend.cart.domain.entity.Cart.CartStatus;
 import com.xplaza.backend.cart.domain.entity.CartItem;
@@ -42,6 +43,7 @@ public class CartService {
   private final ProductVariantRepository productVariantRepository;
   private final InventoryService inventoryService;
   private final ProductDiscountService productDiscountService;
+  private final PriceListResolver priceListResolver;
 
   /** Default cart expiration in days */
   private static final int DEFAULT_CART_EXPIRATION_DAYS = 30;
@@ -120,7 +122,6 @@ public class CartService {
     Product product = productRepository.findById(productId)
         .orElseThrow(() -> new IllegalArgumentException("Product not found: " + productId));
 
-    // Use price from DB to prevent tampering, applying any active discounts
     BigDecimal actualPrice = productDiscountService.calculateDiscountedPrice(product);
 
     if (variantId != null) {
@@ -128,6 +129,15 @@ public class CartService {
           .map(v -> v.getPrice())
           .orElseThrow(() -> new IllegalArgumentException("Variant not found: " + variantId));
     }
+
+    // B2B contract pricing: if the customer belongs to a customer group with
+    // an applicable price list, the resolver returns the negotiated price.
+    // Falls back to the catalog/discounted price when there is no contract.
+    // Currency is passed through so a EUR cart never receives a USD contract
+    // price (or vice versa).
+    BigDecimal catalogPrice = actualPrice;
+    actualPrice = priceListResolver.resolveUnitPrice(
+        cart.getCustomerId(), productId, quantity, cart.getCurrencyCode(), actualPrice);
 
     // Check inventory
     int availableStock = variantId != null
@@ -144,6 +154,19 @@ public class CartService {
       int newTotal = existingItem.getQuantity() + quantity;
       if (availableStock < newTotal) {
         throw new IllegalStateException("Insufficient stock for total quantity. Available: " + availableStock);
+      }
+      // Re-resolve the contract price against the post-merge total quantity:
+      // a quantity-break price list (e.g. $9 for 10+, $8 for 50+) would leave
+      // the existing line priced too high if we naively reused the original
+      // per-increment price. Tier moves only apply in the favourable
+      // direction — if the tier for the new total quantity is strictly lower
+      // than the already-charged unit price, we update the line.
+      BigDecimal mergedPrice = priceListResolver.resolveUnitPrice(
+          cart.getCustomerId(), productId, newTotal, cart.getCurrencyCode(), catalogPrice);
+      if (mergedPrice != null
+          && existingItem.getUnitPrice() != null
+          && mergedPrice.compareTo(existingItem.getUnitPrice()) < 0) {
+        existingItem.setUnitPrice(mergedPrice);
       }
       existingItem.incrementQuantity(quantity);
       return cartItemRepository.save(existingItem);

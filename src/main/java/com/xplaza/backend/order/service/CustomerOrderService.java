@@ -25,6 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.xplaza.backend.cart.domain.entity.Cart;
 import com.xplaza.backend.cart.domain.entity.CartItem;
 import com.xplaza.backend.cart.domain.repository.CartRepository;
+import com.xplaza.backend.common.events.DomainEventPublisher;
+import com.xplaza.backend.common.events.DomainEvents;
 import com.xplaza.backend.inventory.service.InventoryService;
 import com.xplaza.backend.notification.domain.entity.Notification;
 import com.xplaza.backend.notification.service.NotificationService;
@@ -51,9 +53,11 @@ public class CustomerOrderService {
   private final PaymentService paymentService;
   private final NotificationService notificationService;
   private final InventoryService inventoryService;
+  private final DomainEventPublisher domainEventPublisher;
 
   private static final DateTimeFormatter ORDER_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
   private static final Random RANDOM = new Random();
+  private static final java.math.RoundingMode HALF_UP = java.math.RoundingMode.HALF_UP;
 
   /**
    * Create an order from a checkout session.
@@ -102,9 +106,7 @@ public class CustomerOrderService {
         .placedAt(Instant.now())
         .build();
 
-    // Copy cart items to order items
     for (CartItem cartItem : cart.getActiveItems()) {
-      // Reserve stock
       inventoryService.reserveStockAnyWarehouse(cartItem.getProductId(), cartItem.getVariantId(),
           cartItem.getQuantity(), order.getOrderId());
 
@@ -123,18 +125,38 @@ public class CustomerOrderService {
       order.addItem(orderItem);
     }
 
-    // Record initial status
     order.changeStatus(CustomerOrder.OrderStatus.PENDING, "Order created", "system");
 
     CustomerOrder savedOrder = orderRepository.save(order);
 
-    // Mark cart as converted
+    // Multi-vendor split: when the cart spans multiple shops the saved order
+    // becomes the *parent*; per-shop child orders are then minted with shared
+    // ids in `parent_order_id`. Each child carries a proportional slice of
+    // shipping / tax / discount so vendor payouts are clean.
+    splitForVendorsIfNeeded(savedOrder, cart);
+
     cart.markConverted();
     cartRepository.save(cart);
 
     log.info("Created order {} from cart {}", savedOrder.getOrderNumber(), cart.getId());
 
-    // Send notification
+    // Publish OrderPlaced via the transactional outbox so loyalty points,
+    // co-purchase recommendations and email follow-ups all observe the same
+    // committed order. This used to be a TODO and as a result both the
+    // LoyaltyService and RecommendationService listeners were dead code.
+    try {
+      domainEventPublisher.publish(new DomainEvents.OrderPlaced(
+          UUID.randomUUID(),
+          Instant.now(),
+          savedOrder.getOrderId(),
+          savedOrder.getCustomerId(),
+          savedOrder.getShopId(),
+          savedOrder.getGrandTotal(),
+          savedOrder.getCurrency()));
+    } catch (Exception e) {
+      log.error("Failed to publish OrderPlaced for {}: {}", savedOrder.getOrderId(), e.toString());
+    }
+
     try {
       notificationService.createOrderNotification(
           savedOrder.getCustomerId(),
@@ -147,6 +169,180 @@ public class CustomerOrderService {
     }
 
     return savedOrder;
+  }
+
+  /**
+   * Mint a renewal order for a subscription without going through the cart
+   * pipeline. The caller supplies the resolved line items (already priced by the
+   * subscription's snapshot), and we create a {@link CustomerOrder} in
+   * {@code PENDING} state, publish {@code OrderPlaced} and return it.
+   *
+   * <p>
+   * The order uses a synthetic order number suffixed with {@code -SUB<id>} so
+   * renewals are easy to spot in reports and so a reconciliation job can map them
+   * back to the originating subscription without touching metadata.
+   */
+  public CustomerOrder createSubscriptionOrder(Long customerId, String currency,
+      List<SubscriptionOrderLine> lines, Long subscriptionId) {
+    if (lines == null || lines.isEmpty()) {
+      throw new IllegalArgumentException("Subscription renewal requires at least one line item");
+    }
+    String baseOrderNumber = generateOrderNumber();
+    String orderNumber = baseOrderNumber + "-SUB" + subscriptionId;
+
+    BigDecimal subtotal = lines.stream()
+        .map(l -> l.unitPrice().multiply(BigDecimal.valueOf(l.quantity())))
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    // Pick the shop of the first line as the "primary" shop so the single-shop
+    // summary renders sensibly. Multi-vendor split is intentionally NOT run
+    // for renewals in this release: the renewal snapshot carries only the
+    // item list + subscription price, not the shipping/tax allocation that
+    // the split logic needs. v1.2 will revisit this once
+    // `OrderService.createSubscriptionOrder(...)` can consult the tax/shipping
+    // engine at renewal time.
+    Long primaryShopId = lines.get(0).shopId();
+
+    CustomerOrder order = CustomerOrder.builder()
+        .orderNumber(orderNumber)
+        .customerId(customerId)
+        .shopId(primaryShopId)
+        .status(CustomerOrder.OrderStatus.PENDING)
+        .subtotal(subtotal)
+        .discountAmount(BigDecimal.ZERO)
+        .shippingCost(BigDecimal.ZERO)
+        .taxAmount(BigDecimal.ZERO)
+        .grandTotal(subtotal)
+        .currency(currency == null ? "USD" : currency)
+        .paymentMethod("SUBSCRIPTION")
+        .placedAt(Instant.now())
+        .build();
+
+    for (SubscriptionOrderLine line : lines) {
+      CustomerOrderItem orderItem = CustomerOrderItem.builder()
+          .order(order)
+          .productId(line.productId())
+          .shopId(line.shopId())
+          .productName(line.productName() != null ? line.productName() : "Product " + line.productId())
+          .quantity(line.quantity())
+          .unitPrice(line.unitPrice())
+          .discountAmount(BigDecimal.ZERO)
+          .totalPrice(line.unitPrice().multiply(BigDecimal.valueOf(line.quantity())))
+          .build();
+      order.addItem(orderItem);
+    }
+
+    order.changeStatus(CustomerOrder.OrderStatus.PENDING, "Subscription renewal", "system");
+    CustomerOrder saved = orderRepository.save(order);
+
+    try {
+      domainEventPublisher.publish(new DomainEvents.OrderPlaced(
+          UUID.randomUUID(),
+          Instant.now(),
+          saved.getOrderId(),
+          saved.getCustomerId(),
+          saved.getShopId(),
+          saved.getGrandTotal(),
+          saved.getCurrency()));
+    } catch (Exception e) {
+      log.error("Failed to publish OrderPlaced for subscription renewal {}: {}", saved.getOrderId(), e.toString());
+    }
+    return saved;
+  }
+
+  /**
+   * Wire-format line item for {@link #createSubscriptionOrder}. Keeps this
+   * service insulated from the subscription module's own entity types.
+   */
+  public record SubscriptionOrderLine(
+      Long productId,
+      Long shopId,
+      String productName,
+      int quantity,
+      BigDecimal unitPrice
+  ) {
+  }
+
+  /**
+   * Walk the cart's lines, group them by shop, and if more than one shop is
+   * represented mint per-shop child orders linked to the parent via
+   * {@code parent_order_id}. Each child gets the full per-shop subtotal and a
+   * proportional slice of shipping, discount and tax.
+   */
+  private void splitForVendorsIfNeeded(CustomerOrder parent, Cart cart) {
+    var byShop = cart.getActiveItems().stream()
+        .collect(java.util.stream.Collectors.groupingBy(CartItem::getShopId));
+    if (byShop.size() < 2) {
+      return;
+    }
+    BigDecimal parentSubtotal = parent.getSubtotal();
+    if (parentSubtotal == null || parentSubtotal.signum() <= 0) {
+      return;
+    }
+    int childIndex = 0;
+    for (var entry : byShop.entrySet()) {
+      Long shopId = entry.getKey();
+      var lines = entry.getValue();
+      BigDecimal shopSubtotal = lines.stream()
+          .map(CartItem::getLineTotal)
+          .reduce(BigDecimal.ZERO, BigDecimal::add);
+      BigDecimal weight = shopSubtotal.divide(parentSubtotal, 6, HALF_UP);
+      BigDecimal shopShipping = nz(parent.getShippingCost()).multiply(weight).setScale(2, HALF_UP);
+      BigDecimal shopDiscount = nz(parent.getDiscountAmount()).multiply(weight).setScale(2, HALF_UP);
+      BigDecimal shopTax = nz(parent.getTaxAmount()).multiply(weight).setScale(2, HALF_UP);
+      BigDecimal shopTotal = shopSubtotal.add(shopShipping).add(shopTax).subtract(shopDiscount).max(BigDecimal.ZERO);
+
+      CustomerOrder child = CustomerOrder.builder()
+          .orderNumber(parent.getOrderNumber() + "-V" + (++childIndex))
+          .customerId(parent.getCustomerId())
+          .shopId(shopId)
+          .cartId(parent.getCartId())
+          .parentOrderId(parent.getOrderId())
+          .status(CustomerOrder.OrderStatus.PENDING)
+          .subtotal(shopSubtotal)
+          .discountAmount(shopDiscount)
+          .shippingCost(shopShipping)
+          .taxAmount(shopTax)
+          .grandTotal(shopTotal)
+          .currency(parent.getCurrency())
+          .shippingAddressId(parent.getShippingAddressId())
+          .billingAddressId(parent.getBillingAddressId())
+          .billingSameAsShipping(parent.getBillingSameAsShipping())
+          .placedAt(parent.getPlacedAt())
+          .paymentTypeId(parent.getPaymentTypeId())
+          .paymentMethod(parent.getPaymentMethod())
+          .build();
+      for (CartItem ci : lines) {
+        child.addItem(CustomerOrderItem.builder()
+            .order(child)
+            .productId(ci.getProductId())
+            .variantId(ci.getVariantId())
+            .shopId(ci.getShopId())
+            .productName(ci.getProductName() != null ? ci.getProductName() : "Product " + ci.getProductId())
+            .quantity(ci.getQuantity())
+            .unitPrice(ci.getUnitPrice())
+            .discountAmount(ci.getDiscountAmount())
+            .totalPrice(ci.getLineTotal())
+            .build());
+      }
+      child.changeStatus(CustomerOrder.OrderStatus.PENDING,
+          "Auto-split from parent " + parent.getOrderNumber(), "system");
+      orderRepository.save(child);
+    }
+    log.info("Split order {} into {} per-shop child orders", parent.getOrderNumber(), byShop.size());
+  }
+
+  private static BigDecimal nz(BigDecimal v) {
+    return v == null ? BigDecimal.ZERO : v;
+  }
+
+  /**
+   * Return per-shop child orders for a parent order id. Empty list when the order
+   * is stand-alone.
+   */
+  @Transactional(readOnly = true)
+  public List<CustomerOrder> getChildOrders(UUID parentOrderId) {
+    return orderRepository.findByParentOrderId(parentOrderId);
   }
 
   /**

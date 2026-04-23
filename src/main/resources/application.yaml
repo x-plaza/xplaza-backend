@@ -162,6 +162,23 @@ resilience4j:
         sliding-window-size: 20
         failure-rate-threshold: 50
         wait-duration-in-open-state: 30s
+      minio:
+        sliding-window-size: 20
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 30s
+      mail:
+        sliding-window-size: 20
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 30s
+
+# ---------- Push notifications (FCM/APNs) ----------
+# Both providers ship disabled in OSS builds. Set the env vars in production
+# to enable real fan-out; the dispatcher's API contract stays the same.
+push:
+  fcm:
+    enabled: ${PUSH_FCM_ENABLED:false}
+  apns:
+    enabled: ${PUSH_APNS_ENABLED:false}
 
 logging:
   level:

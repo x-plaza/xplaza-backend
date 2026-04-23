@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -20,4 +21,15 @@ public interface ProductCoPurchaseRepository extends JpaRepository<ProductCoPurc
 
   @Query("SELECT cp FROM ProductCoPurchase cp WHERE cp.productId = :productId ORDER BY cp.coPurchaseCount DESC")
   List<ProductCoPurchase> findTopByProductId(@Param("productId") Long productId, Pageable page);
+
+  /**
+   * Atomic upsert/increment for the (product, coProduct) pair. Postgres
+   * {@code ON CONFLICT} keeps the worker race-free under bursty traffic.
+   */
+  @Modifying
+  @Query(value = "INSERT INTO product_co_purchases(product_id, co_product_id, co_purchase_count) "
+      + "VALUES (:productId, :coProductId, 1) "
+      + "ON CONFLICT (product_id, co_product_id) "
+      + "DO UPDATE SET co_purchase_count = product_co_purchases.co_purchase_count + 1", nativeQuery = true)
+  void incrementPair(@Param("productId") Long productId, @Param("coProductId") Long coProductId);
 }

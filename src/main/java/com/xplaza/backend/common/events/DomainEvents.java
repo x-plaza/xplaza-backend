@@ -121,7 +121,7 @@ public final class DomainEvents {
   public record CartAbandoned(
       UUID eventId,
       Instant occurredAt,
-      Long cartId,
+      UUID cartId,
       Long customerId,
       String email
   ) implements DomainEvent {
@@ -204,6 +204,27 @@ public final class DomainEvents {
       Instant occurredAt,
       Long subscriptionId,
       Long customerId
+  ) implements DomainEvent {
+  }
+
+  public record SubscriptionRenewed(
+      UUID eventId,
+      Instant occurredAt,
+      Long subscriptionId,
+      Long customerId,
+      UUID orderId,
+      BigDecimal totalAmount,
+      String currency
+  ) implements DomainEvent {
+  }
+
+  public record SubscriptionRenewalFailed(
+      UUID eventId,
+      Instant occurredAt,
+      Long subscriptionId,
+      Long customerId,
+      int attemptNumber,
+      String reason
   ) implements DomainEvent {
   }
 

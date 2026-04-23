@@ -30,6 +30,7 @@ import com.xplaza.backend.catalog.dto.request.ProductRequest;
 import com.xplaza.backend.catalog.dto.response.ProductResponse;
 import com.xplaza.backend.catalog.mapper.ProductMapper;
 import com.xplaza.backend.catalog.service.ProductService;
+import com.xplaza.backend.catalog.service.ProductTranslationService;
 import com.xplaza.backend.common.util.ApiResponse;
 import com.xplaza.backend.common.util.ApiResponse.PageMeta;
 
@@ -50,6 +51,7 @@ public class ProductController {
 
   private final ProductService productService;
   private final ProductMapper productMapper;
+  private final ProductTranslationService translationService;
 
   /**
    * GET /api/v1/products
@@ -72,7 +74,8 @@ public class ProductController {
       @RequestParam(defaultValue = "0") @Min(0) int page,
       @RequestParam(defaultValue = "20") @Min(1) int size,
       @RequestParam(defaultValue = "productId") String sort,
-      @RequestParam(defaultValue = "ASC") Sort.Direction direction) {
+      @RequestParam(defaultValue = "ASC") Sort.Direction direction,
+      @RequestParam(required = false) String locale) {
 
     // Cap page size to prevent abuse
     size = Math.min(size, 100);
@@ -98,6 +101,10 @@ public class ProductController {
         .map(productMapper::toResponse)
         .toList();
 
+    if (locale != null && !locale.isBlank()) {
+      translationService.applyLocale(dtos, locale);
+    }
+
     PageMeta pageMeta = PageMeta.from(productPage);
 
     return ResponseEntity.ok(ApiResponse.ok(dtos, pageMeta));
@@ -111,10 +118,14 @@ public class ProductController {
   @GetMapping("/{id}")
   @Operation(summary = "Get product by ID", description = "Retrieve a specific product by its ID")
   public ResponseEntity<ApiResponse<ProductResponse>> getProduct(
-      @PathVariable @Positive Long id) {
+      @PathVariable @Positive Long id,
+      @RequestParam(required = false) String locale) {
 
     Product product = productService.listProduct(id);
     ProductResponse dto = productMapper.toResponse(product);
+    if (locale != null && !locale.isBlank()) {
+      translationService.applyLocale(dto, locale);
+    }
 
     return ResponseEntity.ok(ApiResponse.ok(dto));
   }

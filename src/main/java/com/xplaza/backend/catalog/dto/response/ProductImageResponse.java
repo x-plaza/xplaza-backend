@@ -20,4 +20,9 @@ public class ProductImageResponse {
   private String productImageUrl;
   private Long productId;
   private String productName;
+  private String thumbnailUrl;
+  private String mediumUrl;
+  private String largeUrl;
+  private String altText;
+  private Integer sortOrder;
 }

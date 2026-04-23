@@ -15,6 +15,9 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
+
 /**
  * Refund request for an order.
  * 
@@ -27,6 +30,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Audited
 public class Refund {
 
   @Id
@@ -115,6 +119,7 @@ public class Refund {
 
   @OneToMany(mappedBy = "refund", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   @Builder.Default
+  @NotAudited
   private List<RefundItem> items = new ArrayList<>();
 
   public enum RefundStatus {

@@ -40,6 +40,8 @@ public sealed interface DomainEvent permits
     DomainEvents.NotificationRequested,
     DomainEvents.GiftCardIssued,
     DomainEvents.SubscriptionCreated,
+    DomainEvents.SubscriptionRenewed,
+    DomainEvents.SubscriptionRenewalFailed,
     DomainEvents.VendorPayoutProcessed {
 
   UUID eventId();

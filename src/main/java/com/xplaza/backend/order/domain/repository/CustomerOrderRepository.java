@@ -48,6 +48,8 @@ public interface CustomerOrderRepository extends JpaRepository<CustomerOrder, UU
 
   List<CustomerOrder> findByStatus(CustomerOrder.OrderStatus status);
 
+  List<CustomerOrder> findByParentOrderId(UUID parentOrderId);
+
   Page<CustomerOrder> findByStatus(CustomerOrder.OrderStatus status, Pageable pageable);
 
   long countByCouponCode(String couponCode);

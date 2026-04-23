@@ -13,6 +13,8 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
+import org.hibernate.envers.Audited;
+
 /**
  * Payment Transaction records all payment attempts and their outcomes.
  * 
@@ -27,6 +29,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Audited
 public class PaymentTransaction {
 
   @Id
