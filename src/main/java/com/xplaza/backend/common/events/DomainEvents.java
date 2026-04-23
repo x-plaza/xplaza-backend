@@ -121,7 +121,7 @@ public final class DomainEvents {
   public record CartAbandoned(
       UUID eventId,
       Instant occurredAt,
-      Long cartId,
+      UUID cartId,
       Long customerId,
       String email
   ) implements DomainEvent {

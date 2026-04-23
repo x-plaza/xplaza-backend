@@ -25,6 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.xplaza.backend.cart.domain.entity.Cart;
 import com.xplaza.backend.cart.domain.entity.CartItem;
 import com.xplaza.backend.cart.domain.repository.CartRepository;
+import com.xplaza.backend.common.events.DomainEventPublisher;
+import com.xplaza.backend.common.events.DomainEvents;
 import com.xplaza.backend.inventory.service.InventoryService;
 import com.xplaza.backend.notification.domain.entity.Notification;
 import com.xplaza.backend.notification.service.NotificationService;
@@ -51,6 +53,7 @@ public class CustomerOrderService {
   private final PaymentService paymentService;
   private final NotificationService notificationService;
   private final InventoryService inventoryService;
+  private final DomainEventPublisher domainEventPublisher;
 
   private static final DateTimeFormatter ORDER_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
   private static final Random RANDOM = new Random();
@@ -134,7 +137,23 @@ public class CustomerOrderService {
 
     log.info("Created order {} from cart {}", savedOrder.getOrderNumber(), cart.getId());
 
-    // Send notification
+    // Publish OrderPlaced via the transactional outbox so loyalty points,
+    // co-purchase recommendations and email follow-ups all observe the same
+    // committed order. This used to be a TODO and as a result both the
+    // LoyaltyService and RecommendationService listeners were dead code.
+    try {
+      domainEventPublisher.publish(new DomainEvents.OrderPlaced(
+          UUID.randomUUID(),
+          Instant.now(),
+          savedOrder.getOrderId(),
+          savedOrder.getCustomerId(),
+          savedOrder.getShopId(),
+          savedOrder.getGrandTotal(),
+          savedOrder.getCurrency()));
+    } catch (Exception e) {
+      log.error("Failed to publish OrderPlaced for {}: {}", savedOrder.getOrderId(), e.toString());
+    }
+
     try {
       notificationService.createOrderNotification(
           savedOrder.getCustomerId(),
