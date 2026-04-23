@@ -5,11 +5,7 @@
 
 package com.xplaza.backend.notification.service;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
-import java.util.HexFormat;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
@@ -56,8 +52,8 @@ public class PushNotificationService {
     if (existing != null) {
       if (!customerId.equals(existing.getCustomerId())) {
         log.warn("Rejecting push token re-registration: token already bound to a different customer "
-            + "(attemptedBy={}, boundTo={}, fingerprint={})",
-            customerId, existing.getCustomerId(), fingerprint(token));
+            + "(attemptedBy={}, boundTo={}, tokenId={})",
+            customerId, existing.getCustomerId(), existing.getId());
         throw new org.springframework.security.access.AccessDeniedException(
             "Push token is already registered to a different customer");
       }
@@ -95,7 +91,8 @@ public class PushNotificationService {
   public void sendToCustomer(Long customerId, String title, String body) {
     var tokens = tokensForCustomer(customerId);
     if (tokens.isEmpty()) {
-      log.debug("No push tokens for customer {}, skipping push '{}'", customerId, title);
+      log.debug("No push tokens for customer {}, skipping push (title length={})",
+          customerId, length(title));
       return;
     }
     for (PushToken pt : tokens) {
@@ -110,7 +107,8 @@ public class PushNotificationService {
       if (fcmEnabled) {
         // TODO: integrate Firebase Admin SDK; intentionally left out of OSS
         // build because credentials are deployment-specific.
-        log.info("[FCM] -> tokenId={} title='{}' body length={}", tokenId, title, length(body));
+        log.info("[FCM] -> tokenId={} title length={} body length={}",
+            tokenId, length(title), length(body));
       } else {
         log.debug("FCM disabled, skipping push to tokenId={}", tokenId);
       }
@@ -118,7 +116,8 @@ public class PushNotificationService {
     case IOS -> {
       if (apnsEnabled) {
         // TODO: integrate Pushy or apns-http2 client.
-        log.info("[APNs] -> tokenId={} title='{}' body length={}", tokenId, title, length(body));
+        log.info("[APNs] -> tokenId={} title length={} body length={}",
+            tokenId, length(title), length(body));
       } else {
         log.debug("APNs disabled, skipping push to tokenId={}", tokenId);
       }
@@ -129,18 +128,5 @@ public class PushNotificationService {
 
   private static int length(String s) {
     return s == null ? 0 : s.length();
-  }
-
-  private static String fingerprint(String token) {
-    if (token == null) {
-      return "***";
-    }
-    try {
-      MessageDigest md = MessageDigest.getInstance("SHA-256");
-      byte[] digest = md.digest(token.getBytes(StandardCharsets.UTF_8));
-      return HexFormat.of().formatHex(digest).substring(0, 12);
-    } catch (NoSuchAlgorithmException e) {
-      return "***";
-    }
   }
 }

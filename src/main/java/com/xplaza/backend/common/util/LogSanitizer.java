@@ -38,8 +38,9 @@ public final class LogSanitizer {
     }
     String s = value.toString();
     int len = s.length();
+    boolean truncated = len > MAX_LOG_LENGTH;
+    int limit = truncated ? MAX_LOG_LENGTH - TRUNCATED_SUFFIX.length() : len;
     StringBuilder sb = new StringBuilder(Math.min(len, MAX_LOG_LENGTH));
-    int limit = Math.min(len, MAX_LOG_LENGTH);
     for (int i = 0; i < limit; i++) {
       char c = s.charAt(i);
       if (c == '\t') {
@@ -50,7 +51,7 @@ public final class LogSanitizer {
         sb.append(c);
       }
     }
-    if (len > MAX_LOG_LENGTH) {
+    if (truncated) {
       sb.append(TRUNCATED_SUFFIX);
     }
     return sb.toString();

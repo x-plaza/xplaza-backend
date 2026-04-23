@@ -41,7 +41,7 @@ class LogSanitizerTest {
   void overlongValuesAreTruncated() {
     String big = "a".repeat(500);
     String out = LogSanitizer.forLog(big);
-    assertThat(out).hasSize(256 + "...<truncated>".length());
+    assertThat(out).hasSize(256);
     assertThat(out).endsWith("...<truncated>");
   }
 
