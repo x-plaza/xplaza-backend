@@ -71,20 +71,24 @@ public class LoyaltyService {
   }
 
   String determineTier(long points) {
-    if (points >= 10000)
+    if (points >= 10000) {
       return "PLATINUM";
-    if (points >= 5000)
+    }
+    if (points >= 5000) {
       return "GOLD";
-    if (points >= 1000)
+    }
+    if (points >= 1000) {
       return "SILVER";
+    }
     return "BRONZE";
   }
 
   @Async
   @EventListener
   public void on(DomainEvents.OrderPlaced event) {
-    if (event.customerId() == null)
+    if (event.customerId() == null) {
       return;
+    }
     try {
       accrue(event.customerId(), event.total(), event.orderId());
     } catch (Exception e) {

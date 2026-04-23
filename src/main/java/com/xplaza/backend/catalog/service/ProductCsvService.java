@@ -56,7 +56,9 @@ public class ProductCsvService {
 
   @Transactional
   public ImportSummary importCsv(InputStream input) {
-    int created = 0, updated = 0, failed = 0;
+    int created = 0;
+    int updated = 0;
+    int failed = 0;
     try (var reader = new InputStreamReader(input, StandardCharsets.UTF_8);
         var parser = CSVParser.parse(reader,
             CSVFormat.DEFAULT.builder().setHeader().setSkipHeaderRecord(true).build())) {
@@ -70,10 +72,11 @@ public class ProductCsvService {
           product.setProductSellingPrice(parseDouble(record.get("price")));
           product.setQuantity(parseInt(record.get("quantity")));
           var saved = productRepository.save(product);
-          if (id == null)
+          if (id == null) {
             created++;
-          else
+          } else {
             updated++;
+          }
           log.debug("Imported product id={} name={}", saved.getProductId(), saved.getProductName());
         } catch (Exception e) {
           log.warn("Failed to import row {}: {}", record.getRecordNumber(), e.getMessage());

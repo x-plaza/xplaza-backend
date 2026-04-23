@@ -128,8 +128,9 @@ public class CustomerService {
     int attempts = Optional.ofNullable(customer.getFailedLoginAttempts()).orElse(0) + 1;
     customer.setFailedLoginAttempts(attempts);
     var until = AccountLockoutPolicy.computeLockedUntil(attempts);
-    if (until != null)
+    if (until != null) {
       customer.setLockedUntil(until);
+    }
     customerRepository.save(customer);
   }
 
@@ -219,10 +220,12 @@ public class CustomerService {
 
   @Transactional
   public boolean confirmMfaEnrollment(Customer customer, String code) {
-    if (customer.getMfaSecret() == null)
+    if (customer.getMfaSecret() == null) {
       return false;
-    if (!mfaService.verify(customer.getMfaSecret(), code))
+    }
+    if (!mfaService.verify(customer.getMfaSecret(), code)) {
       return false;
+    }
     customer.setMfaEnabled(true);
     customerRepository.save(customer);
     return true;

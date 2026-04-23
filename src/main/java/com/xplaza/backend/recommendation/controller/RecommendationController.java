@@ -40,16 +40,18 @@ public class RecommendationController {
   @GetMapping("/recently-viewed")
   public ResponseEntity<ApiResponse<List<Product>>> recentlyViewed(@AuthenticationPrincipal Customer customer,
       @RequestParam(defaultValue = "10") int limit) {
-    if (customer == null)
+    if (customer == null) {
       return ResponseEntity.ok(ApiResponse.ok(List.of()));
+    }
     return ResponseEntity.ok(ApiResponse.ok(service.recentlyViewed(customer.getCustomerId(), limit)));
   }
 
   @PostMapping("/products/{productId}/views")
   public ResponseEntity<ApiResponse<Void>> recordView(@AuthenticationPrincipal Customer customer,
       @PathVariable Long productId) {
-    if (customer != null)
+    if (customer != null) {
       service.recordView(customer.getCustomerId(), productId);
+    }
     return ResponseEntity.ok(ApiResponse.ok("recorded"));
   }
 }

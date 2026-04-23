@@ -78,8 +78,9 @@ public class ProductSearchService {
   }
 
   public List<String> autocomplete(String prefix, int limit) {
-    if (prefix == null || prefix.isBlank())
+    if (prefix == null || prefix.isBlank()) {
       return List.of();
+    }
     var query = NativeQuery.builder()
         .withQuery(co.elastic.clients.elasticsearch._types.query_dsl.MultiMatchQuery.of(m -> m
             .query(prefix)

@@ -39,8 +39,9 @@ public class OutboxRelayWorker {
   @Transactional
   public void relay() {
     var batch = repo.findUnpublished(PageRequest.of(0, BATCH));
-    if (batch.isEmpty())
+    if (batch.isEmpty()) {
       return;
+    }
     var now = Instant.now();
     for (var ev : batch) {
       try {
@@ -55,8 +56,9 @@ public class OutboxRelayWorker {
   }
 
   private static String truncate(String s) {
-    if (s == null)
+    if (s == null) {
       return null;
+    }
     return s.length() > 999 ? s.substring(0, 999) : s;
   }
 }

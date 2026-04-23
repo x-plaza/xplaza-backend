@@ -99,8 +99,9 @@ public class GiftCardService {
   static String generateCode() {
     var sb = new StringBuilder(16);
     for (int i = 0; i < 16; i++) {
-      if (i > 0 && i % 4 == 0)
+      if (i > 0 && i % 4 == 0) {
         sb.append('-');
+      }
       sb.append(ALPHABET.charAt(RNG.nextInt(ALPHABET.length())));
     }
     return sb.toString();

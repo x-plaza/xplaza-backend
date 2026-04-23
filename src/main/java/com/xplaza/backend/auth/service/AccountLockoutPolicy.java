@@ -18,10 +18,12 @@ public final class AccountLockoutPolicy {
   }
 
   public static Instant computeLockedUntil(int failedAttempts) {
-    if (failedAttempts < 5)
+    if (failedAttempts < 5) {
       return null;
-    if (failedAttempts < 8)
+    }
+    if (failedAttempts < 8) {
       return Instant.now().plus(Duration.ofMinutes(5));
+    }
     long minutes = (long) Math.min(60, Math.pow(2, failedAttempts - 7));
     return Instant.now().plus(Duration.ofMinutes(minutes));
   }

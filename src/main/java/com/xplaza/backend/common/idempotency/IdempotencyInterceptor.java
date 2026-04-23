@@ -5,14 +5,19 @@
 
 package com.xplaza.backend.common.idempotency;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.WriteListener;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponseWrapper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,16 +26,35 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 /**
- * Looks for an {@code Idempotency-Key} header on POST/DELETE/PATCH requests
- * targeting payment, refund, or checkout routes. If the key is new the request
- * proceeds; if it has been seen before with the same body, the previously
- * stored response is replayed without re-running the handler. Body re-use
- * across keys returns 409 Conflict.
+ * Looks for an {@code Idempotency-Key} header on POST/DELETE/PATCH/PUT requests
+ * targeting payment, refund, checkout or order routes.
+ *
+ * <p>
+ * Semantics:
+ * <ul>
+ * <li>If the key is new, the request body's hash + endpoint are reserved and
+ * the request proceeds. After the handler completes, the captured response
+ * status and body are persisted against the same key so a later replay returns
+ * exactly the original response.</li>
+ * <li>If the key already exists and the current endpoint + request hash match
+ * the stored ones, the stored response is replayed and the handler is
+ * skipped.</li>
+ * <li>If the key exists but the current endpoint or body hash does not match,
+ * the request is rejected with HTTP 409 — preventing a client from re-using a
+ * key across different operations and getting back an unrelated cached
+ * response.</li>
+ * <li>If the response has not yet been persisted (concurrent in-flight request
+ * with the same key), the replay returns 409 instead of leaking an empty
+ * body.</li>
+ * </ul>
  */
 @Component
 public class IdempotencyInterceptor implements HandlerInterceptor {
 
   private static final Logger log = LoggerFactory.getLogger(IdempotencyInterceptor.class);
+
+  /** Request attribute name for the idempotency key once it has been reserved. */
+  static final String ATTR_KEY = IdempotencyInterceptor.class.getName() + ".key";
 
   private final IdempotencyService service;
 
@@ -40,17 +64,44 @@ public class IdempotencyInterceptor implements HandlerInterceptor {
 
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-    if (!isMutating(request) || !isProtectedRoute(request))
+    if (!isMutating(request) || !isProtectedRoute(request)) {
       return true;
+    }
 
     String key = request.getHeader("Idempotency-Key");
-    if (key == null || key.isBlank())
-      return true; // header optional; skip if not provided
+    if (key == null || key.isBlank()) {
+      return true;
+    }
+
+    String endpoint = request.getRequestURI();
+    String body = readBody(request);
+    String requestHash = service.hash(body);
 
     var existing = service.find(key);
     if (existing.isPresent()) {
       var rec = existing.get();
-      response.setStatus(rec.getResponseStatus() != null ? rec.getResponseStatus() : 200);
+      // Endpoint + request body must match the original. If they do not, the
+      // client is re-using a key for a different operation — reject with 409.
+      boolean endpointMatches = endpoint.equals(rec.getEndpoint());
+      boolean hashMatches = requestHash != null && requestHash.equals(rec.getRequestHash());
+      if (!endpointMatches || !hashMatches) {
+        log.warn("Idempotency key reuse rejected: key={}, endpointMatches={}, hashMatches={}",
+            key, endpointMatches, hashMatches);
+        writeJson(response, HttpServletResponse.SC_CONFLICT,
+            "{\"error\":\"idempotency_key_reuse\","
+                + "\"message\":\"Idempotency-Key was previously used for a different request\"}");
+        return false;
+      }
+      // No persisted response yet means an earlier request with this key is
+      // still in flight. Returning the original 0-byte body would silently
+      // mislead the caller, so we surface it as a conflict.
+      if (rec.getResponseStatus() == null) {
+        writeJson(response, HttpServletResponse.SC_CONFLICT,
+            "{\"error\":\"idempotency_in_flight\","
+                + "\"message\":\"A request with this Idempotency-Key is still being processed\"}");
+        return false;
+      }
+      response.setStatus(rec.getResponseStatus());
       response.setHeader("Content-Type", "application/json");
       response.setHeader("X-Idempotent-Replay", "true");
       if (rec.getResponseBody() != null) {
@@ -60,16 +111,36 @@ public class IdempotencyInterceptor implements HandlerInterceptor {
     }
 
     try {
-      String body = readBody(request);
-      service.reserve(key, request.getRequestURI(), body);
+      service.reserve(key, endpoint, body);
+      request.setAttribute(ATTR_KEY, key);
     } catch (DataIntegrityViolationException e) {
-      log.warn("Idempotency key collision: {}", key);
-      response.setStatus(HttpServletResponse.SC_CONFLICT);
-      response.setHeader("Content-Type", "application/json");
-      response.getWriter().write("{\"error\":\"idempotency_conflict\"}");
+      // Lost the race with another request that just inserted the same key.
+      log.warn("Idempotency key collision on insert: {}", key);
+      writeJson(response, HttpServletResponse.SC_CONFLICT, "{\"error\":\"idempotency_conflict\"}");
       return false;
     }
     return true;
+  }
+
+  @Override
+  public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+    Object keyAttr = request.getAttribute(ATTR_KEY);
+    if (keyAttr == null) {
+      return;
+    }
+    String key = keyAttr.toString();
+    String body = (response instanceof CapturingHttpServletResponse cap) ? cap.capturedBody() : null;
+    try {
+      service.persistResponse(key, response.getStatus(), body);
+    } catch (Exception persistEx) {
+      log.warn("Failed to persist idempotent response for key {}: {}", key, persistEx.toString());
+    }
+  }
+
+  private static void writeJson(HttpServletResponse response, int status, String json) throws IOException {
+    response.setStatus(status);
+    response.setHeader("Content-Type", "application/json");
+    response.getWriter().write(json);
   }
 
   private boolean isMutating(HttpServletRequest req) {
@@ -94,7 +165,7 @@ public class IdempotencyInterceptor implements HandlerInterceptor {
 
   /**
    * Wraps the request so the request body can be read both here and by the
-   * handler.
+   * downstream handler.
    */
   public static final class CachingHttpServletRequest extends HttpServletRequestWrapper {
     private final byte[] cachedBytes;
@@ -131,6 +202,73 @@ public class IdempotencyInterceptor implements HandlerInterceptor {
         public void setReadListener(ReadListener listener) {
         }
       };
+    }
+  }
+
+  /**
+   * Wraps the response so the body written by the handler can be both sent to the
+   * client and captured for persistence in {@code idempotency_keys}.
+   */
+  public static final class CapturingHttpServletResponse extends HttpServletResponseWrapper {
+    private final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+    private PrintWriter writer;
+    private ServletOutputStream outputStream;
+
+    public CapturingHttpServletResponse(HttpServletResponse response) {
+      super(response);
+    }
+
+    public String capturedBody() {
+      try {
+        if (writer != null) {
+          writer.flush();
+        }
+        if (outputStream != null) {
+          outputStream.flush();
+        }
+      } catch (IOException ignored) {
+        // best-effort; body capture failure must not break the response
+      }
+      return buffer.toString(StandardCharsets.UTF_8);
+    }
+
+    @Override
+    public ServletOutputStream getOutputStream() throws IOException {
+      if (outputStream == null) {
+        ServletOutputStream delegate = super.getOutputStream();
+        outputStream = new ServletOutputStream() {
+          @Override
+          public boolean isReady() {
+            return delegate.isReady();
+          }
+
+          @Override
+          public void setWriteListener(WriteListener listener) {
+            delegate.setWriteListener(listener);
+          }
+
+          @Override
+          public void write(int b) throws IOException {
+            delegate.write(b);
+            buffer.write(b);
+          }
+
+          @Override
+          public void write(byte[] b, int off, int len) throws IOException {
+            delegate.write(b, off, len);
+            buffer.write(b, off, len);
+          }
+        };
+      }
+      return outputStream;
+    }
+
+    @Override
+    public PrintWriter getWriter() throws IOException {
+      if (writer == null) {
+        writer = new PrintWriter(new java.io.OutputStreamWriter(getOutputStream(), StandardCharsets.UTF_8), false);
+      }
+      return writer;
     }
   }
 }

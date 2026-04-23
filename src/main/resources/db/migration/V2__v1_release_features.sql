@@ -9,11 +9,17 @@
 -- ---------- Customers/Admins extras ----------
 ALTER TABLE customers ADD COLUMN IF NOT EXISTS oauth_provider VARCHAR(30);
 ALTER TABLE customers ADD COLUMN IF NOT EXISTS oauth_subject VARCHAR(200);
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS mfa_enabled BOOLEAN NOT NULL DEFAULT FALSE;
 ALTER TABLE customers ADD COLUMN IF NOT EXISTS mfa_secret VARCHAR(200);
 ALTER TABLE customers ADD COLUMN IF NOT EXISTS store_credit DECIMAL(14,2) DEFAULT 0;
 ALTER TABLE customers ADD COLUMN IF NOT EXISTS customer_group_id BIGINT;
 ALTER TABLE customers ADD COLUMN IF NOT EXISTS tax_id VARCHAR(50);
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS verified_email BOOLEAN NOT NULL DEFAULT FALSE;
 ALTER TABLE customers ADD COLUMN IF NOT EXISTS verified_email_at TIMESTAMP;
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS failed_login_attempts INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS locked_until TIMESTAMP;
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS loyalty_points BIGINT NOT NULL DEFAULT 0;
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS loyalty_tier VARCHAR(20) NOT NULL DEFAULT 'BRONZE';
 
 ALTER TABLE admin_users ADD COLUMN IF NOT EXISTS failed_login_attempts INTEGER DEFAULT 0;
 ALTER TABLE admin_users ADD COLUMN IF NOT EXISTS locked_until TIMESTAMP;
@@ -242,24 +248,29 @@ CREATE TABLE IF NOT EXISTS price_list_items (
 );
 
 -- ---------- Tax engine ----------
+-- Column names mirror the JPA entity exactly so that
+-- spring.jpa.hibernate.ddl-auto=validate (cloud profile) succeeds. The
+-- non-mapped `code` column is retained as a stable lookup key for the seed
+-- inserts below (Hibernate's `validate` only checks that mapped columns
+-- exist; extra columns are allowed).
 CREATE TABLE IF NOT EXISTS tax_zones (
-    id BIGSERIAL PRIMARY KEY,
-    code VARCHAR(50) NOT NULL UNIQUE,
-    name VARCHAR(150) NOT NULL,
-    country_code VARCHAR(2) NOT NULL,
-    state VARCHAR(100),
-    postal_code_prefix VARCHAR(10)
+    tax_zone_id          BIGSERIAL PRIMARY KEY,
+    code                 VARCHAR(50) NOT NULL UNIQUE,
+    name                 VARCHAR(150) NOT NULL,
+    country_code         VARCHAR(2)   NOT NULL,
+    region               VARCHAR(100),
+    postal_code_pattern  VARCHAR(50)
 );
 
 CREATE TABLE IF NOT EXISTS tax_rules (
-    id BIGSERIAL PRIMARY KEY,
-    name VARCHAR(150) NOT NULL,
-    tax_zone_id BIGINT REFERENCES tax_zones(id) ON DELETE CASCADE,
-    rate DECIMAL(7,4) NOT NULL,
-    inclusive BOOLEAN DEFAULT FALSE,
-    category_filter VARCHAR(100),
-    priority INTEGER DEFAULT 0,
-    is_active BOOLEAN DEFAULT TRUE
+    tax_rule_id  BIGSERIAL PRIMARY KEY,
+    name         VARCHAR(150) NOT NULL,
+    tax_zone_id  BIGINT NOT NULL REFERENCES tax_zones(tax_zone_id) ON DELETE CASCADE,
+    rate         DECIMAL(6,4) NOT NULL,
+    category     VARCHAR(100),
+    priority     INTEGER DEFAULT 0,
+    compound     BOOLEAN DEFAULT FALSE,
+    active       BOOLEAN DEFAULT TRUE
 );
 
 INSERT INTO tax_zones (code, name, country_code) VALUES
@@ -269,20 +280,20 @@ INSERT INTO tax_zones (code, name, country_code) VALUES
     ('UK',         'United Kingdom',         'GB')
 ON CONFLICT (code) DO NOTHING;
 
-INSERT INTO tax_rules (name, tax_zone_id, rate, inclusive)
-SELECT 'US Sales Tax', id, 0.0875, FALSE FROM tax_zones WHERE code = 'US-DEFAULT'
+INSERT INTO tax_rules (name, tax_zone_id, rate, compound)
+SELECT 'US Sales Tax', tax_zone_id, 0.0875, FALSE FROM tax_zones WHERE code = 'US-DEFAULT'
 ON CONFLICT DO NOTHING;
 
-INSERT INTO tax_rules (name, tax_zone_id, rate, inclusive)
-SELECT 'DE VAT', id, 0.19, TRUE FROM tax_zones WHERE code = 'EU-DE'
+INSERT INTO tax_rules (name, tax_zone_id, rate, compound)
+SELECT 'DE VAT', tax_zone_id, 0.19, FALSE FROM tax_zones WHERE code = 'EU-DE'
 ON CONFLICT DO NOTHING;
 
-INSERT INTO tax_rules (name, tax_zone_id, rate, inclusive)
-SELECT 'FR VAT', id, 0.20, TRUE FROM tax_zones WHERE code = 'EU-FR'
+INSERT INTO tax_rules (name, tax_zone_id, rate, compound)
+SELECT 'FR VAT', tax_zone_id, 0.20, FALSE FROM tax_zones WHERE code = 'EU-FR'
 ON CONFLICT DO NOTHING;
 
-INSERT INTO tax_rules (name, tax_zone_id, rate, inclusive)
-SELECT 'UK VAT', id, 0.20, TRUE FROM tax_zones WHERE code = 'UK'
+INSERT INTO tax_rules (name, tax_zone_id, rate, compound)
+SELECT 'UK VAT', tax_zone_id, 0.20, FALSE FROM tax_zones WHERE code = 'UK'
 ON CONFLICT DO NOTHING;
 
 -- ---------- Product translations ----------

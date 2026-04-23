@@ -85,6 +85,6 @@ public class ProductDocument {
   @Field(type = FieldType.Date)
   private Instant indexedAt;
 
-  @Field(type = FieldType.Text)
-  private String search_all;
+  @Field(name = "search_all", type = FieldType.Text)
+  private String searchAll;
 }

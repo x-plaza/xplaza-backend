@@ -39,8 +39,9 @@ public class IdempotencyService {
    */
   @Transactional(readOnly = true)
   public Optional<IdempotencyKey> find(String key) {
-    if (key == null || key.isBlank())
+    if (key == null || key.isBlank()) {
       return Optional.empty();
+    }
     return repo.findById(key);
   }
 
@@ -66,8 +67,9 @@ public class IdempotencyService {
   }
 
   public String hash(String s) {
-    if (s == null)
+    if (s == null) {
       return null;
+    }
     try {
       var md = MessageDigest.getInstance("SHA-256");
       return HexFormat.of().formatHex(md.digest(s.getBytes()));

@@ -67,8 +67,9 @@ public class AdminUser implements UserDetails {
 
   @PrePersist
   protected void onCreate() {
-    if (createdAt == null)
+    if (createdAt == null) {
       createdAt = LocalDateTime.now();
+    }
   }
 
   @Override

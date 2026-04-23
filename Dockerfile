@@ -31,7 +31,7 @@ COPY --from=build --chown=xplaza:xplaza ${DEPENDENCY}/BOOT-INF/lib /app/lib
 COPY --from=build --chown=xplaza:xplaza ${DEPENDENCY}/META-INF /app/META-INF
 COPY --from=build --chown=xplaza:xplaza ${DEPENDENCY}/BOOT-INF/classes /app
 
-ENV JAVA_OPTS="-XX:+UseZGC -XX:+ZGenerational -XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom"
+ENV JAVA_OPTS="--enable-preview -XX:+UseZGC -XX:+ZGenerational -XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom"
 ENV SPRING_PROFILES_ACTIVE=cloud
 ENV PORT=10001
 
