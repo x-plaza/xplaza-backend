@@ -209,6 +209,16 @@ public class CampaignService {
    */
   @Transactional(readOnly = true)
   public BigDecimal validateCoupon(String code, BigDecimal subtotal, int customerUseCount) {
+    return validateCoupon(code, Campaign.DiscountContext.of(subtotal), customerUseCount);
+  }
+
+  /**
+   * Validate coupon against a richer cart context so BOGO/FREE_SHIPPING/BUNDLE
+   * campaigns calculate correctly. Used by checkout when shipping cost and cart
+   * line items are known.
+   */
+  @Transactional(readOnly = true)
+  public BigDecimal validateCoupon(String code, Campaign.DiscountContext ctx, int customerUseCount) {
     Campaign campaign = campaignRepository.findByCode(code)
         .orElseThrow(() -> new IllegalArgumentException("Campaign not found: " + code));
 
@@ -224,7 +234,7 @@ public class CampaignService {
       throw new IllegalStateException("Customer has reached usage limit for this campaign");
     }
 
-    return campaign.calculateDiscount(subtotal);
+    return campaign.calculateDiscount(ctx);
   }
 
   /**

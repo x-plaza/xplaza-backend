@@ -224,27 +224,177 @@ public class Campaign {
   }
 
   /**
-   * Calculate discount for a given subtotal.
+   * Calculate the cash discount for a flat subtotal. Backwards-compatible shim
+   * for callers that do not have shipping or line-item context. For percentage
+   * and fixed-amount campaigns this is exact; for FREE_SHIPPING and BOGO/BUNDLE
+   * the caller should use {@link #calculateDiscount(DiscountContext)} which can
+   * see shipping cost and individual lines.
    */
   public BigDecimal calculateDiscount(BigDecimal subtotal) {
+    return calculateDiscount(DiscountContext.of(subtotal));
+  }
+
+  /**
+   * Rich discount calculation for all campaign/discount types, using the pre-tax
+   * subtotal, the shipping cost and the cart line items the campaign targets.
+   * Returns the total cash value to subtract from the order.
+   *
+   * <p>
+   * Behaviour by type:
+   * <ul>
+   * <li>{@link DiscountType#PERCENTAGE}: percentage of subtotal.</li>
+   * <li>{@link DiscountType#FIXED_AMOUNT}: fixed cash discount.</li>
+   * <li>{@link DiscountType#FREE_SHIPPING}: returns the shipping cost so the
+   * checkout/cart maths zero out shipping for the buyer.</li>
+   * <li>{@link DiscountType#FREE_ITEM} combined with
+   * {@link CampaignType#BUY_X_GET_Y}: applies a BOGO calculation on the targeted
+   * SKUs (cheapest qualifying line is free per X bought).</li>
+   * <li>{@link CampaignType#BUNDLE}: requires every targeted product to be
+   * present in the cart; if so applies the campaign's discount value as a flat
+   * amount (or {@code maxDiscount}, whichever is smaller).</li>
+   * </ul>
+   * Always honours {@link #minPurchase} and {@link #maxDiscount}.
+   */
+  public BigDecimal calculateDiscount(DiscountContext ctx) {
+    BigDecimal subtotal = ctx.subtotal();
+    if (subtotal == null || subtotal.signum() <= 0) {
+      return BigDecimal.ZERO;
+    }
     if (minPurchase != null && subtotal.compareTo(minPurchase) < 0) {
       return BigDecimal.ZERO;
     }
 
-    BigDecimal discount;
-    if (discountType == DiscountType.PERCENTAGE) {
-      discount = subtotal.multiply(discountValue).divide(BigDecimal.valueOf(100));
-    } else if (discountType == DiscountType.FIXED_AMOUNT) {
-      discount = discountValue;
-    } else {
-      return BigDecimal.ZERO;
+    BigDecimal discount = switch (effectiveDiscountType()) {
+    case PERCENTAGE -> percentageDiscount(subtotal);
+    case FIXED_AMOUNT -> discountValue == null ? BigDecimal.ZERO : discountValue;
+    case FREE_SHIPPING -> ctx.shippingCost() == null ? BigDecimal.ZERO : ctx.shippingCost();
+    case FREE_ITEM -> bogoDiscount(ctx.lineItems());
+    };
+
+    if (type == CampaignType.BUNDLE) {
+      discount = bundleDiscount(ctx.lineItems());
     }
 
     if (maxDiscount != null && discount.compareTo(maxDiscount) > 0) {
       discount = maxDiscount;
     }
+    return discount.max(BigDecimal.ZERO);
+  }
 
-    return discount;
+  /**
+   * Projects {@link CampaignType} onto {@link DiscountType} when the type is
+   * implicit (e.g. a {@code FREE_SHIPPING} campaign with no explicit
+   * {@code discountType}).
+   */
+  private DiscountType effectiveDiscountType() {
+    if (discountType != null) {
+      return discountType;
+    }
+    return switch (type) {
+    case FREE_SHIPPING -> DiscountType.FREE_SHIPPING;
+    case BUY_X_GET_Y -> DiscountType.FREE_ITEM;
+    case PERCENTAGE_DISCOUNT, FLASH_SALE, SEASONAL, CLEARANCE, LOYALTY, FIRST_PURCHASE -> DiscountType.PERCENTAGE;
+    case FIXED_DISCOUNT, BUNDLE -> DiscountType.FIXED_AMOUNT;
+    };
+  }
+
+  private BigDecimal percentageDiscount(BigDecimal subtotal) {
+    if (discountValue == null) {
+      return BigDecimal.ZERO;
+    }
+    return subtotal.multiply(discountValue).divide(java.math.BigDecimal.valueOf(100), 2,
+        java.math.RoundingMode.HALF_UP);
+  }
+
+  /**
+   * BOGO / Buy-X-Get-Y. The {@code discountValue} field holds the X (number of
+   * items the customer must buy to get one free). Picks the cheapest qualifying
+   * line across the cart so the buyer always gets the most-affordable freebie.
+   */
+  private BigDecimal bogoDiscount(List<DiscountLine> lines) {
+    if (lines == null || lines.isEmpty()) {
+      return BigDecimal.ZERO;
+    }
+    int x = (discountValue == null ? 1 : discountValue.intValue());
+    if (x < 1) {
+      x = 1;
+    }
+    int totalQty = lines.stream().mapToInt(DiscountLine::quantity).sum();
+    int freebies = totalQty / (x + 1);
+    if (freebies <= 0) {
+      return BigDecimal.ZERO;
+    }
+    BigDecimal cheapest = lines.stream()
+        .map(DiscountLine::unitPrice)
+        .min(BigDecimal::compareTo)
+        .orElse(BigDecimal.ZERO);
+    return cheapest.multiply(BigDecimal.valueOf(freebies));
+  }
+
+  /**
+   * BUNDLE. Every product id in {@code targetProducts} (CSV) must be present with
+   * quantity ≥ 1; if so the bundle discount equals {@code discountValue}.
+   */
+  private BigDecimal bundleDiscount(List<DiscountLine> lines) {
+    if (discountValue == null || targetProducts == null || targetProducts.isBlank()) {
+      return BigDecimal.ZERO;
+    }
+    var requiredIds = parseTargetProductIds();
+    if (requiredIds.isEmpty()) {
+      return BigDecimal.ZERO;
+    }
+    if (lines == null || lines.isEmpty()) {
+      return BigDecimal.ZERO;
+    }
+    var present = new java.util.HashSet<Long>();
+    for (var l : lines) {
+      if (l.quantity() > 0) {
+        present.add(l.productId());
+      }
+    }
+    return present.containsAll(requiredIds) ? discountValue : BigDecimal.ZERO;
+  }
+
+  private List<Long> parseTargetProductIds() {
+    var out = new ArrayList<Long>();
+    for (var raw : targetProducts.split(",")) {
+      var s = raw.trim();
+      if (s.isEmpty()) {
+        continue;
+      }
+      try {
+        out.add(Long.parseLong(s));
+      } catch (NumberFormatException ignored) {
+        // skip malformed entries
+      }
+    }
+    return out;
+  }
+
+  /**
+   * Cart context required to calculate any campaign type. Only the
+   * {@code subtotal} is mandatory; other fields default to neutral values when
+   * absent so legacy callers using {@link #calculateDiscount(BigDecimal)} get the
+   * previous behaviour.
+   */
+  public record DiscountContext(
+      BigDecimal subtotal,
+      BigDecimal shippingCost,
+      List<DiscountLine> lineItems
+  ) {
+    public static DiscountContext of(BigDecimal subtotal) {
+      return new DiscountContext(subtotal, BigDecimal.ZERO, List.of());
+    }
+  }
+
+  /**
+   * Lightweight projection of a cart line — just what BOGO/BUNDLE need.
+   */
+  public record DiscountLine(
+      Long productId,
+      int quantity,
+      BigDecimal unitPrice
+  ) {
   }
 
   /**
