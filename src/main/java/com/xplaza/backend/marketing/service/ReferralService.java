@@ -9,7 +9,6 @@ import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +19,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.xplaza.backend.common.events.DomainEventPublisher;
 import com.xplaza.backend.common.events.DomainEvents;
 import com.xplaza.backend.loyalty.service.LoyaltyService;
 import com.xplaza.backend.marketing.domain.entity.Referral;
@@ -43,7 +41,6 @@ public class ReferralService {
   private static final String ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 
   private final ReferralRepository referralRepository;
-  private final DomainEventPublisher eventPublisher;
   private final LoyaltyService loyaltyService;
 
   @Value("${referral.reward-amount:10.00}")
@@ -88,8 +85,8 @@ public class ReferralService {
 
   /**
    * The referee's first order triggers the reward. We rely on the transactional
-   * outbox so the credit is durable even if the listener crashes before
-   * settlement.
+   * outbox (inside {@link LoyaltyService#grantPoints}) so the credit is durable
+   * even if the listener crashes before settlement.
    */
   @Async
   @EventListener
@@ -98,26 +95,29 @@ public class ReferralService {
     if (event.customerId() == null) {
       return;
     }
-    referralRepository.findAll().stream()
-        .filter(r -> r.getStatus() == Referral.ReferralStatus.ACCEPTED
-            && event.customerId().equals(r.getRefereeId()))
-        .findFirst()
+    referralRepository
+        .findFirstByRefereeIdAndStatus(event.customerId(), Referral.ReferralStatus.ACCEPTED)
         .ifPresent(ref -> reward(ref, event));
   }
 
   private void reward(Referral ref, DomainEvents.OrderPlaced event) {
     try {
-      loyaltyService.accrue(ref.getReferrerId(), rewardAmount.multiply(BigDecimal.valueOf(10)), event.orderId());
+      // Single source of truth for the grant: LoyaltyService persists the
+      // points and publishes LoyaltyPointsEarned. We do NOT publish our own
+      // event on top — that would double-count the reward in the outbox.
+      loyaltyService.grantPoints(ref.getReferrerId(), rewardPoints, "referral:" + ref.getCode());
     } catch (Exception e) {
-      log.warn("Failed to credit referral loyalty points for referrer {}: {}", ref.getReferrerId(), e.toString());
+      log.error("Failed to credit referral loyalty points for referrer {} (order {}): {}",
+          ref.getReferrerId(), event.orderId(), e.toString(), e);
+      // Do not mark the referral as REWARDED if we could not credit the
+      // points; the scheduler-driven retry path (future iteration) will pick
+      // up ACCEPTED referrals and try again.
+      return;
     }
     ref.setStatus(Referral.ReferralStatus.REWARDED);
     ref.setRewardedAt(Instant.now());
     ref.setRewardAmount(rewardAmount);
     referralRepository.save(ref);
-    eventPublisher.publish(new DomainEvents.LoyaltyPointsEarned(
-        UUID.randomUUID(), Instant.now(), ref.getReferrerId(), rewardPoints,
-        "referral:" + ref.getCode()));
   }
 
   private String generateCode() {

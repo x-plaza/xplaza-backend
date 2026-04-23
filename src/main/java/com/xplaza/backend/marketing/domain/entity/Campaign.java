@@ -310,21 +310,40 @@ public class Campaign {
    * BOGO / Buy-X-Get-Y. The {@code discountValue} field holds the X (number of
    * items the customer must buy to get one free). Picks the cheapest qualifying
    * line across the cart so the buyer always gets the most-affordable freebie.
+   *
+   * <p>
+   * Respects {@link #targetProducts}: when the campaign is scoped to specific
+   * SKUs, only those cart lines are counted for the qty threshold <em>and</em> as
+   * potential freebies. Lines outside the campaign scope are ignored so unrelated
+   * products can never trip the BOGO or serve as the freebie.
    */
   private BigDecimal bogoDiscount(List<DiscountLine> lines) {
     if (lines == null || lines.isEmpty()) {
       return BigDecimal.ZERO;
     }
+    List<DiscountLine> eligible = lines;
+    if (targetProducts != null && !targetProducts.isBlank()) {
+      var targetIds = new java.util.HashSet<>(parseTargetProductIds());
+      if (targetIds.isEmpty()) {
+        return BigDecimal.ZERO;
+      }
+      eligible = lines.stream()
+          .filter(l -> l.productId() != null && targetIds.contains(l.productId()))
+          .toList();
+      if (eligible.isEmpty()) {
+        return BigDecimal.ZERO;
+      }
+    }
     int x = (discountValue == null ? 1 : discountValue.intValue());
     if (x < 1) {
       x = 1;
     }
-    int totalQty = lines.stream().mapToInt(DiscountLine::quantity).sum();
+    int totalQty = eligible.stream().mapToInt(DiscountLine::quantity).sum();
     int freebies = totalQty / (x + 1);
     if (freebies <= 0) {
       return BigDecimal.ZERO;
     }
-    BigDecimal cheapest = lines.stream()
+    BigDecimal cheapest = eligible.stream()
         .map(DiscountLine::unitPrice)
         .min(BigDecimal::compareTo)
         .orElse(BigDecimal.ZERO);

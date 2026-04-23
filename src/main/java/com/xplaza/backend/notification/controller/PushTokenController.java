@@ -52,7 +52,7 @@ public class PushTokenController {
   @Operation(summary = "Unregister a device push token (e.g. on sign-out)")
   @DeleteMapping
   public ResponseEntity<Map<String, String>> unregister(@RequestParam @NotBlank String token) {
-    pushService.unregisterToken(token);
+    pushService.unregisterToken(currentCustomerId(), token);
     return ResponseEntity.ok(Map.of("status", "ok"));
   }
 

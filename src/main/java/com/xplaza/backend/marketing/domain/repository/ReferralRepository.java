@@ -20,4 +20,13 @@ public interface ReferralRepository extends JpaRepository<Referral, Long> {
   List<Referral> findByReferrerId(Long referrerId);
 
   Optional<Referral> findByRefereeEmailIgnoreCaseAndStatus(String email, Referral.ReferralStatus status);
+
+  /**
+   * Indexed lookup for the {@code OrderPlaced} listener. An order placed by
+   * {@code refereeId} triggers the referrer reward, so this query runs on every
+   * order and must be an indexed hit (idx_referrals_referee) — a
+   * {@code findAll()} scan here would degrade to O(N) on the referrals table as
+   * the program grows.
+   */
+  Optional<Referral> findFirstByRefereeIdAndStatus(Long refereeId, Referral.ReferralStatus status);
 }

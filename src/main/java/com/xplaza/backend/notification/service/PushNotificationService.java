@@ -42,33 +42,59 @@ public class PushNotificationService {
 
   /**
    * Idempotently register or refresh a push token for a customer.
+   *
+   * <p>
+   * If the token value already exists in the database, the existing row is only
+   * refreshed when it belongs to the <em>same</em> customer. A leaked or guessed
+   * token cannot be silently re-associated to a different account — the call
+   * fails with {@link org.springframework.security.access.AccessDeniedException}
+   * so operators can detect the attempt and rotate/ban the token.
    */
   @Transactional
   public PushToken registerToken(Long customerId, PushToken.Platform platform, String token, String deviceId) {
     if (token == null || token.isBlank()) {
       throw new IllegalArgumentException("Token must not be blank");
     }
-    return tokenRepo.findByToken(token)
-        .map(existing -> {
-          existing.setCustomerId(customerId);
-          existing.setPlatform(platform);
-          existing.setDeviceId(deviceId);
-          existing.setLastSeenAt(Instant.now());
-          return tokenRepo.save(existing);
-        })
-        .orElseGet(() -> tokenRepo.save(PushToken.builder()
-            .customerId(customerId)
-            .platform(platform)
-            .token(token)
-            .deviceId(deviceId)
-            .createdAt(Instant.now())
-            .lastSeenAt(Instant.now())
-            .build()));
+    if (customerId == null) {
+      throw new IllegalArgumentException("customerId is required");
+    }
+    var existing = tokenRepo.findByToken(token).orElse(null);
+    if (existing != null) {
+      if (!customerId.equals(existing.getCustomerId())) {
+        log.warn("Rejecting push token re-registration: token already bound to a different customer "
+            + "(attemptedBy={}, tokenPrefix={})", customerId, redact(token));
+        throw new org.springframework.security.access.AccessDeniedException(
+            "Push token is already registered to a different customer");
+      }
+      existing.setPlatform(platform);
+      existing.setDeviceId(deviceId);
+      existing.setLastSeenAt(Instant.now());
+      return tokenRepo.save(existing);
+    }
+    return tokenRepo.save(PushToken.builder()
+        .customerId(customerId)
+        .platform(platform)
+        .token(token)
+        .deviceId(deviceId)
+        .createdAt(Instant.now())
+        .lastSeenAt(Instant.now())
+        .build());
   }
 
+  /**
+   * Revoke a push token on behalf of the currently authenticated customer. Only
+   * deletes when the token's {@code customer_id} matches; other customers' tokens
+   * are ignored so an attacker who learns a token value cannot revoke someone
+   * else's device.
+   */
   @Transactional
-  public void unregisterToken(String token) {
-    tokenRepo.findByToken(token).ifPresent(tokenRepo::delete);
+  public void unregisterToken(Long customerId, String token) {
+    if (customerId == null || token == null || token.isBlank()) {
+      return;
+    }
+    tokenRepo.findByToken(token)
+        .filter(t -> customerId.equals(t.getCustomerId()))
+        .ifPresent(tokenRepo::delete);
   }
 
   @Transactional(readOnly = true)

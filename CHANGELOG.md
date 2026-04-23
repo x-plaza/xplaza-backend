@@ -27,8 +27,16 @@ intervention.
 ### Subscriptions
 
 - Domain entities + lifecycle service for create, pause, resume and cancel,
-  plus a renewal scheduler that emits `SubscriptionRenewed` and creates the
-  follow-up order via the existing checkout pipeline.
+  with a `SubscriptionRenewalScheduler` that walks the due subscriptions on
+  a configurable cron, mints a renewal `CustomerOrder` per tick (bypassing
+  the cart by constructing the order items directly from the subscription's
+  line items), publishes a new `SubscriptionRenewed` domain event and
+  advances `nextRenewalAt`. Failures are retried up to `MAX_RETRIES` before
+  the subscription is moved to `FAILED`.
+- `SubscriptionController.create` resolves the unit price server-side from
+  the catalog + active product discounts + any B2B price list the customer
+  is entitled to. Client-supplied prices are ignored so a malicious client
+  cannot subscribe at an arbitrary price.
 
 ### Multi-vendor checkout
 
@@ -62,8 +70,8 @@ intervention.
   histogram aggregations) and a bulk `reindexAll` that streams the full
   catalog into Elasticsearch.
 - `SearchController` exposes `/search/products` with structured filters,
-  `/search/faceted` for the storefront filter sidebar, and an admin-only
-  `/search/reindex`.
+  `/search/products/faceted` for the storefront filter sidebar, and an
+  admin-only `/search/reindex`.
 - `ProductService.add/update/delete` now publishes `ProductIndexInvalidated`
   events so the search index stays in sync with the catalog.
 

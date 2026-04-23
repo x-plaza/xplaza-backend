@@ -172,6 +172,98 @@ public class CustomerOrderService {
   }
 
   /**
+   * Mint a renewal order for a subscription without going through the cart
+   * pipeline. The caller supplies the resolved line items (already priced by the
+   * subscription's snapshot), and we create a {@link CustomerOrder} in
+   * {@code PENDING} state, publish {@code OrderPlaced} and return it.
+   *
+   * <p>
+   * The order uses a synthetic order number suffixed with {@code -SUB<id>} so
+   * renewals are easy to spot in reports and so a reconciliation job can map them
+   * back to the originating subscription without touching metadata.
+   */
+  public CustomerOrder createSubscriptionOrder(Long customerId, String currency,
+      List<SubscriptionOrderLine> lines, Long subscriptionId) {
+    if (lines == null || lines.isEmpty()) {
+      throw new IllegalArgumentException("Subscription renewal requires at least one line item");
+    }
+    String baseOrderNumber = generateOrderNumber();
+    String orderNumber = baseOrderNumber + "-SUB" + subscriptionId;
+
+    BigDecimal subtotal = lines.stream()
+        .map(l -> l.unitPrice().multiply(BigDecimal.valueOf(l.quantity())))
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    // Pick the shop of the first line as the "primary" shop so the single-shop
+    // summary renders sensibly. Multi-vendor split is intentionally NOT run
+    // for renewals in this release: the renewal snapshot carries only the
+    // item list + subscription price, not the shipping/tax allocation that
+    // the split logic needs. v1.2 will revisit this once
+    // `OrderService.createSubscriptionOrder(...)` can consult the tax/shipping
+    // engine at renewal time.
+    Long primaryShopId = lines.get(0).shopId();
+
+    CustomerOrder order = CustomerOrder.builder()
+        .orderNumber(orderNumber)
+        .customerId(customerId)
+        .shopId(primaryShopId)
+        .status(CustomerOrder.OrderStatus.PENDING)
+        .subtotal(subtotal)
+        .discountAmount(BigDecimal.ZERO)
+        .shippingCost(BigDecimal.ZERO)
+        .taxAmount(BigDecimal.ZERO)
+        .grandTotal(subtotal)
+        .currency(currency == null ? "USD" : currency)
+        .paymentMethod("SUBSCRIPTION")
+        .placedAt(Instant.now())
+        .build();
+
+    for (SubscriptionOrderLine line : lines) {
+      CustomerOrderItem orderItem = CustomerOrderItem.builder()
+          .order(order)
+          .productId(line.productId())
+          .shopId(line.shopId())
+          .productName(line.productName() != null ? line.productName() : "Product " + line.productId())
+          .quantity(line.quantity())
+          .unitPrice(line.unitPrice())
+          .discountAmount(BigDecimal.ZERO)
+          .totalPrice(line.unitPrice().multiply(BigDecimal.valueOf(line.quantity())))
+          .build();
+      order.addItem(orderItem);
+    }
+
+    order.changeStatus(CustomerOrder.OrderStatus.PENDING, "Subscription renewal", "system");
+    CustomerOrder saved = orderRepository.save(order);
+
+    try {
+      domainEventPublisher.publish(new DomainEvents.OrderPlaced(
+          UUID.randomUUID(),
+          Instant.now(),
+          saved.getOrderId(),
+          saved.getCustomerId(),
+          saved.getShopId(),
+          saved.getGrandTotal(),
+          saved.getCurrency()));
+    } catch (Exception e) {
+      log.error("Failed to publish OrderPlaced for subscription renewal {}: {}", saved.getOrderId(), e.toString());
+    }
+    return saved;
+  }
+
+  /**
+   * Wire-format line item for {@link #createSubscriptionOrder}. Keeps this
+   * service insulated from the subscription module's own entity types.
+   */
+  public record SubscriptionOrderLine(
+      Long productId,
+      Long shopId,
+      String productName,
+      int quantity,
+      BigDecimal unitPrice
+  ) {
+  }
+
+  /**
    * Walk the cart's lines, group them by shop, and if more than one shop is
    * represented mint per-shop child orders linked to the parent via
    * {@code parent_order_id}. Each child gets the full per-shop subtotal and a

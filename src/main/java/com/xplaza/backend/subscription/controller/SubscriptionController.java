@@ -22,7 +22,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import com.xplaza.backend.b2b.service.PriceListResolver;
+import com.xplaza.backend.catalog.domain.entity.Product;
+import com.xplaza.backend.catalog.domain.repository.ProductRepository;
 import com.xplaza.backend.customer.domain.entity.Customer;
+import com.xplaza.backend.promotion.service.ProductDiscountService;
 import com.xplaza.backend.subscription.domain.entity.Subscription;
 import com.xplaza.backend.subscription.domain.entity.SubscriptionItem;
 import com.xplaza.backend.subscription.service.SubscriptionService;
@@ -34,18 +38,37 @@ import com.xplaza.backend.subscription.service.SubscriptionService;
 public class SubscriptionController {
 
   private final SubscriptionService subscriptionService;
+  private final ProductRepository productRepository;
+  private final ProductDiscountService productDiscountService;
+  private final PriceListResolver priceListResolver;
 
   @Operation(summary = "Create a subscription")
   @PostMapping
   @PreAuthorize("hasRole('CUSTOMER')")
   public ResponseEntity<Subscription> create(@AuthenticationPrincipal Customer principal,
       @RequestBody @Valid CreateSubscriptionRequest request) {
+    // Resolve the unit price server-side from catalog + active product discounts
+    // + any B2B contract pricing the customer is entitled to. Any client-supplied
+    // price is intentionally ignored: otherwise a malicious client could
+    // subscribe for $0.01 and happily pull renewal invoices at that price
+    // forever.
     var items = request.items().stream()
-        .map(it -> SubscriptionItem.builder()
-            .productId(it.productId())
-            .quantity(it.quantity())
-            .unitPrice(it.unitPrice())
-            .build())
+        .map(it -> {
+          Product product = productRepository.findById(it.productId())
+              .orElseThrow(() -> new IllegalArgumentException("Unknown product: " + it.productId()));
+          BigDecimal resolved = productDiscountService.calculateDiscountedPrice(product);
+          resolved = priceListResolver.resolveUnitPrice(
+              principal.getCustomerId(),
+              it.productId(),
+              it.quantity(),
+              request.currency(),
+              resolved);
+          return SubscriptionItem.builder()
+              .productId(it.productId())
+              .quantity(it.quantity())
+              .unitPrice(resolved)
+              .build();
+        })
         .toList();
     var sub = subscriptionService.create(principal.getCustomerId(), request.intervalUnit(),
         request.intervalCount(), request.currency(), items);
@@ -102,10 +125,14 @@ public class SubscriptionController {
   ) {
   }
 
+  /**
+   * Client item payload. Note: {@code unitPrice} is intentionally absent — price
+   * is resolved server-side in {@link #create} against the catalog, active
+   * product discounts and any B2B contract the customer is entitled to.
+   */
   public record Item(
       @NotNull Long productId,
-      @NotNull @Positive Integer quantity,
-      @NotNull BigDecimal unitPrice
+      @NotNull @Positive Integer quantity
   ) {
   }
 }

@@ -21,7 +21,6 @@ import com.xplaza.backend.common.events.DomainEventPublisher;
 import com.xplaza.backend.common.events.DomainEvents;
 import com.xplaza.backend.subscription.domain.entity.Subscription;
 import com.xplaza.backend.subscription.domain.entity.SubscriptionItem;
-import com.xplaza.backend.subscription.domain.repository.SubscriptionItemRepository;
 import com.xplaza.backend.subscription.domain.repository.SubscriptionRepository;
 
 /**
@@ -35,7 +34,6 @@ import com.xplaza.backend.subscription.domain.repository.SubscriptionRepository;
 public class SubscriptionService {
 
   private final SubscriptionRepository subscriptionRepository;
-  private final SubscriptionItemRepository subscriptionItemRepository;
   private final DomainEventPublisher eventPublisher;
 
   public Subscription create(Long customerId, Subscription.IntervalUnit unit, int count, String currency,
@@ -52,11 +50,11 @@ public class SubscriptionService {
         .map(i -> i.getUnitPrice().multiply(BigDecimal.valueOf(i.getQuantity())))
         .reduce(BigDecimal.ZERO, BigDecimal::add);
     sub.setTotalAmount(total);
+    // Bidirectional association — addItem() wires up the back-reference so
+    // the owning SubscriptionItem.subscription INSERT carries a non-null FK.
+    // CascadeType.ALL then persists the children as part of the parent flush.
+    items.forEach(sub::addItem);
     var saved = subscriptionRepository.save(sub);
-    for (SubscriptionItem it : items) {
-      it.setSubscriptionId(saved.getId());
-      subscriptionItemRepository.save(it);
-    }
     eventPublisher.publish(new DomainEvents.SubscriptionCreated(
         UUID.randomUUID(), Instant.now(), saved.getId(), customerId));
     return saved;

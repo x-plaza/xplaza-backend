@@ -91,11 +91,14 @@ public class ProductSearchService {
             .fuzziness("AUTO"))._toQuery());
       }
       if (filters != null) {
-        applyTermFilter(b, filters, "shopId", "shopId");
-        applyTermFilter(b, filters, "brand", "brand");
-        applyTermFilter(b, filters, "category", "category");
-        applyTermFilter(b, filters, "currency", "currency");
-        applyTermFilter(b, filters, "published", "published");
+        // Numeric and boolean filters must be parsed to their typed FieldValue
+        // otherwise Elasticsearch's term query compiles as a string comparison
+        // against an indexed long/bool field and silently returns zero hits.
+        applyLongTermFilter(b, filters, "shopId", "shopId");
+        applyStringTermFilter(b, filters, "brand", "brand");
+        applyStringTermFilter(b, filters, "category", "category");
+        applyStringTermFilter(b, filters, "currency", "currency");
+        applyBooleanTermFilter(b, filters, "published", "published");
         applyPriceRange(b, filters);
       }
       return b;
@@ -115,10 +118,43 @@ public class ProductSearchService {
     return operations.search(query, ProductDocument.class);
   }
 
-  private static void applyTermFilter(BoolQuery.Builder b, Map<String, String> filters, String key, String field) {
+  private static void applyStringTermFilter(BoolQuery.Builder b, Map<String, String> filters,
+      String key, String field) {
     var v = filters.get(key);
     if (v != null && !v.isBlank()) {
       b.filter(TermQuery.of(t -> t.field(field).value(v))._toQuery());
+    }
+  }
+
+  private static void applyLongTermFilter(BoolQuery.Builder b, Map<String, String> filters,
+      String key, String field) {
+    var v = filters.get(key);
+    if (v == null || v.isBlank()) {
+      return;
+    }
+    try {
+      long parsed = Long.parseLong(v.trim());
+      b.filter(TermQuery.of(t -> t.field(field).value(parsed))._toQuery());
+    } catch (NumberFormatException e) {
+      log.debug("Skipping non-numeric filter for '{}' = '{}'", key, v);
+    }
+  }
+
+  private static void applyBooleanTermFilter(BoolQuery.Builder b, Map<String, String> filters,
+      String key, String field) {
+    var v = filters.get(key);
+    if (v == null || v.isBlank()) {
+      return;
+    }
+    String trimmed = v.trim();
+    // Only accept the canonical spellings so we don't silently treat "yes"
+    // as false. Anything else is ignored (a filter-not-applied is safer than
+    // a wrong filter applied).
+    if (trimmed.equalsIgnoreCase("true") || trimmed.equalsIgnoreCase("false")) {
+      boolean parsed = Boolean.parseBoolean(trimmed);
+      b.filter(TermQuery.of(t -> t.field(field).value(parsed))._toQuery());
+    } else {
+      log.debug("Skipping non-boolean filter for '{}' = '{}'", key, v);
     }
   }
 

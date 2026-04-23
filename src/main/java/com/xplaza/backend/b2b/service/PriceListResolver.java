@@ -54,13 +54,17 @@ public class PriceListResolver {
   private final PriceListItemRepository priceListItemRepository;
 
   /**
-   * Resolve the unit price for a customer/product/quantity. Always returns the
-   * input {@code catalogPrice} unchanged when no contract pricing applies, so
-   * callers can use the result directly.
+   * Resolve the unit price for a customer/product/quantity <em>in a given
+   * currency</em>. Only price lists whose {@code currency} equals (case-
+   * insensitively) the caller-supplied {@code currency} are considered, so a
+   * multi-currency catalogue cannot accidentally return a USD contract rate for a
+   * EUR cart. Returns {@code catalogPrice} unchanged when no matching contract
+   * applies.
    */
-  @Cacheable(value = "priceLists", key = "#customerId + ':' + #productId + ':' + #quantity")
+  @Cacheable(value = "priceLists", key = "#customerId + ':' + #productId + ':' + #quantity + ':' + (#currency == null ? '_' : #currency)")
   @Transactional(readOnly = true)
-  public BigDecimal resolveUnitPrice(Long customerId, Long productId, int quantity, BigDecimal catalogPrice) {
+  public BigDecimal resolveUnitPrice(Long customerId, Long productId, int quantity, String currency,
+      BigDecimal catalogPrice) {
     if (customerId == null || productId == null) {
       return catalogPrice;
     }
@@ -78,6 +82,9 @@ public class PriceListResolver {
       if (!pl.isApplicableNow()) {
         continue;
       }
+      if (!currencyMatches(currency, pl.getCurrency())) {
+        continue;
+      }
       var rows = priceListItemRepository
           .findByPriceListIdAndProductIdOrderByMinQuantityDesc(pl.getId(), productId);
       for (PriceListItem row : rows) {
@@ -92,6 +99,27 @@ public class PriceListResolver {
       return best;
     }
     return applyGroupDiscount(catalogPrice, group);
+  }
+
+  /**
+   * Backwards-compatible overload. Callers that genuinely do not know the cart
+   * currency (e.g. legacy code paths) get catalog-price fallback when any
+   * matching contract exists in a different currency.
+   */
+  public BigDecimal resolveUnitPrice(Long customerId, Long productId, int quantity, BigDecimal catalogPrice) {
+    return resolveUnitPrice(customerId, productId, quantity, null, catalogPrice);
+  }
+
+  private static boolean currencyMatches(String cartCurrency, String priceListCurrency) {
+    if (cartCurrency == null || cartCurrency.isBlank()) {
+      // Caller did not specify — treat as "accept everything" to preserve the
+      // previous behaviour for unit-tests and legacy code paths.
+      return true;
+    }
+    if (priceListCurrency == null || priceListCurrency.isBlank()) {
+      return false;
+    }
+    return cartCurrency.equalsIgnoreCase(priceListCurrency);
   }
 
   /**

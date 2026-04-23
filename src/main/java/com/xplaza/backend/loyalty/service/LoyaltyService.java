@@ -72,6 +72,28 @@ public class LoyaltyService {
     return points;
   }
 
+  /**
+   * Credit a fixed number of points to a customer with a caller-supplied
+   * {@code reason}. Used for non-order-derived grants (referral rewards,
+   * customer-service goodwill, etc.). Persists the balance and emits a single
+   * {@link DomainEvents.LoyaltyPointsEarned} event — callers must not publish
+   * their own event on top, otherwise the outbox double-counts the grant.
+   */
+  @Transactional
+  public long grantPoints(Long customerId, long points, String reason) {
+    if (points <= 0) {
+      return 0L;
+    }
+    var customer = customerRepository.findById(customerId).orElseThrow();
+    long newBalance = (customer.getLoyaltyPoints() == null ? 0L : customer.getLoyaltyPoints()) + points;
+    customer.setLoyaltyPoints(newBalance);
+    customer.setLoyaltyTier(determineTier(newBalance));
+    customerRepository.save(customer);
+    eventPublisher.publish(new DomainEvents.LoyaltyPointsEarned(
+        UUID.randomUUID(), Instant.now(), customerId, points, reason));
+    return points;
+  }
+
   @Transactional
   public BigDecimal redeem(Long customerId, long points, UUID orderId) {
     var customer = customerRepository.findById(customerId).orElseThrow();

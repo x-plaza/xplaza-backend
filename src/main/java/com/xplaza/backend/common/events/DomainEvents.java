@@ -207,6 +207,27 @@ public final class DomainEvents {
   ) implements DomainEvent {
   }
 
+  public record SubscriptionRenewed(
+      UUID eventId,
+      Instant occurredAt,
+      Long subscriptionId,
+      Long customerId,
+      UUID orderId,
+      BigDecimal totalAmount,
+      String currency
+  ) implements DomainEvent {
+  }
+
+  public record SubscriptionRenewalFailed(
+      UUID eventId,
+      Instant occurredAt,
+      Long subscriptionId,
+      Long customerId,
+      int attemptNumber,
+      String reason
+  ) implements DomainEvent {
+  }
+
   public record VendorPayoutProcessed(
       UUID eventId,
       Instant occurredAt,

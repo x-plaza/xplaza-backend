@@ -13,10 +13,13 @@ import lombok.*;
 
 /**
  * Storefront CMS block. Used for static content slots like the homepage hero
- * banner, footer copy, return policy etc. Lookup is by stable {@code code}.
+ * banner, footer copy, return policy etc. Lookup is by the composite
+ * {@code (code, locale)} key so the same {@code code} can ship a localised
+ * variant per supported locale.
  */
 @Entity
-@Table(name = "cms_blocks", uniqueConstraints = @UniqueConstraint(columnNames = "code"))
+@Table(name = "cms_blocks", uniqueConstraints = @UniqueConstraint(name = "uq_cms_blocks_code_locale", columnNames = {
+    "code", "locale" }))
 @Getter
 @Setter
 @NoArgsConstructor

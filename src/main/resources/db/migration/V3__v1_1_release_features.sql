@@ -68,6 +68,8 @@ CREATE TABLE IF NOT EXISTS referrals (
 );
 CREATE INDEX IF NOT EXISTS idx_referrals_referrer ON referrals(referrer_id);
 CREATE INDEX IF NOT EXISTS idx_referrals_email ON referrals(referee_email);
+-- Supports ReferralService.onOrderPlaced lookup by (referee_id, status).
+CREATE INDEX IF NOT EXISTS idx_referrals_referee_status ON referrals(referee_id, status);
 
 -- ---------- Product image variants ----------
 ALTER TABLE product_images ADD COLUMN IF NOT EXISTS thumbnail_url VARCHAR(500);
@@ -99,3 +101,24 @@ ALTER TABLE price_list_items ADD COLUMN IF NOT EXISTS notes VARCHAR(500);
 -- ---------- Recommendation: align co-purchase table with JPA entity ----------
 ALTER TABLE product_co_purchases ADD COLUMN IF NOT EXISTS co_purchase_count BIGINT NOT NULL DEFAULT 0;
 CREATE INDEX IF NOT EXISTS idx_copurchases_count ON product_co_purchases(product_id, co_purchase_count DESC);
+
+-- ---------- CMS blocks: make (code, locale) the unique key ----------
+-- V2 created `cms_blocks` with UNIQUE(code), but the service/repository/cache
+-- look up by (code, locale) so the same `code` can ship a localised variant
+-- per supported locale (hero banner EN, FR, etc.). cms_blocks has not been
+-- populated in any deployment yet (v1.1.0 is where it is first user-visible),
+-- so a drop-and-recreate is safe and far more portable across H2/Postgres
+-- than a constraint-name-based ALTER (inline UNIQUE constraint names are not
+-- stable across dialects).
+DROP TABLE IF EXISTS cms_blocks;
+CREATE TABLE cms_blocks (
+    id          BIGSERIAL PRIMARY KEY,
+    code        VARCHAR(100) NOT NULL,
+    title       VARCHAR(255),
+    body        TEXT,
+    locale      VARCHAR(10) NOT NULL DEFAULT 'en',
+    is_active   BOOLEAN DEFAULT TRUE,
+    updated_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_cms_blocks_code_locale UNIQUE (code, locale)
+);
+CREATE INDEX IF NOT EXISTS idx_cms_blocks_code ON cms_blocks(code);
