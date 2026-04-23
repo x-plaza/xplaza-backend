@@ -78,7 +78,7 @@
 		<resilience4j.version>2.3.0</resilience4j.version>
 		<bucket4j.version>8.10.1</bucket4j.version>
 		<!-- openpdf 3.x is a namespace rename (com.lowagie → org.openpdf); hold at 2.x until import migration is scheduled. -->
-		<openpdf.version>2.0.3</openpdf.version>
+		<openpdf.version>3.0.3</openpdf.version>
 		<totp.version>1.7.1</totp.version>
 		<commons-csv.version>1.14.1</commons-csv.version>
 		<logstash-logback.version>9.0</logstash-logback.version>
