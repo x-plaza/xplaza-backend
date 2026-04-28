@@ -60,6 +60,9 @@ public class ProductController {
       @RequestParam(required = false) Long categoryId,
       @RequestParam(required = false) Long brandId,
       @RequestParam(required = false) String search,
+      @RequestParam(required = false) Double minPrice,
+      @RequestParam(required = false) Double maxPrice,
+      @RequestParam(required = false) String gender,
       @RequestParam(defaultValue = "0") @Min(0) int page,
       @RequestParam(defaultValue = "20") @Min(1) int size,
       @RequestParam(defaultValue = "productId") String sort,
@@ -70,21 +73,8 @@ public class ProductController {
     size = Math.min(size, 100);
     Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sort));
 
-    // Use appropriate service method based on filters
-    Page<Product> productPage;
-    if (search != null && !search.isBlank()) {
-      productPage = productService.searchProductsByName(search.trim(), pageable);
-    } else if (shopId != null && categoryId != null) {
-      productPage = productService.findProductsByShopAndCategory(shopId, categoryId, pageable);
-    } else if (shopId != null) {
-      productPage = productService.findProductsByShop(shopId, pageable);
-    } else if (categoryId != null) {
-      productPage = productService.findProductsByCategory(categoryId, pageable);
-    } else if (brandId != null) {
-      productPage = productService.findProductsByBrand(brandId, pageable);
-    } else {
-      productPage = productService.findProducts(pageable);
-    }
+    Page<Product> productPage = productService.findProductsFiltered(
+        shopId, categoryId, brandId, search, minPrice, maxPrice, gender, pageable);
 
     List<ProductResponse> dtos = productPage.getContent().stream()
         .map(productMapper::toResponse)

@@ -29,5 +29,6 @@ public class ProductResponse {
   private String categoryName;
   private Long brandId;
   private String brandName;
+  private String gender;
   private List<ProductImageResponse> images;
 }

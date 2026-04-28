@@ -86,6 +86,9 @@ public class Product {
   @Column(name = "seo_keywords", length = 500)
   private String seoKeywords;
 
+  @Column(name = "gender", length = 20)
+  private String gender;
+
   @Column(name = "is_published")
   private Boolean isPublished;
 

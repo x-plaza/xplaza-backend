@@ -10,10 +10,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import jakarta.persistence.criteria.Predicate;
+
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -103,6 +106,39 @@ public class ProductService {
 
   public Page<Product> findProducts(Pageable pageable) {
     return productRepository.findAll(pageable);
+  }
+
+  public Page<Product> findProductsFiltered(Long shopId, Long categoryId, Long brandId, String search,
+      Double minPrice, Double maxPrice, String gender, Pageable pageable) {
+    Specification<Product> spec = (root, query, cb) -> {
+      List<Predicate> predicates = new ArrayList<>();
+      if (shopId != null) {
+        predicates.add(cb.equal(root.get("shop").get("shopId"), shopId));
+      }
+      if (categoryId != null) {
+        predicates.add(cb.equal(root.get("category").get("categoryId"), categoryId));
+      }
+      if (brandId != null) {
+        predicates.add(cb.equal(root.get("brand").get("brandId"), brandId));
+      }
+      if (search != null && !search.isBlank()) {
+        String pattern = "%" + search.trim().toLowerCase() + "%";
+        predicates.add(cb.or(
+            cb.like(cb.lower(root.get("productName")), pattern),
+            cb.like(cb.lower(root.get("productDescription")), pattern)));
+      }
+      if (minPrice != null) {
+        predicates.add(cb.greaterThanOrEqualTo(root.get("productSellingPrice"), minPrice));
+      }
+      if (maxPrice != null) {
+        predicates.add(cb.lessThanOrEqualTo(root.get("productSellingPrice"), maxPrice));
+      }
+      if (gender != null && !gender.isBlank()) {
+        predicates.add(cb.equal(cb.lower(root.get("gender")), gender.trim().toLowerCase()));
+      }
+      return cb.and(predicates.toArray(new Predicate[0]));
+    };
+    return productRepository.findAll(spec, pageable);
   }
 
   public Page<Product> findProductsByShop(Long shopId, Pageable pageable) {

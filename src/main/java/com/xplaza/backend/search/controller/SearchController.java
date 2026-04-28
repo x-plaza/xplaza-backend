@@ -10,10 +10,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import com.xplaza.backend.catalog.domain.entity.Product;
+import com.xplaza.backend.catalog.mapper.ProductMapper;
+import com.xplaza.backend.catalog.service.ProductService;
 import com.xplaza.backend.common.util.ApiResponse;
 import com.xplaza.backend.search.document.ProductDocument;
 import com.xplaza.backend.search.service.ProductSearchService;
@@ -29,9 +34,14 @@ import com.xplaza.backend.search.service.ProductSearchService;
 public class SearchController {
 
   private final ObjectProvider<ProductSearchService> searchProvider;
+  private final ProductService productService;
+  private final ProductMapper productMapper;
 
-  public SearchController(ObjectProvider<ProductSearchService> searchProvider) {
+  public SearchController(ObjectProvider<ProductSearchService> searchProvider,
+      ProductService productService, ProductMapper productMapper) {
     this.searchProvider = searchProvider;
+    this.productService = productService;
+    this.productMapper = productMapper;
   }
 
   @GetMapping("/products")
@@ -58,7 +68,7 @@ public class SearchController {
       @RequestParam Map<String, String> all) {
     var service = searchProvider.getIfAvailable();
     if (service == null) {
-      return ResponseEntity.ok(ApiResponse.ok(Map.of("hits", List.of(), "facets", Map.of())));
+      return jpaFallbackSearch(q, all, page, size);
     }
     var filters = stripPagingParams(all);
     var hits = service.search(q, filters, page, size, true);
@@ -98,5 +108,27 @@ public class SearchController {
       return ResponseEntity.ok(ApiResponse.ok(List.of()));
     }
     return ResponseEntity.ok(ApiResponse.ok(service.autocomplete(q, limit)));
+  }
+
+  private ResponseEntity<ApiResponse<Map<String, Object>>> jpaFallbackSearch(
+      String q, Map<String, String> all, int page, int size) {
+    Long categoryId = all.containsKey("categoryId") ? Long.valueOf(all.get("categoryId")) : null;
+    Long brandId = all.containsKey("brandId") ? Long.valueOf(all.get("brandId")) : null;
+    Double minPrice = all.containsKey("minPrice") ? Double.valueOf(all.get("minPrice")) : null;
+    Double maxPrice = all.containsKey("maxPrice") ? Double.valueOf(all.get("maxPrice")) : null;
+    String gender = all.get("gender");
+
+    Page<Product> productPage = productService.findProductsFiltered(
+        null, categoryId, brandId, q, minPrice, maxPrice, gender, PageRequest.of(page, size));
+
+    var hits = productPage.getContent().stream()
+        .map(productMapper::toResponse)
+        .toList();
+
+    Map<String, Object> body = new HashMap<>();
+    body.put("hits", hits);
+    body.put("total", productPage.getTotalElements());
+    body.put("aggregations", Map.of());
+    return ResponseEntity.ok(ApiResponse.ok(body));
   }
 }
